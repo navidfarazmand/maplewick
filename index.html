@@ -353,8 +353,10 @@
   .durations .note.all, .durations .note.bonus { color: var(--good); }
   .durations button[aria-pressed="true"] { border-color: var(--focus); box-shadow: 0 0 0 2px var(--focus); }
   .label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 4px; }
-  .jobs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
-  .jobchip { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 1px 5px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 6px 7px; min-width: 0; }
+  .jobs { display: flex; gap: 6px; margin: 0 -16px 12px; padding: 2px 16px 6px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .jobs::-webkit-scrollbar { display: none; }
+  .jobs.idle .jobchip { opacity: .5; }
+  .jobchip { flex: 0 0 106px; scroll-snap-align: start; display: grid; grid-template-columns: 26px minmax(0, 1fr); align-content: start; gap: 1px 5px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 7px; min-width: 0; min-height: 86px; }
   .jobchip canvas { width: 26px; height: 23px; }
   .jobchip b { display: block; font-size: 12.5px; line-height: 1.15; overflow-wrap: anywhere; }
   .jobchip small { grid-column: 1 / -1; display: block; font-size: 11px; color: var(--muted); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -428,6 +430,12 @@
   .focus-list .done { color: var(--night-ink); }
   .phone-note { font-size: 13px; color: var(--night-muted); background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; }
   .focus-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .lock-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border: 1px dashed rgba(255,255,255,.3); background: transparent; color: var(--night-ink); border-radius: 12px; min-height: 42px; padding: 6px 12px; font-size: 13.5px; font-weight: 600; }
+  .lock-btn svg { width: 16px; height: 16px; flex: none; }
+  .lock-btn[aria-pressed="true"] { border-style: solid; border-color: rgba(163,230,53,.55); background: rgba(163,230,53,.12); }
+  .fbme { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 2px 2px 4px; }
+  .fbme .small { flex: 1 1 100%; font-weight: 600; }
+  .fbjoin .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .night-btn { border: 1px solid rgba(255,255,255,.22); background: transparent; color: var(--night-ink); border-radius: 12px; min-height: 44px; padding: 8px 14px; font-weight: 600; }
   .night-btn.warn { border-color: transparent; background: rgba(255,255,255,.1); }
   .focus-confirm { background: rgba(255,255,255,.08); border-radius: 14px; padding: 12px; display: grid; gap: 10px; font-size: 14px; }
@@ -716,6 +724,7 @@
   input { -webkit-user-select: text; user-select: text; }
   button { touch-action: manipulation; }
 </style>
+<script id="fb-config">window.MAPLEWICK_FIREBASE = window.MAPLEWICK_FIREBASE || null;</script>
 </head>
 <body>
 <div class="app" id="app">
@@ -794,6 +803,7 @@
     <div class="focus-meter"><span id="focus-meter"></span></div>
     <ul class="focus-list" id="focus-list"></ul>
     <div class="phone-note">Put your phone away. The timer keeps running with the screen off. In the real app, picking up your phone stops <span id="focus-builder">Sam</span>.</div>
+    <button class="lock-btn" id="focus-lock" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="2" fill="none"/></svg><span id="focus-lock-text">Show the time left on my lock screen</span></button>
     <div class="focus-actions" id="focus-actions">
       <button class="night-btn" id="focus-end">End session</button>
       <button class="night-btn warn" id="focus-pickup" hidden>Test: pick up phone</button>
@@ -924,6 +934,7 @@
   const BIG_WORK = 30, PLAY_BUILD_SEC = [0, 3, 4.5, 6, 7.5], BUILD_MAX_SEC = 150;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
   const MIN_SESSION = 5;
+  const LOCK_SOUNDS = { off: 'Off', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
   const NAMES = ['Mira', 'Theo', 'Priya', 'Jonas', 'Kofi', 'Ines', 'Hugo', 'Yara', 'Sven', 'Noor', 'Ezra', 'Tilly', 'Ravi', 'Ada', 'Felix', 'June', 'Malik', 'Elsie', 'Tomas', 'Wren', 'Idris', 'Pia', 'Otto', 'Leila'];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -973,7 +984,7 @@
       job: { verb: 'Run the arcade', at: 'at the game center', gold: 0.25, play: 2.4, lines: ['You beat the high score. Then a seven-year-old beat yours.', 'You fixed the claw machine. It still never grabs anything.', 'You handed out 400 tickets for one rubber duck.'] },
       blurb: 'Flashing lights and happy beeps. Working here pays very little gold but lots of play time.',
       needs: [['20 residents to play there', () => city().residents >= 20]] },
-    bank: { name: 'Bank', cat: 'shop', size: 1, unlock: 3, cost: 180, work: 35, max: 3, color: '#E9E2D2', roof: '#5E6B7A', radius: 0, limit: [0, 0, 0, 1, 2],
+    bank: { name: 'Bank', cat: 'shop', size: 1, where: 'center', unlock: 3, cost: 180, work: 35, max: 3, color: '#E9E2D2', roof: '#5E6B7A', radius: 0, limit: [0, 0, 0, 1, 2],
       up: [null, null, [260, 60], [520, 110]], base: [0, 22, 34, 50], per: [0, 0, 0, 0],
       job: { verb: 'Count coins', at: 'at the bank', gold: 2.3, play: 0.35, lines: ['You counted 10,000 coins. Twice. Same answer.', 'A customer opened an account for their cat.', 'You stamped "APPROVED" with great joy.'] },
       blurb: 'Keeps the town\'s money safe and pays a steady income. Working here pays the most gold, but you earn little play time.',
@@ -983,16 +994,16 @@
     fountain: { name: 'Fountain', cat: 'joy', size: 1, unlock: 2, cost: 45, work: 8, max: 3, color: '#C9CED3', roof: '#5AA9D6', radius: 2, limit: [0, 0, 2, 3, 4],
       up: [null, null, [70, 15], [150, 35]], boost: [0, 0.1, 0.15, 0.2], blurb: 'Homes within 2 tiles pay 10% more.',
       needs: [['A park (the water pipe runs through it)', () => countLive('park') >= 1]] },
-    clinic: { name: 'Clinic', cat: 'joy', size: 2, unlock: 3, cost: 160, work: 30, max: 3, color: '#F4F6F7', roof: '#C8473D', radius: 3, limit: [0, 0, 0, 1, 2],
-      up: [null, null, [240, 60], [480, 120]], boost: [0, 0.15, 0.2, 0.3], staff: 'nurse', slots: [0, 2, 3, 4], blurb: 'Homes within 3 tiles pay 15% more. Nurses work here.',
+    clinic: { name: 'Clinic', cat: 'joy', size: 2, unlock: 3, cost: 160, work: 30, max: 3, color: '#F4F6F7', roof: '#C8473D', radius: 3, limit: [0, 0, 0, 1, 2], reach: 6,
+      up: [null, null, [240, 60], [480, 120]], boost: [0, 0.15, 0.2, 0.3], staff: 'nurse', slots: [0, 2, 3, 4], blurb: 'Homes within 3 tiles pay 15% more. Nurses work here and look after every home within 6 tiles.',
       needs: [['40 residents', () => city().residents >= 40]] },
     // Service buildings: home base for town staff. Each level gives room for more staff.
-    depot: { name: 'Cleaning depot', cat: 'service', size: 2, unlock: 1, cost: 30, work: 6, max: 2, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3],
-      up: [null, null, [60, 15]], staff: 'sweeper', slots: [0, 2, 4], blurb: 'Home of the street sweepers, with a landfill out back. Homes right next to it pay 15% less: it smells.' },
-    shed: { name: 'Garden shed', cat: 'service', size: 1, unlock: 1, cost: 20, work: 5, max: 2, color: '#E4D2AE', roof: '#5E9A4B', limit: [0, 1, 1, 2, 2],
-      up: [null, null, [40, 10]], staff: 'gardener', slots: [0, 2, 4], blurb: 'Home of the gardeners, who keep the parks tidy.' },
-    firestation: { name: 'Fire station', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2],
-      up: [null, null, [90, 20]], staff: 'fire', slots: [0, 2, 4], blurb: 'Home of the firefighters. They rush out when a building catches fire.' },
+    depot: { name: 'Cleaning depot', cat: 'service', size: 2, unlock: 1, cost: 30, work: 6, max: 2, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3], reach: 6,
+      up: [null, null, [60, 15]], staff: 'sweeper', slots: [0, 2, 4], blurb: 'Home of the street sweepers, who clean within 6 tiles. There is a landfill out back: homes right next to it pay 15% less.' },
+    shed: { name: 'Garden shed', cat: 'service', size: 1, unlock: 1, cost: 20, work: 5, max: 2, color: '#E4D2AE', roof: '#5E9A4B', limit: [0, 1, 1, 2, 2], reach: 6,
+      up: [null, null, [40, 10]], staff: 'gardener', slots: [0, 2, 4], blurb: 'Home of the gardeners, who keep parks within 6 tiles tidy.' },
+    firestation: { name: 'Fire station', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
+      up: [null, null, [90, 20]], staff: 'fire', slots: [0, 2, 4], blurb: 'Home of the firefighters. They rush out when a building catches fire, fastest within 6 tiles.' },
     police: { name: 'Police station', cat: 'service', size: 1, unlock: 2, cost: 70, work: 12, max: 2, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
       up: [null, null, [110, 25]], staff: 'police', slots: [0, 2, 4], blurb: 'Home of the police officers. Homes within 5 tiles of a staffed station feel safe: one station covers most of a town.' },
     stadium: { name: 'Stadium', cat: 'joy', size: 3, unlock: 4, cost: 600, work: 120, max: 2, color: '#D8D2C4', roof: '#B5473A', radius: 4, limit: [0, 0, 0, 0, 1],
@@ -1012,17 +1023,17 @@
     goldstatue: { name: 'Golden mayor', cat: 'joy', size: 1, chest: 3, max: 1, color: '#F2C14E', roof: '#B9862A', radius: 3, boost: [0, 0.15], blurb: 'Found in a royal chest. Homes within 3 tiles pay 15% more.' },
     rainbow: { name: 'Rainbow fountain', cat: 'joy', size: 1, chest: 3, max: 1, color: '#E7E3F5', roof: '#8B5CF6', radius: 3, boost: [0, 0.15], blurb: 'Found in a royal chest. Homes within 3 tiles pay 15% more.' },
     // Landmarks: one of each, many hours of focus, and a bonus for the whole town.
-    lighthouse: { name: 'Lighthouse', cat: 'landmark', size: 2, unlock: 2, cost: 300, work: 300, max: 1, color: '#F4F1EA', roof: '#C8473D', limit: [0, 0, 1, 1, 1], mood: 4,
+    lighthouse: { name: 'Lighthouse', cat: 'landmark', size: 2, where: 'shore', unlock: 2, cost: 300, work: 300, max: 1, color: '#F4F1EA', roof: '#C8473D', limit: [0, 0, 1, 1, 1], mood: 4,
       perk: 'Ships find the harbour: every shop earns 10% more.', blurb: 'A tall striped tower that guides ships home. Ships bring trade: every shop earns 10% more, and the town is 4% happier.' },
-    observatory: { name: 'Observatory', cat: 'landmark', size: 2, unlock: 3, cost: 500, work: 420, max: 1, color: '#E8E4F0', roof: '#4B4E8C', limit: [0, 0, 0, 1, 1], mood: 5,
+    observatory: { name: 'Observatory', cat: 'landmark', size: 2, where: 'far', unlock: 3, cost: 500, work: 420, max: 1, color: '#E8E4F0', roof: '#4B4E8C', limit: [0, 0, 0, 1, 1], mood: 5,
       perk: 'Stargazing sharpens the mind: +10% XP from every focus session.', blurb: 'A domed telescope on the hill. Every focus session gives 10% more XP, and the town is 5% happier.' },
-    castle: { name: 'Castle', cat: 'landmark', size: 3, unlock: 4, cost: 900, work: 600, max: 1, color: '#CFC6B4', roof: '#5B6E9A', limit: [0, 0, 0, 0, 1], mood: 8,
+    castle: { name: 'Castle', cat: 'landmark', size: 3, where: 'hill', unlock: 4, cost: 900, work: 600, max: 1, color: '#CFC6B4', roof: '#5B6E9A', limit: [0, 0, 0, 0, 1], mood: 8,
       perk: 'A proud town: homes pay 10% more and the treasury holds 1,000 more gold.', blurb: 'The crown of your town. Homes pay 10% more taxes, the treasury holds 1,000 more gold, and the town is 8% happier.' },
     // Seasonal finds: earned by focusing during that season's festival.
     pumpkins: { name: 'Pumpkin patch', cat: 'joy', size: 1, season: 'autumn', max: 1, color: '#E8782A', roof: '#5E8A3A', radius: 1, boost: [0, 0.08], blurb: 'From the autumn festival. Homes next to it pay 8% more.' },
     snowman: { name: 'Snowman', cat: 'joy', size: 1, season: 'winter', max: 1, color: '#F6F9FB', roof: '#C8473D', radius: 1, boost: [0, 0.08], blurb: 'From the winter festival. Homes next to it pay 8% more.' },
     tulips: { name: 'Tulip bed', cat: 'joy', size: 1, season: 'spring', max: 1, color: '#E84A6A', roof: '#F3C64B', radius: 1, boost: [0, 0.08], blurb: 'From the spring festival. Homes next to it pay 8% more.' },
-    parasol: { name: 'Beach parasol', cat: 'joy', size: 1, season: 'summer', max: 1, color: '#F2C14E', roof: '#2F9ED8', radius: 1, boost: [0, 0.08], blurb: 'From the summer festival. Homes next to it pay 8% more.' }
+    parasol: { name: 'Beach parasol', cat: 'joy', size: 1, where: 'shore', season: 'summer', max: 1, color: '#F2C14E', roof: '#2F9ED8', radius: 1, boost: [0, 0.08], blurb: 'From the summer festival. Homes next to it pay 8% more.' }
   };
   const special = (t) => !!(t.chest || t.season); // finds you place for free: no upgrades, no cost
   // Town staff: hired at their own building (or the town hall) for a one-off fee, then paid a wage every hour.
@@ -1141,10 +1152,10 @@
     return {
       v: VERSION, savedAt: now, named: false, builder: 'Sam', town: 'Maplewick',
       gold: 30, lastTaxAt: now, playSec: 5 * 60, speed: 1, nextId: 100, nameIdx: 0, job: null, sound: true, staff: noStaff(), boost: null,
-      questsSeen: [], badges: [], flags: {}, civic: { safety: 1, health: 1 }, fireIn: null,
+      questsSeen: [], badges: [], flags: { tracks9: true }, civic: { safety: 1, health: 1 }, fireIn: null,
       xp: 0, level: 1, combo: { n: 0, until: 0 }, chestStats: { opened: 0, sinceSilver: 0, sinceGold: 0, byRarity: [0, 0, 0, 0] },
       land: ['base'], dayPlan: { day: null, blocks: [], perfect: false }, nextBlockId: 1,
-      rush: [], perks: {}, playDay: { key: null, sec: 0 }, season: { key: null, min: 0, got: [] }, week: { key: null, min: 0 }, friends: [], board: { joined: false }, music: true, track: 0, alarms: true, cheers: { day: null, seen: 0 },
+      rush: [], perks: {}, playDay: { key: null, sec: 0 }, season: { key: null, min: 0, got: [] }, week: { key: null, min: 0 }, friends: [], board: { joined: false }, music: true, track: 0, alarms: true, cheers: { day: null, seen: 0 }, lockSound: 'off', lockKind: 'rain', freeMoves: 0, coffee: 0,
       buildings: [
         { id: 1, type: 'townhall', c: 5, r: 5, level: 1, origin: 'start' },
         { id: 2, type: 'cottage', c: 2, r: 4, level: 1, ruin: true, resident: 'Rose', origin: 'start', trash: 2 },
@@ -1235,8 +1246,12 @@
     s.board = Object.assign({ joined: false }, s.board || {});
     if (s.music === undefined) s.music = true;
     if (!(s.track >= 0)) s.track = 0;
+    // v9 added tracks; the old list was Café jazz, Evening lo-fi, Town square
+    if (!s.flags.tracks9) { s.track = [0, 4, 5][s.track | 0] || 0; s.flags.tracks9 = true; }
     if (s.alarms === undefined) s.alarms = true;
     s.cheers = Object.assign({ day: null, seen: 0 }, s.cheers || {});
+    if (!LOCK_SOUNDS[s.lockSound]) s.lockSound = 'off';
+    if (!LOCK_SOUNDS[s.lockKind] || s.lockKind === 'off') s.lockKind = 'rain';
     return s;
   }
   function valid(s) {
@@ -1404,7 +1419,62 @@
         if (tok && tok !== '~' && tok !== '.') { let len = 1; while (mel[i + len] === '~') len++; osc(ac, 'triangle', NOTE(tok), t, len * s8 * 1.1, play ? 0.06 : 0.045, { partials: [[1, 1, 'triangle'], [2, 0.25, 'sine']], att: 0.01, dec: 0.18, sus: 0.35, wet: true }); }
       }
     };
-    const TRACKS = [JZ, LF, TS];
+    const tune = (mel, i, fn) => { const tok = mel[i]; if (tok && tok !== '~' && tok !== '.') { let len = 1; while (mel[i + len] === '~') len++; fn(NOTE(tok), len); } };
+    // Night lounge: a slow swing ballad. Lush electric piano chords, an upright bass and brushes swirling.
+    const NL = {
+      name: 'Night lounge', bpm: 64, swing: 0.3, bars: 8,
+      chords: [[['F3', 'A3', 'C4', 'E4']], [['F3', 'B3', 'E4']], [['E3', 'G3', 'B3', 'D4']], [['G3', 'B3', 'C4', 'E4']], [['F3', 'A3', 'C4', 'E4']], [['F3', 'Ab3', 'B3', 'D4']], [['D3', 'G3', 'B3', 'E4'], ['G3', 'C#4', 'E4']], [['F3', 'A3', 'C4', 'E4'], ['F3', 'B3', 'D4']]],
+      roots: [['D2', 'A2'], ['G2', 'D2'], ['C2', 'G2'], ['A1', 'E2'], ['D2', 'A2'], ['G2', 'B1'], ['E2', 'A1'], ['D2', 'G2']],
+      mel: seq('A4 ~ ~ ~ G4 ~ F4 ~  E4 ~ ~ ~ ~ ~ . .  D4 ~ E4 ~ G4 ~ B4 ~  A4 ~ ~ ~ ~ ~ . .  C5 ~ ~ ~ A4 ~ F4 ~  Ab4 ~ G4 ~ F4 ~ D4 ~  E4 ~ ~ ~ C#4 ~ E4 ~  D4 ~ ~ ~ ~ ~ . .'),
+      step(ac, i, t, s8) {
+        const bar = Math.floor(i / 8), b = i % 8, chs = this.chords[bar], ch = chs.length > 1 && b >= 4 ? chs[1] : chs[0];
+        if (b === 0 || (chs.length > 1 && b === 4)) for (const n of ch) osc(ac, 'sine', NOTE(n), t + Math.random() * 0.02, s8 * (chs.length > 1 ? 3.8 : 7.6), 0.024, Object.assign({}, EP, { dec: 1.2, sus: 0.45, wet: true }));
+        else if (b === 3 && Math.random() < 0.5) for (const n of ch) osc(ac, 'sine', NOTE(n), t, s8 * 1.2, 0.012, EP);
+        if (b === 0 || b === 4) osc(ac, 'triangle', NOTE(this.roots[bar][b / 4]), t, s8 * 3.4, 0.085, { partials: [[1, 1, 'sine'], [2, 0.15, 'triangle']], att: 0.01, dec: 0.4, sus: 0.4, cut: 700 });
+        // brushes: a long swish and a soft tap on 2 and 4
+        noise(ac, t, s8 * 1.6, 0.0045, 'bandpass', 3200, 0.5);
+        if (b === 2 || b === 6) noise(ac, t, 0.18, 0.01, 'bandpass', 2200, 0.7);
+        if (cycle % 2 === 1) tune(this.mel, i, (f, len) => osc(ac, 'sine', f, t, len * s8 * 1.05, 0.042, { partials: [[1, 1, 'sine'], [2, 0.08, 'sine']], att: 0.05, dec: 0.6, sus: 0.6, vib: 0.006, wet: true, cut: 2400 }));
+      }
+    };
+    // Rainy piano: slow electric piano arpeggios over a soft rain, with a drip now and then.
+    const RP = {
+      name: 'Rainy piano', bpm: 64, swing: 0.08, bars: 8,
+      chords: [['F3', 'A3', 'C4', 'E4'], ['E3', 'G3', 'B3', 'D4'], ['D3', 'F3', 'A3', 'C4'], ['C3', 'E3', 'G3', 'B3'], ['Bb2', 'D3', 'F3', 'A3'], ['A2', 'C3', 'E3', 'G3'], ['G2', 'Bb2', 'D3', 'F3'], ['C3', 'F3', 'G3', 'Bb3']],
+      bass: ['F2', 'E2', 'D2', 'C2', 'Bb1', 'A1', 'G1', 'C2'],
+      arp: [0, 1, 2, 3, 4, 3, 2, 1],
+      mel: seq('C5 ~ ~ ~ . . A4 ~  B4 ~ ~ ~ . . G4 ~  A4 ~ ~ ~ F4 ~ ~ ~  E4 ~ ~ ~ ~ ~ . .  D4 ~ F4 ~ A4 ~ ~ ~  C5 ~ ~ ~ . . E4 ~  F4 ~ ~ ~ G4 ~ Bb4 ~  A4 ~ ~ ~ ~ ~ . .'),
+      step(ac, i, t, s8) {
+        const bar = Math.floor(i / 8), b = i % 8, ch = this.chords[bar], k = this.arp[b];
+        const f = k >= 4 ? NOTE(ch[0]) * 2 : NOTE(ch[k]);
+        osc(ac, 'sine', f * 2, t, s8 * 2.2, 0.026, Object.assign({}, EP, { dec: 0.9, sus: 0.3, wet: true, cut: 2200 }));
+        if (b === 0) osc(ac, 'sine', NOTE(this.bass[bar]), t, s8 * 7.5, 0.07, { att: 0.02, dec: 0.8, sus: 0.5, cut: 450 });
+        noise(ac, t, s8 * 1.15, 0.0065, 'lowpass', 1400, 0.4);
+        if (Math.random() < 0.35) osc(ac, 'sine', 1900 + Math.random() * 1700, t + Math.random() * s8, 0.06, 0.006, { att: 0.002, dec: 0.05, sus: 0.1 });
+        if (cycle % 2 === 1) tune(this.mel, i, (fq, len) => osc(ac, 'sine', fq, t, len * s8, 0.04, Object.assign({}, EP, { dec: 1.2, sus: 0.4, wet: true })));
+      }
+    };
+    // Bossa breeze: nylon guitar plucks on the off-beats, a clave, a shaker, and a breathy flute every other time round.
+    const BB = {
+      name: 'Bossa breeze', bpm: 128, swing: 0, bars: 8,
+      chords: [['E3', 'G3', 'B3', 'D4'], ['G3', 'C4', 'E4'], ['F3', 'A3', 'C4'], ['F3', 'B3', 'D4'], ['D3', 'G3', 'B3', 'D4'], ['G3', 'C#4', 'E4'], ['F3', 'A3', 'C4'], ['F3', 'Ab3', 'B3', 'D4']],
+      roots: [['C2', 'G2'], ['A1', 'E2'], ['D2', 'A2'], ['G1', 'D2'], ['E2', 'B2'], ['A1', 'E2'], ['D2', 'A2'], ['G1', 'D2']],
+      comp: [[0, 3, 5], [2, 4, 7], [0, 3, 6], [1, 3, 5, 7]],
+      clave: [0, 3, 6, 10, 12],
+      mel: seq('E5 ~ ~ D5 ~ ~ C5 ~  A4 ~ ~ ~ . . G4 A4  F4 ~ ~ A4 ~ ~ C5 ~  B4 ~ ~ ~ . . . .  G4 ~ ~ B4 ~ ~ D5 ~  C#5 ~ ~ ~ . . E4 F4  F4 ~ ~ A4 ~ ~ C5 ~  B4 ~ ~ ~ ~ ~ . .'),
+      step(ac, i, t, s8) {
+        const bar = Math.floor(i / 8), b = i % 8, play = mode === 'play';
+        if (b === 0 || !this.pat) this.pat = this.comp[rnd(this.comp.length)];
+        if (this.pat.includes(b)) this.chords[bar].forEach((n, j) => osc(ac, 'triangle', NOTE(n), t + j * 0.012, s8 * 1.3, 0.022, { partials: [[1, 1, 'triangle'], [2, 0.2, 'sine']], att: 0.003, dec: 0.22, sus: 0.18, cut: 2400 }));
+        // bass: root, then the fifth twice
+        if (b === 0) osc(ac, 'sine', NOTE(this.roots[bar][0]), t, s8 * 2.6, 0.085, { att: 0.006, dec: 0.3, sus: 0.4, cut: 600 });
+        if (b === 3 || b === 4) osc(ac, 'sine', NOTE(this.roots[bar][1]), t, s8 * (b === 4 ? 3.4 : 0.9), 0.07, { att: 0.006, dec: 0.25, sus: 0.4, cut: 600 });
+        if (this.clave.includes((bar % 2) * 8 + b)) osc(ac, 'sine', 1650, t, 0.05, play ? 0.03 : 0.02, { att: 0.001, dec: 0.04, sus: 0.05 });
+        noise(ac, t, 0.06, b % 2 ? 0.004 : 0.007, 'highpass', 7000, 0.6);
+        if (cycle % 2 === 1) tune(this.mel, i, (f, len) => { osc(ac, 'sine', f, t, len * s8 * 1.05, 0.04, { partials: [[1, 1, 'sine'], [2, 0.05, 'sine']], att: 0.04, dec: 0.4, sus: 0.6, vib: 0.007, wet: true }); noise(ac, t, 0.08, 0.004, 'bandpass', f * 2, 1.2); });
+      }
+    };
+    const TRACKS = [JZ, NL, RP, BB, LF, TS];
     const s8of = (tr) => 60 / tr.bpm / 2;
     function pump() {
       const ac = AUD.ac; if (!on || !ac || ac.state !== 'running' || !cur) return;
@@ -1579,13 +1649,36 @@
     if (c < 0 || r < 0 || c + s > N || r + s > N) return false;
     const occ = occupancy();
     for (let i = 0; i < s; i++) for (let j = 0; j < s; j++) { if (!isOpen(c + i, r + j)) return false; const b = occ.get((c + i) + ',' + (r + j)); if (b && b.id !== ignoreId) return false; }
-    return true;
+    return whereOk(type, c, r);
   }
+  // Some buildings only make sense in certain places: a lighthouse by the sea, the castle up on the hill.
+  const WHERE = {
+    shore: { text: 'on the shore, at the edge of the island', short: 'by the sea' },
+    hill: { text: 'on the Sunny hill', short: 'on the hill' },
+    far: { text: 'at least 5 tiles from the town hall, where the sky is dark', short: 'away from the lights' },
+    center: { text: 'downtown, within 4 tiles of the town hall', short: 'downtown' }
+  };
+  function whereOk(type, c, r) {
+    const w = TYPES[type] && TYPES[type].where; if (!w) return true;
+    const s = sizeOf(type);
+    if (w === 'shore') return c === 0 || r === 0 || c + s === N || r + s === N;
+    if (w === 'hill') return c >= 12 && r >= 12;
+    const hall = state.buildings.find((b) => b.type === 'townhall'); if (!hall) return true;
+    const d = dist({ type, c, r }, hall);
+    return w === 'far' ? d >= 5 : d <= 4;
+  }
+  const whereText = (type) => { const w = TYPES[type].where; return w ? `The ${TYPES[type].name.toLowerCase()} goes ${WHERE[w].text}.` : ''; };
+  // Is there any spot in town where this could go?
+  function anySpot(type, ignoreId) { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r, ignoreId)) return true; return false; }
   const anchorFor = (type, c, r) => { const off = Math.floor((sizeOf(type) - 1) / 2); return { c: c - off, r: r - off }; };
   const byId = (id) => state.buildings.find((b) => b.id === id);
   const jobFor = (bid) => state.queue.find((q) => q.bid === bid);
   const isBigJob = (kind, type, work) => kind === 'clear' || type === 'townhall' || type === 'stadium' || (TYPES[type] && TYPES[type].cat === 'landmark') || work >= BIG_WORK;
   const bigQ = (q) => isBigJob(q.kind, q.type, q.work);
+  // Landmarks and jobs over an hour of focus keep their progress between sessions.
+  // Every other job has to be finished in one session: end early and it is torn down, and the gold is gone.
+  const LONG_WORK = 60;
+  const keepsWork = (q) => q.work > LONG_WORK || (q.kind !== 'clear' && TYPES[q.type] && TYPES[q.type].cat === 'landmark');
   const buildSecs = (work) => Math.round(clamp(work * PLAY_BUILD_SEC[clamp(hallLevel(), 1, 4)], 5, BUILD_MAX_SEC));
   const fmtSecs = (sec) => { sec = Math.max(1, Math.ceil(sec)); return sec < 60 ? `${sec} s` : `${Math.floor(sec / 60)} min${sec % 60 ? ` ${sec % 60} s` : ''}`; };
   function nextName() { const n = NAMES[state.nameIdx % NAMES.length]; state.nameIdx++; return n; }
@@ -1610,18 +1703,39 @@
   const staffBuildings = (k) => state.buildings.filter((b) => b.type === STAFF[k].home && live(b) && !b.fire);
   const staffCapacity = (k) => staffBuildings(k).reduce((a, b) => a + (TYPES[b.type].slots[b.level] || 0), 0);
   const staffWorking = (k) => Math.min(state.staff[k] || 0, staffCapacity(k));
-  // Police stations keep homes within reach safe, if at least one officer works there (officers fill stations one each first).
-  const policeStations = () => staffBuildings('police').slice(0, staffWorking('police'));
-  const policeCovers = (h) => policeStations().some((p) => dist(p, h) <= TYPES.police.reach);
+  // Every service building has a reach. Staff only look after places within reach of a staffed building
+  // (staff fill their buildings one each first, so a second building only helps once someone works there).
+  const SERVES = {
+    sweeper: { what: (b) => messy(b), word: 'homes and shops', tag: 'clean', rgb: '62,142,87' },
+    gardener: { what: (b) => b.type === 'park' && live(b), word: 'parks', tag: 'tidy', rgb: '96,150,60' },
+    fire: { what: (b) => messy(b), word: 'homes and shops', tag: 'covered', rgb: '205,70,50' },
+    police: { what: (b) => live(b) && T(b).cat === 'home', word: 'homes', tag: 'safe', rgb: '50,90,200' },
+    nurse: { what: (b) => live(b) && T(b).cat === 'home', word: 'homes', tag: 'care', rgb: '194,71,122' }
+  };
+  const reachOf = (k) => TYPES[STAFF[k].home].reach;
+  const stationsOf = (k) => staffBuildings(k).slice(0, staffWorking(k));
+  const coversB = (k, b, st) => (st || stationsOf(k)).some((x) => dist(x, b) <= reachOf(k));
+  const policeStations = () => stationsOf('police');
+  const policeCovers = (h) => coversB('police', h);
+  // Night: 0 by day, 1 in the middle of the night (town time).
+  const nightK = () => clamp((skyNow().dark - 0.35) / 0.45, 0, 1);
+  const lit = (h) => state.buildings.some((l) => l.type === 'lamp' && dist(l, h) <= 2);
   function roleInfo(k, ci) {
     const r = STAFF[k], needed = !!r.needed(ci), need = needed ? r.need(ci) : 0, hired = state.staff[k] || 0, cap = staffCapacity(k), working = Math.min(hired, cap);
-    let cover = need ? Math.min(1, working / need) : 1, homes = 0, covered = 0;
-    if (k === 'police') {
-      const hs = state.buildings.filter((b) => live(b) && T(b).cat === 'home');
-      homes = hs.length; covered = hs.filter(policeCovers).length;
-      if (need) cover *= homes ? covered / homes : 1;
-    }
-    return { k, r, needed, need, hired, cap, working, cover, homes, covered, hasHome: staffBuildings(k).length > 0 };
+    const ratio = need ? Math.min(1, working / need) : 1;
+    const st = stationsOf(k), list = state.buildings.filter(SERVES[k].what);
+    const homes = list.length, covered = list.filter((b) => coversB(k, b, st)).length;
+    const cover = ratio * (needed && homes ? covered / homes : 1);
+    return { k, r, needed, need, hired, cap, working, ratio, cover, homes, covered, hasHome: staffBuildings(k).length > 0 };
+  }
+  // How safe the town feels right now. By day a home is safe near a staffed police station and a bit unsafe out of reach.
+  // Crime rises at night: homes out of reach are not safe at all, and homes on dark streets (no lamp post within 2 tiles) feel less safe.
+  function safetyTarget(ci) {
+    const po = roleInfo('police', ci); if (!po.needed) return 1;
+    const hs = state.buildings.filter(SERVES.police.what); if (!hs.length) return 1;
+    const st = stationsOf('police'), nk = nightK();
+    const sum = hs.reduce((a, h) => a + (coversB('police', h, st) ? 1 - (lit(h) ? 0 : 0.3 * nk) : 0.4 * (1 - nk)), 0);
+    return sum / hs.length * po.ratio;
   }
   const messy = (b) => live(b) && (T(b).cat === 'home' || T(b).cat === 'shop');
   // The town keeps living: trash piles up without sweepers, parks grow wild without gardeners,
@@ -1631,14 +1745,15 @@
     if (!(min > 0)) return;
     if (state.rush.length) { for (const r of state.rush) r.left -= min; state.rush = state.rush.filter((r) => r.left > 0); }
     const ci = city();
-    const sw = roleInfo('sweeper', ci).cover, gd = roleInfo('gardener', ci).cover;
+    const swR = roleInfo('sweeper', ci).ratio, gdR = roleInfo('gardener', ci).ratio, swSt = stationsOf('sweeper'), gdSt = stationsOf('gardener');
     for (const b of state.buildings) {
-      if (messy(b)) b.trash = clamp((b.trash || 0) + min * (0.05 * (1 - sw) - 0.16 * sw), 0, 3);
-      if (b.type === 'park' && live(b)) b.overgrown = clamp((b.overgrown || 0) + min * (0.03 * (1 - gd) - 0.08 * gd), 0, 1);
+      // out of reach of a staffed depot or shed, nobody comes to clean
+      if (messy(b)) { const sw = coversB('sweeper', b, swSt) ? swR : 0; b.trash = clamp((b.trash || 0) + min * (0.05 * (1 - sw) - 0.16 * sw), 0, 3); }
+      if (b.type === 'park' && live(b)) { const gd = coversB('gardener', b, gdSt) ? gdR : 0; b.overgrown = clamp((b.overgrown || 0) + min * (0.03 * (1 - gd) - 0.08 * gd), 0, 1); }
     }
     const ease = 1 - Math.exp(-min / 8);
-    const po = roleInfo('police', ci), nu = roleInfo('nurse', ci);
-    state.civic.safety += ((po.needed ? po.cover : 1) - state.civic.safety) * ease;
+    const nu = roleInfo('nurse', ci);
+    state.civic.safety += (safetyTarget(ci) - state.civic.safety) * ease;
     state.civic.health += ((nu.needed ? nu.cover : 1) - state.civic.health) * ease;
     cityCache = null;
   }
@@ -1655,7 +1770,7 @@
     ui.bubbles = ui.bubbles.filter((x) => x.bid !== b.id);
     touch(); revealQuests(); save(); sfx.alarm();
     if (first && !ff) { showOnMap(b, { kind: 'alert', bid: b.id }); }
-    else { toast(ff ? `Fire at ${placeName(b)}! Your firefighters are on their way.` : `Fire at ${placeName(b)}! Hire a firefighter to put it out.`); renderAll(); }
+    else { toast(ff ? (coversB('fire', b) ? `Fire at ${placeName(b)}! Your firefighters are on their way.` : `Fire at ${placeName(b)}! It is far from the fire station, so help takes longer.`) : `Fire at ${placeName(b)}! Hire a firefighter to put it out.`); renderAll(); }
   }
   function extinguish(b) {
     if (!b || !b.fire) return;
@@ -1698,6 +1813,10 @@
     trash: ['Ugh, look at all this trash!', "Who's picking this up?", 'It smells like old fish out here.', 'Trash again? Seriously?', 'Can we get a street sweeper?'],
     park: ['The park is a jungle!', 'I lost my dog in the tall grass.', 'Someone trim that park, please!'],
     safety: ['Someone took my bike!', 'I heard a noise last night...', 'We need police around here.'],
+    nightcrime: ['Footsteps outside... who is there?', 'Someone tried our door!', 'I lock up twice at night now.', 'Is anyone patrolling out here?'],
+    dark: ['Our street is so dark at night.', 'A lamp post would be nice here.', 'I tripped in the dark again!'],
+    farcare: ['The clinic is so far away!', 'Achoo! The nurse never comes out here.'],
+    farclean: ['No sweeper ever comes out this far!', 'Even the sweepers skip our street.'],
     health: ['Achoo! Is there a nurse?', "I don't feel so good.", 'We need a nurse in town.'],
     noise: ['That workshop is SO loud!', 'BANG BANG BANG all day!'],
     smell: ['That landfill stinks!', 'Can we move the dump, please?', 'Phew, what is that smell?'],
@@ -1716,14 +1835,18 @@
     for (const b of state.buildings) {
       if (!live(b) || b.fire || revealFor(b.id)) continue;
       const t = T(b);
-      if (messy(b) && (b.trash || 0) >= 0.9) opts.push({ b, w: b.trash, kind: 'bad', text: pick(LINES.trash), role: 'sweeper' });
+      if (messy(b) && (b.trash || 0) >= 0.9) opts.push({ b, w: b.trash, kind: 'bad', text: pick(stationsOf('sweeper').length && !coversB('sweeper', b) ? LINES.farclean : LINES.trash), role: 'sweeper' });
       if (t.cat !== 'home') continue;
       const inf = ci.info.get(b.id);
       const bad = inf && inf.from.find((f) => f[1] < 0 && f[2]);
       if (bad) opts.push({ b, w: 1, kind: 'bad', text: pick(bad[0] === 'landfill smell' ? LINES.smell : bad[0] === 'workshop noise' ? LINES.noise : LINES.sirens), src: bad[2] });
       if (state.buildings.some((p) => p.type === 'park' && live(p) && (p.overgrown || 0) > 0.5 && dist(p, b) <= 2)) opts.push({ b, w: 1.1, kind: 'bad', text: pick(LINES.park), role: 'gardener' });
-      if (po.needed && !policeCovers(b)) opts.push({ b, w: 0.9, kind: 'bad', text: pick(LINES.safety), role: 'police' });
-      if (nu.needed && state.civic.health < 0.7) opts.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.health), role: 'nurse' });
+      // crime rises at night: more complaints from homes far from police, and dark streets want a lamp post
+      const nk = nightK();
+      if (po.needed && !policeCovers(b)) opts.push({ b, w: 0.9 + 1.4 * nk, kind: 'bad', text: pick(nk > 0.5 ? LINES.nightcrime : LINES.safety), role: 'police' });
+      else if (po.needed && nk > 0.5 && !lit(b)) opts.push({ b, w: 0.5, kind: 'bad', text: pick(LINES.dark), role: 'lamp' });
+      if (nu.needed && stationsOf('nurse').length && !coversB('nurse', b)) opts.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.farcare), role: 'nurse' });
+      else if (nu.needed && state.civic.health < 0.7) opts.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.health), role: 'nurse' });
     }
     const mood = moodNow(Date.now()).value;
     if (!opts.length || (mood >= 60 && Math.random() < 0.3)) {
@@ -1863,16 +1986,35 @@
     if (q.kind === 'repair') return `Repair the ${t.name.toLowerCase()}`;
     return `${t.name} to level ${q.toLevel}`;
   }
+  // The job as the object of a sentence: "Sam finishes the new bakery".
+  function jobName(q) {
+    if (q.kind === 'clear') return `clearing the ${PLOTS[q.plot].name.toLowerCase()}`;
+    const t = TYPES[q.type];
+    if (q.kind === 'build') return `the new ${t.name.toLowerCase()}`;
+    if (q.kind === 'repair') return `repairing the ${t.name.toLowerCase()}`;
+    return `${t.name} to level ${q.toLevel}`;
+  }
+  const capFirst = (x) => x.charAt(0).toUpperCase() + x.slice(1);
   function checkNew(type, c, r, anchored) {
     if (state.session) return { ok: false, why: 'A session is running.' };
     const missing = needsFor(type).filter((n) => !n.ok);
     const { cost, work } = newCost(type);
     if (missing.length) return { ok: false, locked: true, why: `Needs ${missing.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(' and ')}.`, cost, work };
     if (countType(type) >= capFor(type)) return { ok: false, capped: true, why: capWhy(type), cost, work };
-    if (c != null) { const a = anchored ? { c, r } : anchorFor(type, c, r); if (!fits(type, a.c, a.r)) return { ok: false, spot: true, why: sizeOf(type) > 1 ? `Needs a free ${sizeOf(type)}×${sizeOf(type)} space here.` : 'This spot is taken.', cost, work }; }
+    if (c != null) { const a = anchored ? { c, r } : anchorFor(type, c, r); if (!fits(type, a.c, a.r)) return { ok: false, spot: true, why: spotWhy(type, a.c, a.r), cost, work }; }
+    else if (!anySpot(type)) return { ok: false, nospot: true, why: TYPES[type].where ? `${whereText(type)} No free spot there yet.` : `No free ${sizeOf(type) > 1 ? `${sizeOf(type)}×${sizeOf(type)} space` : 'tile'} left. Clear more land or move something.`, cost, work };
     if (state.queue.length >= QUEUE_MAX) return { ok: false, why: `${state.builder}'s plan is full (5 jobs).`, cost, work };
     if (state.gold + 1e-6 < cost) return { ok: false, why: `Needs ${fmtGold(cost - state.gold + 0.999)} more gold.`, cost, work, gold: true };
     return { ok: true, cost, work };
+  }
+  // Why something can't go at this exact spot.
+  function spotWhy(type, c, r, ignoreId) {
+    const s = sizeOf(type);
+    let free = c >= 0 && r >= 0 && c + s <= N && r + s <= N;
+    for (let i = 0; free && i < s; i++) for (let j = 0; j < s; j++) { const b = at(c + i, r + j); if (!isOpen(c + i, r + j) || (b && b.id !== ignoreId)) { free = false; break; } }
+    if (free && !whereOk(type, c, r)) return whereText(type);
+    if (!isOpen(c + Math.floor((s - 1) / 2), r + Math.floor((s - 1) / 2))) return 'That land is still wild. Clear it first.';
+    return s > 1 ? `It needs a free ${s}×${s} space there.` : 'That spot is taken. Pick a free tile.';
   }
   function checkJob(kind, b) {
     if (state.session) return { ok: false, why: 'A session is running.' };
@@ -1953,15 +2095,21 @@
     state.queue = [q].concat(state.queue.filter((x) => x !== q));
     startSession(exactMinutes(q.work - q.done));
   }
-  function simulate(queue, work) {
-    let left = work; const items = [];
+  // Planning a session (strict): Sam works through his plan in order and only starts a job he can finish
+  // in the time you picked; a long job takes whatever time is left. Replaying a running session uses strict = false.
+  function simulate(queue, work, strict = true) {
+    let left = work, stop = false; const items = [];
     for (const q of queue) {
       const need = q.work - q.done;
+      if (stop) { items.push({ q, done: q.done, finished: false, waiting: true }); continue; }
       if (left + 1e-9 >= need) { left -= need; items.push({ q, done: q.work, finished: true }); }
-      else { items.push({ q, done: q.done + left, finished: false }); left = 0; }
+      else if (strict && !keepsWork(q)) { items.push({ q, done: q.done, finished: false, waiting: true }); stop = true; }
+      else { items.push({ q, done: q.done + left, finished: false }); left = 0; stop = true; }
     }
     return { items, leftover: Math.max(0, left) };
   }
+  // The jobs Sam took on when this session started.
+  const sessionQueue = (s) => (s && s.plan ? state.queue.filter((q) => s.plan.includes(q.id)) : state.queue);
   const planWork = () => state.queue.reduce((a, q) => a + q.work - q.done, 0);
   function completeJob(q, result) {
     if (q.kind === 'clear') {
@@ -2008,20 +2156,31 @@
   // The kinds of business you own, for business boosts.
   const ownShops = () => [...new Set(state.buildings.filter((b) => live(b) && T(b).cat === 'shop').map((b) => b.type))];
   const PERK_MAX = 0.3;
+  // A chest find you can still use (most finds are one of a kind).
+  const findOk = (type) => countType(type) + state.tray.filter((x) => x.type === type).length < (TYPES[type].max || 99);
+  // Chests: gold and play time, plus one surprise. Surprises are mostly things that need no space:
+  // a shop rush, Sam's coffee (faster building while you play), or free moves. Decorations are the rarer find.
   function chestLoot(rar) {
     const out = [], g = [[2, 4], [5, 9], [12, 18], [25, 40]][rar];
     out.push({ kind: 'gold', n: randInt(g[0], g[1]) });
     const play = [Math.random() < 0.25 ? 30 : 0, 45, 90, 150][rar];
     if (play) out.push({ kind: 'play', n: play });
     const shops = ownShops();
-    let item = null, rush = null;
-    // Silver: a decoration or a short business rush. Gold: a decoration, often with a big rush. Royal: a royal find and a lasting perk.
-    if (rar === 1) { if (shops.length && Math.random() < 0.4) rush = { mult: 1.5, min: 45 }; else if (Math.random() < 0.6) item = pick(CHEST_ITEMS[1]); }
-    if (rar === 2) { item = pick(Math.random() < 0.7 ? CHEST_ITEMS[2] : CHEST_ITEMS[1]); if (shops.length && Math.random() < 0.5) rush = { mult: 2, min: 60 }; }
-    if (rar === 3) item = pick(CHEST_ITEMS[3]);
-    if (item) out.push({ kind: 'item', type: item });
-    if (rush) out.push({ kind: 'rush', type: pick(shops), mult: rush.mult, min: rush.min });
-    if (rar === 3) { const open = shops.filter((t) => (state.perks[t] || 0) < PERK_MAX - 1e-9); if (open.length) out.push({ kind: 'perk', type: pick(open), n: 0.1 }); }
+    const finds = (tier) => CHEST_ITEMS[tier].filter(findOk);
+    const opts = [];
+    if (rar === 0) { if (Math.random() < 0.3) out.push({ kind: 'moves', n: 1 }); }
+    else if (rar === 1) opts.push([shops.length ? 0.3 : 0, { kind: 'rush', mult: 1.5, min: 45 }], [0.3, { kind: 'coffee', n: 2 }], [0.25, { kind: 'moves', n: 1 }], [finds(1).length ? 0.15 : 0, { kind: 'item', tier: 1 }]);
+    else if (rar === 2) opts.push([finds(2).length || finds(1).length ? 0.35 : 0, { kind: 'item', tier: finds(2).length && (Math.random() < 0.7 || !finds(1).length) ? 2 : 1 }], [shops.length ? 0.3 : 0, { kind: 'rush', mult: 2, min: 60 }], [0.2, { kind: 'coffee', n: 3 }], [0.15, { kind: 'moves', n: 2 }]);
+    else opts.push([finds(3).length ? 0.6 : 0, { kind: 'item', tier: 3 }], [0.4, { kind: 'coffee', n: 5 }]);
+    const tot = opts.reduce((a, o) => a + o[0], 0);
+    if (tot > 0) {
+      let x = Math.random() * tot, ch = opts[0][1];
+      for (const [w, o] of opts) { if (x < w) { ch = o; break; } x -= w; }
+      if (ch.kind === 'item') out.push({ kind: 'item', type: pick(finds(ch.tier)) });
+      else if (ch.kind === 'rush') out.push({ kind: 'rush', type: pick(shops), mult: ch.mult, min: ch.min });
+      else out.push(Object.assign({}, ch));
+    }
+    if (rar === 3) { out.push({ kind: 'moves', n: 3 }); const open = shops.filter((t) => (state.perks[t] || 0) < PERK_MAX - 1e-9); if (open.length) out.push({ kind: 'perk', type: pick(open), n: 0.1 }); }
     if (rar === 3 || (rar === 2 && Math.random() < 0.3)) out.push({ kind: 'freeze', n: 1 });
     return out;
   }
@@ -2033,6 +2192,8 @@
       else if (l.kind === 'freeze') state.streak.freezes = Math.min(3, state.streak.freezes + 1);
       else if (l.kind === 'rush') { const cur = rushFor(l.type); if (cur) { cur.mult = Math.max(cur.mult, l.mult); cur.left = Math.max(cur.left, 0) + l.min; } else state.rush.push({ type: l.type, mult: l.mult, left: l.min }); }
       else if (l.kind === 'perk') state.perks[l.type] = Math.min(PERK_MAX, (state.perks[l.type] || 0) + l.n);
+      else if (l.kind === 'moves') state.freeMoves = (state.freeMoves || 0) + l.n;
+      else if (l.kind === 'coffee') state.coffee = (state.coffee || 0) + l.n;
     }
     cityCache = null;
   }
@@ -2107,6 +2268,102 @@
     return { sim, unfinished, shiftGold, taxes, goalGold, goal, gold: (shiftGold + Math.max(0, taxes) + goalGold) * combo + Math.min(0, taxes), play, playWant: want, playCap, bonusPct: Math.round((work / d - 1) * 100), job, combo, comboN: cn,
       xp: Math.round((d * 10 * (hasLandmark('observatory') ? 1.1 : 1) + (goalGold ? 50 : 0) + (onPlan ? d * 5 : 0)) * combo), chest: d >= MIN_SESSION ? chestOdds(d) : null, block: blk, onPlan };
   }
+  /* ---------- Lock-screen timer. A web app can't put a real countdown on the iPhone lock screen (that needs the native
+     app), but a page that plays sound gets the "now playing" tile there. So during focus an optional soft sound plays,
+     and the tile reads "18 min left · until 15:25". ---------- */
+  const LOCK = { el: null, urls: {}, title: '', on: false, art: null };
+  function wavUrl(kind) {
+    if (LOCK.urls[kind]) return LOCK.urls[kind];
+    const sr = 22050, secs = kind === 'bell' ? 2.6 : 12, fadeN = Math.floor(sr * 0.6);
+    let n = Math.floor(sr * secs); const d = new Float32Array(n);
+    if (kind === 'bell') {
+      for (let i = 0; i < n; i++) { const t = i / sr; d[i] = 0.32 * Math.exp(-t * 1.8) * (Math.sin(2 * Math.PI * 784 * t) + 0.45 * Math.exp(-t * 2.5) * Math.sin(2 * Math.PI * 1176 * t) + 0.25 * Math.exp(-t * 4) * Math.sin(2 * Math.PI * 1568 * t)) * Math.min(1, t * 200); }
+    } else {
+      let br = 0, p0 = 0, p1 = 0, p2 = 0, lp = 0, drop = 0, dropF = 0, ph = 0;
+      for (let i = 0; i < n; i++) {
+        const w = Math.random() * 2 - 1;
+        br = (br + 0.02 * w) / 1.02;
+        if (kind === 'rain') {
+          p0 = 0.99765 * p0 + w * 0.099046; p1 = 0.963 * p1 + w * 0.2965164; p2 = 0.57 * p2 + w * 1.0526913;
+          lp += ((p0 + p1 + p2 + w * 0.1848) * 0.11 - lp) * 0.35;
+          if (Math.random() < 0.0009) { drop = 0.14 + Math.random() * 0.12; dropF = 1400 + Math.random() * 2400; }
+          drop *= 0.9965; ph += 2 * Math.PI * dropF / sr;
+          d[i] = (lp * 0.9 + br * 1.2 + drop * Math.sin(ph) * 0.5) * 0.22; // soft: iPhones ignore the page's volume setting
+        } else d[i] = br * (kind === 'quiet' ? 0.04 : 0.85);
+      }
+    }
+    if (kind !== 'bell') { for (let i = 0; i < fadeN; i++) { const k = i / fadeN; d[i] = d[i] * k + d[n - fadeN + i] * (1 - k); } n -= fadeN; } // seamless loop
+    const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf), str = (o, x) => { for (let i = 0; i < x.length; i++) v.setUint8(o + i, x.charCodeAt(i)); };
+    str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVE'); str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.round(clamp(d[i], -1, 1) * 32000), true);
+    return (LOCK.urls[kind] = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+  }
+  function lockArt() {
+    if (LOCK.art) return LOCK.art;
+    try {
+      const cv = document.createElement('canvas'); cv.width = cv.height = 256; const c = cv.getContext('2d');
+      const g = c.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, '#2B2257'); g.addColorStop(1, '#5B3FD0'); c.fillStyle = g; c.fillRect(0, 0, 256, 256);
+      c.fillStyle = '#F6E7B5'; c.beginPath(); c.arc(190, 62, 26, 0, Math.PI * 2); c.fill(); c.fillStyle = '#2E2560'; c.beginPath(); c.arc(203, 52, 23, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#4E7A4D'; c.beginPath(); c.moveTo(128, 150); c.lineTo(224, 198); c.lineTo(128, 246); c.lineTo(32, 198); c.closePath(); c.fill();
+      c.fillStyle = '#EFE6D6'; c.fillRect(92, 140, 72, 62); c.fillStyle = '#C8473D'; c.beginPath(); c.moveTo(80, 144); c.lineTo(128, 100); c.lineTo(176, 144); c.closePath(); c.fill();
+      c.fillStyle = '#FFD36B'; c.fillRect(106, 160, 16, 16); c.fillRect(136, 160, 16, 16);
+      LOCK.art = cv.toDataURL('image/png');
+    } catch (e) { LOCK.art = ''; }
+    return LOCK.art;
+  }
+  function lockStart() {
+    const kind = state.lockSound; if (!state.session || !LOCK_SOUNDS[kind] || kind === 'off') return;
+    try {
+      const a = LOCK.el || (LOCK.el = new Audio());
+      a.setAttribute('playsinline', ''); a.loop = true; a.src = wavUrl(kind); a.volume = kind === 'rain' ? 0.55 : 0.6;
+      const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+      LOCK.on = true; LOCK.title = '';
+      if ('mediaSession' in navigator) {
+        const ms = navigator.mediaSession;
+        for (const act of ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto', 'previoustrack', 'nexttrack']) {
+          try { ms.setActionHandler(act, act === 'play' ? () => { a.play(); ms.playbackState = 'playing'; } : act === 'pause' ? () => { a.pause(); ms.playbackState = 'paused'; } : null); } catch (e) { /* not supported */ }
+        }
+        ms.playbackState = 'playing';
+      }
+      lockUpdate(true);
+    } catch (e) { LOCK.on = false; }
+    renderLockBtn();
+  }
+  function lockUpdate(force) {
+    const s = state.session; if (!LOCK.on || !s || !('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
+    const now = Date.now(), m = sessionMinutes(s, now), left = Math.max(0, s.duration - m), endAt = new Date(s.start + s.duration * 60000 / (s.speed || 1));
+    const until = `until ${String(endAt.getHours()).padStart(2, '0')}:${String(endAt.getMinutes()).padStart(2, '0')}`;
+    const title = left >= 1 ? `${Math.ceil(left - 1e-9)} min left · ${until}` : `Less than a minute left · ${until}`;
+    if (title === LOCK.title && !force) return;
+    LOCK.title = title;
+    const f = focusNow(now);
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({ title, artist: f && f.cur ? `${state.builder} is building: ${jobLabel(f.cur.q).toLowerCase()}` : `Focus · ${state.town}`, album: 'Maplewick', artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] });
+      const dur = s.duration * 60 / (s.speed || 1);
+      if (navigator.mediaSession.setPositionState) navigator.mediaSession.setPositionState({ duration: dur, playbackRate: 1, position: clamp((now - s.start) / 1000, 0, dur) });
+    } catch (e) { /* older browsers */ }
+  }
+  function lockStop(done) {
+    if (!LOCK.on) return;
+    LOCK.on = false; LOCK.title = '';
+    const a = LOCK.el, ms = 'mediaSession' in navigator ? navigator.mediaSession : null;
+    try {
+      if (done && a) {
+        // a soft bell to say the session is over, then the lock-screen tile goes away
+        a.loop = false; a.src = wavUrl('bell'); a.volume = 0.8; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
+        if (ms && typeof MediaMetadata !== 'undefined') ms.metadata = new MediaMetadata({ title: 'Focus done!', artist: 'Your chest is waiting in Maplewick', album: 'Maplewick', artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] });
+        a.onended = () => { a.onended = null; if (!LOCK.on && ms) { ms.metadata = null; ms.playbackState = 'none'; } };
+      } else { if (a) a.pause(); if (ms) { ms.metadata = null; ms.playbackState = 'none'; } }
+    } catch (e) { /* ignore */ }
+    renderLockBtn();
+  }
+  function renderLockBtn() {
+    const b = $('focus-lock'); if (!b) return;
+    const on = state.lockSound !== 'off';
+    b.setAttribute('aria-pressed', String(on && LOCK.on));
+    $('focus-lock-text').textContent = on ? (LOCK.on ? `Lock-screen timer on · ${LOCK_SOUNDS[state.lockSound].toLowerCase()}` : 'Tap to start the lock-screen timer') : 'Show the time left on my lock screen';
+  }
   function startSession(duration) {
     if (state.session) return;
     duration = Math.max(MIN_SESSION, duration);
@@ -2114,13 +2371,17 @@
     const now = Date.now();
     accrue(now);
     const blk = blockNow();
-    state.session = { duration, jobBid: currentJob().bid, start: now, speed: ui.tourSpeed || state.speed, income: econ(now).net, combo: comboNow(now), planBlock: blk ? blk.id : null };
+    const plan = simulate(state.queue, workFor(duration)).items.filter((x) => !x.waiting).map((x) => x.q.id);
+    const startDone = {}; for (const q of state.queue) if (plan.includes(q.id)) startDone[q.id] = q.done;
+    state.session = { duration, jobBid: currentJob().bid, start: now, speed: ui.tourSpeed || state.speed, income: econ(now).net, combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone };
     state.lastTaxAt = now;
     sfx.pop();
     save(); closeSheet(); renderAll(); showFocus();
+    lockStart();
   }
   function finishSession(reason, forceFull) {
     const s = state.session; if (!s) return;
+    lockStop(reason === 'complete');
     const now = Date.now();
     const m = forceFull ? s.duration : sessionMinutes(s, now);
     const job = jobs().find((j) => j.bid === s.jobBid) || currentJob();
@@ -2131,16 +2392,26 @@
     // gold, xpParts and playParts list where everything came from, for the tally on the result card.
     const r = { reason, minutes: m, built: [], shiftPay: 0, shiftMin: 0, job, taxes: 0, gift: 0, giftText: '', play: 0, streakUp: false, quip: '', newBest: false, recharged: false,
       combo: done && s.combo ? { n: s.combo, mult } : null, gold: [], xpParts: [], playParts: [] };
-    const sim = simulate(state.queue, workFor(m));
-    const remaining = [];
-    // Ending early has a price: jobs that finished stay built, but this session's work on the unfinished ones is lost.
+    const sim = simulate(sessionQueue(s), workFor(m), false);
+    const gone = new Set();
+    // Ending early has a price. Finished jobs stay built. The job Sam was in the middle of is torn down and its gold
+    // is gone, unless it is a landmark or a job over an hour (those only lose this session's work).
+    // In the first minute nothing has really started, so ending then costs nothing.
+    const grace = !done && m < 1;
     for (const it of sim.items) {
-      if (it.finished) { completeJob(it.q, r); continue; }
-      if (done) it.q.done = it.done;
-      else if (it.done > it.q.done + 0.05) { r.lost = r.lost || []; r.lost.push(jobLabel(it.q).toLowerCase()); }
-      remaining.push(it.q);
+      if (it.finished) { completeJob(it.q, r); gone.add(it.q); continue; }
+      if (done) { it.q.done = it.done; continue; }
+      if (grace || !(it.done > it.q.done + 0.05)) continue;
+      const q = it.q; r.lost = r.lost || [];
+      if (keepsWork(q)) { r.lost.push({ text: `${state.builder}'s work this session on ${jobName(q)} was lost. Earlier progress is kept.`, short: `${state.builder}'s work on ${jobName(q)} was lost` }); continue; }
+      gone.add(q);
+      if (q.kind === 'build') state.buildings = state.buildings.filter((b) => b.id !== q.bid);
+      const paid = Math.round(q.paid || 0);
+      const what = q.kind === 'build' ? `The half-built ${TYPES[q.type].name.toLowerCase()} was torn down` : `${capFirst(jobName(q))} was cancelled`;
+      r.lost.push({ text: `${what}${paid ? ` and the ${paid} gold is gone` : ''}.`, short: `${what}${paid ? ` · −${paid} gold` : ''}`, gold: paid });
     }
-    state.queue = remaining;
+    state.queue = state.queue.filter((q) => !gone.has(q));
+    if (grace) r.grace = true;
     touch();
     if (sim.leftover > 0.05 && m > 0) {
       r.shiftMin = sim.leftover / (workFor(m) / m);
@@ -2414,28 +2685,43 @@
     const bs = state.buildings.filter((b) => b.id !== item.moveId).concat([{ id: -1, type: item.type, level: item.level, c, r }]);
     return computeCity(bs).total;
   }
+  // Where the held item can go. Each free spot says what the item adds to the town there (compared with the town
+  // without it, so moving something shows its own effect): green spots are fine, the best ones get a number,
+  // red means it would bother the neighbours there. Free land where it can't go is listed in out.blocked (gray).
   function hints() {
     if (hintCache) return hintCache;
-    const item = heldItem(); const out = [];
+    const item = heldItem(); const out = []; out.blocked = [];
     if (!item) return (hintCache = out);
-    const base = city().total, mult = econ().mood.mult;
+    const base = item.moveId != null ? computeCity(state.buildings.filter((b) => b.id !== item.moveId)).total : city().total, mult = econ().mood.mult;
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
       const a = anchorFor(item.type, c, r);
-      if (!fits(item.type, a.c, a.r, item.moveId)) continue;
+      if (!fits(item.type, a.c, a.r, item.moveId)) { const ob = at(c, r); if (isOpen(c, r) && (!ob || ob.id === item.moveId)) out.blocked.push({ c, r }); continue; }
       out.push({ c, r, ac: a.c, ar: a.r, delta: (placementTotal(item, a.c, a.r) - base) * mult });
     }
     const ds = out.map((h) => h.delta);
     out.max = ds.length ? Math.max(...ds) : 0; out.min = ds.length ? Math.min(...ds) : 0;
     const spread = out.max - out.min;
-    for (const h of out) h.label = spread >= 0.5 && h.delta >= 0.5 && h.delta >= out.max - spread * 0.34;
+    for (const h of out) { h.bad = h.delta <= -0.5; h.label = spread >= 0.5 && h.delta >= 0.5 && h.delta >= out.max - spread * 0.34; }
     return (hintCache = out);
   }
   const deltaAt = (type, c, r) => { const a = anchorFor(type, c, r); if (!fits(type, a.c, a.r)) return null; return (placementTotal({ type, level: 1 }, a.c, a.r) - city().total) * econ().mood.mult; };
 
+  // Moving a building costs a little gold for the moving crew (more for big and upgraded ones), or one free move from a chest.
+  function moveCost(b) {
+    const t = T(b); if (special(t)) return 10;
+    const base = t.cat === 'landmark' ? 40 : t.cost ? t.cost * 0.1 : 15;
+    return Math.max(2, Math.round(base * (1 + 0.5 * ((b.level || 1) - 1))));
+  }
   function placeHeld(c, r) {
     const h = ui.holding, item = heldItem(); if (!h || !item) return;
     if (!fits(item.type, c, r, item.moveId)) return;
-    const b = byId(h.id); if (b) { b.c = c; b.r = r; }
+    const b = byId(h.id);
+    if (b && (b.c !== c || b.r !== r)) {
+      accrue(Date.now());
+      if (state.freeMoves > 0) { state.freeMoves -= 1; toast(`Free move used. ${state.freeMoves} left.`); }
+      else { const mc = moveCost(b); if (state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold.`); return; } state.gold -= mc; floats.push({ x: tileCenter(c, r).x, y: tileCenter(c, r).y - 40, t0: performance.now(), text: `−${mc} gold`, soft: true }); }
+    }
+    if (b) { b.c = c; b.r = r; }
     setHolding(null); touch(); accrue(Date.now()); sfx.place(); bump(h.id);
     checkQuests(false); save(); openPanel({ kind: 'info', bid: h.id }); afterAction();
   }
@@ -2475,7 +2761,8 @@
   const activeBuild = () => state.queue.find((x) => !bigQ(x)) || null;
   function playBuild(dt) {
     const q = activeBuild(); if (!q || !(dt > 0)) return;
-    q.done = Math.min(q.work, q.done + dt * q.work / buildSecs(q.work));
+    const brew = state.coffee > 0 ? 2 : 1; // a coffee from a chest: twice as fast
+    q.done = Math.min(q.work, q.done + dt * brew * q.work / buildSecs(q.work));
     ui.hammer = (ui.hammer || 0) + dt;
     if (ui.hammer > 0.42) { ui.hammer = 0; sfx.hammer(); }
     if (q.done < q.work - 1e-6) return;
@@ -2483,6 +2770,7 @@
     completeJob(q, res);
     state.queue = state.queue.filter((x) => x !== q);
     state.stats.playBuilt = (state.stats.playBuilt || 0) + 1;
+    if (state.coffee > 0) state.coffee -= 1;
     touch();
     for (const it of res.built) if (it.bid != null) ui.reveals.push({ bid: it.bid, kind: it.kind, from: it.from, t0: performance.now() + 60, fired: false });
     checkQuests(false); save(); renderAll(); boardSoon();
@@ -2498,7 +2786,7 @@
     if (state.session) {
       const s = state.session;
       if (sessionMinutes(s, now) >= s.duration - 1e-9) { finishSession('complete'); return; }
-      renderFocus(now);
+      renderFocus(now); lockUpdate();
     } else {
       accrue(now);
       // Play time runs only while you are actually in the town (not while a sheet or overlay is open).
@@ -3422,13 +3710,15 @@
     let target = null, act = null, wait = 700 + Math.random() * 1800;
     const home = w.role ? staffBuildings(w.role)[0] : null;
     if (w.role === 'sweeper') {
-      const dirty = state.buildings.filter((b) => messy(b) && (b.trash || 0) > 0.35 && !b.fire && !claimed(w, b.id)).sort((a, b) => b.trash - a.trash);
+      const st = stationsOf('sweeper');
+      const dirty = state.buildings.filter((b) => messy(b) && (b.trash || 0) > 0.35 && !b.fire && !claimed(w, b.id) && coversB('sweeper', b, st)).sort((a, b) => b.trash - a.trash);
       for (const b of dirty.slice(0, 3)) { const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'sweep', bid: b.id, dur: 1600 + (b.trash || 0) * 700 }; break; } }
     } else if (w.role === 'gardener') {
-      const parks = state.buildings.filter((b) => b.type === 'park' && live(b) && (b.overgrown || 0) > 0.2 && !claimed(w, b.id)).sort((a, b) => b.overgrown - a.overgrown);
+      const st = stationsOf('gardener');
+      const parks = state.buildings.filter((b) => b.type === 'park' && live(b) && (b.overgrown || 0) > 0.2 && !claimed(w, b.id) && coversB('gardener', b, st)).sort((a, b) => b.overgrown - a.overgrown);
       for (const b of parks) { const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'trim', bid: b.id, dur: 2800 }; break; } }
     } else if (w.role === 'nurse' || !w.role) {
-      const spots = state.buildings.filter((b) => live(b) && !b.fire && (w.role ? T(b).cat === 'home' : ['shop', 'joy', 'home'].includes(T(b).cat)));
+      const spots = state.buildings.filter((b) => live(b) && !b.fire && (w.role ? T(b).cat === 'home' && coversB('nurse', b) : ['shop', 'joy', 'home'].includes(T(b).cat)));
       if (spots.length && Math.random() < (w.role ? 0.8 : 0.55)) { const b = pick(spots); const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'visit', bid: b.id, dur: 1200 + Math.random() * 2200 }; } }
     } else if (w.role === 'police') wait = 1400 + Math.random() * 1500;
     else if (w.role === 'fire') { wait = 2500 + Math.random() * 3000; if (home) target = randomFree(home.c, home.r + 1, 2); }
@@ -3477,7 +3767,8 @@
     const b = burningNow(); if (!b) return;
     if (walkers.some((w) => w.act && w.act.kind === 'spray')) return;
     const ro = roleInfo('fire', city()); if (ro.working < 1) return;
-    if (now - ui.fireSince < 1500 + (1 - ro.cover) * 6000) return;
+    const near = coversB('fire', b);
+    if (now - ui.fireSince < (near ? 1500 : 9000) + (1 - ro.ratio) * 6000) return;
     const ff = walkers.filter((w) => w.role === 'fire'); if (!ff.length) return;
     const p = centerOf(b);
     ff.sort((a, c) => Math.hypot(a.c - b.c, a.r - b.r) - Math.hypot(c.c - b.c, c.r - b.r));
@@ -3785,15 +4076,29 @@
     const item = playing ? heldItem() : null;
     if (item) {
       const showNums = HW * z >= 20;
-      for (const hnt of hints()) {
+      const hs = hints();
+      // gray: free land where it can't go; green: it can go here (brighter = better); red: it would bother the neighbours
+      for (const g of hs.blocked) { const p = tileCenter(g.c, g.r); diamond(c, p.x, p.y, HW - 2, HH - 1, 'rgba(70,72,78,.34)'); }
+      for (const hnt of hs) {
         const p = tileCenter(hnt.c, hnt.r);
-        diamond(c, p.x, p.y, HW - 2, HH - 1, hnt.delta < -0.5 ? 'rgba(179,67,43,.32)' : hnt.label ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.2)');
-        if (showNums && hnt.label) tag(c, p.x, p.y, (hnt.delta > 0 ? '+' : '−') + Math.round(Math.abs(hnt.delta)), px, hnt.delta > 0 ? 'rgba(43,117,72,.92)' : 'rgba(179,67,43,.92)', '#fff');
+        diamond(c, p.x, p.y, HW - 2, HH - 1, hnt.bad ? 'rgba(205,62,40,.38)' : hnt.label ? 'rgba(96,205,80,.55)' : 'rgba(120,210,95,.26)');
+        if (showNums && (hnt.label || (hnt.bad && hnt.delta <= hs.min + 0.01))) tag(c, p.x, p.y, (hnt.delta > 0 ? '+' : '−') + Math.round(Math.abs(hnt.delta)), px, hnt.delta > 0 ? 'rgba(43,117,72,.92)' : 'rgba(179,67,43,.92)', '#fff');
       }
     }
     // While placing: tint the area the building affects (green helps, red bothers, gold = its customers, blue = kept safe).
     let placeFx = null;
     const drawRange = (fxr, ac, ar, sz) => {
+      // a service building's reach: a light tint and a dashed edge in its staff colour
+      if (fxr.reach) {
+        const R2 = fxr.reach, rgb = SERVES[fxr.staff].rgb;
+        for (let rr = ar - R2; rr < ar + sz + R2; rr++) for (let cc = ac - R2; cc < ac + sz + R2; cc++) {
+          if (!isOpen(cc, rr) || (cc >= ac && cc < ac + sz && rr >= ar && rr < ar + sz)) continue;
+          const tp = tileCenter(cc, rr); diamond(c, tp.x, tp.y, HW - 1.5, HH - 0.8, `rgba(${rgb},.13)`);
+        }
+        const e0 = tileCenter(ac - R2, ar - R2), e1 = tileCenter(ac + sz - 1 + R2, ar - R2), e2 = tileCenter(ac + sz - 1 + R2, ar + sz - 1 + R2), e3 = tileCenter(ac - R2, ar + sz - 1 + R2);
+        c.save(); c.setLineDash([6 * px, 4 * px]); c.lineWidth = 1.8 * px; c.strokeStyle = `rgba(${rgb},.85)`;
+        outline(c, [[e0.x, e0.y - HH], [e1.x + HW, e1.y], [e2.x, e2.y + HH], [e3.x - HW, e3.y]]); c.restore();
+      }
       const R = fxr.radius; if (!R) return;
       const col = { good: 'rgba(110,200,80,.3)', bad: 'rgba(225,70,45,.3)', shop: 'rgba(245,185,60,.26)', police: 'rgba(80,130,235,.28)' }[fxr.kind];
       for (let rr = ar - R; rr < ar + sz + R; rr++) for (let cc = ac - R; cc < ac + sz + R; cc++) {
@@ -3959,7 +4264,7 @@
     }
     // While placing: how much each affected home changes.
     if (placeFx) for (const e of placeFx.homes) { tag(c, centerOf(e.b).x, labelY(e.b) - 9 * px, `${e.d > 0 ? '+' : '−'}${Math.round(Math.abs(e.d) * 100)}%`, px * 1.15, e.d > 0 ? 'rgba(43,117,72,.95)' : 'rgba(196,58,36,.95)', '#fff'); busy.add(e.b.id); }
-    if (placeFx && placeFx.safeList) for (const h of placeFx.safeList) { if (busy.has(h.id)) continue; tag(c, centerOf(h).x, labelY(h) - 9 * px, 'safe', px * 1.05, 'rgba(50,90,200,.92)', '#fff'); busy.add(h.id); }
+    if (placeFx && placeFx.safeList) { const sv = SERVES[placeFx.staff]; for (const h of placeFx.safeList) { if (busy.has(h.id)) continue; tag(c, centerOf(h).x, labelY(h) - 9 * px, sv.tag, px * 1.05, `rgba(${sv.rgb},.92)`, '#fff'); busy.add(h.id); } }
     if (playing && !item && HW * z >= 18) {
       const ci = city();
       for (const b of state.buildings) {
@@ -4220,9 +4525,10 @@
       const item = heldItem();
       if (item) {
         const s = sizeOf(item.type), name = TYPES[item.type].name.toLowerCase(), hs = hints();
-        const money = hs.length && hs.max - hs.min < 0.5 ? '' : ' Green numbers mark the best spots.';
-        text = (s > 1 ? `Tap where the ${name} should go (${s}×${s}), then tap Place.` : `Tap a free tile to move the ${name}.`) + money;
-      } else if (state.tray.length) text = state.tray[0].resident ? `Tap any empty spot to place ${state.tray[0].resident}'s cottage.` : `Tap any empty spot to place your ${TYPES[state.tray[0].type].name.toLowerCase()}.`;
+        const key = !hs.length ? ` There is no free spot for it right now.` : ` Green: it fits${hs.max - hs.min >= 0.5 ? ' (numbers = best)' : ''}.${hs.some((h) => h.bad) ? ' Red: bothers neighbours.' : ''}${hs.blocked.length ? ' Gray: not allowed.' : ''}`;
+        const cost = item.moveId != null ? (state.freeMoves > 0 ? ' Uses a free move.' : ` Costs ${moveCost(byId(item.moveId))} gold.`) : '';
+        text = (s > 1 ? `Tap where the ${name} should go (${s}×${s}), then tap Place.` : `Tap a spot for the ${name}.`) + cost + (TYPES[item.type].where ? ` It goes ${WHERE[TYPES[item.type].where].short}.` : '') + key;
+      } else if (state.tray.length) { const tt = TYPES[state.tray[0].type]; text = (state.tray[0].resident ? `Tap any empty spot to place ${state.tray[0].resident}'s cottage.` : `Tap any empty spot to place your ${tt.name.toLowerCase()}.`) + (tt.where ? ` It goes ${WHERE[tt.where].short}.` : ''); }
     }
     hint.textContent = text;
     if (hint.hidden === !!text) hint.hidden = !text;
@@ -4309,12 +4615,18 @@
   function rangeLine(b) {
     const t = T(b); if (!live(b)) return null;
     const fx = placeEffects({ type: b.type, level: b.level, moveId: b.id }, b.c, b.r);
+    let reachTxt = '';
+    if (fx.staff) {
+      const k = fx.staff, st = STAFF[k], on = stationsOf(k).includes(b), w = SERVES[k].word;
+      reachTxt = `Dashed line: its reach, ${fx.reach} tiles. ${fx.safe} of your ${w} ${fx.safe === 1 && w === 'homes' ? 'is' : 'are'} inside${on ? `, looked after by its ${st.plural}.` : staffWorking(k) ? `. Hire one more ${st.name.toLowerCase()} so someone works here.` : `. Hire a ${st.name.toLowerCase()} to start.`}`;
+      if (!fx.radius) return reachTxt;
+    }
     if (!fx.radius) return null;
-    if (fx.kind === 'police') { const ro = roleInfo('police', city()), on = policeStations().includes(b); return `Blue on the map: its reach, ${t.reach} tiles. ${fx.safe} home${fx.safe === 1 ? '' : 's'} inside${on ? ' are kept safe.' : ro.working ? '. Hire another officer to staff this station.' : ' will feel safe once an officer works here.'}`; }
+    const pre = reachTxt ? reachTxt + ' ' : '';
     if (fx.kind === 'shop') return `Gold on the map: its customers. ${fx.customers} home${fx.customers === 1 ? '' : 's'} within ${t.radius} tiles shop here.`;
-    if (fx.kind === 'bad') return `Red on the map: homes right next to it pay ${Math.round(-t.near.v * 100)}% less (${t.near.label}).`;
+    if (fx.kind === 'bad') return `${pre}Red on the map: homes right next to it pay ${Math.round(-t.near.v * 100)}% less (${t.near.label}).`;
     const better = fx.homes.filter((h) => h.d > 0).length;
-    return `Green on the map: homes within ${fx.radius} tile${fx.radius > 1 ? 's' : ''} get happier. ${better} home${better === 1 ? '' : 's'} there now.`;
+    return `${pre}Green on the map: homes within ${fx.radius} tile${fx.radius > 1 ? 's' : ''} get happier. ${better} home${better === 1 ? '' : 's'} there now.`;
   }
   function renderInfoPanel(box, b) {
     if (!b) { ui.panel = null; return; }
@@ -4334,10 +4646,13 @@
     const ru = live(b) && t.cat === 'shop' ? rushFor(b.type) : null;
     if (ru) chips.push(pill(`Rush ×${ru.mult} · ${fmtMin(Math.max(1, ru.left))} left`, 'rush'));
     if (live(b) && t.cat === 'shop' && state.perks[b.type]) chips.push(pill(`Perk +${Math.round(state.perks[b.type] * 100)}%`, 'rush'));
-    if (b.type === 'police') chips.push(pill(`Reach ${t.reach} tiles`, 'xp'));
+    if (t.staff && t.reach) chips.push(pill(`Reach ${t.reach} tiles`, 'xp'));
     if (live(b) && messy(b) && (b.trash || 0) >= 0.5) chips.push(fixPill('Trash outside', () => staffAction('sweeper', b)));
     if (b.type === 'park' && live(b) && (b.overgrown || 0) > 0.3) chips.push(fixPill('Overgrown', () => staffAction('gardener', b)));
-    if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && !policeCovers(b)) chips.push(fixPill('Not safe', () => staffAction('police', b)));
+    if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && !policeCovers(b)) chips.push(fixPill(nightK() > 0.5 ? 'Not safe at night' : 'Not safe', () => staffAction('police', b)));
+    else if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && nightK() > 0.5 && !lit(b)) chips.push(fixPill('Dark street', () => lampNear(b)));
+    if (live(b) && t.cat === 'home' && roleInfo('nurse', ci).needed && stationsOf('nurse').length && !coversB('nurse', b)) chips.push(fixPill('Clinic too far', () => staffAction('nurse', b)));
+    if (live(b) && messy(b) && staffWorking('fire') && !coversB('fire', b)) chips.push(fixPill('Far from fire station', () => staffAction('fire', b)));
     if (special(t)) chips.push(pill(t.chest ? `${RARITY[t.chest].name} chest find` : `${SEASONS[t.season].fest} find`, 'gold'));
     box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${t.name}${b.resident ? ' · ' + b.resident : ''}`, chips));
     // Two tabs: what you can do here, and everything about it (including what people ask for).
@@ -4361,7 +4676,8 @@
       box.append(fb);
     }
     const row = el('div', 'acts3');
-    const moveBtn = () => actionBtn('Move', 'somewhere else', '', () => { ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); renderAll(); });
+    const moveBtn = () => { const fm = state.freeMoves || 0, mc = moveCost(b);
+      return actionBtn('Move', fm ? `free move · ${fm} left` : `${mc} gold`, '', () => { if (!fm && state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold. You need ${fmtGold(mc - state.gold + 0.999)} more.`); return; } ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); renderAll(); }); };
     let why = null;
     if (q && bigQ(q)) {
       const left = exactMinutes(q.work - q.done);
@@ -4369,7 +4685,7 @@
       row.append(actionBtn(q.done > 0 ? 'In the plan' : 'Remove from plan', q.done > 0 ? 'Already started' : `Refund ${q.paid} gold`, '', () => { removeFromPlan(q.id); closePanel(); }, q.done > 0));
     } else if (q) {
       const wait = activeBuild() !== q;
-      row.append(actionBtn(wait ? 'Waiting for Sam' : `${q.kind === 'repair' ? 'Repairing' : q.kind === 'build' ? 'Building' : 'Upgrading'}… ${Math.round(q.done / q.work * 100)}%`, wait ? 'next in line' : `${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work))} left`, 'primary', () => {}, true));
+      row.append(actionBtn(wait ? `Waiting for ${state.builder}` : `${q.kind === 'repair' ? 'Repairing' : q.kind === 'build' ? 'Building' : 'Upgrading'}… ${Math.round(q.done / q.work * 100)}%`, wait ? 'next in line' : `${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work) / (state.coffee > 0 ? 2 : 1))} left${state.coffee > 0 ? ' · coffee 2×' : ''}`, 'primary', () => {}, true));
       row.append(actionBtn('Cancel', `Refund ${q.paid} gold`, '', () => { removeFromPlan(q.id); closePanel(); }));
       if (ui.screen !== 'play') why = `${state.builder} builds it next time you play.`;
     } else if (b.ruin) {
@@ -4387,7 +4703,7 @@
       if (!chk.max && isBigJob('upgrade', b.type, chk.work || 0)) {
         row.append(actionBtn('Upgrade now', `${fmtMin(exactMinutes(chk.work))} focus · ${chk.cost} gold`, 'primary', () => doNow(planJob('upgrade', b.id, true)), !chk.ok));
         row.append(actionBtn('Add to plan', `Level ${b.level + 1} · ${chk.cost} gold`, '', () => { planJob('upgrade', b.id); renderAll(); }, !chk.ok));
-        if (chk.ok) why = `A big project: ${state.builder} needs ${fmtMin(exactMinutes(chk.work))} of your focus for it.`; else why = chk.why;
+        if (chk.ok) why = `A big project: ${state.builder} needs ${fmtMin(exactMinutes(chk.work))} of your focus for it${chk.work > LONG_WORK ? '. You can split it over several sessions.' : ', in one session. End early and the upgrade is cancelled.'}`; else why = chk.why;
       } else if (!chk.max) {
         row.append(actionBtn(`Upgrade · ${chk.cost} gold`, `Level ${b.level + 1} in ${fmtSecs(buildSecs(chk.work))}`, 'primary', () => { if (planJob('upgrade', b.id, true)) { toast(`${state.builder} is on it!`); renderAll(); } else toast(checkJob('upgrade', b).why); }, !chk.ok));
         if (!chk.ok) why = chk.why;
@@ -4481,7 +4797,7 @@
       const tt = TYPES[tr.type], inDecor = special(tt);
       if ((p.tab === 'decor') !== inDecor || p.tab === 'services' || p.tab === 'landmarks') continue;
       const a0 = anchorFor(tr.type, p.c, p.r), ok = fits(tr.type, a0.c, a0.r);
-      const c = card(tr.type, 'free' + (ok ? '' : ' off'), () => { if (ok) placeGift(tr.id, p.c, p.r); else toast('It does not fit here. Tap another spot.'); }, [el('span', '', tr.resident ? `For ${tr.resident}` : tt.chest ? `${RARITY[tt.chest].name} chest` : 'Festival find')], 'Free · tap to place', 'pos', 'FREE');
+      const c = card(tr.type, 'free' + (ok ? '' : ' off'), () => { if (ok) placeGift(tr.id, p.c, p.r); else toast(spotWhy(tr.type, a0.c, a0.r)); }, [el('span', '', tr.resident ? `For ${tr.resident}` : tt.chest ? `${RARITY[tt.chest].name} chest` : 'Festival find')], 'Free · tap to place', 'pos', 'FREE');
       c.setAttribute('aria-label', `${tt.name}, free, place here`);
     }
     if (p.tab === 'decor') {
@@ -4506,6 +4822,7 @@
         let note = '', nc = '';
         if (chk.locked) { const miss = needsFor(type).filter((n) => !n.ok); note = miss.length ? `Needs ${miss.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(', ')}` : 'Locked'; nc = 'lock'; }
         else if (chk.capped) { note = capWhy(type).replace('Limit reached: ', 'Limit '); nc = 'lock'; }
+        else if (chk.nospot) { note = t.where ? `Only ${WHERE[t.where].short}: no free spot` : 'No free space'; nc = 'lock'; }
         else if (t.cat === 'landmark') { note = t.perk; nc = 'pos'; }
         else if (t.near && t.near.v < 0) { note = `−${Math.round(-t.near.v * 100)}% next door (${t.near.label})`; nc = 'neg'; }
         else if (t.near) { note = `+${Math.round(t.near.v * 100)}% next door`; nc = 'pos'; }
@@ -4544,7 +4861,7 @@
     const b = byId(q.bid); bump(b.id); const p = centerOf(b); burst(p.x, p.y - 10, 22);
     renderAll();
     if (bigQ(q)) { ui.focusPop = performance.now(); ui.barOpen = true; renderAll(); popFocus(); toast(`A big project! Focus ${fmtMin(exactMinutes(q.work))} and ${state.builder} builds it.`); }
-    else { sfx.chime(); toast(`${state.builder} is on it! Ready in ${fmtSecs(buildSecs(q.work))}econds.`); }
+    else { sfx.chime(); toast(`${state.builder} is on it! Ready in ${fmtSecs(buildSecs(q.work))}.`); }
     afterAction();
   }
   function popFocus() {
@@ -4566,10 +4883,12 @@
     else if (t.near) { radius = t.near.r; kind = t.near.v < 0 ? 'bad' : 'good'; }
     else if (t.cat === 'shop' && t.radius) { radius = t.radius; kind = 'shop'; }
     else if (t.cat === 'decor') { radius = 1; kind = 'good'; }
-    if (item.type === 'police') { radius = t.reach; kind = 'police'; }
+    if (item.type === 'police') { radius = 0; kind = null; }
     const customers = t.cat === 'shop' ? others.filter((h) => live(h) && T(h).cat === 'home' && dist(h, me) <= t.radius).length : 0;
-    const safeList = item.type === 'police' ? others.filter((h) => live(h) && T(h).cat === 'home' && dist(h, me) <= t.reach) : null, safe = safeList ? safeList.length : 0;
-    const val = { homes, radius, kind, customers, safe, safeList, gold: (after.total - before.total) * econ().mood.mult };
+    // A service building's reach and the places its staff would look after from here.
+    const sk = t.staff, reach = sk ? t.reach : 0;
+    const safeList = sk ? others.filter((h) => SERVES[sk].what(h) && dist(h, me) <= reach) : null, safe = safeList ? safeList.length : 0;
+    const val = { homes, radius, kind, customers, safe, safeList, reach, staff: sk, gold: (after.total - before.total) * econ().mood.mult };
     fxCache.key = key; fxCache.val = val;
     return val;
   }
@@ -4578,7 +4897,7 @@
     const t = TYPES[item.type], fx = placeEffects(item, ui.preview.c, ui.preview.r);
     const delta = Math.round(fx.gold);
     const chips = [];
-    if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${fmtMin(chk.work)} of focus`, 'xp') : pill(`Built in ${fmtSecs(buildSecs(chk.work))}`, 'play')); }
+    if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${fmtMin(exactMinutes(chk.work))} of focus${keepsWork({ kind: 'build', type: item.type, work: chk.work }) ? ', can be split' : ' in one go'}`, 'xp') : pill(`Built in ${fmtSecs(buildSecs(chk.work))}`, 'play')); }
     if (delta) chips.push(pill(`${delta > 0 ? '+' : '−'}${Math.abs(delta)} gold/hour`, delta > 0 ? 'good' : 'bad'));
     box.append(panelHead(item.type, item.level, {}, item.isNew ? `Build a ${t.name.toLowerCase()} here?` : `Move the ${t.name.toLowerCase()} here?`, chips));
     const ul = el('ul', 'effects');
@@ -4586,13 +4905,13 @@
     if (better.length) ul.append(el('li', 'pos', `${better.length} home${better.length > 1 ? 's' : ''} nearby get${better.length > 1 ? '' : 's'} happier and pay more (green).`));
     if (worse.length) ul.append(el('li', 'neg', `${worse.length} home${worse.length > 1 ? 's' : ''} next to it ${worse.length > 1 ? 'are' : 'is'} bothered and pay${worse.length > 1 ? '' : 's'} less (red).`));
     if (fx.kind === 'shop') ul.append(el('li', fx.customers ? 'pos' : '', `${fx.customers} home${fx.customers === 1 ? '' : 's'} within ${t.radius} tiles will shop here.`));
-    if (fx.kind === 'police') ul.append(el('li', fx.safe ? 'pos' : '', `Keeps ${fx.safe} home${fx.safe === 1 ? '' : 's'} within ${t.reach} tiles safe once an officer works here.`));
+    if (fx.staff) { const sv = SERVES[fx.staff], st = STAFF[fx.staff]; ul.append(el('li', fx.safe ? 'pos' : '', `${capFirst(st.plural)} here look after ${fx.safe} of your ${sv.word} within ${fx.reach} tiles (dashed line)${fx.staff === 'police' ? ', day and night' : ''}.`)); }
     if (t.staff && item.isNew) ul.append(el('li', '', `Then hire ${STAFF[t.staff].plural} here.`));
     if (!ul.childNodes.length) ul.append(el('li', '', 'No effect on its neighbours.'));
     box.append(ul);
     const grid = el('div', 'actions-grid');
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); grid.append(actionBtn(`Build it · ${chk.cost} gold`, big ? 'then focus to build it' : `${state.builder} starts right away`, 'playc', confirmPlace)); }
-    else grid.append(actionBtn('Place here', null, 'playc', () => { const pv = ui.preview; ui.panel = null; placeHeld(pv.c, pv.r); }));
+    else { const mb = byId(item.moveId); grid.append(actionBtn('Place here', state.freeMoves > 0 ? 'free move' : `moving crew · ${moveCost(mb)} gold`, 'playc', () => { const pv = ui.preview; ui.panel = null; placeHeld(pv.c, pv.r); })); }
     grid.append(actionBtn('Cancel', null, '', () => { ui.panel = null; setHolding(null); renderAll(); afterAction(); }));
     box.append(grid);
     box.append(el('p', 'tiny muted', 'Tap another spot on the map to try it there.'));
@@ -4600,7 +4919,93 @@
 
   /* ---------- Friends: a live leaderboard (inside Claude) and town codes (anywhere) ---------- */
   const CLAUDE_URL = 'https://claude.ai/artifact/53uNamQYLGrU1EeoWjVPfq';
-  const board = { db: null, user: null, me: null, docs: [], unsub: null, timer: 0, last: '', canWrite: null, isOwner: false, tab: 'week', loaded: false };
+  const board = { db: null, user: null, me: null, docs: [], unsub: null, timer: 0, last: '', canWrite: null, isOwner: false, tab: 'week', loaded: false, kind: null };
+  /* The home-screen app's leaderboard runs on Firebase: join with just a name (an anonymous account), or sign in with
+     Google to keep your spot across phones. The module loads only when needed. Inside Claude, Claude's own storage is used. */
+  const FB = { cfg: window.MAPLEWICK_FIREBASE && window.MAPLEWICK_FIREBASE.apiKey ? window.MAPLEWICK_FIREBASE : null, api: null, loading: null, user: null, busy: false, err: '' };
+  function fbLoad() {
+    if (!FB.cfg || inFrame) return Promise.resolve(null);
+    if (FB.api) return Promise.resolve(FB.api);
+    if (!FB.loading) FB.loading = import(window.MAPLEWICK_FB_URL || './fb.js').then((m) => {
+      FB.api = m.init(FB.cfg);
+      FB.api.onUser(fbUser);
+      FB.api.redirectResult().then((code) => { if (code && code !== 'ok') { FB.err = code; } if (state.board.fbPending) { state.board.fbPending = false; save(); } });
+      return FB.api;
+    }).catch(() => { FB.loading = null; FB.err = 'offline'; return null; });
+    return FB.loading;
+  }
+  // Firestore can't hold lists inside lists, so the town layout travels as one short string.
+  const packB = (b) => (b || []).map((x) => x.join(':')).join(';');
+  const unpackB = (str) => String(str || '').split(';').filter(Boolean).map((x) => { const p = x.split(':'); return [p[0], +p[1], +p[2], +p[3], +p[4]]; });
+  function fbDb(api) {
+    const docs = async () => { const list = await api.list(); return { docs: list.map((d) => { const o = Object.assign({}, d); o.b = unpackB(o.bs); delete o.bs; delete o.id; return { id: d.id, data: () => o }; }) }; };
+    const out = (b) => { const o = Object.assign({}, b); if (o.b) { o.bs = packB(o.b); delete o.b; } return o; };
+    return {
+      doc: (path) => { const id = path.split('/')[1]; return { set: (b) => api.put(id, out(b)), update: (b) => api.merge(id, out(b)) }; },
+      // No live updates in the light Firestore client: check every 20 s while Friends is open, else every 5 minutes.
+      collection: () => ({ get: docs, onSnapshot: (fn, err) => {
+        let stop = false, last = 0;
+        const go = async (force) => {
+          if (stop) return;
+          const open = !$('scrim').hidden && $('sheet').dataset.kind === 'friends';
+          if (!force && !open && Date.now() - last < 300000) return;
+          last = Date.now();
+          try { fn(await docs()); } catch (e) { if (err) err(e); }
+        };
+        go(true); const t = setInterval(() => go(false), 20000);
+        return () => { stop = true; clearInterval(t); };
+      } })
+    };
+  }
+  const initialAvatar = (name, id) => {
+    let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360;
+    const L = (String(name || '?').trim()[0] || '?').toUpperCase().replace(/[<>&"]/g, '?');
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="hsl(${h} 55% 52%)"/><text x="18" y="24" font-family="system-ui,sans-serif" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">${L}</text></svg>`);
+  };
+  const fbPeople = { can: async () => true, isOwner: async () => false,
+    profiles: async (ids) => Object.fromEntries([].concat(ids).map((i) => { const d = board.docs.find((x) => x.id === i); const name = d && d.name ? String(d.name).slice(0, 24) : ''; return [i, { id: i, name, avatarUrl: initialAvatar(name, i) }]; })) };
+  function fbUser(u) {
+    FB.user = u;
+    if (u) {
+      if (!state.board.name && u.name) state.board.name = u.name.split(' ')[0].slice(0, 20);
+      state.board.fb = true; state.board.joined = true; save();
+      if (board.unsub) { board.unsub(); board.unsub = null; }
+      board.kind = 'firebase'; board.last = '';
+      connectBoard(fbDb(FB.api), fbPeople, u.uid).then(() => { boardSoon(); refreshFriends(); });
+    } else if (board.kind === 'firebase') {
+      if (board.unsub) { board.unsub(); board.unsub = null; }
+      board.db = null; board.me = null; board.docs = []; board.kind = null; refreshFriends();
+    }
+  }
+  function refreshFriends() { if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const sc = $('sheet').scrollTop; openFriends(); $('sheet').scrollTop = sc; } }
+  async function fbJoin(google) {
+    if (FB.busy) return;
+    const inp = $('fb-name'), name = (inp ? inp.value : state.board.name || '').trim().slice(0, 20);
+    if (!google && !name) { toast('Pick a name first. Friends will see it on the leaderboard.'); if (inp) inp.focus(); return; }
+    if (name) state.board.name = name;
+    FB.busy = true; FB.err = ''; save(); refreshFriends();
+    try {
+      const api = await fbLoad();
+      if (!api) throw { code: 'offline' };
+      if (google) { state.board.fbPending = true; save(); const r = await api.google(); if (r !== 'redirect') { state.board.fbPending = false; save(); } if (r === 'closed') toast('Sign-in closed.'); else if (r === 'switched') toast('Welcome back! That Google account already had a spot.'); }
+      else if (!api.current()) await api.joinAnon();
+      else fbUser(api.current());
+    } catch (e) { FB.err = (e && e.code) || 'error'; toast(fbErrText(FB.err)); }
+    FB.busy = false; refreshFriends();
+  }
+  function fbErrText(code) {
+    if (code === 'offline' || code === 'auth/network-request-failed') return 'Could not reach the leaderboard. Check your connection and try again.';
+    if (code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation') return 'This sign-in is not switched on for the leaderboard yet.';
+    if (code === 'auth/unauthorized-domain') return 'The leaderboard does not allow this web address yet.';
+    if (code === 'permission-denied') return 'The leaderboard refused the update.';
+    return 'Sign-in did not work this time. Joining with a name always works.';
+  }
+  async function fbLeave() {
+    const api = FB.api; if (!api || !board.me) return;
+    try { await api.remove(board.me); } catch (e) { /* already gone */ }
+    try { await api.signOut(); } catch (e) { /* ignore */ }
+    state.board = { joined: false, cheers: {}, name: state.board.name || '' }; save(); toast('You left the leaderboard.'); refreshFriends();
+  }
   const realState = () => (ui.visit ? ui.visit.real : state);
   // What other mayors see of your town: stats and the layout (never your gold or anything personal).
   function townSnap() {
@@ -4615,11 +5020,19 @@
   async function boardPush() {
     if (!board.db || !board.me || !state.board.joined || ui.visit) return;
     const body = Object.assign(townSnap(), { cheers: Object.assign({}, state.board.cheers || {}) });
+    if (board.kind === 'firebase') body.name = (state.board.name || state.builder || 'Mayor').slice(0, 20);
     const json = JSON.stringify(body);
     if (json === board.last) return;
     body.updatedAt = Date.now();
-    try { await board.db.doc('board/' + board.me).set(body); board.last = json; }
+    try {
+      await board.db.doc('board/' + board.me).set(body); board.last = json;
+      // show my own row right away, without waiting for the next refresh
+      const mine = Object.assign({ id: board.me }, body), i = board.docs.findIndex((d) => d.id === board.me);
+      if (i >= 0) board.docs[i] = mine; else board.docs.push(mine);
+      if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const l = $('sheet-body').querySelector('.lb'); if (l) renderBoardList(l); }
+    }
     catch (e) {
+      if (board.kind === 'firebase') { FB.err = (e && e.code) || 'error'; return; }
       if (e && e.code === 'invalid_argument') { state.board.joined = false; board.canWrite = false; save(); toast('You can see the leaderboard, but to join, the owner has to invite you as an Editor.'); }
     }
   }
@@ -4732,7 +5145,7 @@
     let ps = {};
     try { if (board.user && ids.length) ps = await board.user.profiles(ids); } catch (e) { /* names stay blank */ }
     listEl.replaceChildren();
-    if (!rows.length) { listEl.append(el('p', 'small muted', 'Nobody here yet.')); return; }
+    if (!rows.length) { listEl.append(el('p', 'small muted', FB.cfg && !board.db && !inFrame ? 'Join to see who is on the board.' : 'Nobody here yet.')); return; }
     rows.forEach((r, i) => {
       const me = r.live && r.id === board.me, row = el('div', 'lbrow' + (me ? ' me' : '') + (i < 3 ? ` r${i + 1}` : ''));
       const img = el('img'); img.alt = ''; img.src = r.live && ps[r.id] ? ps[r.id].avatarUrl : 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="18" fill="#93C46C"/><path d="M18 8 7 17h3v10h6v-6h4v6h6V17h3z" fill="#fff"/></svg>');
@@ -4753,6 +5166,39 @@
     if (ui.visit) return;
     const wrap = el('div', 'list');
     const live = !!(board.db && board.me);
+    if (FB.cfg && !inFrame && !live) {
+      // Join the online leaderboard: a name is enough; Google keeps your spot when you change phones.
+      const j = el('div', 'req fbjoin');
+      j.append(el('div', 'from', 'Online leaderboard'), el('div', 'small', 'Compete on focus minutes with your friends. They see your name, town name, level, residents, streak, focus minutes and your town\'s layout (so they can visit). Never your gold or anything else.'));
+      const f = el('label', 'field'); f.append(el('span', 'label', 'Your name on the board')); const ni = el('input'); ni.id = 'fb-name'; ni.maxLength = 20; ni.autocomplete = 'nickname'; ni.value = state.board.name || ''; ni.placeholder = 'e.g. Navid'; f.append(ni); j.append(f);
+      const jb = el('button', 'btn primary', FB.busy ? 'Joining…' : 'Join with this name'); jb.disabled = FB.busy; jb.addEventListener('click', () => fbJoin(false));
+      const gb = el('button', 'btn', 'Sign in with Google'); gb.disabled = FB.busy; gb.addEventListener('click', () => fbJoin(true));
+      const rr = el('div', 'row'); rr.append(jb, gb); j.append(rr);
+      j.append(el('div', 'tiny muted', 'Google is optional: it keeps your spot if you switch phones. On iPhone, Google sign-in from the home-screen app can be fussy; joining with a name always works.'));
+      if (FB.err) j.append(el('div', 'tiny', fbErrText(FB.err)));
+      wrap.append(j);
+      if (!FB.api && state.board.fb) fbLoad();
+    }
+    if (live && board.kind === 'firebase') {
+      const u = FB.user || {}, me = el('div', 'fbme');
+      me.append(el('span', 'small', `On the board as ${state.board.name || 'Mayor'}${u.google ? ' · Google' : ''}`));
+      if (!u.google) { const lg = el('button', 'link', 'Link Google'); lg.addEventListener('click', () => fbJoin(true)); me.append(lg); }
+      const ed = el('button', 'link', 'Change name'); ed.addEventListener('click', () => { ui.fbEdit = true; refreshFriends(); }); me.append(ed);
+      const lv = el('button', 'link', 'Leave'); lv.addEventListener('click', () => { ui.fbLeaveAsk = true; refreshFriends(); }); me.append(lv);
+      wrap.append(me);
+      if (ui.fbEdit) {
+        const box = el('div', 'confirm'); const ni = el('input'); ni.maxLength = 20; ni.value = state.board.name || ''; ni.setAttribute('aria-label', 'Your name on the board');
+        const ok = el('button', 'btn sm primary', 'Save'); ok.addEventListener('click', () => { const v = ni.value.trim().slice(0, 20); if (v) { state.board.name = v; save(); board.last = ''; boardPush(); } ui.fbEdit = false; refreshFriends(); });
+        const no = el('button', 'btn sm', 'Cancel'); no.addEventListener('click', () => { ui.fbEdit = false; refreshFriends(); });
+        const rr = el('div', 'row'); rr.append(no, ok); box.append(ni, rr); wrap.append(box);
+      }
+      if (ui.fbLeaveAsk) {
+        const box = el('div', 'confirm'); box.append(el('span', 'small', 'Leave the leaderboard? Your spot and your cheers are removed. You can join again any time.'));
+        const ok = el('button', 'btn sm primary', 'Leave'); ok.addEventListener('click', () => { ui.fbLeaveAsk = false; fbLeave(); });
+        const no = el('button', 'btn sm', 'Stay'); no.addEventListener('click', () => { ui.fbLeaveAsk = false; refreshFriends(); });
+        const rr = el('div', 'row'); rr.append(no, ok); box.append(rr); wrap.append(box);
+      }
+    }
     if (live && !state.board.joined) {
       const j = el('div', 'req');
       j.append(el('div', 'from', 'Leaderboard'), el('div', 'small', 'Compete on focus minutes with everyone who has this page. They will see your town name, level, residents, streak, focus minutes and your town\'s layout (so they can visit). Never your gold or anything else.'));
@@ -4764,8 +5210,8 @@
     for (const [k, lab] of [['week', 'This week'], ['day', 'Today'], ['all', 'All time']]) { const tb = el('button', '', lab); tb.setAttribute('aria-selected', String(board.tab === k)); tb.addEventListener('click', () => { board.tab = k; openFriends(); }); tabs.append(tb); }
     const listEl = el('div', 'lb');
     wrap.append(tabs, listEl);
-    if (!live) wrap.append(el('p', 'small muted', inFrame ? 'The live leaderboard needs your Claude account. Your saved neighbours are below.' : 'The live leaderboard runs inside Claude, where your accounts keep the scores. Here you can still swap town codes with friends.'));
-    if (!live && !inFrame) { const lk = el('a', 'btn sm', 'Open Maplewick in Claude'); lk.href = CLAUDE_URL; lk.target = '_blank'; lk.rel = 'noopener'; lk.style.textDecoration = 'none'; wrap.append(lk); }
+    if (!live && !FB.cfg) wrap.append(el('p', 'small muted', inFrame ? 'The live leaderboard needs your Claude account. Your saved neighbours are below.' : 'The live leaderboard runs inside Claude, where your accounts keep the scores. Here you can still swap town codes with friends.'));
+    if (!live && !inFrame && !FB.cfg) { const lk = el('a', 'btn sm', 'Open Maplewick in Claude'); lk.href = CLAUDE_URL; lk.target = '_blank'; lk.rel = 'noopener'; lk.style.textDecoration = 'none'; wrap.append(lk); }
     if (live && board.isOwner) wrap.append(el('p', 'tiny muted', 'To compete with someone, invite them from this page\'s Share menu as an Editor. They open the same link, tap the trophy and join.'));
     // Town codes
     const codes = el('div', 'menu-sec');
@@ -5024,7 +5470,9 @@
     ok.addEventListener('click', () => {
       const dp = dayPlan();
       if (dp.blocks.some((b) => t < b.at + b.dur && b.at < t + dpEdit.dur)) { toast('That overlaps another block. Pick a shorter one or another time.'); return; }
-      dp.blocks.push({ id: state.nextBlockId++, at: t, dur: dpEdit.dur, label: dpEdit.label.trim().slice(0, 40), status: 'planned' });
+      const nb = { id: state.nextBlockId++, at: t, dur: dpEdit.dur, label: dpEdit.label.trim().slice(0, 40), status: 'planned' };
+      if (t <= minsNow()) { nb.rung = true; nb.warned = true; } // you are planning it right now: no alarm, just a Start button
+      dp.blocks.push(nb);
       dpEdit.at = null; save(); sfx.pop(); renderAll(); openDayPlan();
     });
     const cancel = el('button', 'btn sm ghost', 'Cancel'); cancel.addEventListener('click', () => { dpEdit.at = null; openDayPlan(); });
@@ -5262,7 +5710,8 @@
     const go = () => {
       let rb = nearB && state.buildings.includes(nearB) ? nearB : null;
       if (!rb && type === 'firestation') rb = burningNow();
-      if (!rb && type === 'police') rb = state.buildings.find((h) => live(h) && T(h).cat === 'home' && !policeCovers(h));
+      const sk = TYPES[type].staff;
+      if (!rb && sk && staffBuildings(sk).length) rb = state.buildings.find((h) => SERVES[sk].what(h) && !coversB(sk, h));
       rb = rb || townHall();
       const ref = centerOf(rb), rs = sizeOf(rb.type), t = TYPES[type];
       let best = null, bd = Infinity;
@@ -5289,16 +5738,26 @@
     const r = STAFF[k], ro = roleInfo(k, city()), home = TYPES[r.home].name.toLowerCase();
     const site = state.buildings.find((x) => x.type === r.home && x.site), sq = site && jobFor(site.id);
     const stations = staffBuildings(k).length;
-    if (k === 'police' && ro.hasHome && nearB && T(nearB).cat === 'home' && !policeCovers(nearB) && ro.working >= stations && !sq)
-      return { kind: 'build', label: 'Build a police station nearer', fn: () => openServiceSpot('police', nearB) };
-    const short = ro.working < Math.max(1, ro.need) || (k === 'police' && ro.working < stations);
+    // Out of reach of every one of its buildings: build one nearer. In reach of one nobody works at yet: hire.
+    const far = ro.hasHome && nearB && SERVES[k].what(nearB) && !coversB(k, nearB);
+    const inReach = far && staffBuildings(k).some((x) => dist(x, nearB) <= reachOf(k));
+    if (far && !inReach && !sq) return { kind: 'build', label: `Build a ${home} nearer`, fn: () => { openServiceSpot(r.home, nearB); toast(`Too far: ${r.plural} only work within ${reachOf(k)} tiles of their ${home}.`); } };
+    const short = ro.working < Math.max(1, ro.need) || (inReach && ro.working < stations) || (k === 'police' && ro.working < stations);
     if (ro.hasHome && short && ro.hired < ro.cap) return { kind: 'hire', label: `Hire a ${r.name.toLowerCase()} · ${hireFee(k)} gold`, fn: () => showOnMap(staffBuildings(k)[0]) };
     if (sq && bigQ(sq)) return { kind: 'now', label: `Build the ${home} now · ${fmtMin(exactMinutes(sq.work - sq.done))}`, fn: () => { closeSheet(); doNow(sq); } };
     if (sq) return { kind: 'build', label: `The ${home} is being built`, fn: () => showOnMap(site) };
     if (!ro.hasHome) return { kind: 'build', label: `Build a ${home}`, fn: () => openServiceSpot(r.home, nearB) };
     if (ro.hasHome && short) return { kind: 'build', label: `Build another ${home}`, fn: () => { openServiceSpot(r.home, nearB); toast(`Your ${home} is full. Upgrade it or build another one.`); } };
-    if (k === 'police' && ro.cover < 1) return { kind: 'build', label: 'Build another police station', fn: () => openServiceSpot('police', nearB) };
+    if (ro.needed && ro.covered < ro.homes) return { kind: 'build', label: `Build another ${home}`, fn: () => openServiceSpot(r.home, nearB) };
     return null;
+  }
+  // A free tile next to a home, to put a lamp post on.
+  function lampNear(h) {
+    const s = sizeOf(h.type); let best = null, bd = Infinity;
+    for (let r = h.r - 2; r < h.r + s + 2; r++) for (let c = h.c - 2; c < h.c + s + 2; c++) { if (!fits('lamp', c, r)) continue; const d = Math.hypot(c - h.c - (s - 1) / 2, r - h.r - (s - 1) / 2) + (c + r < h.c + h.r ? 0 : 0.5); if (d < bd) { bd = d; best = { c, r }; } }
+    if (!best) { showOnMap(h); toast('No free tile next to it for a lamp post.'); return; }
+    ui.spot = best; openPanel({ kind: 'build', c: best.c, r: best.r, tab: 'decor' });
+    toast('A lamp post here keeps the street lit at night.');
   }
   function staffAction(k, nearB) { const pl = staffPlan(k, nearB); if (pl) pl.fn(); else if (nearB) showOnMap(nearB); }
   function openMood() {
@@ -5330,11 +5789,12 @@
     fac('Neighbourhoods', m.neigh, m.neigh >= 1 ? 'Parks and decorations near homes make people happy.' : m.neigh <= -1 ? 'Some homes sit next to something noisy or smelly.' : 'Put parks, flowers and trees right next to homes.', null, [-15, 25]);
     fac('Better buildings', m.quality, m.quality >= 1 ? 'Upgraded buildings make the town feel cared for.' : 'Upgrade buildings to raise this.', null, [0, 20]);
     const sw = role('sweeper'), dirty = m.avgTrash > 0.25;
-    fac('Clean streets', m.clean, dirty ? `Trash is piling up outside homes and shops.${sw.working ? ' Your street sweepers are cleaning it up.' : ' Build a cleaning depot and hire a street sweeper.'}` : 'The streets are clean.', dirty ? (sw.cover > 0.3 ? 'up' : 'down') : null, [-15, 6]);
-    const po = role('police');
-    if (po.needed) fac('Safety', m.safety, po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${TYPES.police.reach} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`, Math.abs(state.civic.safety - po.cover) > 0.03 ? (po.cover > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
+    const swFar = sw.working && sw.covered < sw.homes ? ` ${sw.homes - sw.covered} of them are more than ${reachOf('sweeper')} tiles from a staffed depot, so nobody cleans there.` : '';
+    fac('Clean streets', m.clean, dirty ? `Trash is piling up outside homes and shops.${sw.working ? ' Your street sweepers are cleaning it up.' + swFar : ' Build a cleaning depot and hire a street sweeper.'}` : `The streets are clean.${swFar}`, dirty ? (sw.cover > 0.3 ? 'up' : 'down') : null, [-15, 6]);
+    const po = role('police'), safeT = safetyTarget(city()), nk = nightK();
+    if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`} ${nk > 0.5 ? 'It is night: crime rises far from the police, and lamp posts keep streets safer.' : 'Crime rises at night, most of all far from the police and on streets without lamp posts.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
     const nu = role('nurse');
-    if (nu.needed) fac('Health', m.health, nu.cover >= 1 ? 'Enough nurses keep everyone healthy.' : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
+    if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} more than ${reachOf('nurse')} tiles from a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
     if (m.burning) fac('Fire', m.fires, staffWorking('fire') ? 'A building is on fire. Your firefighters are on their way.' : 'A building is on fire and nobody can put it out. Hire a firefighter.', null, [-20, 0]);
     const b = state.boost;
     if (m.landmarks) fac('Landmarks', m.landmarks, `${LANDMARK_ORDER.filter(hasLandmark).map((k) => TYPES[k].name).join(', ')}: the whole town is proud of ${LANDMARK_ORDER.filter(hasLandmark).length > 1 ? 'them' : 'it'}.`, null, [0, 17]);
@@ -5430,9 +5890,23 @@
       durs.append(b);
     }
     wrap.append(durs);
-    const js = jobs(), cur = currentJob();
-    wrap.append(el('span', 'label', planned ? `Your job when ${state.builder} is done` : 'Your job'));
-    const jr = el('div', 'jobs');
+    const js = jobs(), cur = currentJob(), m = startPick.duration, pv = sessionPreview(m);
+    // One line says what Sam does with this session and what you do after.
+    const lab = el('span', 'label');
+    if (planned) {
+      const fin = pv.sim.items.filter((x) => x.finished), part = pv.sim.items.find((x) => !x.finished && !x.waiting), wait = pv.sim.items.find((x) => x.waiting);
+      const pc = (q) => (q.done > 0.5 ? ` (already ${Math.floor(q.done / q.work * 100)}% done)` : '');
+      const finB = () => el('b', '', fin.length === 1 ? jobName(fin[0].q) + pc(fin[0].q) : `${fin.length} jobs`);
+      if (part) { lab.append(`${state.builder} works on `, el('b', '', jobName(part.q) + pc(part.q)), ` (${Math.round(part.done / part.q.work * 100)}% by the end)${fin.length ? ` after finishing ${fin.length}` : ''}. No time left for your job.`); }
+      else if (wait && !fin.length) {
+        // Sam never starts a job he can't finish, so a short session goes to your job instead.
+        const need = exactMinutes(wait.q.work - wait.q.done);
+        lab.append(el('b', '', capFirst(jobName(wait.q))), ` needs ${fmtMin(need)}, so ${state.builder} waits. You:`);
+      } else if (wait) lab.append(`${state.builder} finishes `, finB(), `, then you (${jobName(wait.q)} needs longer):`);
+      else lab.append(`${state.builder} finishes `, finB(), ', then you:');
+    } else lab.append('Your job');
+    wrap.append(lab);
+    const jr = el('div', 'jobs' + (planned && pv.sim.leftover < 0.05 ? ' idle' : ''));
     for (const j of js) {
       const b = el('button', 'jobchip'); b.type = 'button'; b.setAttribute('aria-pressed', String(j.bid === cur.bid));
       b.setAttribute('aria-label', `${j.verb} ${j.at}: ${jobLine(j)}`);
@@ -5441,14 +5915,7 @@
       jr.append(b);
     }
     wrap.append(jr);
-    const m = startPick.duration, pv = sessionPreview(m);
     const box = el('div', 'preview');
-    if (planned) {
-      const fin = pv.sim.items.filter((x) => x.finished).map((x) => jobLabel(x.q).toLowerCase());
-      const notDone = pv.sim.items.filter((x) => !x.finished);
-      if (fin.length) box.append(el('div', '', `${state.builder} finishes: ${fin.join(', ')}.`));
-      if (notDone.length) box.append(el('div', 'small muted', `Not finished this time: ${notDone.map((x) => jobLabel(x.q).toLowerCase()).join(', ')}. Progress is kept.`));
-    }
     // One tile per thing you get, everything already added up.
     const tl = el('div', 'ptiles');
     const ptile = (k, ic, val, unit) => { const t = el('div', 'ptile k-' + k), top = el('span', 'pt-top'), ico = el('span', 'ti-ic'); if (ic === 'coin') ico.append(coinEl()); else ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO[ic]}</svg>`; top.append(ico, unit); t.append(top, el('b', 'num', val)); tl.append(t); };
@@ -5464,7 +5931,7 @@
     if (pv.comboN) extras.push(`Combo ×${pv.combo.toFixed(1)}: session ${pv.comboN + 1} in a row`);
     if (pv.bonusPct >= 4) extras.push(`Long-session bonus +${pv.bonusPct}%`);
     if (extras.length) { const ex = el('div', 'pextras'); for (const e of extras) ex.append(el('span', '', e)); box.append(ex); }
-    if (pv.chest) { const ch = el('div', 'tiny'); ch.style.marginTop = '2px'; ch.append(el('b', '', 'Chest at the end'), ' · longer sessions find better ones'); box.append(ch, oddsBar(m, pv.comboN)); }
+    if (pv.chest) box.append(oddsBar(m, pv.comboN));
     wrap.append(box);
     const go = el('button', 'btn primary full', `Start ${fmtMin(m)} of focus`);
     go.style.minHeight = '52px'; go.style.fontSize = '17px';
@@ -5515,8 +5982,12 @@
     const clkc = el('input'); clkc.type = 'checkbox'; clkc.id = 'set-clock'; clkc.checked = !state.realClock;
     clkc.addEventListener('change', () => { state.realClock = !clkc.checked; save(); renderHud(); });
     clk.append(clkt, clkc);
+    const lk = el('div', 'switch'); const lkt = el('span'); lkt.append(el('b', '', 'Lock-screen timer'), el('div', 'tiny muted', 'While you focus, a soft sound plays so your iPhone lock screen shows the time left, like a song that is playing. It pauses other music apps while it plays.'));
+    lk.append(lkt);
+    const lks = el('div', 'dp-durs');
+    for (const k of Object.keys(LOCK_SOUNDS)) { const b = el('button', '', LOCK_SOUNDS[k]); b.type = 'button'; b.setAttribute('aria-pressed', String(state.lockSound === k)); b.addEventListener('click', () => { state.lockSound = k; if (k !== 'off') state.lockKind = k; save(); openMenu(); }); lks.append(b); }
     const mv = el('button', 'btn', 'Move your town to another device'); mv.addEventListener('click', openMoveTown);
-    sec('Settings', f1, f2, saveBtn, snd, mus, trk, clk, alm, mv);
+    sec('Settings', f1, f2, saveBtn, snd, mus, trk, lk, lks, clk, alm, mv);
     const sw = el('label', 'switch');
     const st = el('span'); st.append(el('b', '', 'Test speed'), el('div', 'tiny muted', 'One focus minute takes one second, and the focus screen gets a "finish now" button. Play time still runs in real time.'));
     const cb = el('input'); cb.type = 'checkbox'; cb.id = 'set-speed'; cb.checked = state.speed > 1; cb.disabled = !!state.session;
@@ -5644,13 +6115,13 @@
     const test = state.speed > 1;
     $('focus-pickup').hidden = !test; $('focus-skip').hidden = !test;
     $('focus-confirm').hidden = true; $('focus-actions').hidden = false;
-    renderFocus(Date.now());
+    renderFocus(Date.now()); renderLockBtn();
   }
   function hideFocus() { $('focus').hidden = true; if (ui.overlay === 'focus') ui.overlay = null; }
   function focusNow(now) {
     const s = state.session; if (!s) return null;
     const m = sessionMinutes(s, now);
-    const sim = simulate(state.queue, workFor(m));
+    const sim = simulate(sessionQueue(s), workFor(m), false);
     const cur = sim.items.find((x) => !x.finished);
     const job = jobs().find((j) => j.bid === s.jobBid) || currentJob();
     return { s, m, sim, cur, job };
@@ -5665,7 +6136,10 @@
     if (fc.dataset.html !== fcHtml) { fc.innerHTML = fcHtml; fc.dataset.html = fcHtml; }
     fc.hidden = false;
     const list = $('focus-list'); list.replaceChildren();
-    if (cur) { $('focus-eyebrow').textContent = `Building with ${state.builder}`; $('focus-task').textContent = `${state.builder} is working on: ${jobLabel(cur.q).toLowerCase()} · ${Math.round(cur.done / cur.q.work * 100)}%`; }
+    if (cur) {
+      const was = s.startDone && s.startDone[cur.q.id] > 0.5 ? ` (was ${Math.floor(s.startDone[cur.q.id] / cur.q.work * 100)}% when you started)` : '';
+      $('focus-eyebrow').textContent = `Building with ${state.builder}`; $('focus-task').textContent = `${state.builder} is working on: ${jobLabel(cur.q).toLowerCase()} · ${Math.floor(cur.done / cur.q.work * 100)}%${was}`;
+    }
     else { $('focus-eyebrow').textContent = sim.items.length ? 'Plan finished' : 'At work'; $('focus-task').textContent = `You: ${job.verb.toLowerCase()} ${job.at} · +${fmtGold(sim.leftover * job.gold)} gold so far`; }
     for (const it of sim.items) list.append(el('li', it.finished ? 'done' : '', `${it.finished ? '✓ ' : ''}${jobLabel(it.q)}`));
   }
@@ -5868,7 +6342,9 @@
   const LOOT_ICONS = {
     gold: '<circle cx="12" cy="12" r="9" fill="#E8A93A"/><circle cx="12" cy="12" r="6.2" fill="#F6C65B"/><path d="M12 7.8v8.4M9.6 10c0-1 1-1.6 2.4-1.6s2.4.6 2.4 1.5c0 2.2-4.8 1.3-4.8 3.6 0 1 1 1.7 2.4 1.7s2.4-.6 2.4-1.6" stroke="#9A6512" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
     play: '<circle cx="12" cy="12" r="10" fill="#A3E635"/><path d="M9.5 7.5v9l7-4.5z" fill="#1A2E04"/>',
-    freeze: '<circle cx="12" cy="12" r="10" fill="#BFE3FF"/><path d="M12 5v14M6 8.5l12 7M18 8.5l-12 7" stroke="#2B6FD4" stroke-width="1.8" stroke-linecap="round"/>'
+    freeze: '<circle cx="12" cy="12" r="10" fill="#BFE3FF"/><path d="M12 5v14M6 8.5l12 7M18 8.5l-12 7" stroke="#2B6FD4" stroke-width="1.8" stroke-linecap="round"/>',
+    moves: '<circle cx="12" cy="12" r="10" fill="#FFD9A8"/><path d="M5.5 12h13M15 8.5l3.5 3.5-3.5 3.5M9 8.5 5.5 12 9 15.5" stroke="#9A4F12" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    coffee: '<circle cx="12" cy="12" r="10" fill="#E9D3B6"/><path d="M7 10h8v3.6a3.4 3.4 0 0 1-3.4 3.4h-1.2A3.4 3.4 0 0 1 7 13.6z" fill="#6B3E1E"/><path d="M15 11h1.2a1.6 1.6 0 0 1 0 3.2H15" stroke="#6B3E1E" stroke-width="1.4" fill="none"/><path d="M9.5 8.4c0-1 1-1 1-2M12.2 8.4c0-1 1-1 1-2" stroke="#8A5A33" stroke-width="1.1" fill="none" stroke-linecap="round"/>'
   };
   function showChest(r) {
     hideCelebration();
@@ -5939,6 +6415,8 @@
       if (l.kind === 'gold') { main = `+${l.n} gold`; sub = 'Straight into your treasury'; }
       if (l.kind === 'play') { const got = l.got != null ? l.got : l.n; main = `+${fmtClock(got)} play time`; sub = got + 1 < l.n ? (playLeftToday() <= 0 ? 'Daily play limit reached: the rest stays in the chest' : 'Your play time is full') : 'More time to enjoy your town'; }
       if (l.kind === 'freeze') { main = 'Streak freeze'; sub = 'Saves your streak if you miss a day'; }
+      if (l.kind === 'moves') { main = `${l.n} free move${l.n > 1 ? 's' : ''}`; sub = 'Move a building for free instead of paying the moving crew'; }
+      if (l.kind === 'coffee') { main = `Coffee for ${state.builder} ×${l.n}`; sub = `Your next ${l.n} builds during play go twice as fast`; }
     }
     const tx = el('span'); tx.append(el('b', '', main), el('small', '', sub));
     li.append(ic, tx); $('chest-loot').append(li);
@@ -6041,7 +6519,8 @@
       const pillEl = el('span', 'rw k-' + kind); pillEl.textContent = amt; li.append(pillEl); led.append(li);
     };
     if (r.reason === 'pickup') row('bad', 'alert', 'Phone picked up', 'no chest', 'bad');
-    if (r.lost) row('bad', 'alert', `Ended early: ${state.builder}'s work this session on ${r.lost.join(', ')} was lost`, 'lost', 'bad');
+    if (r.lost) for (const l of r.lost) row('bad', 'alert', `Ended early: ${l.text}`, l.gold ? `−${l.gold} gold` : 'lost', 'bad');
+    if (r.grace) row('play', 'alert', 'Ended in the first minute: nothing was lost', 'free', 'play');
     for (const g of r.gold) row(g.ic === 'heart' || g.ic === 'gift' ? 'req' : g.ic === 'chest' ? 'chest' : g.ic === 'badge' ? 'badge' : 'gold', g.ic, g.label, `${g.n < 0 ? '−' : '+'}${fmtGold(Math.abs(g.n))} gold`, g.n < 0 ? 'bad' : 'gold', g.ic === 'badge' ? `background:${TIER_COLORS[g.tier][0]};color:#3B2A10` : g.ic === 'chest' ? `background:${RARITY[g.rar].body};color:#fff` : '');
     if (r.comboGold) row('combo', 'combo', `Combo ×${r.combo.mult.toFixed(1)} on gold`, `+${fmtGold(r.comboGold)} gold`, 'gold');
     for (const x of r.xpParts) row('xp', x.ic === 'plan' ? 'plan' : 'xp', x.label, `+${x.n} XP`, 'xp');
@@ -6050,7 +6529,7 @@
     for (const p of r.playParts) row('play', 'play', p.label, `+${fmtClock(p.n)}`, 'play');
     if (r.boost) row('energy', 'energy', 'Focus energy: town mood', `+${r.boost.pts} · ${fmtMin(r.boost.durMin)}`, 'energy');
     if (r.chest) { const it = r.chest.loot.find((l) => l.kind === 'item'); if (it) row('chest', 'chest', `Found: ${TYPES[it.type].name} (waiting to be placed)`, RARITY[r.chest.rar].name, 'chest'); }
-    if (r.chest) for (const l of r.chest.loot) { if (l.kind === 'rush') row('combo', 'energy', `${TYPES[l.type].name} rush: ×${l.mult} income for ${l.min} min of play and focus`, `×${l.mult}`, 'combo'); if (l.kind === 'perk') row('combo', 'energy', `${TYPES[l.type].name} perk: +10% income for good`, '+10%', 'combo'); }
+    if (r.chest) for (const l of r.chest.loot) { if (l.kind === 'moves') row('chest', 'chest', `${l.n} free move${l.n > 1 ? 's' : ''} (you have ${state.freeMoves || 0})`, 'chest', 'chest'); if (l.kind === 'coffee') row('chest', 'chest', `Coffee: your next ${l.n} play builds go 2× faster`, '2×', 'chest'); if (l.kind === 'rush') row('combo', 'energy', `${TYPES[l.type].name} rush: ×${l.mult} income for ${l.min} min of play and focus`, `×${l.mult}`, 'combo'); if (l.kind === 'perk') row('combo', 'energy', `${TYPES[l.type].name} perk: +10% income for good`, '+10%', 'combo'); }
     if (r.seasonItem) row('chest', 'gift', `${SEASONS[curSeason()].fest}: you earned the ${TYPES[r.seasonItem].name.toLowerCase()}`, 'free', 'chest');
     if (r.playCapped) row('play', 'play', r.playCapped === 'daily' ? `Daily play limit reached (${fmtMin(DAILY_PLAY / 60)} a day). Gold and XP still count.` : `Play time is full (${fmtMin(PLAY_CAP / 60)} max). Spend some first.`, 'limit', 'play');
     if (r.cleaned) row('clean', 'clean', 'Your sweepers cleaned up while you worked', 'cleaner', 'clean');
@@ -6125,7 +6604,7 @@
     at(t, () => {
       for (const o of [G, X, P]) o.t.classList.remove('active');
       if (r.nextCombo && comboNow() > 0) say(`${FLAME_SVG}<b>Focus again within ${COMBO_WINDOW} min</b> for a ×${r.nextCombo.toFixed(1)} combo`, 'combo');
-      else if (r.lost) say(`Ended early: ${state.builder}'s work on ${esc(r.lost[0])} was lost`, 'bad');
+      else if (r.lost) say(esc(r.lost[0].short), 'bad');
       else if (r.reason === 'pickup') say('Phone picked up: no chest this time', 'bad');
       else if (r.reason === 'ended') say('Finish a whole session to get a chest', '');
       else src.replaceChildren();
@@ -6142,7 +6621,7 @@
       if (r.combo && (r.comboGold || r.comboXp) && !box.querySelector('.tcombo')) { const st = el('div', 'tcombo'); st.innerHTML = `${FLAME_SVG}×${r.combo.mult.toFixed(1)}`; box.append(st); }
       if (r.xp && r.xp.ups.length && !X.t.querySelector('.lvl')) X.t.append(el('span', 'lvl', `Level ${r.xp.ups[r.xp.ups.length - 1].level}!`));
       if (r.nextCombo && comboNow() > 0) say(`${FLAME_SVG}<b>Focus again within ${COMBO_WINDOW} min</b> for a ×${r.nextCombo.toFixed(1)} combo`, 'combo');
-      else if (r.lost) say(`Ended early: ${state.builder}'s work on ${esc(r.lost[0])} was lost`, 'bad');
+      else if (r.lost) say(esc(r.lost[0].short), 'bad');
       else src.replaceChildren();
     };
     for (const sp of steps) TALLY.timers.push(setTimeout(sp.fn, reduced ? 0 : sp.ms));
@@ -6269,6 +6748,14 @@
       if (vb) openPanel({ kind: 'info', bid: vb.id });
       return;
     }
+    // The building under the finger, ignoring bubbles and markers drawn on top of it.
+    const under = () => { const w0 = toWorld(sx, sy), t0 = tileAtWorld(w0.x, w0.y); return t0 && isOpen(t0.c, t0.r) ? at(t0.c, t0.r) || null : null; };
+    // A second tap on the same marker reaches the building behind it.
+    const lh = ui.lastHit; ui.lastHit = null;
+    if (ui.screen === 'play' && !ui.holding && lh && performance.now() - lh.t < 2500 && Math.hypot(sx - lh.x, sy - lh.y) < 32) {
+      const ub = under();
+      if (ub && ub.id === lh.behind) { ui.barOpen = false; ui.flash = { bid: ub.id, t0: performance.now() }; openPanel({ kind: 'info', bid: ub.id }); return; }
+    }
     // With a card or the bottom bar open, the first tap on the map just closes it.
     if (ui.screen === 'play' && ui.barOpen) { closeBar(); return; }
     if (ui.screen === 'play' && ui.panel && ui.panel.kind !== 'place' && !ui.holding) { closePanel(); return; }
@@ -6278,11 +6765,16 @@
       if (h.plot) { const go = () => openPanel({ kind: 'land', plot: h.plot }); if (ui.screen === 'home') { if (enterPlay()) setTimeout(go, 420); } else go(); return; }
       const b = byId(h.bid); if (!b) break;
       const bb = h.bubble;
+      const ub = ui.screen === 'play' ? under() : null;
+      const behind = ub && ub.id !== b.id ? ub : null;
+      if (behind) ui.lastHit = { t: performance.now(), x: sx, y: sy, behind: behind.id };
+      if (bb && bb.role === 'lamp') { lampNear(b); return; }
       if (bb && bb.role) { staffAction(bb.role, b); return; }
       if (bb && bb.src && byId(bb.src)) { showOnMap(byId(bb.src)); toast(`${b.resident || 'The neighbours'} would like this moved further away from their home.`); return; }
       if (ui.screen === 'home') { showOnMap(b, h.q ? { tab: 'info' } : null); return; }
       ui.flash = { bid: b.id, t0: performance.now() };
       openPanel(b.fire && staffWorking('fire') < 1 ? { kind: 'alert', bid: b.id } : { kind: 'info', bid: b.id, tab: h.q ? 'info' : 'actions' });
+      if (behind && (state.flags.tapHint = (state.flags.tapHint || 0) + 1) <= 4) toast(`Wanted the ${T(behind).name.toLowerCase()} behind? Tap the same spot again.`);
       return;
     }
     if (ui.screen === 'home') { enterPlay(sx, sy); return; }
@@ -6291,7 +6783,7 @@
       if (!tl) return;
       const item = heldItem(); if (!item) return;
       const a = anchorFor(item.type, tl.c, tl.r);
-      if (!fits(item.type, a.c, a.r, item.moveId)) { toast(!isOpen(tl.c, tl.r) ? 'That land is still wild. Clear it first.' : sizeOf(item.type) > 1 ? `It needs a free ${sizeOf(item.type)}×${sizeOf(item.type)} space there.` : 'That spot is taken. Pick a free tile.'); return; }
+      if (!fits(item.type, a.c, a.r, item.moveId)) { toast(!isOpen(tl.c, tl.r) ? 'That land is still wild. Clear it first.' : spotWhy(item.type, a.c, a.r, item.moveId)); return; }
       if (item.isNew || sizeOf(item.type) > 1) { ui.preview = { c: a.c, r: a.r }; ui.panel = { kind: 'place' }; renderAll(); return; }
       placeHeld(a.c, a.r); return;
     }
@@ -6359,8 +6851,22 @@
   });
   $('focus-end').addEventListener('click', () => {
     const f = focusNow(Date.now());
-    $('focus-confirm-text').textContent = f && f.cur ? `End now? ${state.builder}'s work on ${jobLabel(f.cur.q).toLowerCase()} this session is lost (${Math.round(f.cur.done / f.cur.q.work * 100)}% so far), and so is your chest. Anything already finished stays built.` : 'End now? You keep the gold and play time so far, but lose the chest and your combo.';
+    let txt = 'End now? You keep the gold and play time so far, but lose the chest and your combo.';
+    if (f && f.m < 1) txt = 'End now? You are still in the first minute, so nothing is lost. You just get no rewards.';
+    else if (f && f.cur && f.cur.done > f.cur.q.done + 0.05) {
+      const q = f.cur.q, paid = Math.round(q.paid || 0), gold = paid ? ` and the ${paid} gold you paid is gone` : '';
+      txt = keepsWork(q) ? `End now? ${state.builder}'s work on ${jobName(q)} this session is lost (earlier progress is kept), and so is your chest.`
+        : q.kind === 'build' ? `End now? The half-built ${TYPES[q.type].name.toLowerCase()} is torn down${gold}. You lose the chest too.`
+        : `End now? ${capFirst(jobName(q))} is cancelled${gold}. You lose the chest too.`;
+      txt += ' Anything already finished stays built.';
+    }
+    $('focus-confirm-text').textContent = txt;
     $('focus-confirm').hidden = false; $('focus-actions').hidden = true;
+  });
+  $('focus-lock').addEventListener('click', () => {
+    if (state.lockSound !== 'off' && LOCK.on) { state.lockKind = state.lockSound; state.lockSound = 'off'; lockStop(false); toast('Lock-screen timer off.'); }
+    else { if (state.lockSound === 'off') state.lockSound = state.lockKind || 'rain'; lockStart(); toast('Lock your phone: the time left shows on the lock screen. Change the sound in the menu.'); }
+    save(); renderLockBtn();
   });
   $('focus-keep').addEventListener('click', () => { $('focus-confirm').hidden = true; $('focus-actions').hidden = false; });
   $('focus-stop').addEventListener('click', () => finishSession('ended'));
@@ -6416,6 +6922,7 @@
   setInterval(tick, 250);
   requestAnimationFrame(loop);
   connectCloud();
+  if (FB.cfg && !inFrame && (state.board.fb || state.board.fbPending)) fbLoad(); // back on the online leaderboard
   window.MaplewickDebug = Object.freeze({
     state: () => JSON.parse(JSON.stringify(state)),
     screen: () => ui.screen,
@@ -6462,6 +6969,17 @@
     pack: (o, tag) => packCode(o, tag || 'MWT1'),
     unpack: (code, tag) => unpackCode(code, tag || 'MWT1'),
     board: () => ({ me: board.me, docs: board.docs.length, joined: state.board.joined, canWrite: board.canWrite }),
+    fits: (type, c, r) => fits(type, c, r),
+    anySpot: (type) => anySpot(type),
+    checkNew: (type) => { const x = checkNew(type); return { ok: x.ok, why: x.why || '', nospot: !!x.nospot }; },
+    hints: () => { const h = hints(); return { fit: h.length, blocked: h.blocked ? h.blocked.length : 0, bad: h.filter((x) => x.bad).length, best: h.filter((x) => x.label).length, max: h.max, min: h.min }; },
+    covers: (k, bid) => coversB(k, byId(bid)),
+    safety: () => ({ target: safetyTarget(city()), now: state.civic.safety, night: nightK() }),
+    townStep: (m) => { townStep(m); },
+    loot: (rar, n) => { const c = {}; for (let i = 0; i < (n || 200); i++) for (const l of chestLoot(rar)) c[l.kind] = (c[l.kind] || 0) + 1; return c; },
+    moveCost: (bid) => moveCost(byId(bid)),
+    simulate: (min) => simulate(state.queue, workFor(min)).items.map((x) => ({ type: x.q.type, finished: x.finished, waiting: !!x.waiting, done: x.done })),
+    complaint: () => { const o = complaintFor(); return o ? { bid: o.b.id, text: o.text, role: o.role || null } : null; },
     freeSpot: (c, r) => { for (let d = 0; d < 8; d++) for (let dc = -d; dc <= d; dc++) for (let dr = -d; dr <= d; dr++) { if (Math.max(Math.abs(dc), Math.abs(dr)) !== d) continue; if (freeTile(c + dc, r + dr)) return { c: c + dc, r: r + dr }; } return null; }
   });
 })();
