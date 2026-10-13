@@ -117,7 +117,7 @@
   @keyframes tick { 0% { transform: scale(1); } 35% { transform: scale(1.3); } 100% { transform: scale(1); } }
   @keyframes glow { 0%, 100% { box-shadow: var(--shadow); } 50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--focus) 22%, transparent), var(--shadow); } }
 
-  .app { height: 100%; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; background: var(--bg); position: relative; }
+  .app { height: 100%; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; background: var(--bg); position: relative; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   @media (min-width: 560px) { .app { box-shadow: 0 0 0 1px var(--line), var(--shadow); } }
 
   /* Top bar */
@@ -126,6 +126,12 @@
   .brand { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; }
   .brand h1 { font-size: 24px; font-weight: 800; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
   .icon-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; width: 42px; height: 42px; display: inline-grid; place-items: center; flex: none; }
+  .musicbox { flex: none; display: flex; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; overflow: hidden; height: 42px; }
+  .musicbox button { border: 0; background: transparent; width: 34px; display: grid; place-items: center; color: var(--muted); }
+  .musicbox button svg { width: 17px; height: 17px; }
+  .musicbox button + button { border-left: 1px solid var(--line); }
+  .musicbox button.on { color: var(--focus); }
+  @media (max-width: 400px) { .icon-btn { width: 38px; height: 38px; } .musicbox { height: 38px; } .musicbox button { width: 30px; } .brand h1 { font-size: 21px; } .hud-row { gap: 6px; } }
   .chips { display: grid; grid-template-columns: 1.5fr 1fr 1.05fr 1fr 1fr; gap: 5px; }
   .face { width: 24px; height: 24px; flex: none; }
   .chip.mood.boosted { box-shadow: 0 0 0 2px var(--gold-bright); }
@@ -297,6 +303,15 @@
   .homebar .bigfocus span { font-size: 27px; }
   .homebar .bigfocus small { font-size: 13.5px; }
   .pb-row { display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 8px; align-items: stretch; }
+  .playbar.float { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; border-radius: 22px 22px 0 0; border-top: 0; box-shadow: 0 -10px 30px rgba(20, 30, 28, .2); transform: translateY(calc(100% + 10px)); transition: transform .3s cubic-bezier(.2, 1.1, .3, 1); padding-top: 18px; touch-action: none; }
+  .playbar.float::before { content: ''; position: absolute; left: 50%; top: 7px; width: 40px; height: 5px; margin-left: -20px; border-radius: 99px; background: var(--line); }
+  .playbar.float.open { transform: none; }
+  .barhandle { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 5; border: 0; border-radius: 99px; background: linear-gradient(135deg, var(--focus), var(--focus-2)); color: var(--focus-ink); padding: 9px 18px 9px 13px; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; gap: 7px; box-shadow: var(--shadow); white-space: nowrap; animation: popIn .3s both; touch-action: none; max-width: calc(100% - 140px); }
+  .barhandle:active:not(:disabled) { transform: scale(.95); }
+  .barhandle svg { width: 18px; height: 18px; flex: none; }
+  .barhandle span { overflow: hidden; text-overflow: ellipsis; }
+  .barhandle.combo { background: linear-gradient(135deg, var(--combo), #B8401A); }
+  .barhandle.pop { animation: focusPop .8s cubic-bezier(.2, 1.6, .3, 1) 2; }
   .sidebtn { position: relative; border: 1px solid var(--line); background: var(--surface); border-radius: 16px; min-height: 64px; padding: 6px 2px; display: grid; place-items: center; align-content: center; gap: 3px; font-size: 12px; font-weight: 800; box-shadow: 0 1px 0 rgba(30,42,40,.06); }
   .sidebtn svg { width: 20px; height: 20px; }
   .sidebtn .badge { position: absolute; top: 4px; right: 4px; margin: 0; }
@@ -648,6 +663,9 @@
   .lbacts { grid-column: 3 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
   .codebox { width: 100%; min-height: 70px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface); font: 12px/1.35 ui-monospace, Menlo, monospace; resize: vertical; word-break: break-all; }
   .app.visiting #chip-gold, .app.visiting #chip-play { visibility: hidden; }
+  .app.visiting .skychip { display: none; }
+  .skychip { position: absolute; right: 12px; top: 10px; z-index: 2; border: 0; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; background: color-mix(in oklab, var(--surface) 88%, transparent); box-shadow: var(--shadow); font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .reqpill:not([hidden]) ~ .skychip { top: 58px; }
   .visitbar { position: absolute; left: 12px; right: 12px; top: 10px; display: flex; align-items: center; gap: 8px; background: var(--ink); color: var(--bg); border-radius: 14px; box-shadow: var(--shadow); padding: 8px 10px 8px 14px; font-size: 13.5px; font-weight: 700; animation: popIn .3s both; }
   .visitbar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .visitbar .btn { min-height: 36px; padding: 4px 12px; color: var(--ink); }
@@ -704,6 +722,7 @@
   <header class="hud">
     <div class="hud-row">
       <div class="brand"><h1 id="town-name">Maplewick</h1><button class="xpline" id="xpline" aria-label="Mayor level"><span class="lv"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="lvl-text">Lv 1</span></span><span class="xpbar" aria-hidden="true"><span id="xp-fill" style="width:0%"></span></span></button></div>
+      <div class="musicbox" role="group" aria-label="Music"><button id="mus-toggle" aria-label="Play music"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l10.5-6.5z"/></svg></button><button id="mus-skip" aria-label="Next track"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 5.5v13l9-6.5zM16 5.5h2.6v13H16z"/></svg></button></div>
       <button class="icon-btn" id="open-friends" aria-label="Friends and leaderboard"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm0 4H6v1a2 2 0 0 0 1 1.7zm10 0v2.7A2 2 0 0 0 18 8V7z"/></svg></button>
       <button class="icon-btn" id="open-menu" aria-label="Menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></button>
     </div>
@@ -721,6 +740,7 @@
     <button class="home-cta" id="home-cta"><span class="playdot" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg></span><span><span id="cta-main">Tap your town to play</span><small id="cta-sub">0:00 of play time</small></span></button>
     <button class="reqpill" id="reqpill" hidden></button>
     <button class="season" id="season-card" hidden></button>
+    <button class="skychip" id="skychip" aria-label="Time and weather in town"></button>
     <div class="zoom" id="zoom" hidden>
       <button id="zoom-in" aria-label="Zoom in">+</button>
       <button id="zoom-out" aria-label="Zoom out">−</button>
@@ -745,7 +765,8 @@
       <button class="btn playc" id="btn-play">Play <span class="num" id="play-sub">0:00</span></button>
     </div>
   </nav>
-  <nav class="playbar" id="playbar" aria-label="Play actions" hidden>
+  <button class="barhandle" id="barhandle" hidden aria-label="Show Home, Focus and Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 7.6 7 7-1.6 1.6-5.4-5.4-5.4 5.4L5 14.6z"/></svg><span id="bh-text">Focus · Home · Plan</span></button>
+  <nav class="playbar float" id="playbar" aria-label="Play actions" hidden>
     <div class="combo-chip" id="combo-play" hidden></div>
     <div class="pb-row">
       <button class="sidebtn" id="play-home" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3 2.5 11H5v9h5v-6h4v6h5v-9h2.5z"/></svg><span>Home</span></button>
@@ -779,7 +800,7 @@
       <button class="night-btn warn" id="focus-skip" hidden>Test: finish now</button>
     </div>
     <div class="focus-confirm" id="focus-confirm" hidden>
-      <span>End now? You keep everything built so far, but lose the clean-session gift.</span>
+      <span id="focus-confirm-text">End now? Anything already finished stays built, but you lose the chest.</span>
       <div class="focus-actions"><button class="night-btn" id="focus-keep">Keep going</button><button class="night-btn warn" id="focus-stop">End session</button></div>
     </div>
   </div>
@@ -899,7 +920,8 @@
   const QUEUE_MAX = 5;
   // Small jobs get built while you play (a couple of seconds per minute of work). Big projects need focus:
   // the town hall, new land, landmarks, the stadium, and anything over half an hour of work.
-  const BIG_WORK = 30, PLAY_BUILD_SEC = 2;
+  // Building gets slower as the town grows: 3 seconds of play per minute of work at town hall 1, then 4.5, 6 and 7.5.
+  const BIG_WORK = 30, PLAY_BUILD_SEC = [0, 3, 4.5, 6, 7.5], BUILD_MAX_SEC = 150;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
   const MIN_SESSION = 5;
   const NAMES = ['Mira', 'Theo', 'Priya', 'Jonas', 'Kofi', 'Ines', 'Hugo', 'Yara', 'Sven', 'Noor', 'Ezra', 'Tilly', 'Ravi', 'Ada', 'Felix', 'June', 'Malik', 'Elsie', 'Tomas', 'Wren', 'Idris', 'Pia', 'Otto', 'Leila'];
@@ -1018,6 +1040,12 @@
       needed: () => countLive('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' }
   };
   const STAFF_ORDER = ['sweeper', 'gardener', 'fire', 'police', 'nurse'];
+  // Each extra person of the same kind costs more to hire and asks a higher wage: the 2nd 1.6× the fee and 1.5× the wage, the 3rd 2.2× and 2×, and so on.
+  const STAFF_STEP_FEE = 0.6, STAFF_STEP_WAGE = 0.5;
+  const hireFee = (k, n) => Math.round(STAFF[k].fee * (1 + STAFF_STEP_FEE * (n == null ? (state.staff[k] || 0) : n)));
+  const wageOf = (k, i) => Math.round(STAFF[k].wage * (1 + STAFF_STEP_WAGE * i));
+  const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
+  const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th');
   const noStaff = () => ({ sweeper: 0, police: 0, fire: 0, gardener: 0, nurse: 0 });
   const BUILD_ORDER = ['cottage', 'market', 'cafe', 'park', 'townhouse', 'bakery', 'fountain', 'arcade', 'workshop', 'bookshop', 'bank', 'stadium'];
   const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle'];
@@ -1116,7 +1144,7 @@
       questsSeen: [], badges: [], flags: {}, civic: { safety: 1, health: 1 }, fireIn: null,
       xp: 0, level: 1, combo: { n: 0, until: 0 }, chestStats: { opened: 0, sinceSilver: 0, sinceGold: 0, byRarity: [0, 0, 0, 0] },
       land: ['base'], dayPlan: { day: null, blocks: [], perfect: false }, nextBlockId: 1,
-      rush: [], perks: {}, playDay: { key: null, sec: 0 }, season: { key: null, min: 0, got: [] }, week: { key: null, min: 0 }, friends: [], board: { joined: false }, music: true, alarms: true, cheers: { day: null, seen: 0 },
+      rush: [], perks: {}, playDay: { key: null, sec: 0 }, season: { key: null, min: 0, got: [] }, week: { key: null, min: 0 }, friends: [], board: { joined: false }, music: true, track: 0, alarms: true, cheers: { day: null, seen: 0 },
       buildings: [
         { id: 1, type: 'townhall', c: 5, r: 5, level: 1, origin: 'start' },
         { id: 2, type: 'cottage', c: 2, r: 4, level: 1, ruin: true, resident: 'Rose', origin: 'start', trash: 2 },
@@ -1206,6 +1234,7 @@
     if (!Array.isArray(s.friends)) s.friends = [];
     s.board = Object.assign({ joined: false }, s.board || {});
     if (s.music === undefined) s.music = true;
+    if (!(s.track >= 0)) s.track = 0;
     if (s.alarms === undefined) s.alarms = true;
     s.cheers = Object.assign({ day: null, seen: 0 }, s.cheers || {});
     return s;
@@ -1260,6 +1289,7 @@
       applause: (sec) => { for (let i = 0; i < sec * 50; i++) noise(0.25 + Math.random() * sec, 0.025 + Math.random() * 0.03, 0.04 + Math.random() * 0.05, 1300 + Math.random() * 1800, 1.6); },
       boom: (t) => { noise(t, 0.45, 0.1, 260, 0.6); for (let i = 0; i < 9; i++) noise(t + 0.12 + Math.random() * 0.45, 0.02, 0.05, 3200, 2); },
       tick: () => tone(1250, 0, 0.05, 'square', 0.02),
+      thunder: () => { for (let i = 0; i < 6; i++) noise(0.05 + i * 0.17, 0.55, 0.09 * (1 - i / 7), 110 + i * 25, 0.5); },
       hammer: () => { tone(170 + Math.random() * 40, 0, 0.05, 'square', 0.018); noise(0, 0.035, 0.025, 1500, 1.2); },
       alarm: () => { for (let i = 0; i < 4; i++) { tone(880, i * 0.36, 0.17, 'square', 0.03); tone(660, i * 0.36 + 0.18, 0.17, 'square', 0.03); } },
       splash: () => { noise(0, 0.6, 0.06, 900, 0.5); noise(0.2, 0.5, 0.05, 1400, 0.6); },
@@ -1274,85 +1304,150 @@
     };
   })();
 
-  /* ---------- Music: a small tune made on the fly. It plays on Home and in your town, never while you focus. ---------- */
+  /* ---------- Music: a few tunes made on the fly. They play on Home and in your town, never while you focus. ---------- */
   const music = (() => {
-    let master = null, wet = null, timer = 0, step = 0, nextT = 0, on = false, mode = 'home', cycle = 0, noiseBuf = null;
-    const BPM = 92, S8 = 60 / BPM / 2;
-    const NOTE = (n) => { const m = /^([A-G])(b?)(\d)$/.exec(n); const idx = { C: -9, D: -7, E: -5, F: -4, G: -2, A: 0, B: 2 }[m[1]] - (m[2] ? 1 : 0) + (Number(m[3]) - 4) * 12; return 440 * Math.pow(2, idx / 12); };
-    const MEL = ('A4 ~ C5 ~ D5 C5 A4 ~  F4 ~ A4 ~ G4 ~ F4 ~  D5 ~ C5 ~ A4 ~ G4 A4  G4 ~ ~ ~ C5 ~ . .  ' +
-      'C5 ~ D5 ~ F5 ~ D5 C5  A4 ~ C5 ~ D5 ~ A4 ~  G4 ~ A4 ~ C5 ~ D5 ~  C5 ~ ~ ~ . . . .').trim().split(/\s+/);
-    const ALT = ('F5 ~ ~ D5 C5 ~ A4 ~  C5 ~ ~ A4 G4 ~ F4 ~  F4 ~ G4 ~ A4 ~ C5 ~  E5 ~ D5 ~ C5 ~ . .  ' +
-      'A4 ~ C5 ~ D5 ~ F5 ~  D5 ~ C5 ~ A4 ~ G4 ~  F4 ~ G4 ~ A4 ~ C5 D5  C5 ~ ~ ~ ~ ~ . .').trim().split(/\s+/);
-    const CHORDS = [['F3', 'A3', 'C4'], ['D3', 'F3', 'A3'], ['Bb2', 'D3', 'F3'], ['C3', 'E3', 'G3']];
-    const BASS = ['F2', 'D2', 'Bb1', 'C2'];
+    let master = null, wet = null, lp = null, timer = 0, step = 0, nextT = 0, on = false, mode = 'home', cycle = 0, noiseBuf = null, cur = null, switching = false;
+    const NOTE = (n) => { const m = /^([A-G])([b#]?)(\d)$/.exec(n); const idx = { C: -9, D: -7, E: -5, F: -4, G: -2, A: 0, B: 2 }[m[1]] + (m[2] === 'b' ? -1 : m[2] === '#' ? 1 : 0) + (Number(m[3]) - 4) * 12; return 440 * Math.pow(2, idx / 12); };
+    const seq = (str) => str.trim().split(/\s+/);
+    const rnd = (n) => Math.floor(Math.random() * n);
     function graph(ac) {
       if (master) return;
-      master = ac.createGain(); master.gain.value = 0.0001; master.connect(ac.destination);
-      const dl = ac.createDelay(1); dl.delayTime.value = S8 * 3; const fb = ac.createGain(); fb.gain.value = 0.28;
-      wet = ac.createGain(); wet.gain.value = 0.22;
+      master = ac.createGain(); master.gain.value = 0.0001;
+      lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 9000;
+      master.connect(lp); lp.connect(ac.destination);
+      const dl = ac.createDelay(1); dl.delayTime.value = 0.36; const fb = ac.createGain(); fb.gain.value = 0.25;
+      wet = ac.createGain(); wet.gain.value = 0.18;
       wet.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(master);
     }
-    function voice(ac, type, f, t, dur, vol, att, rel, toWet) {
-      const o = ac.createOscillator(), g = ac.createGain();
-      o.type = type; o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + att); g.gain.setValueAtTime(vol, t + Math.max(att, dur - rel)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(g); g.connect(master); if (toWet) g.connect(wet);
-      o.start(t); o.stop(t + dur + 0.05);
+    function env(ac, g, t, vol, att, dec, sus, dur) {
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + att);
+      g.gain.exponentialRampToValueAtTime(Math.max(0.0001, vol * sus), t + att + dec);
+      g.gain.setValueAtTime(Math.max(0.0001, vol * sus), t + Math.max(att + dec, dur - 0.08)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.25);
     }
-    function pluck(ac, f, t, dur, vol) {
-      const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain();
-      o.type = 'triangle'; o2.type = 'sine'; o.frequency.setValueAtTime(f, t); o2.frequency.setValueAtTime(f * 2, t);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(vol * 0.35, t + 0.18); g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.3, dur));
-      const g2 = ac.createGain(); g2.gain.value = 0.25; o2.connect(g2); g2.connect(g);
-      o.connect(g); g.connect(master); g.connect(wet);
-      o.start(t); o2.start(t); o.stop(t + dur + 0.1); o2.stop(t + dur + 0.1);
-    }
-    function shaker(ac, t, vol) {
-      if (!noiseBuf) { noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.2), ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
-      const sN = ac.createBufferSource(); sN.buffer = noiseBuf;
-      const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 6000;
-      const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
-      sN.connect(f); f.connect(g); g.connect(master); sN.start(t, 0, 0.1);
-    }
-    function playStep(ac, i, t) {
-      const bar = Math.floor(i / 8), beat = i % 8, play = mode === 'play';
-      if (beat === 0) for (const n of CHORDS[bar % 4]) voice(ac, 'sine', NOTE(n), t, S8 * 8 * 0.98, 0.022, 0.5, 0.8, false);
-      if (play && (beat === 0 || beat === 4)) voice(ac, 'sine', NOTE(BASS[bar % 4]), t, S8 * 3, 0.07, 0.02, 0.3, false);
-      if (play && beat === 6) voice(ac, 'sine', NOTE(BASS[bar % 4]) * 1.5, t, S8 * 1.5, 0.04, 0.02, 0.2, false);
-      if (play && beat % 2 === 1) shaker(ac, t, 0.012);
-      const mel = cycle % 2 ? ALT : MEL, tok = mel[i];
-      if (tok && tok !== '~' && tok !== '.') {
-        let len = 1; while (mel[i + len] === '~') len++;
-        pluck(ac, NOTE(tok), t, len * S8 * 1.1, play ? 0.075 : 0.055);
-        if (cycle % 4 === 3 && beat % 4 === 0) pluck(ac, NOTE(tok) * 2, t + 0.01, S8, 0.025);
+    function osc(ac, type, f, t, dur, vol, o) {
+      o = o || {};
+      const g = ac.createGain(), parts = o.partials || [[1, 1, type]];
+      env(ac, g, t, vol, o.att || 0.01, o.dec || 0.3, o.sus == null ? 0.5 : o.sus, dur);
+      let dest = g;
+      if (o.cut) { const f2 = ac.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = o.cut; g.connect(f2); dest = f2; }
+      dest.connect(master); if (o.wet) dest.connect(wet);
+      for (const [mul, amp, ty] of parts) {
+        const os = ac.createOscillator(), pg = ac.createGain(); os.type = ty || type; os.frequency.setValueAtTime(f * mul, t);
+        if (o.vib) { const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 5.2; lg.gain.value = f * mul * o.vib; lfo.connect(lg); lg.connect(os.frequency); lfo.start(t); lfo.stop(t + dur + 0.3); }
+        pg.gain.value = amp; os.connect(pg); pg.connect(g); os.start(t); os.stop(t + dur + 0.3);
       }
     }
-    function pump() {
-      const ac = AUD.ac; if (!on || !ac || ac.state !== 'running') return;
-      if (nextT < ac.currentTime) nextT = ac.currentTime + 0.05;
-      while (nextT < ac.currentTime + 0.3) { playStep(ac, step, nextT); step = (step + 1) % 64; if (!step) cycle++; nextT += S8; }
+    function noise(ac, t, dur, vol, type, freq, q) {
+      if (!noiseBuf) { noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.5), ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+      const sN = ac.createBufferSource(); sN.buffer = noiseBuf;
+      const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q || 0.8;
+      const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      sN.connect(f); f.connect(g); g.connect(master); sN.start(t, Math.random() * 0.3, dur + 0.05);
     }
+    const EP = { partials: [[1, 1, 'sine'], [2.001, 0.28, 'sine'], [3, 0.06, 'triangle']], att: 0.006, dec: 0.5, sus: 0.35, cut: 2600 };
+    // Café jazz: swing, an electric piano comping, a walking bass, brushes and a soft vibraphone tune every other time round.
+    const JZ = {
+      name: 'Café jazz', bpm: 100, swing: 0.36, bars: 8,
+      chords: [['F3', 'Bb3', 'D4'], ['E3', 'Bb3', 'D4'], ['E3', 'A3', 'C4'], ['F3', 'A3', 'C4'], ['F3', 'Bb3', 'D4'], ['E3', 'Bb3', 'D4'], ['G3', 'C4', 'E4', 'F#3', 'C4', 'E4'], ['F3', 'Bb3', 'D4', 'E3', 'Bb3', 'D4']],
+      roots: [['G2', 'Bb2', 'D3', 'Db3'], ['C2', 'E2', 'G2', 'E2'], ['F2', 'A2', 'C3', 'C#3'], ['D2', 'F2', 'A2', 'Ab2'], ['G2', 'Bb2', 'D3', 'Db3'], ['C2', 'E2', 'G2', 'B1'], ['A1', 'C2', 'D2', 'F#2'], ['G2', 'F2', 'C2', 'E2']],
+      mel: [seq('A4 . C5 ~ D5 C5 A4 .  Bb4 ~ ~ . A4 G4 F4 .  E4 . G4 ~ A4 ~ C5 .  A4 ~ ~ ~ . . . .  . . D5 ~ C5 A4 Ab4 G4  F4 ~ . . G4 A4 Bb4 .  C5 ~ A4 . F#4 ~ A4 .  G4 ~ ~ ~ E4 ~ . .'),
+        seq('. . F5 ~ D5 ~ C5 A4  Bb4 ~ G4 . . . . .  C5 . A4 . G4 . F4 ~  E4 ~ ~ ~ . . C5 .  D5 ~ C5 . Bb4 ~ A4 .  G4 . A4 Bb4 C5 ~ . .  E5 ~ D5 C5 A4 ~ F#4 .  G4 ~ ~ ~ ~ ~ . .')],
+      step(ac, i, t, s8) {
+        const bar = Math.floor(i / 8), b = i % 8, ch = this.chords[bar], play = mode === 'play';
+        const two = ch.length > 3, voicing = two && b >= 4 ? ch.slice(3) : ch.slice(0, 3);
+        // comping: a few rhythms, picked fresh each bar
+        if (b === 0 || !this.comp) this.comp = [[0, 3], [1, 5], [0, 4, 6], [2, 5], [0, 3, 6]][rnd(5)];
+        if (two && b === 4 && !this.comp.includes(4)) this.comp = this.comp.concat([4]);
+        if (this.comp.includes(b)) for (const n of voicing) osc(ac, 'sine', NOTE(n), t, s8 * (b % 2 ? 1.2 : 2.4), 0.026, EP);
+        // walking bass on the beats
+        if (b % 2 === 0) { const note = this.roots[bar][b / 2]; osc(ac, 'triangle', NOTE(note), t, s8 * 1.7, 0.09, { partials: [[1, 1, 'sine'], [2, 0.18, 'triangle']], att: 0.008, dec: 0.18, sus: 0.45, cut: 900 }); }
+        // ride cymbal "ding, ding-a ding" and brushes on 2 and 4
+        if (b === 0 || b === 2 || b === 3 || b === 4 || b === 6 || b === 7) noise(ac, t, 0.22, b % 2 ? 0.006 : 0.011, 'highpass', 7000, 0.7);
+        if (b === 2 || b === 6) noise(ac, t, 0.28, play ? 0.018 : 0.012, 'bandpass', 2600, 0.6);
+        if (b === 0 && play) osc(ac, 'sine', 70, t, 0.18, 0.05, { att: 0.004, dec: 0.12, sus: 0.1 });
+        // the tune: only every other time round, so it can breathe
+        if (cycle % 2 === 1) {
+          const mel = this.mel[Math.floor(cycle / 2) % 2], tok = mel[i];
+          if (tok && tok !== '~' && tok !== '.') { let len = 1; while (mel[i + len] === '~') len++; osc(ac, 'sine', NOTE(tok), t, len * s8 * 1.05, 0.05, { partials: [[1, 1, 'sine'], [4, 0.12, 'sine']], att: 0.004, dec: 0.7, sus: 0.25, vib: 0.004, wet: true }); }
+        }
+      }
+    };
+    // Evening lo-fi: slow, warm chords, a lazy beat and a little vinyl crackle.
+    const LF = {
+      name: 'Evening lo-fi', bpm: 76, swing: 0.16, bars: 8,
+      chords: [['F3', 'A3', 'C4', 'E4'], ['E3', 'G3', 'B3', 'D4'], ['D3', 'F3', 'A3', 'C4'], ['C3', 'E3', 'G3', 'B3'], ['F3', 'A3', 'C4', 'E4'], ['E3', 'G3', 'B3', 'D4'], ['D3', 'F3', 'A3', 'C4'], ['G3', 'B3', 'D4', 'F4']],
+      bass: ['F2', 'E2', 'D2', 'C2', 'F2', 'E2', 'D2', 'G2'],
+      mel: seq('C5 . . A4 G4 . E4 .  . . D5 . B4 . G4 .  A4 . . F4 . . E4 ~  ~ ~ . . . . . .  C5 . E5 . D5 . B4 .  G4 ~ . . A4 . B4 .  C5 ~ A4 . F4 . D4 .  B3 ~ ~ ~ . . . .'),
+      step(ac, i, t, s8) {
+        const bar = Math.floor(i / 8), b = i % 8, play = mode === 'play';
+        if (b === 0) for (const n of this.chords[bar]) osc(ac, 'triangle', NOTE(n), t, s8 * 7.6, 0.017, { att: 0.25, dec: 0.8, sus: 0.6, cut: 1300 });
+        if (b === 0 || b === 5) osc(ac, 'sine', NOTE(this.bass[bar]), t, s8 * 2.5, 0.08, { att: 0.01, dec: 0.25, sus: 0.5, cut: 500 });
+        if (b === 0 || b === 5) osc(ac, 'sine', 62, t, 0.22, play ? 0.09 : 0.06, { att: 0.003, dec: 0.15, sus: 0.05 });
+        if (b === 2 || b === 6) noise(ac, t, 0.2, play ? 0.02 : 0.013, 'bandpass', 1800, 0.7);
+        if (play) noise(ac, t, 0.05, 0.004, 'highpass', 8000, 0.7);
+        if (Math.random() < 0.5) noise(ac, t + Math.random() * s8, 0.012, 0.006, 'highpass', 3000, 0.5);
+        if (cycle % 2 === 1 || play) { const tok = this.mel[i]; if (tok && tok !== '~' && tok !== '.') { let len = 1; while (this.mel[i + len] === '~') len++; osc(ac, 'sine', NOTE(tok), t, len * s8, 0.045, Object.assign({}, EP, { wet: true, cut: 1800 })); } }
+      }
+    };
+    // Town square: the bright little tune from version 7, a bit softer.
+    const TS = {
+      name: 'Town square', bpm: 92, swing: 0, bars: 8,
+      mel: [seq('A4 ~ C5 ~ D5 C5 A4 ~  F4 ~ A4 ~ G4 ~ F4 ~  D5 ~ C5 ~ A4 ~ G4 A4  G4 ~ ~ ~ C5 ~ . .  C5 ~ D5 ~ F5 ~ D5 C5  A4 ~ C5 ~ D5 ~ A4 ~  G4 ~ A4 ~ C5 ~ D5 ~  C5 ~ ~ ~ . . . .'),
+        seq('F5 ~ ~ D5 C5 ~ A4 ~  C5 ~ ~ A4 G4 ~ F4 ~  F4 ~ G4 ~ A4 ~ C5 ~  E5 ~ D5 ~ C5 ~ . .  A4 ~ C5 ~ D5 ~ F5 ~  D5 ~ C5 ~ A4 ~ G4 ~  F4 ~ G4 ~ A4 ~ C5 D5  C5 ~ ~ ~ ~ ~ . .')],
+      chords: [['F3', 'A3', 'C4'], ['D3', 'F3', 'A3'], ['Bb2', 'D3', 'F3'], ['C3', 'E3', 'G3']], bass: ['F2', 'D2', 'Bb1', 'C2'],
+      step(ac, i, t, s8) {
+        const bar = Math.floor(i / 8), b = i % 8, play = mode === 'play';
+        if (b === 0) for (const n of this.chords[bar % 4]) osc(ac, 'sine', NOTE(n), t, s8 * 7.8, 0.018, { att: 0.5, dec: 0.8, sus: 0.7 });
+        if (play && (b === 0 || b === 4)) osc(ac, 'sine', NOTE(this.bass[bar % 4]), t, s8 * 3, 0.06, { att: 0.02, dec: 0.3, sus: 0.4 });
+        if (play && b % 2 === 1) noise(ac, t, 0.07, 0.009, 'highpass', 6000, 0.7);
+        const mel = this.mel[cycle % 2], tok = mel[i];
+        if (tok && tok !== '~' && tok !== '.') { let len = 1; while (mel[i + len] === '~') len++; osc(ac, 'triangle', NOTE(tok), t, len * s8 * 1.1, play ? 0.06 : 0.045, { partials: [[1, 1, 'triangle'], [2, 0.25, 'sine']], att: 0.01, dec: 0.18, sus: 0.35, wet: true }); }
+      }
+    };
+    const TRACKS = [JZ, LF, TS];
+    const s8of = (tr) => 60 / tr.bpm / 2;
+    function pump() {
+      const ac = AUD.ac; if (!on || !ac || ac.state !== 'running' || !cur) return;
+      const s8 = s8of(cur);
+      if (nextT < ac.currentTime) nextT = ac.currentTime + 0.05;
+      while (nextT < ac.currentTime + 0.3) {
+        cur.step(ac, step, nextT + (step % 2 ? s8 * cur.swing : 0), s8 * (step % 2 ? 1 - cur.swing : 1 + cur.swing));
+        step = (step + 1) % (cur.bars * 8); if (!step) cycle++;
+        nextT += s8;
+      }
+    }
+    function fade(ac, to, sec) { master.gain.cancelScheduledValues(ac.currentTime); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), ac.currentTime); master.gain.exponentialRampToValueAtTime(Math.max(0.0001, to), ac.currentTime + sec); }
     return {
-      set(want, m) {
+      tracks: TRACKS.map((t) => t.name),
+      set(want, m, trackIdx) {
         mode = m || mode;
+        const tr = TRACKS[((trackIdx | 0) % TRACKS.length + TRACKS.length) % TRACKS.length];
         const ac = want ? audioCtx() : AUD.ac;
-        if (want && ac && !on) {
-          graph(ac); on = true; step = 0; cycle = 0; nextT = ac.currentTime + 0.1;
-          master.gain.cancelScheduledValues(ac.currentTime); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), ac.currentTime); master.gain.exponentialRampToValueAtTime(0.6, ac.currentTime + 1.6);
-          clearInterval(timer); timer = setInterval(pump, 60); pump();
+        if (want && switching) return;
+        if (want && ac && (!on || cur !== tr)) {
+          graph(ac);
+          const start = () => { switching = false; cur = tr; on = true; step = 0; cycle = 0; nextT = ac.currentTime + 0.08; fade(ac, 0.55, 1.6); clearInterval(timer); timer = setInterval(pump, 50); pump(); };
+          if (on && cur !== tr) { fade(ac, 0.0001, 0.35); on = false; switching = true; clearInterval(timer); setTimeout(start, 380); } else start();
         } else if (!want && on) {
           on = false; clearInterval(timer); timer = 0;
-          if (ac && master) { master.gain.cancelScheduledValues(ac.currentTime); master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), ac.currentTime); master.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.5); }
+          if (ac && master) fade(ac, 0.0001, 0.5);
         }
       },
       playing: () => on,
-      mode: () => mode
+      mode: () => mode,
+      track: () => (cur ? cur.name : TRACKS[0].name)
     };
   })();
   function musicUpdate() {
     const want = !!state.music && AUD.unlocked && !document.hidden && !state.session && !ui.visitLoading && !['focus', 'celebrate', 'chest', 'alarm'].includes(ui.overlay) && !!state.named;
-    music.set(want, ui.screen === 'play' ? 'play' : 'home');
+    music.set(want, ui.screen === 'play' ? 'play' : 'home', state.track | 0);
+    const tg = $('mus-toggle');
+    if (tg && tg.dataset.on !== String(!!state.music)) { tg.dataset.on = String(!!state.music); tg.innerHTML = state.music ? MUS_PAUSE : MUS_PLAY; tg.setAttribute('aria-label', state.music ? 'Pause music' : 'Play music'); tg.classList.toggle('on', !!state.music); }
   }
+  const MUS_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l10.5-6.5z"/></svg>';
+  const MUS_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 5h3.6v14H7zm6.4 0H17v14h-3.6z"/></svg>';
+  function musicToggle() { state.music = !state.music; AUD.unlocked = true; save(); musicUpdate(); toast(state.music ? `♪ ${music.tracks[(state.track | 0) % music.tracks.length]}` : 'Music off'); }
+  function musicSkip() { state.track = ((state.track | 0) + 1) % music.tracks.length; state.music = true; AUD.unlocked = true; save(); musicUpdate(); toast(`♪ ${music.tracks[state.track]}`); }
   // The plan alarm: a bell that rings until you answer it (it ignores the sound-effects switch, but has its own).
   function ringBell() {
     if (!state.alarms) return;
@@ -1491,7 +1586,8 @@
   const jobFor = (bid) => state.queue.find((q) => q.bid === bid);
   const isBigJob = (kind, type, work) => kind === 'clear' || type === 'townhall' || type === 'stadium' || (TYPES[type] && TYPES[type].cat === 'landmark') || work >= BIG_WORK;
   const bigQ = (q) => isBigJob(q.kind, q.type, q.work);
-  const buildSecs = (work) => Math.round(clamp(work * PLAY_BUILD_SEC, 3, 30));
+  const buildSecs = (work) => Math.round(clamp(work * PLAY_BUILD_SEC[clamp(hallLevel(), 1, 4)], 5, BUILD_MAX_SEC));
+  const fmtSecs = (sec) => { sec = Math.max(1, Math.ceil(sec)); return sec < 60 ? `${sec} s` : `${Math.floor(sec / 60)} min${sec % 60 ? ` ${sec % 60} s` : ''}`; };
   function nextName() { const n = NAMES[state.nameIdx % NAMES.length]; state.nameIdx++; return n; }
 
   // Positive amounts fill the treasury up to its limit; negative amounts (wages above taxes) take gold away, never below zero.
@@ -1610,7 +1706,9 @@
     cafe: ['Best coffee in town!', 'One more latte, please.'],
     bakery: ['Fresh bread! Still warm!', 'Croissants are ready!'],
     market: ['Turnips! Get your turnips!', 'Fresh apples today!'],
-    park2: ['Lovely day for a picnic.', 'The ducks are back!']
+    park2: ['Lovely day for a picnic.', 'The ducks are back!'],
+    rain: ['Grab an umbrella!', 'I love the sound of rain.', 'Perfect weather for a café.'], storm: ['Did you hear that thunder?', 'Stay inside, everyone!'],
+    fog: ["I can't see a thing!", 'Spooky fog today.'], snow: ['Snowball fight!', 'Brr, so cold!'], night: ['Look at all the stars!', 'Good night, Mayor!'], rainbow: ['A rainbow! Make a wish!']
   };
   function complaintFor() {
     const ci = city(), opts = [];
@@ -1632,8 +1730,9 @@
       const nice = state.buildings.filter((b) => live(b) && !b.fire && (b.trash || 0) < 0.9 && (b.overgrown || 0) < 0.5 && (T(b).cat === 'home' || T(b).cat === 'shop' || b.type === 'park') && !revealFor(b.id));
       if (!nice.length || mood < 50) return opts.length ? pick(opts) : null;
       const b = pick(nice);
-      const pool = LINES[b.type === 'park' ? 'park2' : b.type] || LINES.happy;
-      return { b, kind: 'good', text: pick(Math.random() < 0.5 ? pool : LINES.happy) };
+      const pool = LINES[b.type === 'park' ? 'park2' : b.type] || LINES.happy, SP = skyNow();
+      const wl = SP.w.rainbow > 0.3 ? LINES.rainbow : SP.w.k > 0.5 && LINES[SP.w.kind] ? LINES[SP.w.kind] : SP.dark > 0.7 ? LINES.night : null;
+      return { b, kind: 'good', text: pick(wl && Math.random() < 0.45 ? wl : Math.random() < 0.5 ? pool : LINES.happy) };
     }
     let x = Math.random() * opts.reduce((a, o) => a + o.w, 0);
     for (const o of opts) { if (x < o.w) return o; x -= o.w; }
@@ -1657,14 +1756,15 @@
     if (ui.screen !== 'play') { toast('Hire staff during play time.'); return false; }
     if (!ro.hasHome) { toast(`Build a ${TYPES[r.home].name.toLowerCase()} first. ${r.plural.charAt(0).toUpperCase() + r.plural.slice(1)} work from there.`); return false; }
     if (ro.hired >= ro.cap) { toast(`No room: your ${TYPES[r.home].name.toLowerCase()}${staffBuildings(k).length > 1 ? 's hold' : ' holds'} ${ro.cap}. Upgrade it or build another.`); return false; }
-    if (state.gold + 1e-6 < r.fee) { toast(`Hiring costs ${r.fee} gold. You need ${fmtGold(r.fee - state.gold + 0.999)} more.`); return false; }
+    const fee = hireFee(k, ro.hired), wage = wageOf(k, ro.hired);
+    if (state.gold + 1e-6 < fee) { toast(`Hiring costs ${fee} gold. You need ${fmtGold(fee - state.gold + 0.999)} more.`); return false; }
     accrue(Date.now());
-    state.gold -= r.fee; state.staff[k] = ro.hired + 1;
+    state.gold -= fee; state.staff[k] = ro.hired + 1;
     state.stats.hired = (state.stats.hired || 0) + 1;
     touch(); save(); sfx.coin();
     const home = staffBuildings(k)[0];
     if (home) { const p = centerOf(home); burst(p.x, p.y - 20, 18); floats.push({ x: p.x, y: p.y - HH * sizeOf(home.type) - 30, t0: performance.now(), text: `New ${r.name.toLowerCase()}!`, soft: true }); }
-    toast(`You hired a ${r.name.toLowerCase()} for ${r.fee} gold. Wage: ${r.wage} gold an hour. Watch them get to work.`);
+    toast(`You hired your ${ordinal(ro.hired + 1)} ${r.name.toLowerCase()} for ${fee} gold. Wage: ${wage} gold an hour. Watch them get to work.`);
     checkQuests(false); renderAll();
     return true;
   }
@@ -1673,7 +1773,7 @@
     if (!(state.staff[k] > 0)) return false;
     accrue(Date.now());
     state.staff[k] -= 1; touch(); save(); sfx.pop();
-    toast(`One ${STAFF[k].name.toLowerCase()} left. No more wage for them; hiring again costs the fee.`);
+    toast(`One ${STAFF[k].name.toLowerCase()} left. You save ${wageOf(k, state.staff[k])} gold an hour; hiring again costs ${hireFee(k)} gold.`);
     renderAll();
     return true;
   }
@@ -1707,7 +1807,7 @@
   const moodWord = (v) => (v < 25 ? 'Miserable' : v < 45 ? 'Grumpy' : v < 60 ? 'Okay' : v < 80 ? 'Happy' : 'Delighted');
   function econ(now) {
     const ci = city(), mood = moodNow(now || Date.now());
-    const wages = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0) * STAFF[k].wage, 0);
+    const wages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0);
     const taxes = ci.total * mood.mult;
     return { ci, mood, taxes, wages, net: taxes - wages };
   }
@@ -2033,7 +2133,13 @@
       combo: done && s.combo ? { n: s.combo, mult } : null, gold: [], xpParts: [], playParts: [] };
     const sim = simulate(state.queue, workFor(m));
     const remaining = [];
-    for (const it of sim.items) { if (it.finished) completeJob(it.q, r); else { it.q.done = it.done; remaining.push(it.q); } }
+    // Ending early has a price: jobs that finished stay built, but this session's work on the unfinished ones is lost.
+    for (const it of sim.items) {
+      if (it.finished) { completeJob(it.q, r); continue; }
+      if (done) it.q.done = it.done;
+      else if (it.done > it.q.done + 0.05) { r.lost = r.lost || []; r.lost.push(jobLabel(it.q).toLowerCase()); }
+      remaining.push(it.q);
+    }
     state.queue = remaining;
     touch();
     if (sim.leftover > 0.05 && m > 0) {
@@ -3443,69 +3549,189 @@
     pumpkins: () => 10, snowman: () => 27, tulips: () => 11, parasol: () => 26 };
   function labelY(b) { const p = centerOf(b), s = sizeOf(b.type), u = (HW / 30) * (1 + 0.35 * (s - 1)); return p.y - (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u - 4; }
   const tileHash = (c, r) => (((c + 1) * 73856093) ^ ((r + 1) * 19349663)) >>> 0;
-  const clouds = [{ s: 0.3, y: 70, r: 1 }, { s: 0.55, y: 230, r: 0.8 }, { s: 0.8, y: 330, r: 1.2 }];
+  const clouds = [{ s: 0.3, y: 70, r: 1 }, { s: 0.55, y: 230, r: 0.8 }, { s: 0.8, y: 330, r: 1.2 }, { s: 0.42, y: 150, r: 0.9 }, { s: 0.65, y: 420, r: 1.1 }, { s: 0.36, y: 300, r: 0.7 }, { s: 0.5, y: 500, r: 1 }];
 
   let lastDraw = 0;
-  /* ---------- The world around the island: sky, sea, clouds and a boat, following your time of day ---------- */
-  let skyOverride = null;
-  function skyPhase() { if (skyOverride) return skyOverride; const d = new Date(), h = d.getHours() + d.getMinutes() / 60; return h >= 7 && h < 18.5 ? 'day' : h >= 18.5 && h < 20.5 ? 'dusk' : h >= 5 && h < 7 ? 'dawn' : 'night'; }
-  const SKY = {
-    day: { top: '#7CC4EC', hor: '#D6EEF7', sea: '#6CBBD6', deep: '#3C8FB3', glow: 'rgba(255,250,220,.55)', foam: 'rgba(255,255,255,.6)', isle: ['#86AFC0', '#9DC0CE'], cloud: 'rgba(255,255,255,.92)', tint: null },
-    dawn: { top: '#7FA6D8', hor: '#FAD3B0', sea: '#86B6C8', deep: '#4F87A6', glow: 'rgba(255,200,150,.6)', foam: 'rgba(255,240,230,.55)', isle: ['#8E9DB8', '#A8B3C8'], cloud: 'rgba(255,236,224,.92)', tint: 'rgba(255,170,120,.06)' },
-    dusk: { top: '#3E3F86', hor: '#F29C76', sea: '#4F7BA2', deep: '#2C5079', glow: 'rgba(255,150,110,.55)', foam: 'rgba(255,220,210,.45)', isle: ['#5A5C8C', '#6E6A96'], cloud: 'rgba(255,205,190,.85)', tint: 'rgba(90,50,120,.1)' },
-    night: { top: '#0A1430', hor: '#25407A', sea: '#1D3E66', deep: '#0F2747', glow: 'rgba(170,190,255,.25)', foam: 'rgba(200,220,255,.35)', isle: ['#1B2C52', '#22365F'], cloud: 'rgba(170,185,225,.35)', tint: 'rgba(16,28,80,.16)' }
+  /* ---------- The world around the island: a town clock, sky, sea, weather and a boat ---------- */
+  // One real minute is one hour in town, so a whole day goes by in 24 minutes (or follow the real clock in settings).
+  let skyOverride = null, weatherOverride = null;
+  const townHours = () => (state.realClock ? (Date.now() - new Date().getTimezoneOffset() * 60000) / 3600000 : Date.now() / 60000);
+  const gameHour = () => (skyOverride != null ? skyOverride : ((townHours() % 24) + 24) % 24);
+  const SKY_OVR = { day: 12, dawn: 6.2, dusk: 19.9, night: 1 };
+  const SKYP = {
+    day: { top: [124, 196, 236], hor: [214, 238, 247], sea: [108, 187, 214], deep: [60, 143, 179], shallow: [146, 224, 222], glow: [255, 250, 220, 0.55], foam: [255, 255, 255, 0.6], isle0: [134, 175, 192], isle1: [157, 192, 206], cloud: [255, 255, 255, 0.92], tint: [0, 0, 0, 0] },
+    dawn: { top: [127, 166, 216], hor: [250, 211, 176], sea: [134, 182, 200], deep: [79, 135, 166], shallow: [168, 212, 210], glow: [255, 200, 150, 0.6], foam: [255, 240, 230, 0.55], isle0: [142, 157, 184], isle1: [168, 179, 200], cloud: [255, 236, 224, 0.92], tint: [255, 170, 120, 0.06] },
+    dusk: { top: [62, 63, 134], hor: [242, 156, 118], sea: [79, 123, 162], deep: [44, 80, 121], shallow: [104, 152, 172], glow: [255, 150, 110, 0.55], foam: [255, 220, 210, 0.45], isle0: [90, 92, 140], isle1: [110, 106, 150], cloud: [255, 205, 190, 0.85], tint: [90, 50, 120, 0.1] },
+    night: { top: [10, 20, 48], hor: [37, 64, 122], sea: [29, 62, 102], deep: [15, 39, 71], shallow: [44, 92, 128], glow: [170, 190, 255, 0.25], foam: [200, 220, 255, 0.35], isle0: [27, 44, 82], isle1: [34, 54, 95], cloud: [170, 185, 225, 0.4], tint: [16, 28, 80, 0.16] }
   };
-  const skyClouds = [{ x: 0.08, y: 0.32, s: 1.1, v: 0.6 }, { x: 0.42, y: 0.18, s: 0.8, v: 1 }, { x: 0.7, y: 0.4, s: 1.3, v: 0.45 }, { x: 0.92, y: 0.12, s: 0.7, v: 0.8 }];
+  const SKY_KEYS = [[0, 'night'], [4.6, 'night'], [5.8, 'dawn'], [7.2, 'day'], [18.4, 'day'], [19.6, 'dusk'], [21, 'night'], [24, 'night']];
+  const mixA = (a, b, k) => a.map((v, i) => v + ((b[i] == null ? v : b[i]) - v) * k);
+  const css = (a) => (a.length > 3 ? `rgba(${a[0] | 0},${a[1] | 0},${a[2] | 0},${a[3].toFixed(3)})` : `rgb(${a[0] | 0},${a[1] | 0},${a[2] | 0})`);
+  const rnd01 = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  // Weather comes in spells of six town hours, and fades in and out.
+  const WEATHER = { clear: { name: 'Clear', icon: '☀️', night: '🌙', cloud: 0.15 }, cloudy: { name: 'Cloudy', icon: '⛅', night: '☁️', cloud: 0.6 }, rain: { name: 'Rain', icon: '🌧️', cloud: 0.85 }, storm: { name: 'Storm', icon: '⛈️', cloud: 1 }, fog: { name: 'Fog', icon: '🌫️', cloud: 0.4 }, snow: { name: 'Snow', icon: '❄️', cloud: 0.7 } };
+  function weatherOf(seg) {
+    if (weatherOverride) return weatherOverride;
+    const r = rnd01(seg), morning = ((seg * 6) % 24) < 12, winter = SEA.k === 'winter';
+    if (r < 0.42) return 'clear';
+    if (r < 0.66) return 'cloudy';
+    if (r < 0.86) return winter ? 'snow' : 'rain';
+    if (r < 0.92) return winter ? 'snow' : 'storm';
+    return morning ? 'fog' : 'cloudy';
+  }
+  function weatherNow() {
+    const th = townHours(), seg = Math.floor(th / 6), p = (th - seg * 6) / 6, kind = weatherOf(seg);
+    const k = weatherOverride ? 1 : clamp(Math.min(p, 1 - p) * 6 / 0.8, 0, 1);
+    const prev = weatherOf(seg - 1), h = gameHour();
+    const rainbow = !weatherOverride && (prev === 'rain' || prev === 'storm') && (kind === 'clear' || kind === 'cloudy') && p < 0.4 && h > 7 && h < 18 ? clamp(1 - p / 0.4, 0, 1) : (weatherOverride === 'rainbow' ? 1 : 0);
+    return { kind: weatherOverride === 'rainbow' ? 'clear' : kind, k, rainbow, cloud: WEATHER[weatherOverride === 'rainbow' ? 'clear' : kind].cloud };
+  }
+  const SKYC = { at: -1, v: null };
+  function skyNow() {
+    const tick = Math.floor(performance.now() / 120);
+    if (SKYC.at === tick && SKYC.v) return SKYC.v;
+    const h = gameHour();
+    let i = 0; while (i < SKY_KEYS.length - 2 && h >= SKY_KEYS[i + 1][0]) i++;
+    const [h0, a] = SKY_KEYS[i], [h1, b] = SKY_KEYS[i + 1], kk = h1 > h0 ? clamp((h - h0) / (h1 - h0), 0, 1) : 0, e = kk * kk * (3 - 2 * kk);
+    const A = SKYP[a], B = SKYP[b], P = {};
+    for (const key of Object.keys(A)) P[key] = mixA(A[key], B[key], e);
+    const dk = (x) => (x === 'night' ? 1 : x === 'day' ? 0 : 0.45);
+    P.dark = dk(a) + (dk(b) - dk(a)) * e;
+    P.hour = h; P.phase = P.dark > 0.75 ? 'night' : P.dark < 0.2 ? 'day' : h < 12 ? 'dawn' : 'dusk';
+    const w = weatherNow(); P.w = w;
+    const wet = (w.kind === 'rain' || w.kind === 'storm' ? (w.kind === 'storm' ? 0.75 : 0.55) : w.kind === 'snow' ? 0.35 : w.kind === 'cloudy' ? 0.18 : w.kind === 'fog' ? 0.3 : 0) * w.k;
+    if (wet) {
+      const grey = [128, 138, 150];
+      P.top = mixA(P.top, grey, wet); P.hor = mixA(P.hor, [176, 184, 192], wet); P.sea = mixA(P.sea, [100, 128, 146], wet * 0.7); P.deep = mixA(P.deep, [62, 86, 106], wet * 0.6);
+      P.cloud = mixA(P.cloud, [196, 202, 210, P.cloud[3]], wet); P.glow = mixA(P.glow, [255, 255, 255, 0.12], wet);
+      P.tint = mixA(P.tint, [40, 52, 72, Math.max(P.tint[3], 0.14 * wet)], wet);
+    }
+    SKYC.at = tick; SKYC.v = P;
+    return P;
+  }
+  const skyPhase = () => skyNow().phase;
+  const skyClouds = Array.from({ length: 8 }, (_, i) => ({ x: rnd01(i + 3), y: 0.1 + rnd01(i + 11) * 0.35, s: 0.6 + rnd01(i + 23) * 0.8, v: 0.35 + rnd01(i + 41) * 0.8 }));
   function cloudPuff(c, x, y, s, col) {
     c.fillStyle = col; c.beginPath();
     c.ellipse(x, y, 34 * s, 13 * s, 0, 0, Math.PI * 2); c.ellipse(x - 20 * s, y + 3 * s, 20 * s, 10 * s, 0, 0, Math.PI * 2);
     c.ellipse(x + 22 * s, y + 2 * s, 22 * s, 11 * s, 0, 0, Math.PI * 2); c.ellipse(x + 4 * s, y - 9 * s, 20 * s, 13 * s, 0, 0, Math.PI * 2); c.fill();
   }
-  // Screen space, before the world is drawn.
+  // Screen space, before the world is drawn: sea, sky, sun or moon, stars, far islands and clouds.
   function drawBackdrop(c, now) {
-    const P = SKY[skyPhase()], W = geo.w, H = geo.h;
+    const P = skyNow(), W = geo.w, H = geo.h, t = reduced ? 0 : now, h = P.hour;
     const hy = clamp(toScreen(0, -N * HH * 0.85).y, -40, H);
-    const sea = c.createLinearGradient(0, Math.max(0, hy), 0, H); sea.addColorStop(0, P.sea); sea.addColorStop(1, P.deep);
+    const sea = c.createLinearGradient(0, Math.max(0, hy), 0, H); sea.addColorStop(0, css(P.sea)); sea.addColorStop(1, css(P.deep));
     c.fillStyle = sea; c.fillRect(0, Math.max(0, hy), W, H);
     if (hy <= 0) return;
-    const sky = c.createLinearGradient(0, 0, 0, hy); sky.addColorStop(0, P.top); sky.addColorStop(1, P.hor);
+    const sky = c.createLinearGradient(0, 0, 0, hy); sky.addColorStop(0, css(P.top)); sky.addColorStop(1, css(P.hor));
     c.fillStyle = sky; c.fillRect(0, 0, W, hy + 1);
-    const ph = skyPhase(), t = reduced ? 0 : now;
-    if (ph === 'night') for (let i = 0; i < 46; i++) { const sx = (i * 97.3) % W, sy = ((i * 53.7) % 1) * 0 + ((i * 37) % 100) / 100 * hy * 0.92, a = 0.35 + 0.5 * (Math.sin(t / 700 + i * 2.1) + 1) / 2; c.fillStyle = `rgba(255,255,255,${a})`; c.fillRect(sx, sy, i % 5 ? 1.4 : 2.2, i % 5 ? 1.4 : 2.2); }
-    // the sun or the moon, drifting with the camera a little
-    const bx = W * 0.78 - cam.x * cam.z * 0.05, by = hy * (ph === 'day' ? 0.35 : ph === 'night' ? 0.3 : 0.72);
-    if (ph === 'night') { c.fillStyle = 'rgba(255,248,220,.18)'; c.beginPath(); c.arc(bx, by, 26, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFF4D6'; c.beginPath(); c.arc(bx, by, 13, 0, Math.PI * 2); c.fill(); c.fillStyle = P.top; c.beginPath(); c.arc(bx + 6, by - 4, 11, 0, Math.PI * 2); c.fill(); }
-    else { const g = c.createRadialGradient(bx, by, 4, bx, by, 60); g.addColorStop(0, ph === 'day' ? 'rgba(255,250,215,1)' : 'rgba(255,214,160,1)'); g.addColorStop(0.25, P.glow); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.beginPath(); c.arc(bx, by, 60, 0, Math.PI * 2); c.fill(); }
-    // a glow along the horizon and far-off islands sitting on it
-    const hg = c.createLinearGradient(0, hy - 30, 0, hy + 8); hg.addColorStop(0, 'rgba(255,255,255,0)'); hg.addColorStop(1, P.glow); c.fillStyle = hg; c.fillRect(0, hy - 30, W, 38);
-    const par = -cam.x * cam.z * 0.12;
-    for (const [fx, w, h, k] of [[0.12, 120, 16, 0], [0.48, 70, 10, 1], [0.86, 150, 22, 0]]) {
-      const ix = ((fx * W + par) % (W + 200) + W + 200) % (W + 200) - 100;
-      c.fillStyle = P.isle[k]; c.beginPath(); c.moveTo(ix - w / 2, hy + 1); c.quadraticCurveTo(ix - w * 0.25, hy - h * 1.2, ix, hy - h); c.quadraticCurveTo(ix + w * 0.3, hy - h * 0.6, ix + w / 2, hy + 1); c.closePath(); c.fill();
+    if (P.dark > 0.3) for (let i = 0; i < 46; i++) { const sx = (i * 97.3) % W, sy = ((i * 37) % 100) / 100 * hy * 0.92, a = (P.dark - 0.3) / 0.7 * (0.35 + 0.5 * (Math.sin(t / 700 + i * 2.1) + 1) / 2) * (1 - P.w.cloud * 0.7); c.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`; c.fillRect(sx, sy, i % 5 ? 1.4 : 2.2, i % 5 ? 1.4 : 2.2); }
+    const par = -cam.x * cam.z * 0.05;
+    let bx = null, by = 0;
+    const sunP = (h - 5.6) / 14.4, moonP = (((h - 19.4) % 24) + 24) % 24 / 11;
+    if (sunP > 0 && sunP < 1) {
+      bx = W * (0.08 + 0.84 * sunP) + par; by = hy + 8 - Math.sin(Math.PI * sunP) * hy * 0.78;
+      const g = c.createRadialGradient(bx, by, 4, bx, by, 62); g.addColorStop(0, sunP < 0.12 || sunP > 0.88 ? 'rgba(255,205,150,1)' : 'rgba(255,250,215,1)'); g.addColorStop(0.25, css(P.glow)); g.addColorStop(1, 'rgba(255,255,255,0)');
+      c.globalAlpha = 1 - P.w.cloud * 0.55; c.fillStyle = g; c.beginPath(); c.arc(bx, by, 62, 0, Math.PI * 2); c.fill(); c.globalAlpha = 1;
     }
-    for (const cl of skyClouds) {
-      const span = W + 260, x = ((cl.x * span + t * 0.006 * cl.v) % span) - 130;
-      cloudPuff(c, x, hy * cl.y + 6, cl.s, P.cloud);
+    if (moonP > 0 && moonP < 1) {
+      const mx = W * (0.1 + 0.8 * moonP) + par, my = hy + 8 - Math.sin(Math.PI * moonP) * hy * 0.7;
+      c.globalAlpha = 1 - P.w.cloud * 0.5;
+      c.fillStyle = 'rgba(255,248,220,.16)'; c.beginPath(); c.arc(mx, my, 26, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFF4D6'; c.beginPath(); c.arc(mx, my, 13, 0, Math.PI * 2); c.fill(); c.fillStyle = css(P.top); c.beginPath(); c.arc(mx + 6, my - 4, 11, 0, Math.PI * 2); c.fill();
+      c.globalAlpha = 1; if (bx == null) { bx = mx; by = my; }
     }
-    // light on the water under the sun or moon
-    for (let i = 0; i < 6; i++) { const yy = hy + 6 + i * 7, w = 30 - i * 3 + Math.sin(t / 500 + i) * 6; c.fillStyle = ph === 'night' ? 'rgba(255,244,214,.18)' : 'rgba(255,255,255,.3)'; c.fillRect(bx - w / 2, yy, w, 1.6); }
+    const hg = c.createLinearGradient(0, hy - 30, 0, hy + 8); hg.addColorStop(0, 'rgba(255,255,255,0)'); hg.addColorStop(1, css(P.glow)); c.fillStyle = hg; c.fillRect(0, hy - 30, W, 38);
+    const ip = -cam.x * cam.z * 0.12;
+    for (const [fx, w, ih, k] of [[0.12, 120, 16, 0], [0.48, 70, 10, 1], [0.86, 150, 22, 0]]) {
+      const ix = ((fx * W + ip) % (W + 200) + W + 200) % (W + 200) - 100;
+      c.fillStyle = css(k ? P.isle1 : P.isle0); c.beginPath(); c.moveTo(ix - w / 2, hy + 1); c.quadraticCurveTo(ix - w * 0.25, hy - ih * 1.2, ix, hy - ih); c.quadraticCurveTo(ix + w * 0.3, hy - ih * 0.6, ix + w / 2, hy + 1); c.closePath(); c.fill();
+    }
+    const nCl = 3 + Math.round(P.w.cloud * 5);
+    for (let i = 0; i < nCl; i++) { const cl = skyClouds[i], span = W + 260, x = ((cl.x * span + t * 0.006 * cl.v) % span) - 130; cloudPuff(c, x, hy * cl.y + 6, cl.s * (1 + P.w.cloud * 0.4), css(P.cloud)); }
+    if (bx != null) for (let i = 0; i < 6; i++) { const yy = hy + 6 + i * 7, w = 30 - i * 3 + Math.sin(t / 500 + i) * 6; c.fillStyle = P.dark > 0.5 ? 'rgba(255,244,214,.16)' : 'rgba(255,255,255,.28)'; c.fillRect(bx - w / 2, yy, w, 1.6); }
   }
-  // World space, around the island: waves, rocks and a little sailboat going round.
+  // World space, around the island: shallow water, surf, rocks, a little pier and a sailboat going round.
   function drawSea(c, now) {
-    const P = SKY[skyPhase()], t = reduced ? 0 : now, cx = 0, cy = N * HH;
+    const P = skyNow(), t = reduced ? 0 : now, cx = 0, cy = N * HH;
     for (let i = 0; i < 70; i++) {
-      const a = i * 2.39996, rr = 1.12 + ((i * 0.618) % 1) * 1.3, x = cx + Math.cos(a) * N * HW * rr, y = cy + Math.sin(a) * N * HH * rr;
-      const k = (Math.sin(t / 1300 + i * 1.3) + 1) / 2;
-      c.strokeStyle = P.foam.replace(/[\d.]+\)$/, `${(0.15 + 0.4 * k).toFixed(2)})`); c.lineWidth = 1.4;
+      const a = i * 2.39996, rr = 1.16 + ((i * 0.618) % 1) * 1.3, x = cx + Math.cos(a) * N * HW * rr, y = cy + Math.sin(a) * N * HH * rr;
+      const k = (Math.sin(t / 1300 + i * 1.3) + 1) / 2, foam = P.foam.slice(); foam[3] = 0.15 + 0.4 * k;
+      c.strokeStyle = css(foam); c.lineWidth = 1.4;
       c.beginPath(); c.moveTo(x - 9, y); c.quadraticCurveTo(x - 4.5, y + 2.6, x, y); c.quadraticCurveTo(x + 4.5, y + 2.6, x + 9, y); c.stroke();
     }
-    for (const [a, rr, s2] of [[0.7, 1.08, 1], [2.6, 1.1, 0.8], [4.1, 1.06, 1.2]]) { const x = cx + Math.cos(a) * N * HW * rr, y = cy + Math.sin(a) * N * HH * rr; c.fillStyle = '#7E7A72'; c.beginPath(); c.ellipse(x, y, 9 * s2, 5 * s2, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#9B958B'; c.beginPath(); c.ellipse(x - 2, y - 2, 6 * s2, 3.2 * s2, 0, 0, Math.PI * 2); c.fill(); c.strokeStyle = P.foam; c.lineWidth = 1.2; c.beginPath(); c.ellipse(x, y + 2, 12 * s2, 5.5 * s2, 0, 0, Math.PI); c.stroke(); }
-    const ba = t / 90000 * Math.PI * 2, bx = cx + Math.cos(ba) * N * HW * 1.32, by = cy + Math.sin(ba) * N * HH * 1.32, dir = -Math.sin(ba) >= 0 ? 1 : -1;
-    c.strokeStyle = P.foam; c.lineWidth = 1.2; for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(bx - dir * (8 + i * 7), by + 2 + i); c.lineTo(bx - dir * (14 + i * 7), by + 2 + i); c.stroke(); }
+    for (const [a, rr, s2] of [[0.7, 1.1, 1], [2.6, 1.13, 0.8], [4.1, 1.09, 1.2]]) { const x = cx + Math.cos(a) * N * HW * rr, y = cy + Math.sin(a) * N * HH * rr; c.fillStyle = '#7E7A72'; c.beginPath(); c.ellipse(x, y, 9 * s2, 5 * s2, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#9B958B'; c.beginPath(); c.ellipse(x - 2, y - 2, 6 * s2, 3.2 * s2, 0, 0, Math.PI * 2); c.fill(); c.strokeStyle = css(P.foam); c.lineWidth = 1.2; c.beginPath(); c.ellipse(x, y + 2, 12 * s2, 5.5 * s2, 0, 0, Math.PI); c.stroke(); }
+    const ba = t / 90000 * Math.PI * 2, bx = cx + Math.cos(ba) * N * HW * 1.34, by = cy + Math.sin(ba) * N * HH * 1.34, dir = -Math.sin(ba) >= 0 ? 1 : -1;
+    c.strokeStyle = css(P.foam); c.lineWidth = 1.2; for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(bx - dir * (8 + i * 7), by + 2 + i); c.lineTo(bx - dir * (14 + i * 7), by + 2 + i); c.stroke(); }
     poly(c, [[bx - 11, by - 2], [bx + 11, by - 2], [bx + 7 * dir, by + 4], [bx - 7 * dir, by + 4]], '#7A4E33');
     line(c, [bx, by - 2], [bx, by - 24], '#4A3B2B', 1.2);
     poly(c, [[bx + 1, by - 23], [bx + 1, by - 4], [bx + 13 * dir, by - 5]], '#FBF8F0');
     poly(c, [[bx - 1, by - 20], [bx - 1, by - 5], [bx - 8 * dir, by - 5]], '#E8503A');
+    if (P.dark > 0.6) { c.fillStyle = 'rgba(255,214,120,.9)'; c.beginPath(); c.arc(bx, by - 25, 1.6, 0, Math.PI * 2); c.fill(); }
+  }
+  // The island itself: a sandy beach all round, cliffs with layers of rock and soil, wet sand, shells and a pier.
+  function drawIsland(c, now) {
+    const P = skyNow(), t = reduced ? 0 : now, M = 15, dz = HH * 1.3;
+    const T = [0, -M * 0.5], R = [N * HW + M, N * HH], B = [0, 2 * N * HH + M * 0.5], L = [-N * HW - M, N * HH];
+    // shallow water around it, lighter near the shore
+    for (const [g, a] of [[46, 0.12], [30, 0.2], [16, 0.32]]) poly(c, [[T[0], T[1] - g * 0.5], [R[0] + g, R[1] + dz * 0.5], [B[0], B[1] + dz + g * 0.5], [L[0] - g, L[1] + dz * 0.5]], css(P.shallow.concat([a])));
+    // surf hugging the shore
+    c.lineCap = 'round';
+    for (const [A, Bp, nx, ny, dd] of [[L, T, -0.45, -0.9, 0], [T, R, 0.45, -0.9, 0], [L, B, -0.45, 0.9, dz], [B, R, 0.45, 0.9, dz]]) {
+      for (let i = 0; i < 20; i++) {
+        const tt = (i + 0.5) / 20, wob = Math.sin(t / 900 + i * 1.7), off = dd + 5 + 3 * wob;
+        const x0 = A[0] + (Bp[0] - A[0]) * tt + nx * off, y0 = A[1] + (Bp[1] - A[1]) * tt + ny * off * 0.5;
+        const ex = (Bp[0] - A[0]) / 20 * 0.36, ey = (Bp[1] - A[1]) / 20 * 0.36, f = P.foam.slice(); f[3] = 0.32 + 0.22 * wob;
+        c.strokeStyle = css(f); c.lineWidth = 2; c.beginPath(); c.moveTo(x0 - ex, y0 - ey); c.lineTo(x0 + ex, y0 + ey); c.stroke();
+      }
+    }
+    // cliffs: soil on top, rock below, a darker waterline
+    const winter = SEA.k === 'winter';
+    const face = (A, Bp, soil, rock) => {
+      poly(c, [A, Bp, [Bp[0], Bp[1] + dz], [A[0], A[1] + dz]], rock);
+      poly(c, [A, Bp, [Bp[0], Bp[1] + dz * 0.38], [A[0], A[1] + dz * 0.38]], soil);
+      poly(c, [[A[0], A[1] + dz * 0.84], [Bp[0], Bp[1] + dz * 0.84], [Bp[0], Bp[1] + dz], [A[0], A[1] + dz]], 'rgba(30,40,50,.18)');
+      for (let i = 0; i < 12; i++) { const k = (i + 0.5) / 12, x = A[0] + (Bp[0] - A[0]) * k, y = A[1] + (Bp[1] - A[1]) * k + dz * (0.5 + ((i * 7) % 3) * 0.12); c.fillStyle = 'rgba(40,30,20,.2)'; c.beginPath(); c.ellipse(x, y, 4 + (i % 3), 1.8, 0, 0, Math.PI * 2); c.fill(); }
+    };
+    face(L, B, '#A9845A', '#857059'); face(B, R, '#BF9867', '#9A8166');
+    // the beach
+    poly(c, [T, R, B, L], winter ? '#EEF2F2' : '#E8D8AA');
+    c.strokeStyle = winter ? 'rgba(170,190,200,.5)' : 'rgba(175,145,95,.42)'; c.lineWidth = 4; c.lineJoin = 'round';
+    outline(c, [[T[0], T[1] + 2], [R[0] - 3, R[1]], [B[0], B[1] - 2], [L[0] + 3, L[1]]]);
+    for (let i = 0; i < 26; i++) {
+      const side = i % 4, k = rnd01(i + 7), A = [L, T, B, L][side], Bp = [B, R, R, T][side], x = A[0] + (Bp[0] - A[0]) * k, y = A[1] + (Bp[1] - A[1]) * k, inx = side === 1 ? -4 : side === 2 ? -4 : 4, iny = side < 2 ? (side === 0 ? -3 : 3) : (side === 2 ? -3 : 3);
+      c.fillStyle = ['#F7EFE3', '#D9B48C', '#B9AFA2', '#F2D0C4'][i % 4]; c.beginPath(); c.ellipse(x + inx * 1.2, y + iny * 0.6, 1.8, 1.1, 0, 0, Math.PI * 2); c.fill();
+    }
+    // a little wooden pier on the south-east shore
+    const E = [B[0] + (R[0] - B[0]) * 0.62, B[1] + (R[1] - B[1]) * 0.62], tx = (R[0] - B[0]) / Math.hypot(R[0] - B[0], R[1] - B[1]), ty = (R[1] - B[1]) / Math.hypot(R[0] - B[0], R[1] - B[1]);
+    const nx = 0.5, ny = 0.86, w = 7, len = 44;
+    const p1 = [E[0] - tx * w, E[1] - ty * w], p2 = [E[0] + tx * w, E[1] + ty * w], p3 = [p2[0] + nx * len, p2[1] + ny * len * 0.6 + dz * 0.45], p4 = [p1[0] + nx * len, p1[1] + ny * len * 0.6 + dz * 0.45];
+    for (const pp of [p3, p4]) line(c, pp, [pp[0], pp[1] + 9], '#5E4430', 2);
+    poly(c, [p1, p2, p3, p4], '#9A6B43');
+    for (let i = 1; i < 7; i++) { const k = i / 7; line(c, [p1[0] + (p4[0] - p1[0]) * k, p1[1] + (p4[1] - p1[1]) * k], [p2[0] + (p3[0] - p2[0]) * k, p2[1] + (p3[1] - p2[1]) * k], 'rgba(60,40,25,.45)', 0.8); }
+    // the grass lip where the town meets the beach
+    c.strokeStyle = 'rgba(60,80,40,.28)'; c.lineWidth = 3;
+    c.beginPath(); c.moveTo(-N * HW, N * HH + 1.5); c.lineTo(0, 2 * N * HH + 1.5); c.lineTo(N * HW, N * HH + 1.5); c.stroke();
+  }
+  // Rain, snow, fog, lightning and the rainbow, over everything (screen space).
+  const WX = { flashAt: 0, nextFlash: 0 };
+  function drawWeather(c, now) {
+    const P = skyNow(), w = P.w, W = geo.w, H = geo.h, t = reduced ? 0 : now;
+    if (w.rainbow > 0.02) { c.save(); c.globalAlpha = 0.2 * w.rainbow; c.lineWidth = 9; ['#E8503A', '#F39A2C', '#F3D23A', '#6CC04A', '#3E9ADB', '#6A5BD8'].forEach((col, i) => { c.strokeStyle = col; c.beginPath(); c.arc(W * 0.55, H * 1.02, W * 0.95 - i * 9, Math.PI * 1.08, Math.PI * 1.92); c.stroke(); }); c.restore(); }
+    if (reduced || w.k < 0.02) return;
+    if (w.kind === 'rain' || w.kind === 'storm') {
+      const n = Math.round((w.kind === 'storm' ? 130 : 75) * w.k), sl = w.kind === 'storm' ? 0.35 : 0.2;
+      c.strokeStyle = `rgba(210,225,240,${(0.38 * w.k).toFixed(3)})`; c.lineWidth = 1.1; c.beginPath();
+      for (let i = 0; i < n; i++) { const sp = 0.55 + rnd01(i) * 0.35, x = (rnd01(i + 99) * (W + 80) + t * sp * sl) % (W + 80) - 40, y = (rnd01(i + 7) * (H + 60) + t * sp) % (H + 60) - 30; c.moveTo(x, y); c.lineTo(x - 14 * sl * 2, y - 14); }
+      c.stroke();
+    }
+    if (w.kind === 'snow') { for (let i = 0; i < Math.round(70 * w.k); i++) { const x = (rnd01(i + 5) * W + Math.sin(t / 1200 + i) * 20 + t * 0.008) % W, y = (rnd01(i + 61) * H + t * (0.03 + rnd01(i) * 0.03)) % H; c.fillStyle = 'rgba(255,255,255,.85)'; c.beginPath(); c.arc(x, y, 1.2 + (i % 3) * 0.6, 0, Math.PI * 2); c.fill(); } }
+    if (w.kind === 'fog') { const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, `rgba(232,238,240,${(0.55 * w.k).toFixed(3)})`); g.addColorStop(1, `rgba(232,238,240,${(0.22 * w.k).toFixed(3)})`); c.fillStyle = g; c.fillRect(0, 0, W, H); }
+    if (w.kind === 'storm') {
+      if (!WX.nextFlash) WX.nextFlash = now + 5000 + Math.random() * 7000;
+      if (now > WX.nextFlash) { WX.flashAt = now; WX.nextFlash = now + 7000 + Math.random() * 9000; if (ui.screen === 'play' && !ui.overlay) sfx.thunder(); }
+      const fk = (now - WX.flashAt) / 260;
+      if (fk >= 0 && fk < 1) { c.fillStyle = `rgba(255,255,255,${(0.45 * (1 - fk) * w.k).toFixed(3)})`; c.fillRect(0, 0, W, H); }
+    }
   }
   // Falling leaves in autumn, snow in winter, petals in spring, butterflies in summer.
   function seasonFx(c, now) {
@@ -3535,21 +3761,7 @@
     c.setTransform(d * z, 0, 0, d * z, d * (geo.w / 2 - cam.x * z), d * (geo.h / 2 - cam.y * z));
     drawSea(c, now);
     const top = [0, 0], right = [N * HW, N * HH], bottom = [0, 2 * N * HH], left = [-N * HW, N * HH], dz = HH * 1.1;
-    // Sea foam lapping around the island.
-    c.lineCap = 'round';
-    for (const [A, B, nx, ny] of [[left, top, -0.45, -0.9], [top, right, 0.45, -0.9], [left, bottom, -0.45, 0.9], [bottom, right, 0.45, 0.9]]) {
-      for (let i = 0; i < 18; i++) {
-        const t = (i + 0.5) / 18, wob = Math.sin(tt / 900 + i * 1.7), off = (ny > 0 ? dz : 0) + 7 + 3 * wob;
-        const x0 = A[0] + (B[0] - A[0]) * t + nx * off, y0 = A[1] + (B[1] - A[1]) * t + ny * off * 0.5;
-        const ex = (B[0] - A[0]) / 18 * 0.32, ey = (B[1] - A[1]) / 18 * 0.32;
-        c.strokeStyle = `rgba(255,255,255,${0.28 + 0.18 * wob})`; c.lineWidth = 1.6;
-        c.beginPath(); c.moveTo(x0 - ex, y0 - ey); c.lineTo(x0 + ex, y0 + ey); c.stroke();
-      }
-    }
-    poly(c, [left, bottom, [bottom[0], bottom[1] + dz], [left[0], left[1] + dz]], '#9C7A52');
-    poly(c, [bottom, right, [right[0], right[1] + dz], [bottom[0], bottom[1] + dz]], '#B48E62');
-    for (let i = 0; i < 9; i++) { const t = (i + 0.5) / 9; c.fillStyle = 'rgba(70,50,30,.22)'; c.beginPath(); c.ellipse(left[0] + (bottom[0] - left[0]) * t, left[1] + (bottom[1] - left[1]) * t + dz * (0.35 + (i % 3) * 0.2), 3, 1.6, 0, 0, Math.PI * 2); c.fill(); c.beginPath(); c.ellipse(bottom[0] + (right[0] - bottom[0]) * t, bottom[1] + (right[1] - bottom[1]) * t + dz * (0.3 + ((i + 1) % 3) * 0.2), 3, 1.6, 0, 0, Math.PI * 2); c.fill(); }
-    poly(c, [top, right, bottom, left], '#E3D3A4');
+    drawIsland(c, now);
     const occ = occupancy(), wild = [];
     for (let r = 0; r < N; r++) for (let cc = 0; cc < N; cc++) {
       const p = tileCenter(cc, r);
@@ -3708,12 +3920,17 @@
     for (const o of objs) o.draw();
     for (const fn of after) fn();
     // a soft evening or night light over the town (labels stay bright)
-    const tint = SKY[skyPhase()].tint;
-    if (tint) { c.save(); c.setTransform(d, 0, 0, d, 0, 0); c.fillStyle = tint; c.fillRect(0, 0, geo.w, geo.h); c.restore(); }
+    const tint = skyNow().tint;
+    if (tint[3] > 0.005) { c.save(); c.setTransform(d, 0, 0, d, 0, 0); c.fillStyle = css(tint); c.fillRect(0, 0, geo.w, geo.h); c.restore(); }
     // Drifting cloud shadows.
-    if (!reduced) for (const cl of clouds) {
-      const span = 2 * N * HW + 400, x = ((now * 0.012 * cl.s + cl.y * 7) % span) - span / 2;
-      c.fillStyle = 'rgba(20,40,40,.07)'; c.beginPath(); c.ellipse(x, cl.y, 70 * cl.r, 26 * cl.r, 0, 0, Math.PI * 2); c.ellipse(x + 46 * cl.r, cl.y + 8, 44 * cl.r, 20 * cl.r, 0, 0, Math.PI * 2); c.fill();
+    // Clouds drift high above the town, with their shadows on the ground: more of them on grey days.
+    if (!reduced) {
+      const SP = skyNow(), nCl = 2 + Math.round(SP.w.cloud * 5), puff = SP.cloud.slice(); puff[3] = 0.3 + 0.25 * SP.w.cloud;
+      for (let i = 0; i < Math.min(nCl, clouds.length); i++) {
+        const cl = clouds[i], span = 2 * N * HW + 500, x = ((now * 0.012 * cl.s + cl.y * 7 + i * 260) % span) - span / 2;
+        c.fillStyle = `rgba(20,40,40,${(0.05 + 0.06 * SP.w.cloud).toFixed(3)})`; c.beginPath(); c.ellipse(x, cl.y, 70 * cl.r, 26 * cl.r, 0, 0, Math.PI * 2); c.ellipse(x + 46 * cl.r, cl.y + 8, 44 * cl.r, 20 * cl.r, 0, 0, Math.PI * 2); c.fill();
+        cloudPuff(c, x - 40, cl.y - 175, 1.7 * cl.r, css(puff));
+      }
     }
     // Labels above buildings: a fire or speech bubble first, then a request marker, then (in play) the income.
     // Income tags are drawn first so bubbles sit on top of them.
@@ -3801,6 +4018,8 @@
       tag(c, f.x, f.y - k * 34, f.text, px * 1.15, f.soft ? 'rgba(255,255,255,.96)' : 'rgba(43,117,72,.95)', f.soft ? '#1E2A28' : '#fff');
       c.restore();
     }
+    c.setTransform(d, 0, 0, d, 0, 0);
+    drawWeather(c, now);
     bubbleTick(now);
   }
 
@@ -3869,6 +4088,8 @@
     if (playing && state.playSec <= 30) root.setProperty('--play-now-ink', '#FFFFFF'); else root.removeProperty('--play-now-ink');
     const secs = Math.ceil(state.playSec);
     if (playing && secs <= 10 && secs > 0 && ui.lastPlaySec !== secs) { pulse($('play-chip')); sfx.tick(); }
+    if (playing) renderHandle();
+    renderSkyChip();
     ui.lastPlaySec = secs;
     const none = state.playSec <= 0;
     $('cta-main').textContent = none ? 'Focus to earn play time' : (state.tray.length ? (state.tray[0].resident ? 'Tap your town: a family is waiting' : `Tap your town: place your ${TYPES[state.tray[0].type].name.toLowerCase()}`) : 'Tap your town to play');
@@ -3890,6 +4111,7 @@
     $('focus-builder').textContent = state.builder;
     stage.classList.toggle('home', !playing);
     $('homebar').hidden = playing; $('playbar').hidden = !playing; $('homebody').hidden = playing;
+    if (!playing) ui.barOpen = false;
     $('home-cta').hidden = playing; $('zoom').hidden = !playing || !!ui.panel;
     $('map').setAttribute('aria-label', playing ? 'Your town. Drag to look around, pinch or use the buttons to zoom. Tap a building or an empty spot.' : 'Your town. Tap it to start playing.');
     const qn = state.queue.length;
@@ -3901,9 +4123,34 @@
     if (ft.n) { const bigs = state.queue.filter(bigQ); $('pf-main').textContent = ft.n === 1 ? 'Focus to build it' : `Focus to build all ${ft.n}`; $('pf-sub').textContent = `${fmtMin(ft.ex)} of focus · ${ft.n === 1 ? `${state.builder}: ${jobLabel(bigs[0]).toLowerCase()}` : `${ft.n} big projects`}`; }
     else { $('pf-main').textContent = 'Start focus now'; $('pf-sub').textContent = 'Earn play time and gold'; }
     $('play-focus').classList.toggle('ready', ft.n > 0);
-    renderBanner(); renderHint(); renderPanel(); renderNextBlock(); renderSeason(); renderVisit();
+    renderBanner(); renderHint(); renderPanel(); renderNextBlock(); renderSeason(); renderBar(); renderVisit();
     syncWalkers(); renderHud();
   }
+  // In town the bottom bar tucks away so the map (and the building cards) get the room. Swipe up, or tap the pill, to bring it back.
+  function renderSkyChip() {
+    const P = skyNow(), w = P.w, W0 = WEATHER[w.kind], night = P.dark > 0.6;
+    const hh = Math.floor(P.hour), mm = state.realClock ? Math.floor((P.hour - hh) * 60) : Math.floor((P.hour - hh) * 4) * 15;
+    const txt = `${w.k > 0.3 ? (night && W0.night ? W0.night : W0.icon) : night ? '🌙' : '☀️'} ${fmtTod(hh * 60 + mm)}${w.k > 0.3 && w.kind !== 'clear' ? ` · ${W0.name}` : ''}${w.rainbow > 0.3 ? ' · 🌈' : ''}`;
+    const n = $('skychip'); if (n.textContent !== txt) n.textContent = txt;
+  }
+  function renderBar() {
+    const playing = ui.screen === 'play' && !ui.visit;
+    const open = playing && !!ui.barOpen && !ui.panel && !ui.holding;
+    if (!open) ui.barOpen = false;
+    $('playbar').classList.toggle('open', open);
+    const showHandle = playing && !open && !ui.panel && !ui.holding;
+    if ($('barhandle').hidden === showHandle) $('barhandle').hidden = !showHandle;
+    renderHandle();
+  }
+  function renderHandle() {
+    const h = $('barhandle'); if (h.hidden) return;
+    const cn = comboNow(), ft = focusText();
+    const txt = cn > 0 ? `Combo ×${comboMultFor(cn).toFixed(1)} · ${fmtClock((state.combo.until - Date.now()) / 1000)} · Focus` : ft.n ? (ft.n === 1 ? 'Focus to build it' : `Focus to build all ${ft.n}`) : 'Focus · Home · Plan';
+    if ($('bh-text').textContent !== txt) $('bh-text').textContent = txt;
+    h.classList.toggle('combo', cn > 0);
+  }
+  function openBar() { if (ui.screen !== 'play' || ui.visit) return; if (ui.panel) closePanel(true); if (ui.holding) return; ui.barOpen = true; renderAll(); sfx.pop(); }
+  function closeBar() { if (!ui.barOpen) return; ui.barOpen = false; renderAll(); }
   function questAction(q, small) {
     const cls = 'btn ' + (small ? 'sm ' : '');
     if (q.action === 'play') {
@@ -3984,6 +4231,7 @@
   /* ---------- Map cards ---------- */
   function openPanel(p) {
     if (ui.screen !== 'play') return;
+    ui.barOpen = false;
     if (ui.playExpired && !ui.panel && !ui.holding) { leavePlay(true); return; }
     const wasOpen = !!ui.panel;
     ui.panel = p;
@@ -4121,12 +4369,12 @@
       row.append(actionBtn(q.done > 0 ? 'In the plan' : 'Remove from plan', q.done > 0 ? 'Already started' : `Refund ${q.paid} gold`, '', () => { removeFromPlan(q.id); closePanel(); }, q.done > 0));
     } else if (q) {
       const wait = activeBuild() !== q;
-      row.append(actionBtn(wait ? 'Waiting for Sam' : `${q.kind === 'repair' ? 'Repairing' : q.kind === 'build' ? 'Building' : 'Upgrading'}… ${Math.round(q.done / q.work * 100)}%`, wait ? 'next in line' : `${Math.max(1, Math.ceil(buildSecs(q.work) * (1 - q.done / q.work)))} s left`, 'primary', () => {}, true));
+      row.append(actionBtn(wait ? 'Waiting for Sam' : `${q.kind === 'repair' ? 'Repairing' : q.kind === 'build' ? 'Building' : 'Upgrading'}… ${Math.round(q.done / q.work * 100)}%`, wait ? 'next in line' : `${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work))} left`, 'primary', () => {}, true));
       row.append(actionBtn('Cancel', `Refund ${q.paid} gold`, '', () => { removeFromPlan(q.id); closePanel(); }));
       if (ui.screen !== 'play') why = `${state.builder} builds it next time you play.`;
     } else if (b.ruin) {
       const chk = checkJob('repair', b);
-      row.append(actionBtn(`Repair · ${t.repair} gold`, `${state.builder} fixes it in ${buildSecs(1)} s`, 'primary', () => { planJob('repair', b.id, true); renderAll(); }, !chk.ok));
+      row.append(actionBtn(`Repair · ${t.repair} gold`, `${state.builder} fixes it in ${fmtSecs(buildSecs(1))}`, 'primary', () => { planJob('repair', b.id, true); renderAll(); }, !chk.ok));
       if (!chk.ok) why = chk.why;
     } else if (b.site) {
       // a site without a job cannot happen; nothing to do
@@ -4141,7 +4389,7 @@
         row.append(actionBtn('Add to plan', `Level ${b.level + 1} · ${chk.cost} gold`, '', () => { planJob('upgrade', b.id); renderAll(); }, !chk.ok));
         if (chk.ok) why = `A big project: ${state.builder} needs ${fmtMin(exactMinutes(chk.work))} of your focus for it.`; else why = chk.why;
       } else if (!chk.max) {
-        row.append(actionBtn(`Upgrade · ${chk.cost} gold`, `Level ${b.level + 1} in ${buildSecs(chk.work)} s`, 'primary', () => { if (planJob('upgrade', b.id, true)) { toast(`${state.builder} is on it!`); renderAll(); } else toast(checkJob('upgrade', b).why); }, !chk.ok));
+        row.append(actionBtn(`Upgrade · ${chk.cost} gold`, `Level ${b.level + 1} in ${fmtSecs(buildSecs(chk.work))}`, 'primary', () => { if (planJob('upgrade', b.id, true)) { toast(`${state.builder} is on it!`); renderAll(); } else toast(checkJob('upgrade', b).why); }, !chk.ok));
         if (!chk.ok) why = chk.why;
       } else why = 'Fully upgraded.';
       row.append(moveBtn());
@@ -4189,7 +4437,7 @@
     } else if (t.cat === 'service') {
       box.append(el('p', 'small', t.blurb));
       const sl = t.slots[b.level], nx = t.slots[b.level + 1];
-      box.append(el('p', 'small muted', `Room for ${sl} ${STAFF[t.staff].plural} here${nx ? `; level ${b.level + 1} has room for ${nx}` : ''}. Hiring: ${STAFF[t.staff].fee} gold once, then ${STAFF[t.staff].wage} gold an hour each.`));
+      box.append(el('p', 'small muted', `Room for ${sl} ${STAFF[t.staff].plural} here${nx ? `; level ${b.level + 1} has room for ${nx}` : ''}. Next hire: ${hireFee(t.staff)} gold once, then ${wageOf(t.staff, state.staff[t.staff] || 0)} gold an hour. Each extra ${STAFF[t.staff].name.toLowerCase()} costs more and asks a higher wage.`));
     } else if (b.type === 'townhall') {
       box.append(el('p', 'small', t.blurb));
       if (b.level < t.max) {
@@ -4253,7 +4501,7 @@
       for (const { type, chk } of rows) {
         const t = TYPES[type];
         const big = isBigJob('build', type, chk.work || 0);
-        const meta = [goldLine(chk.cost), big ? el('span', 'bc-big', `${fmtMin(chk.work)} focus`) : el('span', '', `${buildSecs(chk.work)} s`)];
+        const meta = [goldLine(chk.cost), big ? el('span', 'bc-big', `${fmtMin(chk.work)} focus`) : el('span', '', `${fmtSecs(buildSecs(chk.work))}`)];
         if (t.size > 1) meta.push(el('span', '', `${t.size}×${t.size}`));
         let note = '', nc = '';
         if (chk.locked) { const miss = needsFor(type).filter((n) => !n.ok); note = miss.length ? `Needs ${miss.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(', ')}` : 'Locked'; nc = 'lock'; }
@@ -4295,8 +4543,8 @@
     setHolding(null); ui.panel = null;
     const b = byId(q.bid); bump(b.id); const p = centerOf(b); burst(p.x, p.y - 10, 22);
     renderAll();
-    if (bigQ(q)) { ui.focusPop = performance.now(); popFocus(); toast(`A big project! Focus ${fmtMin(exactMinutes(q.work))} and ${state.builder} builds it.`); }
-    else { sfx.chime(); toast(`${state.builder} is on it! Ready in ${buildSecs(q.work)} seconds.`); }
+    if (bigQ(q)) { ui.focusPop = performance.now(); ui.barOpen = true; renderAll(); popFocus(); toast(`A big project! Focus ${fmtMin(exactMinutes(q.work))} and ${state.builder} builds it.`); }
+    else { sfx.chime(); toast(`${state.builder} is on it! Ready in ${fmtSecs(buildSecs(q.work))}econds.`); }
     afterAction();
   }
   function popFocus() {
@@ -4330,7 +4578,7 @@
     const t = TYPES[item.type], fx = placeEffects(item, ui.preview.c, ui.preview.r);
     const delta = Math.round(fx.gold);
     const chips = [];
-    if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${fmtMin(chk.work)} of focus`, 'xp') : pill(`Built in ${buildSecs(chk.work)} s`, 'play')); }
+    if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${fmtMin(chk.work)} of focus`, 'xp') : pill(`Built in ${fmtSecs(buildSecs(chk.work))}`, 'play')); }
     if (delta) chips.push(pill(`${delta > 0 ? '+' : '−'}${Math.abs(delta)} gold/hour`, delta > 0 ? 'good' : 'bad'));
     box.append(panelHead(item.type, item.level, {}, item.isNew ? `Build a ${t.name.toLowerCase()} here?` : `Move the ${t.name.toLowerCase()} here?`, chips));
     const ul = el('ul', 'effects');
@@ -4801,7 +5049,7 @@
       onEnter: () => { closePanel(true); const b = state.buildings.find((x) => x.ruin); tour.ruin = b ? b.id : null; if (b) { const p = centerOf(b), z = Math.max(cam.z, playZoom()); animateCam({ x: p.x, y: p.y - (geo.h * 0.25 - geo.h / 2) / z, z }, 500); } renderAll(); },
       wait: () => { const b = byId(tour.ruin); return !b || !b.ruin || !!jobFor(b.id); }, skipIf: () => !state.buildings.some((b) => b.ruin) || ui.screen !== 'play' },
     { el: '#play-focus', pass: true, place: 'top', text: () => `Focus is what earns play time, and ${state.builder} needs it for big projects like the town hall. Try one now: your first focus runs 10× faster.`,
-      onEnter: () => { ui.tourSpeed = 10; }, wait: () => !!state.session, skipIf: () => ui.screen !== 'play' && !state.session },
+      onEnter: () => { ui.tourSpeed = 10; openBar(); }, wait: () => !!state.session, skipIf: () => ui.screen !== 'play' && !state.session },
     { el: '#focus-scene', text: () => 'While you focus, you earn play time, gold and XP. In real life you put your phone away now. This one runs 10× faster.', wait: () => !state.session, skipIf: () => !state.session },
     { el: '#cele-go', pass: true, place: 'top', text: 'Done! Every finished session ends with a celebration and a chest. Open it.', wait: () => ui.overlay === 'chest' || ui.overlay === 'result', skipIf: () => ui.overlay !== 'celebrate' },
     { el: '#chest-hit', pass: true, place: 'top', text: 'Tap the chest! Longer sessions find better ones.', wait: () => ui.overlay === 'result', skipIf: () => ui.overlay !== 'chest' },
@@ -4810,7 +5058,7 @@
   ]);
   const TOUR_REPLAY = TOUR_START.concat([
     { el: '#stage', pass: true, place: 'top', text: 'Tap a building to see what it does, or empty land to build. Wild land around town can be cleared with focus.' },
-    { el: '#play-focus', text: 'Small things get built right away while you play. Focus earns more play time, and big projects need it.' },
+    { el: '#barhandle', text: 'Small things get built right away while you play. Swipe up from the bottom (or tap this) for Focus, Home and Sam\'s plan.' },
     { text: "That's it. Plan your day, keep your streak, open chests. Have fun, Mayor!", next: 'Done' }
   ]);
   const tour = { steps: null, i: 0, raf: 0, ruin: null };
@@ -4887,7 +5135,7 @@
       state.queue.forEach((q, i) => {
         const it = el('div', 'item');
         it.append(icon(q.type, q.kind === 'upgrade' ? q.toLevel : 1, 60, 52, { ruin: q.kind === 'repair' }));
-        const main = el('div'); main.append(el('h3', '', `${i + 1}. ${jobLabel(q)}`), el('div', 'meta', bigQ(q) ? `Big project · ${fmtMin(Math.max(1, q.work - q.done))} of focus left` : `Built while you play · ${Math.max(1, Math.ceil(buildSecs(q.work) * (1 - q.done / q.work)))} s`));
+        const main = el('div'); main.append(el('h3', '', `${i + 1}. ${jobLabel(q)}`), el('div', 'meta', bigQ(q) ? `Big project · ${fmtMin(Math.max(1, q.work - q.done))} of focus left` : `Built while you play · ${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work))}`));
         if (q.done > 0) { const bar = el('div', 'bar'); const s = el('span'); s.style.width = (q.done / q.work * 100) + '%'; bar.append(s); main.append(bar); }
         it.append(main);
         const act = el('div', 'actions');
@@ -4968,18 +5216,19 @@
     let info;
     if (!ro.hasHome) info = `${r.what} They work from a ${TYPES[r.home].name.toLowerCase()}, so build one first${ro.needed ? '' : r.neededText ? ` (${r.neededText.toLowerCase()})` : ''}.`;
     else info = `${ro.working} working${ro.needed ? ` · town needs ${ro.need} (${r.needText})` : r.neededText ? ` · ${r.neededText.toLowerCase()}` : ''} · room for ${ro.cap}`;
-    tx.append(el('small', '', info), el('span', 'fee', `Hire: ${r.fee} gold once, then ${r.wage} gold an hour`));
+    const nf = hireFee(k, ro.hired), nw = wageOf(k, ro.hired);
+    tx.append(el('small', '', info), el('span', 'fee', `${ro.hired ? `${ordinal(ro.hired + 1)} hire` : 'Hire'}: ${nf} gold, then ${nw} gold an hour${ro.hired ? ` · now paying ${wagesFor(k, ro.hired)}/h` : ''}`));
     row.append(tx);
     const ask = ui.staffAsk && ui.staffAsk.k === k ? ui.staffAsk.op : null;
     if (ask) {
       const box = el('div', 'confirm'); box.style.gridColumn = '1 / -1'; box.style.marginTop = '2px';
-      const can = ask === 'hire' ? state.gold + 1e-6 >= r.fee : true;
+      const can = ask === 'hire' ? state.gold + 1e-6 >= nf : true;
       box.append(el('span', 'small', ask === 'hire'
-        ? `Hire a ${r.name.toLowerCase()} for ${r.fee} gold? Then ${r.wage} gold an hour from your taxes.${can ? '' : ` You need ${fmtGold(r.fee - state.gold + 0.999)} more gold.`}`
-        : `Let one ${r.name.toLowerCase()} go? You save the ${r.wage} gold wage, but hiring again costs ${r.fee} gold.`));
+        ? `Hire your ${ordinal(ro.hired + 1)} ${r.name.toLowerCase()} for ${nf} gold? Then ${nw} gold an hour from your taxes.${ro.hired ? ' Every extra one costs more.' : ''}${can ? '' : ` You need ${fmtGold(nf - state.gold + 0.999)} more gold.`}`
+        : `Let one ${r.name.toLowerCase()} go? You save ${wageOf(k, ro.hired - 1)} gold an hour, but hiring again costs ${hireFee(k, ro.hired - 1)} gold.`));
       const rr = el('div', 'row');
       const no = el('button', 'btn sm', 'Cancel'); no.addEventListener('click', () => { ui.staffAsk = null; refreshStaffViews(true); });
-      const yes = el('button', 'btn sm ' + (ask === 'hire' ? 'playc' : 'primary'), ask === 'hire' ? `Hire · ${r.fee} gold` : 'Let go'); yes.disabled = !can;
+      const yes = el('button', 'btn sm ' + (ask === 'hire' ? 'playc' : 'primary'), ask === 'hire' ? `Hire · ${nf} gold` : 'Let go'); yes.disabled = !can;
       yes.addEventListener('click', () => { ui.staffAsk = null; if (ask === 'hire') hire(k); else letGo(k); refreshStaffViews(true); });
       rr.append(no, yes); box.append(rr);
       row.append(el('span'), box);
@@ -4989,7 +5238,7 @@
     if (ro.hasHome || ro.hired) {
       const minus = el('button', '', '−'); minus.setAttribute('aria-label', `Let one ${r.name.toLowerCase()} go`); minus.disabled = !playing || ro.hired <= 0;
       minus.addEventListener('click', () => { ui.staffAsk = { k, op: 'fire' }; refreshStaffViews(true); });
-      const plus = el('button', 'add', '+'); plus.setAttribute('aria-label', `Hire a ${r.name.toLowerCase()} for ${r.fee} gold`); plus.disabled = !playing || ro.hired >= ro.cap;
+      const plus = el('button', 'add', '+'); plus.setAttribute('aria-label', `Hire a ${r.name.toLowerCase()} for ${nf} gold`); plus.disabled = !playing || ro.hired >= ro.cap;
       plus.addEventListener('click', () => { ui.staffAsk = { k, op: 'hire' }; refreshStaffViews(true); });
       stp.append(minus, el('span', '', String(ro.hired)), plus);
     } else {
@@ -5043,7 +5292,7 @@
     if (k === 'police' && ro.hasHome && nearB && T(nearB).cat === 'home' && !policeCovers(nearB) && ro.working >= stations && !sq)
       return { kind: 'build', label: 'Build a police station nearer', fn: () => openServiceSpot('police', nearB) };
     const short = ro.working < Math.max(1, ro.need) || (k === 'police' && ro.working < stations);
-    if (ro.hasHome && short && ro.hired < ro.cap) return { kind: 'hire', label: `Hire a ${r.name.toLowerCase()} · ${r.fee} gold`, fn: () => showOnMap(staffBuildings(k)[0]) };
+    if (ro.hasHome && short && ro.hired < ro.cap) return { kind: 'hire', label: `Hire a ${r.name.toLowerCase()} · ${hireFee(k)} gold`, fn: () => showOnMap(staffBuildings(k)[0]) };
     if (sq && bigQ(sq)) return { kind: 'now', label: `Build the ${home} now · ${fmtMin(exactMinutes(sq.work - sq.done))}`, fn: () => { closeSheet(); doNow(sq); } };
     if (sq) return { kind: 'build', label: `The ${home} is being built`, fn: () => showOnMap(site) };
     if (!ro.hasHome) return { kind: 'build', label: `Build a ${home}`, fn: () => openServiceSpot(r.home, nearB) };
@@ -5136,7 +5385,7 @@
     const ol = el('ol', 'steps');
     const step = (txt, ok) => ol.append(el('li', ok ? 'ok' : '', txt));
     step(`Build a fire station (${TYPES.firestation.cost} gold, ${fmtMin(TYPES.firestation.work)} of focus)`, !!st);
-    step(`Hire a firefighter there (${STAFF.fire.fee} gold, then ${STAFF.fire.wage} gold an hour)`, staffWorking('fire') >= 1);
+    step(`Hire a firefighter there (${hireFee('fire')} gold, then ${wageOf('fire', state.staff.fire || 0)} gold an hour)`, staffWorking('fire') >= 1);
     step('Watch them rush over and put it out', false);
     box.append(ol);
     const grid = el('div', 'actions-grid');
@@ -5250,17 +5499,24 @@
     sndc.addEventListener('change', () => { state.sound = sndc.checked; save(); if (state.sound) sfx.chime(); });
     snd.append(sndt, sndc);
     const mus = el('label', 'switch');
-    const must = el('span'); must.append(el('b', '', 'Music'), el('div', 'tiny muted', 'A calm tune on Home and in your town. Never while you focus.'));
+    const must = el('span'); must.append(el('b', '', 'Music'), el('div', 'tiny muted', 'Plays on Home and in your town, never while you focus. Pick a tune below, or use ▶ and ⏭ in the top bar.'));
     const musc = el('input'); musc.type = 'checkbox'; musc.id = 'set-music'; musc.checked = state.music !== false;
     musc.addEventListener('change', () => { state.music = musc.checked; save(); musicUpdate(); });
     mus.append(must, musc);
+    const trk = el('div', 'dp-durs');
+    music.tracks.forEach((nm, i) => { const b = el('button', '', nm); b.type = 'button'; b.setAttribute('aria-pressed', String((state.track | 0) === i)); b.addEventListener('click', () => { state.track = i; state.music = true; AUD.unlocked = true; save(); musicUpdate(); openMenu(); }); trk.append(b); });
     const alm = el('label', 'switch');
     const almt = el('span'); almt.append(el('b', '', 'Focus plan alarm'), el('div', 'tiny muted', 'A bell rings when a planned focus block starts (while Maplewick is open).'));
     const almc = el('input'); almc.type = 'checkbox'; almc.id = 'set-alarm'; almc.checked = state.alarms !== false;
     almc.addEventListener('change', () => { state.alarms = almc.checked; save(); if (state.alarms) ringBell(); });
     alm.append(almt, almc);
+    const clk = el('label', 'switch');
+    const clkt = el('span'); clkt.append(el('b', '', 'Fast days'), el('div', 'tiny muted', 'A day in town lasts 24 minutes, with dawn, dusk, night and weather. Off: town time follows your real clock.'));
+    const clkc = el('input'); clkc.type = 'checkbox'; clkc.id = 'set-clock'; clkc.checked = !state.realClock;
+    clkc.addEventListener('change', () => { state.realClock = !clkc.checked; save(); renderHud(); });
+    clk.append(clkt, clkc);
     const mv = el('button', 'btn', 'Move your town to another device'); mv.addEventListener('click', openMoveTown);
-    sec('Settings', f1, f2, saveBtn, snd, mus, alm, mv);
+    sec('Settings', f1, f2, saveBtn, snd, mus, trk, clk, alm, mv);
     const sw = el('label', 'switch');
     const st = el('span'); st.append(el('b', '', 'Test speed'), el('div', 'tiny muted', 'One focus minute takes one second, and the focus screen gets a "finish now" button. Play time still runs in real time.'));
     const cb = el('input'); cb.type = 'checkbox'; cb.id = 'set-speed'; cb.checked = state.speed > 1; cb.disabled = !!state.session;
@@ -5785,6 +6041,7 @@
       const pillEl = el('span', 'rw k-' + kind); pillEl.textContent = amt; li.append(pillEl); led.append(li);
     };
     if (r.reason === 'pickup') row('bad', 'alert', 'Phone picked up', 'no chest', 'bad');
+    if (r.lost) row('bad', 'alert', `Ended early: ${state.builder}'s work this session on ${r.lost.join(', ')} was lost`, 'lost', 'bad');
     for (const g of r.gold) row(g.ic === 'heart' || g.ic === 'gift' ? 'req' : g.ic === 'chest' ? 'chest' : g.ic === 'badge' ? 'badge' : 'gold', g.ic, g.label, `${g.n < 0 ? '−' : '+'}${fmtGold(Math.abs(g.n))} gold`, g.n < 0 ? 'bad' : 'gold', g.ic === 'badge' ? `background:${TIER_COLORS[g.tier][0]};color:#3B2A10` : g.ic === 'chest' ? `background:${RARITY[g.rar].body};color:#fff` : '');
     if (r.comboGold) row('combo', 'combo', `Combo ×${r.combo.mult.toFixed(1)} on gold`, `+${fmtGold(r.comboGold)} gold`, 'gold');
     for (const x of r.xpParts) row('xp', x.ic === 'plan' ? 'plan' : 'xp', x.label, `+${x.n} XP`, 'xp');
@@ -5868,6 +6125,7 @@
     at(t, () => {
       for (const o of [G, X, P]) o.t.classList.remove('active');
       if (r.nextCombo && comboNow() > 0) say(`${FLAME_SVG}<b>Focus again within ${COMBO_WINDOW} min</b> for a ×${r.nextCombo.toFixed(1)} combo`, 'combo');
+      else if (r.lost) say(`Ended early: ${state.builder}'s work on ${esc(r.lost[0])} was lost`, 'bad');
       else if (r.reason === 'pickup') say('Phone picked up: no chest this time', 'bad');
       else if (r.reason === 'ended') say('Finish a whole session to get a chest', '');
       else src.replaceChildren();
@@ -5883,7 +6141,9 @@
       for (const [o, v, any] of [[G, gTot, r.gold.length], [X, xTot, r.xpParts.length], [P, pTot, r.playParts.length]]) { o.val = v; o.v.textContent = o.fmt(v); o.t.classList.remove('active', 'boom'); if (any) o.t.classList.add('on'); }
       if (r.combo && (r.comboGold || r.comboXp) && !box.querySelector('.tcombo')) { const st = el('div', 'tcombo'); st.innerHTML = `${FLAME_SVG}×${r.combo.mult.toFixed(1)}`; box.append(st); }
       if (r.xp && r.xp.ups.length && !X.t.querySelector('.lvl')) X.t.append(el('span', 'lvl', `Level ${r.xp.ups[r.xp.ups.length - 1].level}!`));
-      if (r.nextCombo && comboNow() > 0) say(`${FLAME_SVG}<b>Focus again within ${COMBO_WINDOW} min</b> for a ×${r.nextCombo.toFixed(1)} combo`, 'combo'); else src.replaceChildren();
+      if (r.nextCombo && comboNow() > 0) say(`${FLAME_SVG}<b>Focus again within ${COMBO_WINDOW} min</b> for a ×${r.nextCombo.toFixed(1)} combo`, 'combo');
+      else if (r.lost) say(`Ended early: ${state.builder}'s work on ${esc(r.lost[0])} was lost`, 'bad');
+      else src.replaceChildren();
     };
     for (const sp of steps) TALLY.timers.push(setTimeout(sp.fn, reduced ? 0 : sp.ms));
     if (reduced) TALLY.finish();
@@ -5963,7 +6223,7 @@
   canvas.addEventListener('pointerdown', (e) => {
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     ptrs.set(e.pointerId, localPt(e));
-    if (ptrs.size === 1) { const p = localPt(e); gesture = { type: 'pan', sx: p.x, sy: p.y, cx: cam.x, cy: cam.y, moved: false }; }
+    if (ptrs.size === 1) { const p = localPt(e); gesture = { type: 'pan', sx: p.x, sy: p.y, cx: cam.x, cy: cam.y, moved: false, barZone: ui.screen === 'play' && !ui.visit && !ui.panel && !ui.holding && !ui.barOpen && p.y > geo.h - 120 }; }
     else if (ptrs.size === 2 && ui.screen === 'play') {
       const [a, b] = [...ptrs.values()];
       const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
@@ -5977,6 +6237,7 @@
     if (ui.screen !== 'play') return;
     if (gesture && gesture.type === 'pan' && ptrs.size === 1) {
       const dx = p.x - gesture.sx, dy = p.y - gesture.sy;
+      if (gesture.barZone && !gesture.moved && dy < -8 && Math.abs(dy) > Math.abs(dx)) { if (dy < -26) { gesture = { type: 'none' }; openBar(); } return; }
       if (!gesture.moved && Math.hypot(dx, dy) > 7) { gesture.moved = true; camAnim = null; }
       if (gesture.moved) { cam.x = gesture.cx - dx / cam.z; cam.y = gesture.cy - dy / cam.z; clampCam(); }
     } else if (gesture && gesture.type === 'pinch' && ptrs.size === 2) {
@@ -5990,7 +6251,7 @@
     }
   });
   function endPointer(e) {
-    const wasTap = gesture && gesture.type === 'pan' && !gesture.moved && ptrs.size === 1 && ptrs.has(e.pointerId);
+    const wasTap = gesture && gesture.type === 'pan' && !gesture.moved && ptrs.size === 1 && ptrs.has(e.pointerId) && Math.abs(localPt(e).y - gesture.sy) < 12;
     ptrs.delete(e.pointerId);
     if (wasTap && e.type === 'pointerup') { const p = localPt(e); tapAt(p.x, p.y); }
     if (ptrs.size === 1) { const [p] = [...ptrs.values()]; gesture = { type: 'pan', sx: p.x, sy: p.y, cx: cam.x, cy: cam.y, moved: true }; }
@@ -6008,7 +6269,8 @@
       if (vb) openPanel({ kind: 'info', bid: vb.id });
       return;
     }
-    // With a card open, the first tap on the map just closes it.
+    // With a card or the bottom bar open, the first tap on the map just closes it.
+    if (ui.screen === 'play' && ui.barOpen) { closeBar(); return; }
     if (ui.screen === 'play' && ui.panel && ui.panel.kind !== 'place' && !ui.holding) { closePanel(); return; }
     // Speech bubbles, request markers and land signs lead to what needs doing.
     if (!ui.holding) for (let i = ui.hits.length - 1; i >= 0; i--) {
@@ -6053,6 +6315,16 @@
   $('tour-skip').addEventListener('click', endTour);
   $('btn-play').addEventListener('click', () => enterPlay());
   $('play-home').addEventListener('click', () => leavePlay(false));
+  $('barhandle').addEventListener('click', openBar);
+  (() => {
+    let sy = null;
+    const down = (e) => { sy = e.clientY; }, up = () => { sy = null; };
+    $('barhandle').addEventListener('pointerdown', (e) => { down(e); try { $('barhandle').setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } });
+    $('barhandle').addEventListener('pointermove', (e) => { if (sy != null && sy - e.clientY > 20) { sy = null; openBar(); } });
+    $('playbar').addEventListener('pointerdown', down);
+    $('playbar').addEventListener('pointermove', (e) => { if (sy != null && e.clientY - sy > 28) { sy = null; closeBar(); } });
+    for (const n of ['barhandle', 'playbar']) { $(n).addEventListener('pointerup', up); $(n).addEventListener('pointercancel', up); }
+  })();
   $('play-plan').addEventListener('click', openPlan);
   $('reqpill').addEventListener('click', () => {
     const q = activeQuests()[0], place = questPlace(q);
@@ -6066,6 +6338,9 @@
   $('xpline').addEventListener('click', notVisiting(openLevels));
   $('open-menu').addEventListener('click', notVisiting(openMenu));
   $('open-friends').addEventListener('click', notVisiting(openFriends));
+  $('mus-toggle').addEventListener('click', musicToggle);
+  $('skychip').addEventListener('click', () => { const P = skyNow(); toast(state.realClock ? `Town time follows your clock. ${WEATHER[P.w.kind].name} in ${state.town}.` : `A day in ${state.town} lasts 24 minutes: every real minute is an hour here. Weather changes every few hours. You can switch to your real clock in settings.`); });
+  $('mus-skip').addEventListener('click', musicSkip);
   $('visit-home').addEventListener('click', endVisit);
   $('visit-cheer').addEventListener('click', () => { if (ui.visit && ui.visit.id) cheer(ui.visit.id); });
   $('season-card').addEventListener('click', openSeason);
@@ -6077,11 +6352,16 @@
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
     if (!$('scrim').hidden) closeSheet();
+    else if (ui.barOpen) closeBar();
     else if (ui.visit && !ui.panel) endVisit();
     else if (ui.holding) { setHolding(null); ui.panel = null; renderAll(); afterAction(); }
     else if (ui.panel) closePanel();
   });
-  $('focus-end').addEventListener('click', () => { $('focus-confirm').hidden = false; $('focus-actions').hidden = true; });
+  $('focus-end').addEventListener('click', () => {
+    const f = focusNow(Date.now());
+    $('focus-confirm-text').textContent = f && f.cur ? `End now? ${state.builder}'s work on ${jobLabel(f.cur.q).toLowerCase()} this session is lost (${Math.round(f.cur.done / f.cur.q.work * 100)}% so far), and so is your chest. Anything already finished stays built.` : 'End now? You keep the gold and play time so far, but lose the chest and your combo.';
+    $('focus-confirm').hidden = false; $('focus-actions').hidden = true;
+  });
   $('focus-keep').addEventListener('click', () => { $('focus-confirm').hidden = true; $('focus-actions').hidden = false; });
   $('focus-stop').addEventListener('click', () => finishSession('ended'));
   $('focus-pickup').addEventListener('click', () => finishSession('pickup'));
@@ -6129,7 +6409,8 @@
     if (!state.named) showWelcome(); else $('welcome').hidden = true;
     if (state.session) showFocus();
     if (state.flags.migrated) { delete state.flags.migrated; save(); setTimeout(() => toast('New: town staff, fires, chests and mayor levels. Your streets need a sweeper!'), 900); }
-    if (state.flags.migrated7) { delete state.flags.migrated7; save(); setTimeout(() => toast('New: build right away while you play! Plus landmarks, seasons, friends and a leaderboard.'), 1200); }
+    if (state.named && state.flags.tourDone && !state.flags.news8 && !state.flags.migrated7) { state.flags.news8 = true; save(); setTimeout(() => toast('New: a music player up top, 24-minute days with weather, and in town swipe up for Focus, Home and Plan.'), 1200); }
+    if (state.flags.migrated7) { state.flags.news8 = true; delete state.flags.migrated7; save(); setTimeout(() => toast('New: build right away while you play! Plus landmarks, seasons, friends and a leaderboard.'), 1200); }
   }
   boot();
   setInterval(tick, 250);
@@ -6164,15 +6445,19 @@
     tour: () => (tour.steps ? tour.i : -1),
     openCard: (bid) => { closePanel(true); openPanel({ kind: 'info', bid }); },
     season: (k) => { seasonOverride = k || null; renderAll(); },
-    sky: (k) => { skyOverride = k || null; },
+    sky: (k) => { skyOverride = k == null ? null : typeof k === 'number' ? k : SKY_OVR[k]; SKYC.at = -1; },
+    weather: (k) => { weatherOverride = k || null; SKYC.at = -1; },
+    skyNow: () => { const P = skyNow(); return { hour: P.hour, phase: P.phase, dark: P.dark, weather: P.w.kind, k: P.w.k }; },
     remind: () => planReminders(),
     alarm: () => (ALARM.b ? { id: ALARM.b.id, label: ALARM.b.label } : null),
     visit: (snap, who, id) => visitTown(snap, who, id),
     visiting: () => !!ui.visit,
     snap: () => townSnap(),
-    music: () => ({ on: music.playing(), mode: music.mode() }),
+    music: () => ({ on: music.playing(), mode: music.mode(), track: music.track() }),
     playDay: () => Object.assign({}, playDayNow(), { left: playLeftToday() }),
     addPlay: (sec) => addPlay(sec),
+    playBuild: (sec) => { for (let i = 0; i < Math.ceil(sec); i++) playBuild(1); },
+    buildSecs: (w) => buildSecs(w),
     queue: () => state.queue.map((q) => ({ kind: q.kind, type: q.type, bid: q.bid, done: q.done, work: q.work, big: bigQ(q) })),
     pack: (o, tag) => packCode(o, tag || 'MWT1'),
     unpack: (code, tag) => unpackCode(code, tag || 'MWT1'),
