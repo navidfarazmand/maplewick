@@ -306,9 +306,9 @@
   .playbar.float { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; border-radius: 22px 22px 0 0; border-top: 0; box-shadow: 0 -10px 30px rgba(20, 30, 28, .2); transform: translateY(calc(100% + 10px)); transition: transform .3s cubic-bezier(.2, 1.1, .3, 1); padding-top: 18px; touch-action: none; }
   .playbar.float::before { content: ''; position: absolute; left: 50%; top: 7px; width: 40px; height: 5px; margin-left: -20px; border-radius: 99px; background: var(--line); }
   .playbar.float.open { transform: none; }
-  .barhandle { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 5; border: 0; border-radius: 99px; background: linear-gradient(135deg, var(--focus), var(--focus-2)); color: var(--focus-ink); padding: 9px 18px 9px 13px; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; gap: 7px; box-shadow: var(--shadow); white-space: nowrap; animation: popIn .3s both; touch-action: none; max-width: calc(100% - 140px); }
+  .barhandle { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: max(6px, calc(env(safe-area-inset-bottom, 0px) - 5px)); min-height: 57px; z-index: 5; border: 0; border-radius: 99px; background: linear-gradient(135deg, var(--focus), var(--focus-2)); color: var(--focus-ink); padding: 12px 24px 12px 18px; font-weight: 800; font-size: 18px; display: inline-flex; align-items: center; gap: 9px; box-shadow: var(--shadow); white-space: nowrap; animation: popIn .3s both; touch-action: none; max-width: calc(100% - 118px); }
   .barhandle:active:not(:disabled) { transform: scale(.95); }
-  .barhandle svg { width: 18px; height: 18px; flex: none; }
+  .barhandle svg { width: 24px; height: 24px; flex: none; }
   .barhandle span { overflow: hidden; text-overflow: ellipsis; }
   .barhandle.combo { background: linear-gradient(135deg, var(--combo), #B8401A); }
   .barhandle.pop { animation: focusPop .8s cubic-bezier(.2, 1.6, .3, 1) 2; }
@@ -420,6 +420,7 @@
   .focus-screen { background: radial-gradient(120% 80% at 50% 0%, var(--night-2), var(--night) 70%); color: var(--night-ink); display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
   .focus-inner { width: min(460px, 100%); display: grid; gap: 12px; text-align: center; }
   .focus-inner .eyebrow { color: var(--night-muted); }
+  .focus-screen.ready .clock { color: var(--play); }
   .clock { font-family: var(--display); font-weight: 800; font-size: clamp(64px, 20vw, 104px); line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .focus-sub { color: var(--night-muted); font-size: 14px; }
   .focus-scene { width: 260px; height: 200px; margin: 0 auto; display: block; }
@@ -724,7 +725,7 @@
   input { -webkit-user-select: text; user-select: text; }
   button { touch-action: manipulation; }
 </style>
-<script id="fb-config">window.MAPLEWICK_FIREBASE = window.MAPLEWICK_FIREBASE || {"apiKey": "AIzaSyB_iBo8PgoV37nLH-BZQxIvZ-ZU6mmxffk", "authDomain": "maplewick-eb4df.firebaseapp.com", "projectId": "maplewick-eb4df", "storageBucket": "maplewick-eb4df.firebasestorage.app", "messagingSenderId": "816864251885", "appId": "1:816864251885:web:b9d6959bccef2873d861e4"};</script>
+<script id="fb-config">window.MAPLEWICK_FIREBASE = window.MAPLEWICK_FIREBASE || {"apiKey": "AIzaSyB_iBo8PgoV37nLH-BZQxIvZ-ZU6mmxffk", "authDomain": "maplewick-eb4df.firebaseapp.com", "projectId": "maplewick-eb4df", "storageBucket": "maplewick-eb4df.firebasestorage.app", "messagingSenderId": "816864251885", "appId": "1:816864251885:web:b9d6959bccef2873d861e4"}; window.MAPLEWICK_GOOGLE_CLIENT_ID = window.MAPLEWICK_GOOGLE_CLIENT_ID || "";</script>
 </head>
 <body>
 <div class="app" id="app">
@@ -923,7 +924,7 @@
   const inGrid = (c, r) => c >= 0 && r >= 0 && c < N && r < N;
   const isOpen = (c, r) => inGrid(c, r) && state.land.includes(plotAt(c, r));
   const HW = 32, HH = 16; // tile half-width/height in map units
-  const HOME_TAX = 3;
+  const HOME_TAX = 1.2; // gold per resident per hour (version 10: was 3)
   const AWAY_RATE = 0.1; // taxes when you're not focusing or playing
   const PLAY_CAP = 30 * 60; // most play time you can hold at once
   const DAILY_PLAY = 45 * 60; // most play time you can earn in one day, so a fake 8-hour "focus" can't buy a day of play
@@ -934,6 +935,7 @@
   const BIG_WORK = 30, PLAY_BUILD_SEC = [0, 3, 4.5, 6, 7.5], BUILD_MAX_SEC = 150;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
   const MIN_SESSION = 5;
+  const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
   const NAMES = ['Mira', 'Theo', 'Priya', 'Jonas', 'Kofi', 'Ines', 'Hugo', 'Yara', 'Sven', 'Noor', 'Ezra', 'Tilly', 'Ravi', 'Ada', 'Felix', 'June', 'Malik', 'Elsie', 'Tomas', 'Wren', 'Idris', 'Pia', 'Otto', 'Leila'];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -949,16 +951,16 @@
   const TYPES = {
     townhall: { name: 'Town hall', cat: 'civic', size: 2, max: 4, color: '#E7DCC2', roof: '#4E6B90',
       up: [null, null, [120, 15], [350, 45], [800, 90]], cap: [0, 200, 500, 1000, 2500],
-      job: { verb: 'Stamp permits', at: 'at the town hall', gold: 0.6, play: 1.6, lines: ['You stamped 212 permits. One of them was a sandwich.', 'You approved a permit to build a permit office.', 'A pigeon filed a complaint. You approved it.'] },
+      job: { verb: 'Stamp permits', at: 'at the town hall', gold: 0.6, play: 1.3, lines: ['You stamped 212 permits. One of them was a sandwich.', 'You approved a permit to build a permit office.', 'A pigeon filed a complaint. You approved it.'] },
       blurb: 'Holds your gold. Its level is the highest level any other building can reach, and each level lets the town grow bigger.' },
     cottage: { name: 'Cottage', cat: 'home', size: 1, unlock: 1, cost: 15, work: 5, max: 3, repair: 5, color: '#F2E1BE', roof: '#BF5A3E', limit: [0, 4, 7, 10, 14],
-      up: [null, null, [25, 8], [60, 18]], residents: [0, 4, 6, 9], blurb: 'A small home. Every resident pays 3 gold an hour, more when they are happy.' },
+      up: [null, null, [25, 8], [60, 18]], residents: [0, 4, 6, 9], blurb: 'A small home. Every resident pays a little over 1 gold an hour, more when they are happy.' },
     townhouse: { name: 'Townhouse', cat: 'home', size: 1, unlock: 2, cost: 70, work: 15, max: 3, color: '#D9C6E6', roof: '#6A4A86', limit: [0, 0, 3, 5, 8],
       up: [null, null, [110, 25], [220, 50]], residents: [0, 10, 14, 18], blurb: 'A tall home for a whole family.',
       needs: [['3 homes in town', () => homesCount() >= 3]] },
     market: { name: 'Market stall', cat: 'shop', size: 1, unlock: 1, cost: 20, work: 6, max: 3, repair: 6, color: '#E9D7B4', roof: '#D2503E', radius: 2, limit: [0, 2, 3, 4, 5],
       up: [null, null, [35, 10], [80, 22]], base: [0, 5, 8, 12], per: [0, 2, 3, 4],
-      job: { verb: 'Sell turnips', at: 'at the market', gold: 0.8, play: 1.3, lines: ['You sold a turnip to a man who already had a turnip.', 'You sorted the turnips by size. Sales went up 2%.', 'A child asked if turnips are sad apples. You said yes.'] },
+      job: { verb: 'Sell turnips', at: 'at the market', gold: 0.8, play: 1.15, lines: ['You sold a turnip to a man who already had a turnip.', 'You sorted the turnips by size. Sales went up 2%.', 'A child asked if turnips are sad apples. You said yes.'] },
       blurb: 'A cheap shop. Earns more for every home within 2 tiles.' },
     cafe: { name: 'Café', cat: 'shop', size: 1, unlock: 1, cost: 35, work: 8, max: 3, repair: 8, color: '#F4EBDD', roof: '#2F7D5B', radius: 2, limit: [0, 2, 3, 3, 4],
       up: [null, null, [55, 14], [120, 30]], base: [0, 8, 12, 18], per: [0, 2, 3, 4],
@@ -966,27 +968,27 @@
       blurb: 'Earns more for every home within 2 tiles.' },
     bakery: { name: 'Bakery', cat: 'shop', size: 1, unlock: 2, cost: 60, work: 12, max: 3, color: '#F6D79A', roof: '#8A5530', radius: 2, near: { r: 1, v: 0.05, label: 'smell of fresh bread' }, limit: [0, 0, 1, 2, 3],
       up: [null, null, [90, 25], [200, 50]], base: [0, 12, 18, 26], per: [0, 3, 4, 6],
-      job: { verb: 'Knead dough', at: 'at the bakery', gold: 1.3, play: 0.8, lines: ['The bread rose. So did your confidence.', 'Your croissant looked like a duck. It sold first.', 'You were covered in flour by 9 a.m. A new record.'] },
+      job: { verb: 'Knead dough', at: 'at the bakery', gold: 1.3, play: 0.9, lines: ['The bread rose. So did your confidence.', 'Your croissant looked like a duck. It sold first.', 'You were covered in flour by 9 a.m. A new record.'] },
       blurb: 'A busy shop. Earns more for every home within 2 tiles.',
       needs: [['A market stall at level 2 (it sells the flour)', () => hasLevel('market', 2)]] },
     workshop: { name: 'Workshop', cat: 'shop', size: 2, unlock: 2, cost: 80, work: 15, max: 3, color: '#B9B4AA', roof: '#5C5F66', radius: 0, near: { r: 1, v: -0.2, label: 'workshop noise' }, limit: [0, 0, 1, 1, 2],
       up: [null, null, [120, 30], [240, 60]], base: [0, 30, 45, 65], per: [0, 0, 0, 0],
-      job: { verb: 'Sweep sawdust', at: 'at the workshop', gold: 1.6, play: 0.6, lines: ['You found a sandwich in the sawdust. It was not yours.', 'You swept one corner 14 times. It is very clean.', 'You learned what a dovetail joint is. You will not forget.'] },
+      job: { verb: 'Sweep sawdust', at: 'at the workshop', gold: 1.6, play: 0.8, lines: ['You found a sandwich in the sawdust. It was not yours.', 'You swept one corner 14 times. It is very clean.', 'You learned what a dovetail joint is. You will not forget.'] },
       blurb: 'Big and loud. Earns a lot, but homes right next to it pay 20% less.',
       needs: [['16 residents to work there', () => city().residents >= 16]] },
     bookshop: { name: 'Bookshop', cat: 'shop', size: 1, unlock: 3, cost: 140, work: 25, max: 3, color: '#3E5C76', roof: '#23394D', radius: 3, limit: [0, 0, 0, 1, 2],
       up: [null, null, [210, 45], [420, 90]], base: [0, 15, 22, 32], per: [0, 2, 3, 4],
-      job: { verb: 'Shelve books', at: 'at the bookshop', gold: 0.7, play: 2, lines: ['You shelved the books by vibes.', 'Someone asked for "the blue one". You found it.', 'You read three pages of a mystery. Now you have to know.'] },
+      job: { verb: 'Shelve books', at: 'at the bookshop', gold: 0.7, play: 1.5, lines: ['You shelved the books by vibes.', 'Someone asked for "the blue one". You found it.', 'You read three pages of a mystery. Now you have to know.'] },
       blurb: 'Draws readers from far away: counts homes within 3 tiles.',
       needs: [['A café at level 2 (readers want coffee)', () => hasLevel('cafe', 2)]] },
     arcade: { name: 'Game center', cat: 'shop', size: 1, unlock: 2, cost: 90, work: 18, max: 3, color: '#3B2F6B', roof: '#FF4FA3', radius: 2, limit: [0, 0, 1, 2, 2],
       up: [null, null, [130, 30], [260, 55]], base: [0, 8, 12, 18], per: [0, 2, 3, 4],
-      job: { verb: 'Run the arcade', at: 'at the game center', gold: 0.25, play: 2.4, lines: ['You beat the high score. Then a seven-year-old beat yours.', 'You fixed the claw machine. It still never grabs anything.', 'You handed out 400 tickets for one rubber duck.'] },
+      job: { verb: 'Run the arcade', at: 'at the game center', gold: 0.25, play: 1.7, lines: ['You beat the high score. Then a seven-year-old beat yours.', 'You fixed the claw machine. It still never grabs anything.', 'You handed out 400 tickets for one rubber duck.'] },
       blurb: 'Flashing lights and happy beeps. Working here pays very little gold but lots of play time.',
       needs: [['20 residents to play there', () => city().residents >= 20]] },
     bank: { name: 'Bank', cat: 'shop', size: 1, where: 'center', unlock: 3, cost: 180, work: 35, max: 3, color: '#E9E2D2', roof: '#5E6B7A', radius: 0, limit: [0, 0, 0, 1, 2],
       up: [null, null, [260, 60], [520, 110]], base: [0, 22, 34, 50], per: [0, 0, 0, 0],
-      job: { verb: 'Count coins', at: 'at the bank', gold: 2.3, play: 0.35, lines: ['You counted 10,000 coins. Twice. Same answer.', 'A customer opened an account for their cat.', 'You stamped "APPROVED" with great joy.'] },
+      job: { verb: 'Count coins', at: 'at the bank', gold: 2.3, play: 0.7, lines: ['You counted 10,000 coins. Twice. Same answer.', 'A customer opened an account for their cat.', 'You stamped "APPROVED" with great joy.'] },
       blurb: 'Keeps the town\'s money safe and pays a steady income. Working here pays the most gold, but you earn little play time.',
       needs: [['40 residents', () => city().residents >= 40]] },
     park: { name: 'Park', cat: 'joy', size: 2, unlock: 1, cost: 20, work: 6, max: 3, repair: 4, color: '#7DB65A', roof: '#3F8A4A', radius: 1, limit: [0, 2, 3, 4, 5],
@@ -1008,7 +1010,7 @@
       up: [null, null, [110, 25]], staff: 'police', slots: [0, 2, 4], blurb: 'Home of the police officers. Homes within 5 tiles of a staffed station feel safe: one station covers most of a town.' },
     stadium: { name: 'Stadium', cat: 'joy', size: 3, unlock: 4, cost: 600, work: 120, max: 2, color: '#D8D2C4', roof: '#B5473A', radius: 4, limit: [0, 0, 0, 0, 1],
       up: [null, null, [900, 180]], boost: [0, 0.2, 0.3], base: [0, 80, 120],
-      job: { verb: 'Sell snacks', at: 'at the stadium', gold: 2, play: 0.5, lines: ['You sold 300 pretzels and caught a foul ball.', 'The crowd did the wave. You dropped the nachos.', 'You yelled "Popcorn!" so loudly the mascot jumped.'] },
+      job: { verb: 'Sell snacks', at: 'at the stadium', gold: 2, play: 0.75, lines: ['You sold 300 pretzels and caught a foul ball.', 'The crowd did the wave. You dropped the nachos.', 'You yelled "Popcorn!" so loudly the mascot jumped.'] },
       blurb: 'A huge goal for a big town. Earns from matches and makes every home within 4 tiles 20% happier.',
       needs: [['60 residents', () => city().residents >= 60], ['2 parks', () => countLive('park') >= 2]] },
     tree: { name: 'Tree', cat: 'decor', size: 1, unlock: 1, cost: 5, max: 1, color: '#3E8E57', roof: '#2F6F45', limit: [0, 14, 18, 24, 30], blurb: 'Homes next to it pay 5% more (up to 15% from decorations).' },
@@ -1029,30 +1031,46 @@
       perk: 'Stargazing sharpens the mind: +10% XP from every focus session.', blurb: 'A domed telescope on the hill. Every focus session gives 10% more XP, and the town is 5% happier.' },
     castle: { name: 'Castle', cat: 'landmark', size: 3, where: 'hill', unlock: 4, cost: 900, work: 600, max: 1, color: '#CFC6B4', roof: '#5B6E9A', limit: [0, 0, 0, 0, 1], mood: 8,
       perk: 'A proud town: homes pay 10% more and the treasury holds 1,000 more gold.', blurb: 'The crown of your town. Homes pay 10% more taxes, the treasury holds 1,000 more gold, and the town is 8% happier.' },
+    // Roadworks: an incident, not something you build. It blocks its tile and is noisy for the homes next to it.
+    works: { name: 'Roadworks', cat: 'works', size: 1, max: 1, color: '#E8A93A', roof: '#5C5F66', near: { r: 1, v: -0.15, label: 'roadworks noise' }, blurb: 'A crew is digging up the street. The homes next to it pay 15% less until they are done.' },
     // Seasonal finds: earned by focusing during that season's festival.
     pumpkins: { name: 'Pumpkin patch', cat: 'joy', size: 1, season: 'autumn', max: 1, color: '#E8782A', roof: '#5E8A3A', radius: 1, boost: [0, 0.08], blurb: 'From the autumn festival. Homes next to it pay 8% more.' },
     snowman: { name: 'Snowman', cat: 'joy', size: 1, season: 'winter', max: 1, color: '#F6F9FB', roof: '#C8473D', radius: 1, boost: [0, 0.08], blurb: 'From the winter festival. Homes next to it pay 8% more.' },
     tulips: { name: 'Tulip bed', cat: 'joy', size: 1, season: 'spring', max: 1, color: '#E84A6A', roof: '#F3C64B', radius: 1, boost: [0, 0.08], blurb: 'From the spring festival. Homes next to it pay 8% more.' },
     parasol: { name: 'Beach parasol', cat: 'joy', size: 1, where: 'shore', season: 'summer', max: 1, color: '#F2C14E', roof: '#2F9ED8', radius: 1, boost: [0, 0.08], blurb: 'From the summer festival. Homes next to it pay 8% more.' }
   };
+  /* Version 10 economy: buildings earn much less and cost more, so gold stays scarce and each purchase is a real choice.
+     Prices and upgrades ×1.5 (decorations and repairs stay cheap), shops and the stadium earn 40% of what they did,
+     homes pay 1.2 gold per resident an hour (was 3), and the treasury holds a bit more so the big upgrades still fit. */
+  (() => {
+    const r5 = (x) => Math.max(5, Math.round(x / 5) * 5);
+    for (const t of Object.values(TYPES)) {
+      if (t.cost && t.cat !== 'decor') t.cost = r5(t.cost * 1.5);
+      if (t.up) t.up = t.up.map((u) => (u ? [r5(u[0] * 1.5), u[1]] : u));
+      if (t.base) t.base = t.base.map((v) => v * 0.4);
+      if (t.per) t.per = t.per.map((v) => v * 0.4);
+    }
+    TYPES.townhall.cap = [0, 250, 600, 1500, 3500];
+  })();
+  const g1 = (x) => String(Math.round(x * 10) / 10);
   const special = (t) => !!(t.chest || t.season); // finds you place for free: no upgrades, no cost
   // Town staff: hired at their own building (or the town hall) for a one-off fee, then paid a wage every hour.
   // needed() says when the town starts to need them; need() how many it needs.
   const STAFF = {
-    sweeper: { name: 'Street sweeper', plural: 'street sweepers', home: 'depot', fee: 50, wage: 3, look: { shirt: '#3E8E57', hat: '#F3C64B', hair: '#5A3A22', skin: '#E0AC7E' }, what: 'Cleans up trash around homes and shops.',
+    sweeper: { name: 'Street sweeper', plural: 'street sweepers', home: 'depot', fee: 60, wage: 4, look: { shirt: '#3E8E57', hat: '#F3C64B', hair: '#5A3A22', skin: '#E0AC7E' }, what: 'Cleans up trash around homes and shops.',
       needed: () => true, need: (ci) => Math.max(1, Math.ceil(ci.residents / 15)), needText: '1 for every 15 residents' },
-    gardener: { name: 'Gardener', plural: 'gardeners', home: 'shed', fee: 50, wage: 3, look: { shirt: '#6EA453', hat: '#D8B26A', hair: '#2B1E16', skin: '#C68B5E' }, what: 'Keeps parks tidy so they keep homes happy.',
+    gardener: { name: 'Gardener', plural: 'gardeners', home: 'shed', fee: 60, wage: 4, look: { shirt: '#6EA453', hat: '#D8B26A', hair: '#2B1E16', skin: '#C68B5E' }, what: 'Keeps parks tidy so they keep homes happy.',
       needed: () => countLive('park') >= 1, neededText: 'Needed once you have a park', need: () => Math.max(1, Math.ceil(countLive('park') / 2)), needText: '1 for every 2 parks' },
-    fire: { name: 'Firefighter', plural: 'firefighters', home: 'firestation', fee: 90, wage: 5, look: { shirt: '#C8473D', hat: '#F3C64B', hair: '#1A1A1A', skin: '#F2C9A0' }, what: 'Rushes out to put out fires.',
+    fire: { name: 'Firefighter', plural: 'firefighters', home: 'firestation', fee: 180, wage: 10, look: { shirt: '#C8473D', hat: '#F3C64B', hair: '#1A1A1A', skin: '#F2C9A0' }, what: 'Rushes out to put out fires.',
       needed: (ci) => ci.residents >= 16, neededText: 'Needed from 16 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
-    police: { name: 'Police officer', plural: 'police officers', home: 'police', fee: 120, wage: 5, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
+    police: { name: 'Police officer', plural: 'police officers', home: 'police', fee: 240, wage: 10, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
       needed: (ci) => ci.residents >= 24, neededText: 'Needed from 24 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 25)), needText: '1 for every 25 residents, and every home within 5 tiles of a station' },
-    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', fee: 150, wage: 6, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
+    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
       needed: () => countLive('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' }
   };
   const STAFF_ORDER = ['sweeper', 'gardener', 'fire', 'police', 'nurse'];
-  // Each extra person of the same kind costs more to hire and asks a higher wage: the 2nd 1.6× the fee and 1.5× the wage, the 3rd 2.2× and 2×, and so on.
-  const STAFF_STEP_FEE = 0.6, STAFF_STEP_WAGE = 0.5;
+  // Staff are expensive (version 10). Each extra person of the same kind costs more to hire and asks a higher wage: the 2nd 1.8× the fee and 1.6× the wage, the 3rd 2.6× and 2.2×, and so on.
+  const STAFF_STEP_FEE = 0.8, STAFF_STEP_WAGE = 0.6;
   const hireFee = (k, n) => Math.round(STAFF[k].fee * (1 + STAFF_STEP_FEE * (n == null ? (state.staff[k] || 0) : n)));
   const wageOf = (k, i) => Math.round(STAFF[k].wage * (1 + STAFF_STEP_WAGE * i));
   const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
@@ -1152,7 +1170,7 @@
     return {
       v: VERSION, savedAt: now, named: false, builder: 'Sam', town: 'Maplewick',
       gold: 30, lastTaxAt: now, playSec: 5 * 60, speed: 1, nextId: 100, nameIdx: 0, job: null, sound: true, staff: noStaff(), boost: null,
-      questsSeen: [], badges: [], flags: { tracks9: true }, civic: { safety: 1, health: 1 }, fireIn: null,
+      questsSeen: [], badges: [], flags: { tracks9: true, music10: true }, civic: { safety: 1, health: 1 }, fireIn: null,
       xp: 0, level: 1, combo: { n: 0, until: 0 }, chestStats: { opened: 0, sinceSilver: 0, sinceGold: 0, byRarity: [0, 0, 0, 0] },
       land: ['base'], dayPlan: { day: null, blocks: [], perfect: false }, nextBlockId: 1,
       rush: [], perks: {}, playDay: { key: null, sec: 0 }, season: { key: null, min: 0, got: [] }, week: { key: null, min: 0 }, friends: [], board: { joined: false }, music: true, track: 0, alarms: true, cheers: { day: null, seen: 0 }, lockSound: 'off', lockKind: 'rain', freeMoves: 0, coffee: 0,
@@ -1248,6 +1266,7 @@
     if (!(s.track >= 0)) s.track = 0;
     // v9 added tracks; the old list was Café jazz, Evening lo-fi, Town square
     if (!s.flags.tracks9) { s.track = [0, 4, 5][s.track | 0] || 0; s.flags.tracks9 = true; }
+    if (!s.flags.music10) { s.track = 0; s.flags.music10 = true; } // version 10: real music stations
     if (s.alarms === undefined) s.alarms = true;
     s.cheers = Object.assign({ day: null, seen: 0 }, s.cheers || {});
     if (!LOCK_SOUNDS[s.lockSound]) s.lockSound = 'off';
@@ -1307,6 +1326,7 @@
       thunder: () => { for (let i = 0; i < 6; i++) noise(0.05 + i * 0.17, 0.55, 0.09 * (1 - i / 7), 110 + i * 25, 0.5); },
       hammer: () => { tone(170 + Math.random() * 40, 0, 0.05, 'square', 0.018); noise(0, 0.035, 0.025, 1500, 1.2); },
       alarm: () => { for (let i = 0; i < 4; i++) { tone(880, i * 0.36, 0.17, 'square', 0.03); tone(660, i * 0.36 + 0.18, 0.17, 'square', 0.03); } },
+      siren: (kind) => { if (kind === 'crew') { tone(330, 0, 0.12, 'square', 0.02); tone(330, 0.2, 0.12, 'square', 0.02); return; } for (let i = 0; i < 3; i++) tone(kind === 'police' ? 740 : 620, i * 0.5, 0.48, 'sine', 0.03, kind === 'police' ? 980 : 820); },
       splash: () => { noise(0, 0.6, 0.06, 900, 0.5); noise(0.2, 0.5, 0.05, 1400, 0.6); },
       medal: () => { [659, 784, 988, 1319].forEach((f, i) => tone(f, i * 0.09, 0.5, 'sine', 0.06)); },
       grumble: () => { tone(230, 0, 0.12, 'triangle', 0.03, 170); tone(200, 0.13, 0.16, 'triangle', 0.03, 140); },
@@ -1508,16 +1528,91 @@
       track: () => (cur ? cur.name : TRACKS[0].name)
     };
   })();
+  /* Real music (version 10): relaxed recordings by Kevin MacLeod (incompetech.com), licensed Creative Commons
+     Attribution 4.0, streamed from the Internet Archive. If they can't be reached (offline, or a page that blocks them),
+     the tunes made in the app play instead. */
+  const IA = 'https://archive.org/download/';
+  const TJ = 'Kevin-MacLeod_Teh-Jazzes_2017_FullAlbum/Teh Jazzes/Kevin MacLeod - ', CA = 'KevinMacLeod_2019-04_Discography/Kevin MacLeod/Calming/Kevin MacLeod - ';
+  const STATIONS = [
+    { name: 'Café jazz', synth: 0, tracks: [[TJ + '01 - Backbay Lounge.mp3', 'Backbay Lounge'], [TJ + '07 - Jazz Brunch.mp3', 'Jazz Brunch'], [TJ + '03 - Apero Hour.mp3', 'Apero Hour'], [TJ + '10 - Smooth Lovin’.mp3', 'Smooth Lovin’'], ['Incompetech/mp3-royaltyfree/Airport Lounge.mp3', 'Airport Lounge'], [TJ + '06 - Crinoline Dreams.mp3', 'Crinoline Dreams']] },
+    { name: 'Bossa nova', synth: 3, tracks: [[TJ + '02 - Bossa Antigua.mp3', 'Bossa Antigua'], [TJ + '04 - Samba Isobel.mp3', 'Samba Isobel']] },
+    { name: 'Calm piano', synth: 2, tracks: [[CA + '12 - Meditation Impromptu 01.mp3', 'Meditation Impromptu 01'], [CA + '13 - Meditation Impromptu 02.mp3', 'Meditation Impromptu 02'], [CA + '14 - Meditation Impromptu 03.mp3', 'Meditation Impromptu 03'], [CA + '05 - Clean Soul.mp3', 'Clean Soul'], [CA + '23 - Winter Reflections.mp3', 'Winter Reflections']] },
+    { name: 'Soft ambient', synth: 1, tracks: [[CA + '18 - Silver Blue Light.mp3', 'Silver Blue Light'], [CA + '07 - Dream Culture.mp3', 'Dream Culture'], [CA + '02 - Bathed in the Light.mp3', 'Bathed in the Light'], [CA + '22 - Windswept.mp3', 'Windswept']] }
+  ];
+  const radio = (() => {
+    let a = null, st = -1, idx = 0, order = [], on = false, mode = 'home', fails = 0, fallback = false, fadeTimer = 0, cur = '', target = 0;
+    const vol = () => (mode === 'play' ? 0.55 : 0.32);
+    function el() {
+      if (a) return a;
+      a = new Audio(); a.preload = 'auto';
+      a.addEventListener('ended', () => { if (on) next(); });
+      a.addEventListener('error', () => { if (!on) return; fails += 1; if (fails >= 2) useFallback(); else next(); });
+      a.addEventListener('playing', () => { fails = 0; meta(); });
+      return a;
+    }
+    function shuffle(n) { const o = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return o; }
+    function fade(to, ms, then) {
+      clearInterval(fadeTimer); target = to; const from = a.volume, t0 = performance.now();
+      fadeTimer = setInterval(() => { const k = clamp((performance.now() - t0) / ms, 0, 1); try { a.volume = from + (to - from) * k; } catch (e) { /* iPhone: fixed volume */ } if (k >= 1) { clearInterval(fadeTimer); fadeTimer = 0; if (then) then(); } }, 50);
+    }
+    function load() {
+      const t = STATIONS[st].tracks[order[idx % order.length]];
+      cur = t[1];
+      el().src = IA + encodeURI(t[0]);
+      try { a.volume = 0; } catch (e) { /* fixed volume */ }
+      const pr = a.play(); if (pr && pr.catch) pr.catch(() => { /* not allowed yet: the next tap starts it */ });
+      fade(vol(), 1500);
+    }
+    function next() { idx += 1; load(); }
+    function meta() {
+      if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || LOCK.on) return;
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({ title: cur, artist: 'Kevin MacLeod', album: `Maplewick · ${STATIONS[st].name}`, artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] });
+        navigator.mediaSession.setActionHandler('nexttrack', () => radio.skip());
+        navigator.mediaSession.setActionHandler('pause', () => { state.music = false; save(); musicUpdate(); });
+        navigator.mediaSession.setActionHandler('play', () => { state.music = true; save(); musicUpdate(); });
+      } catch (e) { /* not supported */ }
+    }
+    function useFallback() {
+      fallback = true; on = false; if (a) a.pause();
+      toast('Could not reach the music online, so the built-in tunes play instead.');
+      musicUpdate();
+    }
+    return {
+      stations: STATIONS.map((x) => x.name),
+      get fallback() { return fallback; },
+      set(want, m, station) {
+        mode = m || mode;
+        const s2 = ((station | 0) % STATIONS.length + STATIONS.length) % STATIONS.length;
+        if (fallback) { music.set(want, mode, STATIONS[s2].synth); return; }
+        if (want) {
+          if (!on || st !== s2) { st = s2; order = shuffle(STATIONS[st].tracks.length); idx = 0; on = true; load(); }
+          else if (a && a.paused) { const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); fade(vol(), 800); }
+          else if (a && target !== vol() && !fadeTimer) fade(vol(), 800);
+        } else if (on && a && !a.paused) { fade(0, 500, () => a.pause()); }
+        if (!want) { /* stays loaded, so it picks up where it was */ }
+      },
+      skip() { if (fallback) return false; if (!on) return false; next(); return true; },
+      playing: () => (fallback ? music.playing() : on && !!a && !a.paused),
+      track: () => (fallback ? music.track() : cur || STATIONS[Math.max(0, st)].tracks[0][1])
+    };
+  })();
   function musicUpdate() {
     const want = !!state.music && AUD.unlocked && !document.hidden && !state.session && !ui.visitLoading && !['focus', 'celebrate', 'chest', 'alarm'].includes(ui.overlay) && !!state.named;
-    music.set(want, ui.screen === 'play' ? 'play' : 'home', state.track | 0);
+    radio.set(want, ui.screen === 'play' ? 'play' : 'home', state.track | 0);
     const tg = $('mus-toggle');
     if (tg && tg.dataset.on !== String(!!state.music)) { tg.dataset.on = String(!!state.music); tg.innerHTML = state.music ? MUS_PAUSE : MUS_PLAY; tg.setAttribute('aria-label', state.music ? 'Pause music' : 'Play music'); tg.classList.toggle('on', !!state.music); }
   }
   const MUS_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l10.5-6.5z"/></svg>';
   const MUS_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 5h3.6v14H7zm6.4 0H17v14h-3.6z"/></svg>';
-  function musicToggle() { state.music = !state.music; AUD.unlocked = true; save(); musicUpdate(); toast(state.music ? `♪ ${music.tracks[(state.track | 0) % music.tracks.length]}` : 'Music off'); }
-  function musicSkip() { state.track = ((state.track | 0) + 1) % music.tracks.length; state.music = true; AUD.unlocked = true; save(); musicUpdate(); toast(`♪ ${music.tracks[state.track]}`); }
+  const stationName = () => radio.stations[(state.track | 0) % radio.stations.length];
+  function musicToggle() { state.music = !state.music; AUD.unlocked = true; save(); musicUpdate(); toast(state.music ? `♪ ${stationName()}` : 'Music off'); }
+  // ⏭ plays the next song; a long press (or the menu) changes the station.
+  function musicSkip() {
+    state.music = true; AUD.unlocked = true; save();
+    if (!radio.skip()) { state.track = ((state.track | 0) + 1) % radio.stations.length; save(); musicUpdate(); toast(`♪ ${stationName()}`); return; }
+    musicUpdate(); setTimeout(() => toast(`♪ ${radio.track()} · Kevin MacLeod`), 300);
+  }
   // The plan alarm: a bell that rings until you answer it (it ignores the sound-effects switch, but has its own).
   function ringBell() {
     if (!state.alarms) return;
@@ -1612,6 +1707,10 @@
       }
       decor = Math.min(decor, 0.15);
       if (decor) from.push(['decorations', decor]);
+      // incidents: a break-in, the shock afterwards (fading), smoke from a fire next door
+      if (h.robbed) { noise += 0.3; from.push(['break-in', -0.3]); }
+      else if (h.shaken && h.shaken.total) { const v = 0.3 * clamp(h.shaken.left / h.shaken.total, 0, 1); if (v > 0.01) { noise += v; from.push([h.shaken.label || 'after a scare', -v]); } }
+      if (!h.fire && act.some((o) => o.fire && o !== h && dist(o, h) <= 1)) { noise += 0.1; from.push(['smoke from next door', -0.1]); }
       const mult = clamp(1 + joy + decor - noise, 0.3, 2.5);
       const res = T(h).residents[h.level];
       const income = h.fire ? 0 : res * HOME_TAX * mult * (castle ? 1.1 : 1);
@@ -1622,7 +1721,8 @@
       const t = T(s);
       if (t.cat === 'shop') {
         const near = homes.filter((h) => dist(h, s) <= t.radius).length;
-        const income = s.fire ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1);
+        const shaken = s.robbed ? 0.6 : s.shaken && s.shaken.total ? 1 - 0.3 * clamp(s.shaken.left / s.shaken.total, 0, 1) : 1;
+        const income = s.fire ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken;
         total += income; info.set(s.id, { income, near });
       } else if (t.cat === 'joy' || t.cat === 'decor') {
         const r = t.cat === 'joy' ? t.radius : 1;
@@ -1719,7 +1819,6 @@
   const policeCovers = (h) => coversB('police', h);
   // Night: 0 by day, 1 in the middle of the night (town time).
   const nightK = () => clamp((skyNow().dark - 0.35) / 0.45, 0, 1);
-  const lit = (h) => state.buildings.some((l) => l.type === 'lamp' && dist(l, h) <= 2);
   function roleInfo(k, ci) {
     const r = STAFF[k], needed = !!r.needed(ci), need = needed ? r.need(ci) : 0, hired = state.staff[k] || 0, cap = staffCapacity(k), working = Math.min(hired, cap);
     const ratio = need ? Math.min(1, working / need) : 1;
@@ -1729,12 +1828,12 @@
     return { k, r, needed, need, hired, cap, working, ratio, cover, homes, covered, hasHome: staffBuildings(k).length > 0 };
   }
   // How safe the town feels right now. By day a home is safe near a staffed police station and a bit unsafe out of reach.
-  // Crime rises at night: homes out of reach are not safe at all, and homes on dark streets (no lamp post within 2 tiles) feel less safe.
+  // Crime rises at night: homes out of police reach are not safe at all after dark (and that is when most break-ins happen).
   function safetyTarget(ci) {
     const po = roleInfo('police', ci); if (!po.needed) return 1;
     const hs = state.buildings.filter(SERVES.police.what); if (!hs.length) return 1;
     const st = stationsOf('police'), nk = nightK();
-    const sum = hs.reduce((a, h) => a + (coversB('police', h, st) ? 1 - (lit(h) ? 0 : 0.3 * nk) : 0.4 * (1 - nk)), 0);
+    const sum = hs.reduce((a, h) => a + (coversB('police', h, st) ? 1 - 0.1 * nk : 0.4 * (1 - nk)), 0);
     return sum / hs.length * po.ratio;
   }
   const messy = (b) => live(b) && (T(b).cat === 'home' || T(b).cat === 'shop');
@@ -1751,126 +1850,338 @@
       if (messy(b)) { const sw = coversB('sweeper', b, swSt) ? swR : 0; b.trash = clamp((b.trash || 0) + min * (0.05 * (1 - sw) - 0.16 * sw), 0, 3); }
       if (b.type === 'park' && live(b)) { const gd = coversB('gardener', b, gdSt) ? gdR : 0; b.overgrown = clamp((b.overgrown || 0) + min * (0.03 * (1 - gd) - 0.08 * gd), 0, 1); }
     }
-    const ease = 1 - Math.exp(-min / 8);
+    // Trouble fades slowly: recent incidents, and homes shaken by one.
+    if (state.scars && state.scars.length) { for (const sc of state.scars) sc.left -= min; state.scars = state.scars.filter((sc) => sc.left > 0); }
+    for (const b of state.buildings) if (b.shaken) { b.shaken.left -= min; if (b.shaken.left <= 0) delete b.shaken; }
+    const ease = 1 - Math.exp(-min / 20); // safety and health change bit by bit, both ways
     const nu = roleInfo('nurse', ci);
     state.civic.safety += (safetyTarget(ci) - state.civic.safety) * ease;
     state.civic.health += ((nu.needed ? nu.cover : 1) - state.civic.health) * ease;
     cityCache = null;
   }
 
-  /* ---------- Fires: only while you play, never destructive. The first one teaches you what to do. ---------- */
+  /* ---------- Incidents: fires, break-ins and roadworks. They only happen while you play and never destroy anything,
+     but they take time to sort out: responders gear up, drive over in their vehicle, then work on site. Meanwhile the
+     homes involved pay less and the town is upset, and the upset fades slowly afterwards ("recent trouble"). ---------- */
   const burningNow = () => state.buildings.find((b) => b.fire);
+  const burningAll = () => state.buildings.filter((b) => b.fire);
   function placeName(b) { return b.resident ? `${b.resident}'s ${T(b).name.toLowerCase()}` : `the ${T(b).name.toLowerCase()}`; }
-  function startFire(b) {
+  // Lingering trouble: points off the town's mood that fade over town minutes.
+  function addScar(label, pts, minutes) { state.scars = (state.scars || []).concat([{ label, pts, left: minutes, total: minutes }]).slice(-8); cityCache = null; }
+  const troubleNow = () => -Math.min(20, (state.scars || []).reduce((a, s) => a + s.pts * clamp(s.left / s.total, 0, 1), 0));
+  // How likely a building is to catch fire: ovens and machines more, packed streets much more, a fire station nearby a bit less.
+  const FIRE_RISK = { bakery: 2.2, workshop: 2.6, cafe: 1.5, arcade: 1.4, market: 1.2 };
+  const crowd = (b) => state.buildings.filter((o) => o !== b && live(o) && T(o).cat !== 'decor' && dist(o, b) <= 1).length;
+  function fireRisk(b) {
+    if (!messy(b) || b.fire || revealFor(b.id) || (b.noFireUntil || 0) > Date.now()) return 0;
+    return (FIRE_RISK[b.type] || 1) * (1 + 0.45 * crowd(b)) * (coversB('fire', b) ? 0.75 : 1);
+  }
+  function weighted(list, wf) {
+    const ws = list.map(wf), tot = ws.reduce((a, w) => a + w, 0); if (!(tot > 0)) return null;
+    let x = Math.random() * tot; for (let i = 0; i < list.length; i++) { if (x < ws[i]) return list[i]; x -= ws[i]; } return list[list.length - 1];
+  }
+  const fireHp = (b) => 16 + 8 * (sizeOf(b.type) - 1);
+  function startFire(b, spread) {
     if (!b || b.fire) return;
     const ff = staffWorking('fire') >= 1, first = !state.flags.fireSeen;
-    b.fire = { at: Date.now() };
+    b.fire = { at: Date.now(), hp: fireHp(b), max: fireHp(b), spreadIn: 18 + Math.random() * 10, first }; // the very first fire (the lesson) never spreads
     state.flags.fireSeen = true;
-    ui.fireSince = performance.now();
     ui.bubbles = ui.bubbles.filter((x) => x.bid !== b.id);
     touch(); revealQuests(); save(); sfx.alarm();
-    if (first && !ff) { showOnMap(b, { kind: 'alert', bid: b.id }); }
-    else { toast(ff ? (coversB('fire', b) ? `Fire at ${placeName(b)}! Your firefighters are on their way.` : `Fire at ${placeName(b)}! It is far from the fire station, so help takes longer.`) : `Fire at ${placeName(b)}! Hire a firefighter to put it out.`); renderAll(); }
+    if (first && !ff) { showOnMap(b, { kind: 'alert', bid: b.id }); return; }
+    if (spread) toast(`The fire spread to ${placeName(b)}!`);
+    else toast(ff ? (coversB('fire', b) ? `Fire at ${placeName(b)}! Your firefighters are gearing up.` : `Fire at ${placeName(b)}! It is far from the fire station, so help takes longer.`) : `Fire at ${placeName(b)}! It can spread. Hire a firefighter to put it out.`);
+    renderAll();
   }
-  function extinguish(b) {
+  // byCrew: firefighters put it out (counts for the fire quest); otherwise it burned itself out.
+  function extinguish(b, byCrew = true) {
     if (!b || !b.fire) return;
     delete b.fire;
-    state.flags.firesOut = (state.flags.firesOut || 0) + 1;
+    b.noFireUntil = Date.now() + 5 * 60000; // a building that just burned can't catch fire again for a while
+    if (byCrew) state.flags.firesOut = (state.flags.firesOut || 0) + 1;
     state.fireIn = null;
+    addScar(`fire at ${placeName(b)}`, byCrew ? 4 : 6, byCrew ? 15 : 25);
+    if (b.resident || T(b).cat === 'home') b.shaken = { left: byCrew ? 8 : 15, total: byCrew ? 8 : 15, label: 'after the fire' };
     const p = centerOf(b), s = sizeOf(b.type), now = performance.now();
     for (let i = 0; i < 16; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 30, y: p.y - 30, vx: (Math.random() - 0.5) * 30, vy: -20 - Math.random() * 30, life: 0, max: 1.2, puff: true, color: 'rgba(235,240,245,.8)', r: 4 });
-    floats.push({ x: p.x, y: p.y - HH * s - 30, t0: now, text: 'Fire out!' });
-    ui.bubbles.push({ bid: b.id, text: b.resident ? 'Thank you, firefighters!' : 'Phew! Thank you!', kind: 'good', t0: now + 500, dur: 3200 });
-    sfx.splash(); setTimeout(() => sfx.chime(), 300);
+    floats.push({ x: p.x, y: p.y - HH * s - 30, t0: now, text: byCrew ? 'Fire out!' : 'It burned out', soft: !byCrew });
+    if (byCrew) { ui.bubbles.push({ bid: b.id, text: pick(LINES.thanksFire), kind: 'good', t0: now + 500, dur: 3200 }); sfx.splash(); setTimeout(() => sfx.chime(), 300); }
     touch(); checkQuests(false); save(); renderAll();
   }
-  // Called every tick while you play. The first fire comes once the town has 16 residents; later ones every 4–8 minutes of play.
-  function fireTick(dt) {
-    if (ui.screen !== 'play' || ui.holding || !$('scrim').hidden || ui.overlay || ui.reveals.length) return;
+  // Break-ins: most often at homes and shops far from a staffed police station, and at night.
+  function startRobbery(b) {
+    if (!b || b.robbed || b.fire) return;
+    const stolen = Math.min(Math.floor(state.gold), Math.round(4 + econ().taxes * 0.12));
+    state.gold -= stolen;
+    b.robbed = { at: Date.now(), stolen, open: 120 };
+    touch(); save(); sfx.alarm();
+    const cops = staffWorking('police') >= 1;
+    toast(`Break-in at ${placeName(b)}!${stolen ? ` The thief took ${stolen} gold.` : ''}${cops ? (coversB('police', b) ? ' The police are on it.' : ' It is far from the police, so they will be slow.') : ' No police in town to catch them.'}`);
+    ui.bubbles.push({ bid: b.id, text: pick(LINES.robbery), kind: 'bad', t0: performance.now(), dur: 4200, role: 'police' }); sfx.grumble();
+    renderAll();
+  }
+  function endRobbery(b, caught) {
+    if (!b || !b.robbed) return;
+    const back = caught ? b.robbed.stolen : 0;
+    if (back) state.gold += back;
+    delete b.robbed;
+    b.shaken = { left: caught ? 5 : 12, total: caught ? 5 : 12, label: 'after the break-in' };
+    addScar(`break-in at ${placeName(b)}`, caught ? 2 : 5, caught ? 8 : 15);
+    const p = centerOf(b), now = performance.now();
+    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: now, text: caught ? (back ? `Caught! +${back} gold back` : 'Thief caught!') : 'The thief got away', soft: !caught });
+    if (caught) { ui.bubbles.push({ bid: b.id, text: pick(LINES.thanksPolice), kind: 'good', t0: now + 400, dur: 3200 }); sfx.chime(); }
+    touch(); save(); renderAll();
+  }
+  // Roadworks: a crew digs up the street next to some homes for a few minutes. Noisy, but you can pay to hurry them.
+  function startWorks() {
+    const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home');
+    const spots = [];
+    for (const h of homes) for (let dc = -1; dc <= sizeOf(h.type); dc++) for (let dr = -1; dr <= sizeOf(h.type); dr++) { const c = h.c + dc, r = h.r + dr; if (fits('works', c, r) && !spots.some((s) => s.c === c && s.r === r)) spots.push({ c, r }); }
+    if (!spots.length) return;
+    const sp = pick(spots), secs = 100 + Math.random() * 60;
+    const b = { id: state.nextId++, type: 'works', c: sp.c, r: sp.r, level: 1, origin: 'incident', works: { left: secs, total: secs, job: pick(WORKS_JOBS) } };
+    state.buildings.push(b);
+    touch(); save();
+    toast(`Roadworks: ${b.works.job}. The homes next to it pay 15% less until the crew is done.`);
+    renderAll();
+  }
+  const WORKS_JOBS = ['a burst water pipe', 'new cables for the street lights', 'fixing a pothole the size of a bathtub', 'a leaking gas pipe', 'new drains for the rain'];
+  const hurryCost = (b) => Math.max(10, Math.round(8 + econ().taxes * 0.25 * (b.works.left / b.works.total)));
+  function endWorks(b, hurried) {
+    if (!b || b.type !== 'works') return;
+    state.buildings = state.buildings.filter((x) => x !== b);
+    if (!hurried) addScar('roadworks', 1, 6);
+    if (ui.panel && ui.panel.bid === b.id) closePanel(true);
+    const p = centerOf(b);
+    floats.push({ x: p.x, y: p.y - 30, t0: performance.now(), text: 'Road open again', soft: true });
+    touch(); save(); renderAll();
+  }
+  function hurryWorks(b) {
+    const cost = hurryCost(b);
+    if (state.gold + 1e-6 < cost) { toast(`Hurrying the crew costs ${cost} gold.`); return; }
+    state.gold -= cost; b.works.left = Math.min(b.works.left, 8); b.works.hurried = true; sfx.coin();
+    toast(`Overtime pay: the crew finishes in a few seconds. −${cost} gold`);
+    save(); renderAll();
+  }
+
+  /* Vehicles: a fire truck, a police car and the roadworks van. They gear up at their station, then drive over. */
+  const VEH = [];
+  let vehSeq = 0;
+  const VEH_SPEED = { fire: 3.2, police: 3.8, crew: 2.6 };
+  function vehicleFor(kind, targetId) { return VEH.find((v) => v.kind === kind && v.target === targetId); }
+  function dispatch(kind, station, target, prepSec) {
+    const d0 = station ? doorTile(station, target.c, target.r) : null;
+    const start = d0 || doorTile(townHall(), target.c, target.r) || { c: target.c, r: target.r + 1 };
+    const v = { id: vehSeq++, kind, c: start.c + 0.5, r: start.r + 0.5, path: [], state: 'prep', until: performance.now() + prepSec * 1000, target: target.id, station: station ? station.id : null, dir: { dc: 0, dr: 1 }, home: { c: start.c, r: start.r } };
+    VEH.push(v);
+    return v;
+  }
+  function routeTo(v, b) {
+    const d = doorTile(b, v.c, v.r) || { c: clamp(b.c, 0, N - 1), r: clamp(b.r + sizeOf(b.type), 0, N - 1) };
+    v.path = bfs(Math.floor(v.c), Math.floor(v.r), d.c, d.r) || [{ c: d.c + 0.5, r: d.r + 0.5 }];
+    v.state = 'drive';
+  }
+  function sendHome(v) {
+    v.target = null;
+    v.path = bfs(Math.floor(v.c), Math.floor(v.r), v.home.c, v.home.r) || [];
+    v.state = 'back';
+  }
+  // Moves vehicles along their routes (every frame) and decides what happens when they arrive.
+  function stepVehicles(dt, now) {
+    for (const v of VEH.slice()) {
+      if (v.state === 'prep') { if (now >= v.until) { const b = byId(v.target); if (b) { routeTo(v, b); sfx.siren && sfx.siren(v.kind); } else sendHome(v); } continue; }
+      if (v.state !== 'drive' && v.state !== 'back') continue;
+      const tg = v.path[0];
+      if (!tg) {
+        if (v.state === 'back') { VEH.splice(VEH.indexOf(v), 1); continue; }
+        v.state = 'work'; v.workT = 0;
+        continue;
+      }
+      const dx = tg.c - v.c, dr = tg.r - v.r, dd = Math.hypot(dx, dr), step = VEH_SPEED[v.kind] * dt;
+      if (Math.abs(dx) > Math.abs(dr)) v.dir = { dc: Math.sign(dx), dr: 0 }; else if (dr) v.dir = { dc: 0, dr: Math.sign(dr) };
+      if (dd <= step) { v.c = tg.c; v.r = tg.r; v.path.shift(); } else { v.c += dx / dd * step; v.r += dr / dd * step; }
+    }
+  }
+  const crewFire = (b) => VEH.find((v) => v.kind === 'fire' && v.state === 'work' && v.target === b.id);
+  function fireStatus(b) {
+    if (!staffWorking('fire')) return 'Help! Fire!';
+    const v = VEH.find((x) => x.kind === 'fire' && x.target === b.id);
+    if (!v) return 'Fire! Waiting for a truck';
+    if (v.state === 'prep') return 'Fire! Crew gearing up';
+    if (v.state === 'drive') return 'Fire! Truck on the way';
+    return `Putting it out · ${Math.round((1 - b.fire.hp / b.fire.max) * 100)}%`;
+  }
+  function robberyStatus(b) {
+    if (!staffWorking('police')) return 'Break-in! No police';
+    const v = VEH.find((x) => x.kind === 'police' && x.target === b.id);
+    if (!v) return 'Break-in!';
+    if (v.state === 'prep') return 'Break-in! Police getting ready';
+    if (v.state === 'drive') return 'Break-in! Police on the way';
+    return 'Police looking for clues';
+  }
+  // How strongly a building still burns (spraying shrinks the flames).
+  function fireK(b) { return b.fire ? clamp(0.25 + 0.75 * b.fire.hp / (b.fire.max || 16), 0.12, 1) : 0; }
+
+  // Called every tick while you play: new incidents, fires spreading and burning down, crews at work.
+  function incidentTick(dt) {
+    if (ui.screen !== 'play' || ui.holding || !$('scrim').hidden || ui.overlay || ui.reveals.length || ui.visit) return;
     ui.playVisit += dt;
-    const b0 = burningNow();
-    if (b0) {
-      // Without animation (reduced motion), firefighters still put it out after a short wait.
-      if (reduced && staffWorking('fire') >= 1 && performance.now() - ui.fireSince > 4000) extinguish(b0);
-      return;
+    const ci = city(), now = performance.now();
+    // ---- fires
+    for (const b of burningAll()) {
+      const f = b.fire; if (!f.max) { f.max = fireHp(b); f.hp = f.hp == null ? f.max : f.hp; f.spreadIn = f.spreadIn || 20; }
+      const crew = crewFire(b);
+      if (crew) f.hp -= dt * Math.min(2, staffWorking('fire')) * 0.9;
+      else {
+        f.hp -= dt * 0.12; // with nobody coming, neighbours with buckets get it out after a couple of minutes
+        if (!f.first) f.spreadIn -= dt;
+        if (f.spreadIn <= 0) {
+          f.spreadIn = 16 + Math.random() * 12;
+          const near = state.buildings.filter((o) => dist(o, b) <= 1 && fireRisk(o) > 0);
+          if (near.length && burningAll().length < 3 && Math.random() < 0.45 * (1 + 0.15 * crowd(b))) startFire(weighted(near, fireRisk) || pick(near), true);
+        }
+      }
+      if (f.hp <= 0) { extinguish(b, !!crew); if (crew) { const next = burningNow(); if (next && !vehicleFor('fire', next.id)) { crew.target = next.id; routeTo(crew, next); } else sendHome(crew); } }
     }
-    const ci = city(); if (ci.residents < 16 || !isDone('repair')) return;
-    const homes = state.buildings.filter((b) => messy(b) && !revealFor(b.id));
-    if (!homes.length) return;
-    if (!state.flags.fireSeen) {
-      if (ui.playVisit < 20 || ui.panel) return;
-      const omar = resident('Omar');
-      startFire(omar && homes.includes(omar) ? omar : pick(homes));
-      return;
+    // a truck for every fire without one, from the nearest staffed fire station
+    if (staffWorking('fire') >= 1) for (const b of burningAll()) {
+      if (VEH.some((v) => v.kind === 'fire' && v.target === b.id)) continue;
+      if (VEH.filter((v) => v.kind === 'fire' && v.state !== 'back').length >= Math.max(1, stationsOf('fire').length)) break;
+      const st = stationsOf('fire').slice().sort((a, c) => dist(a, b) - dist(c, b))[0];
+      dispatch('fire', st, b, coversB('fire', b) ? 8 : 15);
+      floats.push({ x: centerOf(st || b).x, y: centerOf(st || b).y - 40, t0: now, text: 'Firefighters gearing up', soft: true });
     }
-    if (state.fireIn == null) state.fireIn = 240 + Math.random() * 240;
-    state.fireIn -= dt;
-    if (state.fireIn <= 0 && ui.playVisit >= 15 && !ui.panel) { state.fireIn = null; startFire(pick(homes)); }
+    // ---- break-ins
+    for (const b of state.buildings) {
+      if (!b.robbed) continue;
+      const v = VEH.find((x) => x.kind === 'police' && x.target === b.id);
+      if (v && v.state === 'work') { v.workT += dt; if (v.workT >= 10) { endRobbery(b, true); sendHome(v); } continue; }
+      if (!v) { b.robbed.open -= dt; if (b.robbed.open <= 0) endRobbery(b, false); }
+      if (!v && staffWorking('police') >= 1) { const st = stationsOf('police').slice().sort((a, c) => dist(a, b) - dist(c, b))[0]; dispatch('police', st, b, coversB('police', b) ? 5 : 14); }
+    }
+    // ---- roadworks: the crew van comes, works, then leaves
+    for (const b of state.buildings.slice()) {
+      if (b.type !== 'works' || !b.works) continue;
+      let v = VEH.find((x) => x.kind === 'crew' && x.target === b.id);
+      if (!v) v = dispatch('crew', null, b, 2);
+      if (v.state === 'work' || b.works.hurried) b.works.left -= dt;
+      if (b.works.left <= 0) { endWorks(b, !!b.works.hurried); if (v) sendHome(v); }
+    }
+    for (const v of VEH) {
+      if (v.state !== 'work') continue;
+      const tb = byId(v.target);
+      if (v.kind === 'fire' && !(tb && tb.fire)) { const next = burningAll().find((x) => !VEH.some((o) => o !== v && o.kind === 'fire' && o.target === x.id)); if (next) { v.target = next.id; routeTo(v, next); } else sendHome(v); }
+      else if (v.kind === 'police' && !(tb && tb.robbed)) sendHome(v);
+      else if (v.kind === 'crew' && !tb) sendHome(v);
+    }
+    // ---- new incidents (none while one of the same kind is going on)
+    const live2 = state.buildings.filter((b) => messy(b) && !revealFor(b.id));
+    if (ci.residents >= 16 && isDone('repair') && live2.length && !burningNow()) {
+      if (!state.flags.fireSeen) {
+        if (ui.playVisit >= 20 && !ui.panel) { const omar = resident('Omar'); startFire(omar && live2.includes(omar) ? omar : weighted(live2, fireRisk) || pick(live2)); }
+      } else {
+        if (state.fireIn == null) state.fireIn = 300 + Math.random() * 240;
+        state.fireIn -= dt;
+        if (state.fireIn <= 0 && ui.playVisit >= 15 && !ui.panel) { state.fireIn = null; startFire(weighted(live2, fireRisk) || pick(live2)); }
+      }
+    }
+    if (roleInfo('police', ci).needed && !state.buildings.some((b) => b.robbed)) {
+      const nk = nightK();
+      if (ui.robIn == null) ui.robIn = 240 + Math.random() * 240;
+      ui.robIn -= dt * (1 + 1.2 * nk); // more break-ins at night
+      if (ui.robIn <= 0 && ui.playVisit >= 25 && !ui.panel) {
+        ui.robIn = null;
+        const st = stationsOf('police');
+        startRobbery(weighted(live2.filter((b) => !b.fire), (b) => (coversB('police', b, st) ? 0.5 : 5) * (T(b).cat === 'shop' ? 1.3 : 1)));
+      }
+    }
+    if (homesCount() >= 6 && !state.buildings.some((b) => b.type === 'works')) {
+      if (ui.worksIn == null) ui.worksIn = 420 + Math.random() * 300;
+      ui.worksIn -= dt;
+      if (ui.worksIn <= 0 && ui.playVisit >= 30 && !ui.panel) { ui.worksIn = null; startWorks(); }
+    }
   }
 
   /* ---------- Residents speak up: a speech bubble every few seconds while you play ---------- */
   const LINES = {
-    trash: ['Ugh, look at all this trash!', "Who's picking this up?", 'It smells like old fish out here.', 'Trash again? Seriously?', 'Can we get a street sweeper?'],
-    park: ['The park is a jungle!', 'I lost my dog in the tall grass.', 'Someone trim that park, please!'],
-    safety: ['Someone took my bike!', 'I heard a noise last night...', 'We need police around here.'],
-    nightcrime: ['Footsteps outside... who is there?', 'Someone tried our door!', 'I lock up twice at night now.', 'Is anyone patrolling out here?'],
-    dark: ['Our street is so dark at night.', 'A lamp post would be nice here.', 'I tripped in the dark again!'],
-    farcare: ['The clinic is so far away!', 'Achoo! The nurse never comes out here.'],
-    farclean: ['No sweeper ever comes out this far!', 'Even the sweepers skip our street.'],
-    health: ['Achoo! Is there a nurse?', "I don't feel so good.", 'We need a nurse in town.'],
-    noise: ['That workshop is SO loud!', 'BANG BANG BANG all day!'],
-    smell: ['That landfill stinks!', 'Can we move the dump, please?', 'Phew, what is that smell?'],
-    sirens: ['Those sirens again!', 'Nee-naw all night long.'],
-    happy: ['I love this town!', 'What a lovely day!', 'Our mayor is the best!', 'So clean and tidy!', 'Great job, Mayor!', 'Best town ever.'],
-    cafe: ['Best coffee in town!', 'One more latte, please.'],
-    bakery: ['Fresh bread! Still warm!', 'Croissants are ready!'],
-    market: ['Turnips! Get your turnips!', 'Fresh apples today!'],
-    park2: ['Lovely day for a picnic.', 'The ducks are back!'],
-    rain: ['Grab an umbrella!', 'I love the sound of rain.', 'Perfect weather for a café.'], storm: ['Did you hear that thunder?', 'Stay inside, everyone!'],
-    fog: ["I can't see a thing!", 'Spooky fog today.'], snow: ['Snowball fight!', 'Brr, so cold!'], night: ['Look at all the stars!', 'Good night, Mayor!'], rainbow: ['A rainbow! Make a wish!']
+    trash: ['Ugh, look at all this trash!', "Who's picking this up?", 'It smells like old fish out here.', 'Trash again? Seriously?', 'Can we get a street sweeper?', 'A raccoon just waved at me from the bin.', 'I named the trash pile Gary. Gary is growing.', 'My cat refuses to go outside. I get it.', 'The seagulls are holding a party in our bins.'],
+    park: ['The park is a jungle!', 'I lost my dog in the tall grass.', 'Someone trim that park, please!', 'I saw a tiger in the park. It was a very tall cat.', 'The grass is taller than my kids now.', 'Is that a park or a rainforest?'],
+    safety: ['Someone took my bike!', 'I heard a noise last night...', 'We need police around here.', 'Someone stole my garden gnome. Again.', 'Who keeps taking the doormats?', 'My neighbour says he saw a mask. Not a Halloween one.'],
+    nightcrime: ['Footsteps outside... who is there?', 'Someone tried our door!', 'I lock up twice at night now.', 'Is anyone patrolling out here?', 'I sleep with a frying pan now.', 'A shadow just ran past my window!'],
+    robbery: ['Someone broke into my house!', 'My TV is gone! And my snacks!', 'Thief! Call the police!', "They took my grandma's spoons!", 'The window is broken and my piggy bank is empty!', 'They even took the good cheese!'],
+    shaken: ["I can't sleep since the break-in.", 'I jump at every sound now.', 'We bought a very loud dog.', 'I check the locks five times a night.'],
+    farcare: ['The clinic is so far away!', 'Achoo! The nurse never comes out here.', 'By the time I reach the clinic, I feel better.'],
+    farclean: ['No sweeper ever comes out this far!', 'Even the sweepers skip our street.', 'Our street is not on the sweepers\' map.'],
+    health: ['Achoo! Is there a nurse?', "I don't feel so good.", 'We need a nurse in town.', 'My cough has a cough.', 'I googled my symptoms. Bad idea.'],
+    noise: ['That workshop is SO loud!', 'BANG BANG BANG all day!', 'I can hear the workshop in my dreams.', 'My teacup rattles every time they saw.'],
+    smell: ['That landfill stinks!', 'Can we move the dump, please?', 'Phew, what is that smell?', 'My laundry smells like old pizza.', 'I hold my breath from the door to the bus.'],
+    sirens: ['Those sirens again!', 'Nee-naw all night long.', 'My dog howls with every siren.'],
+    smoke: ['Smoke! Close the windows!', 'Is the fire coming our way?', 'My curtains smell like a barbecue.', 'Cough cough! Hurry, firefighters!'],
+    works: ['BRRRRRRT. That drill!', 'They dig a hole, then fill it, then dig it again.', 'How long will the road be closed?', 'I can feel the digger in my teeth.', 'The workers ate lunch on my wall. Twice.'],
+    thanksFire: ['Thank you, firefighters!', 'Phew! Thank you!', 'My hero has a big hose!', 'Only my toast got burned. Again.', 'Saved! I owe you a cake.'],
+    thanksPolice: ['You caught them! Thank you!', 'My spoons are back!', 'Great work, officers!', 'I feel safe again.'],
+    happy: ['I love this town!', 'What a lovely day!', 'Our mayor is the best!', 'So clean and tidy!', 'Great job, Mayor!', 'Best town ever.', 'I waved at the mayor. The mayor waved back!', 'I found a coin on the street. Lucky day!', 'My plants are thriving. I talk to them.', 'Even the pigeons look happy today.', 'Somebody hum a tune, it is that kind of day.', 'I would give this town five stars.'],
+    cafe: ['Best coffee in town!', 'One more latte, please.', 'I have had six espressos. I can see sounds.', 'The barista drew a cat in my foam!'],
+    bakery: ['Fresh bread! Still warm!', 'Croissants are ready!', 'I came for bread. I left with eleven pastries.', 'The whole street smells like cinnamon.'],
+    market: ['Turnips! Get your turnips!', 'Fresh apples today!', 'Two-for-one on carrots. I bought nine.', 'The tomato guy winked at me.'],
+    arcade: ['New high score!', 'I spent all my tokens on the claw machine. Worth it.', 'Beep boop! Level up!'],
+    bookshop: ['I came in for one book. Bought four.', 'Shh! I am at the good part.'],
+    park2: ['Lovely day for a picnic.', 'The ducks are back!', 'I fed a duck. Now it follows me.', 'Cloud spotting: that one is a sheep.'],
+    rain: ['Grab an umbrella!', 'I love the sound of rain.', 'Perfect weather for a café.', 'My umbrella flipped inside out. Again.'], storm: ['Did you hear that thunder?', 'Stay inside, everyone!', 'My cat is hiding under the bed.'],
+    fog: ["I can't see a thing!", 'Spooky fog today.', 'I just said hi to a lamp post.'], snow: ['Snowball fight!', 'Brr, so cold!', 'I built a snowman. It looks like you, Mayor.'], night: ['Look at all the stars!', 'Good night, Mayor!', 'Shh, the kids are asleep.'], rainbow: ['A rainbow! Make a wish!', 'Is there gold at the end? Asking for the mayor.']
   };
+  // What residents might say right now. Urgent: incidents and serious mess. Then other complaints, then happy chatter.
+  // At night most people are asleep, so it is much quieter.
   function complaintFor() {
-    const ci = city(), opts = [];
-    const po = roleInfo('police', ci), nu = roleInfo('nurse', ci);
+    const ci = city(), urgent = [], bad = [];
+    const po = roleInfo('police', ci), nu = roleInfo('nurse', ci), nk = nightK();
     for (const b of state.buildings) {
-      if (!live(b) || b.fire || revealFor(b.id)) continue;
+      if (!live(b) || b.fire || revealFor(b.id) || b.type === 'works') continue;
       const t = T(b);
-      if (messy(b) && (b.trash || 0) >= 0.9) opts.push({ b, w: b.trash, kind: 'bad', text: pick(stationsOf('sweeper').length && !coversB('sweeper', b) ? LINES.farclean : LINES.trash), role: 'sweeper' });
+      if (b.robbed) { urgent.push({ b, w: 2, kind: 'bad', text: pick(LINES.robbery), role: 'police' }); continue; }
+      if (messy(b) && (b.trash || 0) >= 0.9) ((b.trash || 0) >= 2 ? urgent : bad).push({ b, w: b.trash, kind: 'bad', text: pick(stationsOf('sweeper').length && !coversB('sweeper', b) ? LINES.farclean : LINES.trash), role: 'sweeper' });
       if (t.cat !== 'home') continue;
+      if (nk > 0.7 && Math.random() < 0.7) continue; // asleep
       const inf = ci.info.get(b.id);
-      const bad = inf && inf.from.find((f) => f[1] < 0 && f[2]);
-      if (bad) opts.push({ b, w: 1, kind: 'bad', text: pick(bad[0] === 'landfill smell' ? LINES.smell : bad[0] === 'workshop noise' ? LINES.noise : LINES.sirens), src: bad[2] });
-      if (state.buildings.some((p) => p.type === 'park' && live(p) && (p.overgrown || 0) > 0.5 && dist(p, b) <= 2)) opts.push({ b, w: 1.1, kind: 'bad', text: pick(LINES.park), role: 'gardener' });
-      // crime rises at night: more complaints from homes far from police, and dark streets want a lamp post
-      const nk = nightK();
-      if (po.needed && !policeCovers(b)) opts.push({ b, w: 0.9 + 1.4 * nk, kind: 'bad', text: pick(nk > 0.5 ? LINES.nightcrime : LINES.safety), role: 'police' });
-      else if (po.needed && nk > 0.5 && !lit(b)) opts.push({ b, w: 0.5, kind: 'bad', text: pick(LINES.dark), role: 'lamp' });
-      if (nu.needed && stationsOf('nurse').length && !coversB('nurse', b)) opts.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.farcare), role: 'nurse' });
-      else if (nu.needed && state.civic.health < 0.7) opts.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.health), role: 'nurse' });
+      const nb = inf && inf.from.find((f) => f[1] < 0 && f[2]);
+      if (nb) bad.push({ b, w: 1, kind: 'bad', text: pick(nb[0] === 'landfill smell' ? LINES.smell : nb[0] === 'workshop noise' ? LINES.noise : nb[0] === 'roadworks noise' ? LINES.works : LINES.sirens), src: byId(nb[2]) && byId(nb[2]).type === 'works' ? null : nb[2] });
+      if (inf && inf.from.some((f) => f[0] === 'smoke from next door')) urgent.push({ b, w: 1, kind: 'bad', text: pick(LINES.smoke), role: 'fire' });
+      if (b.shaken && Math.random() < 0.5) bad.push({ b, w: 0.6, kind: 'bad', text: pick(LINES.shaken) });
+      const wild = state.buildings.find((p) => p.type === 'park' && live(p) && (p.overgrown || 0) > 0.5 && dist(p, b) <= 2);
+      if (wild) (wild.overgrown > 0.85 ? urgent : bad).push({ b, w: 1.1, kind: 'bad', text: pick(LINES.park), role: 'gardener' });
+      if (po.needed && !policeCovers(b)) bad.push({ b, w: 0.9 + 1.4 * nk, kind: 'bad', text: pick(nk > 0.5 ? LINES.nightcrime : LINES.safety), role: 'police' });
+      if (nu.needed && stationsOf('nurse').length && !coversB('nurse', b)) bad.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.farcare), role: 'nurse' });
+      else if (nu.needed && state.civic.health < 0.7) bad.push({ b, w: 0.8, kind: 'bad', text: pick(LINES.health), role: 'nurse' });
     }
+    const one = (opts) => { if (!opts.length) return null; let x = Math.random() * opts.reduce((a, o) => a + o.w, 0); for (const o of opts) { if (x < o.w) return o; x -= o.w; } return opts[0]; };
+    let good = null;
     const mood = moodNow(Date.now()).value;
-    if (!opts.length || (mood >= 60 && Math.random() < 0.3)) {
-      const nice = state.buildings.filter((b) => live(b) && !b.fire && (b.trash || 0) < 0.9 && (b.overgrown || 0) < 0.5 && (T(b).cat === 'home' || T(b).cat === 'shop' || b.type === 'park') && !revealFor(b.id));
-      if (!nice.length || mood < 50) return opts.length ? pick(opts) : null;
-      const b = pick(nice);
-      const pool = LINES[b.type === 'park' ? 'park2' : b.type] || LINES.happy, SP = skyNow();
+    const nice = state.buildings.filter((b) => live(b) && !b.fire && !b.robbed && (b.trash || 0) < 0.9 && (b.overgrown || 0) < 0.5 && (T(b).cat === 'home' || T(b).cat === 'shop' || b.type === 'park') && !revealFor(b.id));
+    if (nice.length && mood >= 50 && !(nk > 0.7 && Math.random() < 0.6)) {
+      const b = pick(nice), pool = LINES[b.type === 'park' ? 'park2' : b.type] || LINES.happy, SP = skyNow();
       const wl = SP.w.rainbow > 0.3 ? LINES.rainbow : SP.w.k > 0.5 && LINES[SP.w.kind] ? LINES[SP.w.kind] : SP.dark > 0.7 ? LINES.night : null;
-      return { b, kind: 'good', text: pick(wl && Math.random() < 0.45 ? wl : Math.random() < 0.5 ? pool : LINES.happy) };
+      good = { b, kind: 'good', text: pick(wl && Math.random() < 0.45 ? wl : Math.random() < 0.5 ? pool : LINES.happy) };
     }
-    let x = Math.random() * opts.reduce((a, o) => a + o.w, 0);
-    for (const o of opts) { if (x < o.w) return o; x -= o.w; }
-    return opts[0];
+    return { urgent: one(urgent), bad: one(bad), good };
   }
+  // Fewer bubbles: urgent problems at most every 30 seconds, other complaints and happy chatter at most once a
+  // minute each, never two at once, and at least 15 seconds of quiet in between. Happy lines make no sound.
+  const BUBBLE_GAP = { urgent: 30000, bad: 60000, good: 60000, quiet: 15000 };
   function bubbleTick(now) {
     if (ui.screen !== 'play' || ui.holding || ui.overlay || ui.visit) return;
     ui.bubbles = ui.bubbles.filter((x) => now < x.t0 + x.dur);
-    if (now < ui.nextBubble) return;
-    ui.nextBubble = now + 7000 + Math.random() * 5000;
-    if (burningNow()) return;
-    const o = complaintFor(); if (!o) return;
-    if (ui.bubbles.some((x) => x.bid === o.b.id)) return;
-    ui.bubbles.push({ bid: o.b.id, text: o.text, kind: o.kind, t0: now, dur: 3800, role: o.role || null, src: o.src || null });
-    if (o.kind === 'bad') sfx.grumble(); else sfx.chirp();
+    if (ui.bubbles.some((x) => !x.reply) || now < ui.nextBubble) return;
+    const nb = ui.nextBy || (ui.nextBy = { urgent: 0, bad: now + 20000, good: now + 30000 });
+    const c = complaintFor();
+    let o = null, kind = null;
+    if (c.urgent && now >= nb.urgent) { o = c.urgent; kind = 'urgent'; }
+    else if (c.bad && now >= nb.bad) { o = c.bad; kind = 'bad'; }
+    else if (c.good && now >= nb.good && !c.urgent) { o = c.good; kind = 'good'; }
+    ui.nextBubble = now + 2000;
+    if (!o || ui.bubbles.some((x) => x.bid === o.b.id)) return;
+    nb[kind] = now + BUBBLE_GAP[kind]; ui.nextBubble = now + BUBBLE_GAP.quiet;
+    ui.bubbles.push({ bid: o.b.id, text: o.text, kind: o.kind, t0: now, dur: 4200, role: o.role || null, src: o.src || null });
+    if (o.kind === 'bad') sfx.grumble();
   }
 
   /* ---------- Hiring: one-off fee at the staff's own building (or from the town hall), then a wage every hour ---------- */
@@ -1911,7 +2222,7 @@
     const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home');
     let neigh = 0;
     if (homes.length) neigh = clamp(homes.reduce((a, h) => a + (ci.info.get(h.id).mult - 1), 0) / homes.length * 60, -15, 25);
-    const lv = state.buildings.filter((b) => live(b) && T(b).cat !== 'decor' && !special(T(b)) && T(b).cat !== 'landmark' && b.type !== 'townhall');
+    const lv = state.buildings.filter((b) => live(b) && T(b).cat !== 'decor' && !special(T(b)) && T(b).cat !== 'landmark' && T(b).cat !== 'works' && b.type !== 'townhall');
     const quality = lv.length ? clamp((lv.reduce((a, b) => a + b.level, 0) / lv.length - 1) * 14, 0, 20) : 0;
     const dirty = state.buildings.filter(messy);
     const avgTrash = dirty.length ? dirty.reduce((a, b) => a + (b.trash || 0), 0) / dirty.length : 0;
@@ -1924,8 +2235,9 @@
     const fires = -Math.min(20, burning * 10);
     const boost = boostNow(now);
     const landmarks = LANDMARK_ORDER.reduce((a, k) => a + (hasLandmark(k) ? TYPES[k].mood : 0), 0);
-    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks), 0, 100);
-    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, roles, mult: 0.6 + 0.8 * value / 100 };
+    const trouble = troubleNow() - state.buildings.filter((b) => b.robbed).length * 3;
+    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble), 0, 100);
+    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, roles, mult: 0.6 + 0.8 * value / 100 };
   }
   const moodWord = (v) => (v < 25 ? 'Miserable' : v < 45 ? 'Grumpy' : v < 60 ? 'Okay' : v < 80 ? 'Happy' : 'Delighted');
   function econ(now) {
@@ -2252,6 +2564,8 @@
     const frac = clamp(leftoverWork / total, 0, 1);
     let p = d / PLAY_PER_MIN * 60 * (1 + ((job ? job.play : 1) - 1) * frac);
     if (complete && d >= MIN_SESSION) p = Math.max(p, 60);
+    // Ending early pays half the play time, and nothing for less than 5 minutes.
+    if (!complete) p = d < MIN_SESSION ? 0 : p * 0.5;
     return p;
   }
   function sessionPreview(d) {
@@ -2373,14 +2687,26 @@
     const blk = blockNow();
     const plan = simulate(state.queue, workFor(duration)).items.filter((x) => !x.waiting).map((x) => x.q.id);
     const startDone = {}; for (const q of state.queue) if (plan.includes(q.id)) startDone[q.id] = q.done;
-    state.session = { duration, jobBid: currentJob().bid, start: now, speed: ui.tourSpeed || state.speed, income: econ(now).net, combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone };
+    // The timer starts after a short get-ready countdown; until then, cancelling is free.
+    const ready = ui.tourSpeed ? 3 : READY_SEC;
+    state.session = { duration, jobBid: currentJob().bid, start: now + ready * 1000, ready, speed: ui.tourSpeed || state.speed, income: econ(now).net, combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone };
     state.lastTaxAt = now;
     sfx.pop();
     save(); closeSheet(); renderAll(); showFocus();
     lockStart();
   }
+  const inReady = (s, now) => !!s && (now || Date.now()) < s.start;
+  // Cancelled during the get-ready countdown: as if it never started.
+  function cancelSession() {
+    if (!state.session) return;
+    lockStop(false);
+    state.session = null; state.lastTaxAt = Date.now();
+    save(); hideFocus(); renderAll();
+    toast('Cancelled before it started. Nothing lost.');
+  }
   function finishSession(reason, forceFull) {
     const s = state.session; if (!s) return;
+    if (!forceFull && inReady(s)) { cancelSession(); return; }
     lockStop(reason === 'complete');
     const now = Date.now();
     const m = forceFull ? s.duration : sessionMinutes(s, now);
@@ -2396,8 +2722,7 @@
     const gone = new Set();
     // Ending early has a price. Finished jobs stay built. The job Sam was in the middle of is torn down and its gold
     // is gone, unless it is a landmark or a job over an hour (those only lose this session's work).
-    // In the first minute nothing has really started, so ending then costs nothing.
-    const grace = !done && m < 1;
+    const grace = false; // the free cancel is the get-ready countdown before the timer starts
     for (const it of sim.items) {
       if (it.finished) { completeJob(it.q, r); gone.add(it.q); continue; }
       if (done) { it.q.done = it.done; continue; }
@@ -2430,7 +2755,8 @@
     if (trashBefore - trashAfter > 0.3) r.cleaned = true;
     const wantPlay = playFor(m, sim.leftover, job, done);
     r.play = addPlay(wantPlay);
-    if (r.play >= 1) r.playParts.push({ ic: 'play', label: 'For your focus', n: r.play });
+    if (r.play >= 1) r.playParts.push({ ic: 'play', label: done ? 'For your focus' : 'For your focus (half: ended early)', n: r.play });
+    else if (!done && m >= 0.5) r.noPlay = true;
     if (wantPlay - r.play >= 30) r.playCapped = playLeftToday() <= 0 ? 'daily' : 'bank';
     r.xpParts.push({ ic: 'xp', label: `${fmtMin(Math.max(1, m))} of focus`, n: Math.round(m * 10) });
     if (hasLandmark('observatory') && m >= 1) r.xpParts.push({ ic: 'xp', label: 'Observatory: +10% focus XP', n: Math.round(m) });
@@ -2549,8 +2875,8 @@
       avail: () => hallLevel() >= 2, done: () => state.buildings.some((b) => b.type === 'bakery' && live(b) && state.buildings.some((c) => c.type === 'cafe' && live(c) && dist(b, c) <= 1)) },
     { id: 'quiet', from: 'Neighbours', text: '"That workshop is loud. Keep it away from our homes."', short: 'Keep homes away from the workshop.', hint: 'No home may touch a workshop.', reward: 40, action: 'play', at: () => state.buildings.find((b) => b.type === 'workshop' && live(b)),
       avail: () => countLive('workshop') > 0, done: () => { const ws = state.buildings.filter((b) => b.type === 'workshop' && live(b)); return ws.length > 0 && !ws.some((w) => state.buildings.some((h) => T(h).cat === 'home' && live(h) && dist(h, w) <= 1)); } },
-    { id: 'inc150', from: 'Town council', text: 'Reach 150 gold an hour in taxes.', short: 'Reach 150 gold an hour.', reward: 100, action: 'play',
-      avail: () => hallLevel() >= 2, done: () => econ().taxes >= 150, progress: () => [Math.min(150, Math.floor(econ().taxes)), 150] },
+    { id: 'inc150', from: 'Town council', text: 'Reach 60 gold an hour in taxes.', short: 'Reach 60 gold an hour.', reward: 100, action: 'play',
+      avail: () => hallLevel() >= 2, done: () => econ().taxes >= 60, progress: () => [Math.min(60, Math.floor(econ().taxes)), 60] },
     { id: 'hall3', from: 'Town council', text: 'Upgrade the town hall to level 3. It unlocks the bookshop and the clinic.', short: 'Upgrade the town hall to level 3.', reward: 150, action: 'hall', at: () => townHall(),
       avail: () => isDone('hall2'), done: () => hallLevel() >= 3 },
     { id: 'grow60', from: 'Town council', text: 'Grow the town to 60 residents.', short: 'Grow to 60 residents.', reward: 200, action: 'play',
@@ -2623,7 +2949,7 @@
     accrue(Date.now());
     let target;
     const firstReveal = ui.reveals.length && byId(ui.reveals[0].bid);
-    ui.playVisit = 0; ui.nextBubble = performance.now() + 3500; ui.fireSince = performance.now();
+    ui.playVisit = 0; ui.nextBubble = performance.now() + 3500; ui.fireSince = performance.now(); ui.hintKey = '';
     if (focusB) { const p = centerOf(focusB); target = { x: p.x, y: p.y - (geo.h * 0.3 - geo.h / 2) / playZoom() }; }
     else if (ui.landReveal) { const pl = PLOTS[ui.landReveal.plot], p = tileCenter((pl.c0 + pl.c1) / 2, (pl.r0 + pl.r1) / 2); target = { x: p.x, y: p.y }; }
     else if (firstReveal) { const p = centerOf(firstReveal); target = { x: p.x, y: p.y - 20 }; }
@@ -2664,9 +2990,9 @@
   function leavePlay(expired, silent) {
     if (ui.screen !== 'play') return;
     accrue(Date.now());
-    // A firefighter already on the way finishes the job.
-    const ff = walkers.find((w) => w.act && w.act.kind === 'spray');
-    if (ff) { extinguish(byId(ff.act.bid)); ff.act = null; ff.path = []; ff.state = 'idle'; ff.speed = 1.05; }
+    // Crews already at work finish the job; everyone else heads back and comes again next time you play.
+    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, true); } }
+    VEH.length = 0;
     ui.screen = 'home'; ui.holding = null; ui.preview = null; ui.playExpired = false;
     closePanel(true);
     animateCam(homeCam(), 550);
@@ -2793,7 +3119,7 @@
       if (ui.screen === 'play' && !document.hidden && $('scrim').hidden && !ui.overlay && dt > 0 && dt < 5) {
         state.playSec = Math.max(0, state.playSec - dt);
         playBuild(dt);
-        fireTick(dt);
+        incidentTick(dt);
         if (state.playSec <= 0 && !ui.playExpired) {
           ui.playExpired = true;
           if (ui.holding || (ui.panel && ui.panel.kind === 'place')) toast('Play time is up. Finish this move, then you head home.');
@@ -2801,7 +3127,7 @@
         }
       }
       if (ui.recharge && ui.recharge.step === 'timer') renderRecharge();
-      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock(); }
+      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock(); if (ui.screen === 'play' || ui.screen === 'home') syncWalkers(); }
     }
     renderHud();
   }
@@ -3517,6 +3843,17 @@
         wallQuad(c, [x - hw * 0.55, y], [x, y + hh * 0.18], 0, 1, 7 * u, 10 * u, roofc);
         break;
       }
+      case 'works': {
+        // a dug-up patch with a barrier, cones and a pile of dirt
+        diamond(c, x, y, hw * 0.62, hh * 0.62, '#7A5A3C'); diamond(c, x, y + 1 * u, hw * 0.4, hh * 0.4, '#4E3826');
+        c.fillStyle = '#8E6A48'; c.beginPath(); c.ellipse(x + 9 * u, y - 2 * u, 7 * u, 4 * u, 0, Math.PI, 0); c.fill();
+        for (const [cx, cy] of [[-14, 2], [14, 3], [0, 9], [-4, -7]]) { c.fillStyle = '#F06A1F'; poly(c, [[x + cx * u - 2.4 * u, y + cy * u], [x + cx * u + 2.4 * u, y + cy * u], [x + cx * u, y + cy * u - 8 * u]], '#F06A1F'); c.fillStyle = '#fff'; c.fillRect(x + cx * u - 1.4 * u, y + cy * u - 4.4 * u, 2.8 * u, 1.2 * u); }
+        line(c, [x - 13 * u, y - 4 * u], [x - 13 * u, y - 13 * u], '#5C5F66', 1.4 * u); line(c, [x + 4 * u, y - 10 * u], [x + 4 * u, y - 19 * u], '#5C5F66', 1.4 * u);
+        poly(c, [[x - 15 * u, y - 15 * u], [x + 6 * u, y - 21 * u], [x + 6 * u, y - 17 * u], [x - 15 * u, y - 11 * u]], '#F2F2F2');
+        for (let i = 0; i < 3; i++) poly(c, [[x - 13 * u + i * 7 * u, y - 15.5 * u - i * 2 * u], [x - 10 * u + i * 7 * u, y - 16.4 * u - i * 2 * u], [x - 12 * u + i * 7 * u, y - 12.4 * u - i * 2 * u], [x - 15 * u + i * 7 * u, y - 11.6 * u - i * 2 * u]], '#D9342B');
+        if (Math.floor(now / 400) % 2) { c.fillStyle = 'rgba(255,190,60,.95)'; c.beginPath(); c.arc(x + 6 * u, y - 22 * u, 1.8 * u, 0, Math.PI * 2); c.fill(); }
+        break;
+      }
       case 'lamp': {
         line(c, [x, y], [x, y - 24 * u], col, 2 * u);
         c.fillStyle = roofc; c.beginPath(); c.arc(x, y - 26 * u, 4 * u, 0, Math.PI * 2); c.fill();
@@ -3645,6 +3982,61 @@
   }
   function pips(c, x, y, u, n) { for (let i = 0; i < n; i++) { c.fillStyle = '#fff'; c.beginPath(); c.arc(x + i * 5 * u, y, 2.6 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(x + i * 5 * u, y, 1.8 * u, 0, Math.PI * 2); c.fill(); } }
 
+  /* ---------- Vehicles: a small box on wheels, turned along the street it drives on ---------- */
+  const VEH_LOOK = {
+    fire: { top: '#E2483A', a: '#B8342A', b: '#9A2A22', stripe: '#F4F1EA' },
+    police: { top: '#F4F6F8', a: '#D8DDE3', b: '#C3C9D1', stripe: '#2F4E8C' },
+    crew: { top: '#F4BE3E', a: '#D99F22', b: '#BF8A18', stripe: '#3B3B3B' }
+  };
+  function drawVehicle(c, v, now, after) {
+    const p = tileCenter(v.c - 0.5, v.r - 0.5), L = VEH_LOOK[v.kind];
+    const ec = [HW, HH], er = [-HW, HH];
+    const A = v.dir.dc ? [ec[0] * v.dir.dc, ec[1] * v.dir.dc] : [er[0] * (v.dir.dr || 1), er[1] * (v.dir.dr || 1)], B = v.dir.dc ? er : ec;
+    const len = v.kind === 'fire' ? 0.62 : 0.48, wid = 0.32, h = v.kind === 'fire' ? 11 : 8;
+    const pt = (a, b, up) => [p.x + A[0] * a + B[0] * b, p.y + A[1] * a + B[1] * b - (up || 0)];
+    const q = [pt(len / 2, wid / 2), pt(len / 2, -wid / 2), pt(-len / 2, -wid / 2), pt(-len / 2, wid / 2)];
+    c.fillStyle = 'rgba(20,30,25,.22)'; c.beginPath(); c.ellipse(p.x, p.y + 2, HW * 0.36, HH * 0.36, 0, 0, Math.PI * 2); c.fill();
+    // the two sides that face us, then the roof
+    const sides = [[0, 1], [1, 2], [2, 3], [3, 0]].map(([i, j]) => ({ i, j, y: (q[i][1] + q[j][1]) / 2 })).sort((m, n) => m.y - n.y).slice(2);
+    for (const sd of sides) { const a = q[sd.i], b = q[sd.j]; poly(c, [a, b, [b[0], b[1] - h], [a[0], a[1] - h]], sd === sides[1] ? L.a : L.b); }
+    for (const sd of sides) { const a = q[sd.i], b = q[sd.j]; c.fillStyle = '#1E1E1E'; for (const k of [0.22, 0.78]) { c.beginPath(); c.ellipse(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k - 1, 2.6, 2.2, 0, 0, Math.PI * 2); c.fill(); } }
+    for (const sd of sides) { const a = q[sd.i], b = q[sd.j]; line(c, [a[0], a[1] - h * 0.45], [b[0], b[1] - h * 0.45], L.stripe, 1.6); }
+    poly(c, q.map(([x, y]) => [x, y - h]), L.top);
+    // windscreen at the front, and the extras
+    const f1 = pt(len / 2 - 0.02, wid / 2 - 0.03, h), f2 = pt(len / 2 - 0.02, -wid / 2 + 0.03, h), f3 = pt(len / 2 - 0.16, -wid / 2 + 0.03, h), f4 = pt(len / 2 - 0.16, wid / 2 - 0.03, h);
+    poly(c, [f1, f2, f3, f4], 'rgba(150,200,230,.95)');
+    if (v.kind === 'fire') { const l1 = pt(-len / 2 + 0.05, 0, h + 2), l2 = pt(len / 2 - 0.2, 0, h + 2); line(c, l1, l2, '#C9CDD2', 2.4); for (let i = 1; i < 6; i++) { const m = pt(-len / 2 + 0.05 + (len - 0.25) * i / 6, 0.06, h + 2), n = pt(-len / 2 + 0.05 + (len - 0.25) * i / 6, -0.06, h + 2); line(c, m, n, '#C9CDD2', 1); } }
+    if (v.kind === 'crew') { const b1 = pt(-len / 2 + 0.04, wid / 2 - 0.04, h), b2 = pt(-0.04, -wid / 2 + 0.04, h); c.fillStyle = 'rgba(60,60,60,.35)'; c.fillRect(Math.min(b1[0], b2[0]), Math.min(b1[1], b2[1]), Math.abs(b2[0] - b1[0]), Math.abs(b2[1] - b1[1])); }
+    // flashing lights while it is on a job
+    const on = v.state !== 'back' && (reduced || Math.floor(now / 220) % 2 === 0);
+    const lb = pt(len / 2 - 0.22, 0, h + 1.5);
+    if (v.kind === 'crew') { c.fillStyle = on ? '#FFB020' : '#9A7A30'; c.beginPath(); c.arc(lb[0], lb[1] - 1, 2.2, 0, Math.PI * 2); c.fill(); }
+    else {
+      const l = pt(len / 2 - 0.22, 0.07, h + 1.5), r2 = pt(len / 2 - 0.22, -0.07, h + 1.5);
+      c.fillStyle = on ? '#FF3B30' : '#7A2A26'; c.beginPath(); c.arc(l[0], l[1] - 1, 2.2, 0, Math.PI * 2); c.fill();
+      c.fillStyle = !on ? (v.kind === 'police' ? '#3D7BFF' : '#FF3B30') : (v.kind === 'police' ? '#22346B' : '#7A2A26'); c.beginPath(); c.arc(r2[0], r2[1] - 1, 2.2, 0, Math.PI * 2); c.fill();
+      if (on && !reduced) { c.fillStyle = v.kind === 'police' ? 'rgba(80,130,255,.18)' : 'rgba(255,70,50,.18)'; c.beginPath(); c.arc(lb[0], lb[1], 14, 0, Math.PI * 2); c.fill(); }
+    }
+    // at work: firefighters spray, an officer takes notes, a worker digs
+    if (v.state === 'work') {
+      const b = byId(v.target); if (!b) return;
+      const bp = centerOf(b), side = pt(0, -wid / 2 - 0.28), facing = bp.x >= side[0] ? 1 : -1;
+      if (v.kind === 'fire') {
+        const n = Math.min(2, Math.max(1, staffWorking('fire')));
+        for (let i = 0; i < n; i++) {
+          const sx = side[0] + (i ? -10 : 4) * facing, sy = side[1] + (i ? 4 : 0);
+          const hand = person(c, sx, sy, 1, staffLook('fire'), { facing, arms: 'spray', tool: 'hose', t: now / 1000 });
+          after.push(() => {
+            const ub = (HW / 30) * (1 + 0.35 * (sizeOf(b.type) - 1)), tx = bp.x + (i ? -6 : 6), ty = bp.y - topOf(b.type, b.level) * ub * 0.78;
+            for (let k0 = 0; k0 < 14; k0++) { const k = ((now / 360) + k0 / 14 + i * 0.3) % 1; const x = hand[0] + (tx - hand[0]) * k, y = hand[1] + (ty - hand[1]) * k - Math.sin(k * Math.PI) * 16; c.fillStyle = `rgba(120,190,255,${0.9 - k * 0.45})`; c.beginPath(); c.arc(x, y, 1.1 + k * 1.3, 0, Math.PI * 2); c.fill(); }
+            if (!reduced && Math.random() < 0.2) fx.push({ x: tx + (Math.random() - 0.5) * 16, y: ty, vx: (Math.random() - 0.5) * 16, vy: -26, life: 0, max: 1, puff: true, color: 'rgba(240,244,248,.75)', r: 3 });
+          });
+        }
+      } else if (v.kind === 'police') person(c, side[0], side[1], 1, staffLook('police'), { facing, arms: 'rest', t: now / 1000 });
+      else person(c, bp.x - 12, bp.y + 6, 1, BUILDER_LOOK, { facing: 1, arms: 'hammer', tool: 'hammer', swing: reduced ? 0.5 : (Math.sin(now / 200) + 1) / 2 });
+    }
+  }
+
   /* ---------- Walkers: residents stroll between buildings; staff go where they are needed ---------- */
   const walkers = [];
   let walkerSeq = 0;
@@ -3690,7 +4082,8 @@
       phase: Math.random() * 6, facing: Math.random() < 0.5 ? 1 : -1, speed: role ? 1.05 : 0.7 + Math.random() * 0.25, base: role ? 1.05 : 0.8, off: (Math.random() - 0.5) * 0.3, act: null, wait: 1000 };
   }
   function syncWalkers() {
-    const want = Math.min(16, Math.floor(city().residents / 3));
+    // At night most residents are asleep: only a few night owls stay out.
+    const want = Math.round(Math.min(16, Math.floor(city().residents / 3)) * (1 - 0.85 * nightK()));
     const res = walkers.filter((w) => !w.role), staff = walkers.filter((w) => w.role);
     while (res.length < want) res.push(makeWalker(null));
     res.length = want;
@@ -3703,6 +4096,9 @@
       else { const home = staffBuildings(k)[0]; keep.push(makeWalker(k, home ? doorTile(home, home.c + 1, home.r + 3) : null)); }
     }
     walkers.length = 0; walkers.push(...res, ...keep);
+    // sweepers and gardeners go home for the night; police, firefighters and nurses stay on call
+    const late = nightK() > 0.6;
+    for (const w of walkers) w.asleep = late && (w.role === 'sweeper' || w.role === 'gardener');
   }
   const claimed = (w, bid) => walkers.some((o) => o !== w && o.act && o.act.bid === bid);
   function planWalker(w, now) {
@@ -3762,30 +4158,6 @@
       planWalker(w, now);
     }
   }
-  // Sends the nearest firefighter running to a burning building.
-  function fireDispatch(now) {
-    const b = burningNow(); if (!b) return;
-    if (walkers.some((w) => w.act && w.act.kind === 'spray')) return;
-    const ro = roleInfo('fire', city()); if (ro.working < 1) return;
-    const near = coversB('fire', b);
-    if (now - ui.fireSince < (near ? 1500 : 9000) + (1 - ro.ratio) * 6000) return;
-    const ff = walkers.filter((w) => w.role === 'fire'); if (!ff.length) return;
-    const p = centerOf(b);
-    ff.sort((a, c) => Math.hypot(a.c - b.c, a.r - b.r) - Math.hypot(c.c - b.c, c.r - b.r));
-    const w = ff[0], d = doorTile(b, w.c, w.r);
-    if (!d) { extinguish(b); return; }
-    w.path = bfs(Math.floor(w.c), Math.floor(w.r), d.c, d.r) || [{ c: d.c + 0.5, r: d.r + 0.5 }];
-    w.state = 'walk'; w.speed = 3.2; w.act = { kind: 'spray', bid: b.id, dur: 3400, t0: 0 };
-    sfx.alarm();
-    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 50, t0: now, text: 'Firefighter on the way!', soft: true });
-  }
-  // How strongly a building still burns (a firefighter spraying it shrinks the flames).
-  function fireK(b, now) {
-    const w = walkers.find((x) => x.state === 'act' && x.act && x.act.kind === 'spray' && x.act.bid === b.id);
-    if (!w) return 1;
-    return clamp(1 - 0.9 * (1 - (w.until - now) / w.act.dur), 0.08, 1);
-  }
-
   /* ---------- Map effects: confetti bursts and floating labels when something opens ---------- */
   const CONFETTI = ['#E8A93A', '#E46B8A', '#5AA9D6', '#7DB65A', '#F3C64B', '#8E5BB5', '#FFFFFF'];
   const fx = [], floats = [];
@@ -3810,8 +4182,8 @@
     c.save(); c.translate(x, y); c.scale(sc, sc);
     c.font = `700 ${11.5 * px}px Figtree, system-ui, sans-serif`;
     const fw = 12 * px, w = c.measureText(txt).width + fw + 17 * px, h = 22 * px, bx = -w / 2, by = -h - 7 * px;
-    const bg = kind === 'fire' ? '#E5482F' : kind === 'req' ? '#C2477A' : kind === 'land' ? '#7A5230' : '#FFFFFF', fg = kind === 'fire' || kind === 'req' || kind === 'land' ? '#FFFFFF' : '#1E2A28';
-    const edge = kind === 'good' ? '#5FA83A' : kind === 'fire' ? '#B72F1C' : kind === 'req' ? '#9C2F5E' : kind === 'land' ? '#4E331C' : '#E06A4E';
+    const bg = kind === 'fire' ? '#E5482F' : kind === 'alarm' ? '#2F4E8C' : kind === 'req' ? '#C2477A' : kind === 'land' ? '#7A5230' : '#FFFFFF', fg = kind === 'fire' || kind === 'alarm' || kind === 'req' || kind === 'land' ? '#FFFFFF' : '#1E2A28';
+    const edge = kind === 'good' ? '#5FA83A' : kind === 'fire' ? '#B72F1C' : kind === 'alarm' ? '#1E2F55' : kind === 'req' ? '#9C2F5E' : kind === 'land' ? '#4E331C' : '#E06A4E';
     c.fillStyle = 'rgba(0,0,0,.16)'; roundRect(c, bx + 1 * px, by + 2.5 * px, w, h, 11 * px); c.fill();
     c.fillStyle = bg; roundRect(c, bx, by, w, h, 11 * px); c.fill();
     c.strokeStyle = edge; c.lineWidth = 1.6 * px; roundRect(c, bx, by, w, h, 11 * px); c.stroke();
@@ -4167,7 +4539,7 @@
         let sc = 1;
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
-        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, fire: b.fire ? fireK(b, now) : 0 });
+        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, fire: b.fire ? fireK(b) : 0 });
         if (sc !== 1) c.restore();
         if (q && q.done === 0) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#5B2DB8', String(state.queue.indexOf(q) + 1));
         if (b.ruin && !q) badge(c, p.x + hw * 0.5, p.y - 26 * u, 7 * u, '#B3432B', '!');
@@ -4185,8 +4557,12 @@
     for (const w of wild) objs.push(w);
     ui.reveals = ui.reveals.filter((r) => !r.done);
     if (!ui.reveals.length && stage.classList.contains('peek') && !scheduleReveals.timer && !peekAt.timer) stage.classList.remove('peek');
-    if (!reduced) { fireDispatch(now); for (const w of walkers) stepWalker(w, dt, now); }
+    stepVehicles(dt, now);
+    const truckOut = VEH.some((v) => v.kind === 'fire'), copOut = VEH.some((v) => v.kind === 'police');
+    if (!reduced) for (const w of walkers) { if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep) continue; stepWalker(w, dt, now); }
+    for (const v of VEH) objs.push({ depth: v.c + v.r - 1 + 0.05, draw: () => drawVehicle(c, v, now, after) });
     for (const w of walkers) {
+      if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep) continue;
       objs.push({ depth: w.c + w.r - 1 + 0.02, draw: () => {
         const p = tileCenter(w.c - 0.5, w.r - 0.5), pose = { facing: w.facing, t: now / 1000 };
         if (w.state === 'walk') pose.walk = w.phase;
@@ -4240,7 +4616,7 @@
     // Labels above buildings: a fire or speech bubble first, then a request marker, then (in play) the income.
     // Income tags are drawn first so bubbles sit on top of them.
     const labelled = new Set(), busy = new Set();
-    for (const b of state.buildings) if (b.fire) busy.add(b.id);
+    for (const b of state.buildings) if (b.fire || b.robbed || b.works) busy.add(b.id);
     for (const bb of ui.bubbles) if (now >= bb.t0) busy.add(bb.bid);
     if (!item) for (const q of activeQuests()) { const b = questPlace(q); if (b) busy.add(b.id); }
     // A wooden sign on each plot of wild land (only while you play, to keep Home calm).
@@ -4265,6 +4641,14 @@
     // While placing: how much each affected home changes.
     if (placeFx) for (const e of placeFx.homes) { tag(c, centerOf(e.b).x, labelY(e.b) - 9 * px, `${e.d > 0 ? '+' : '−'}${Math.round(Math.abs(e.d) * 100)}%`, px * 1.15, e.d > 0 ? 'rgba(43,117,72,.95)' : 'rgba(196,58,36,.95)', '#fff'); busy.add(e.b.id); }
     if (placeFx && placeFx.safeList) { const sv = SERVES[placeFx.staff]; for (const h of placeFx.safeList) { if (busy.has(h.id)) continue; tag(c, centerOf(h).x, labelY(h) - 9 * px, sv.tag, px * 1.05, `rgba(${sv.rgb},.92)`, '#fff'); busy.add(h.id); } }
+    // Late at night the homes are asleep: a few sleepy z's float up.
+    const nkz = nightK();
+    if (nkz > 0.6 && !item && HW * z >= 14) for (const b of state.buildings) {
+      if (!live(b) || T(b).cat !== 'home' || b.fire || b.robbed || busy.has(b.id) || b.id % 3) continue;
+      const p = centerOf(b), k = ((now / 2600) + b.id * 0.37) % 1, y = labelY(b) + 6 - k * 18;
+      c.save(); c.globalAlpha = (nkz - 0.6) * 2.5 * Math.sin(k * Math.PI) * 0.9; c.fillStyle = '#EEF2FF'; c.font = `800 ${(9 + k * 4) * px}px Figtree, system-ui, sans-serif`; c.textAlign = 'center';
+      c.fillText('z', p.x + 6 + k * 6, y); c.restore();
+    }
     if (playing && !item && HW * z >= 18) {
       const ci = city();
       for (const b of state.buildings) {
@@ -4278,7 +4662,12 @@
     for (const b of state.buildings) {
       if (!b.fire) continue;
       const p = centerOf(b), y = labelY(b) - 8 - (reduced ? 0 : Math.abs(Math.sin(now / 240)) * 3);
-      hit(b, p.x, y, speech(c, p.x, y, 'Help! Fire!', px, 'fire', 1)); labelled.add(b.id);
+      hit(b, p.x, y, speech(c, p.x, y, fireStatus(b), px, 'fire', 1)); labelled.add(b.id);
+    }
+    for (const b of state.buildings) {
+      if (labelled.has(b.id)) continue;
+      if (b.robbed) { const p = centerOf(b), y = labelY(b) - 8 - (reduced ? 0 : Math.abs(Math.sin(now / 300)) * 2); hit(b, p.x, y, speech(c, p.x, y, robberyStatus(b), px, 'alarm', 1)); labelled.add(b.id); }
+      else if (b.works && playing) { const p = centerOf(b), y = p.y - 26; hit(b, p.x, y, speech(c, p.x, y, `Roadworks · ${fmtClock(b.works.left)}`, px, 'land', 1)); labelled.add(b.id); }
     }
     for (const bb of ui.bubbles) {
       const b = byId(bb.bid); if (!b || labelled.has(b.id) || now < bb.t0) continue;
@@ -4520,18 +4909,21 @@
   }
   function renderHint() {
     const hint = $('board-hint');
-    let text = '';
-    if (ui.screen === 'play' && !ui.panel) {
+    let text = '', key = '';
+    if (ui.screen === 'play') {
       const item = heldItem();
       if (item) {
+        key = 'hold:' + (ui.holding.id != null ? ui.holding.id : ui.holding.type);
         const s = sizeOf(item.type), name = TYPES[item.type].name.toLowerCase(), hs = hints();
-        const key = !hs.length ? ` There is no free spot for it right now.` : ` Green: it fits${hs.max - hs.min >= 0.5 ? ' (numbers = best)' : ''}.${hs.some((h) => h.bad) ? ' Red: bothers neighbours.' : ''}${hs.blocked.length ? ' Gray: not allowed.' : ''}`;
+        const legend = !hs.length ? ` There is no free spot for it right now.` : ` Green: it fits${hs.max - hs.min >= 0.5 ? ' (numbers = best)' : ''}.${hs.some((h) => h.bad) ? ' Red: bothers neighbours.' : ''}${hs.blocked.length ? ' Gray: not allowed.' : ''}`;
         const cost = item.moveId != null ? (state.freeMoves > 0 ? ' Uses a free move.' : ` Costs ${moveCost(byId(item.moveId))} gold.`) : '';
-        text = (s > 1 ? `Tap where the ${name} should go (${s}×${s}), then tap Place.` : `Tap a spot for the ${name}.`) + cost + (TYPES[item.type].where ? ` It goes ${WHERE[TYPES[item.type].where].short}.` : '') + key;
-      } else if (state.tray.length) { const tt = TYPES[state.tray[0].type]; text = (state.tray[0].resident ? `Tap any empty spot to place ${state.tray[0].resident}'s cottage.` : `Tap any empty spot to place your ${tt.name.toLowerCase()}.`) + (tt.where ? ` It goes ${WHERE[tt.where].short}.` : ''); }
+        text = (s > 1 ? `Tap where the ${name} should go (${s}×${s}), then tap Place.` : `Tap a spot for the ${name}.`) + cost + (TYPES[item.type].where ? ` It goes ${WHERE[TYPES[item.type].where].short}.` : '') + legend;
+      } else if (state.tray.length) { key = 'tray:' + state.tray[0].id; const tt = TYPES[state.tray[0].type]; text = (state.tray[0].resident ? `Tap any empty spot to place ${state.tray[0].resident}'s cottage.` : `Tap any empty spot to place your ${tt.name.toLowerCase()}.`) + (tt.where ? ` It goes ${WHERE[tt.where].short}.` : ''); }
     }
-    hint.textContent = text;
-    if (hint.hidden === !!text) hint.hidden = !text;
+    // Version 10: no hint line over the map (it covered the bottom); the same tips come as a short toast instead.
+    // Each tip shows once (per thing you hold, and once per visit for a find waiting to be placed).
+    if (!hint.hidden) hint.hidden = true;
+    if (key && text && key !== ui.hintKey && !ui.panel && !ui.visit) { ui.hintKey = key; toast(text); }
   }
 
   /* ---------- Map cards ---------- */
@@ -4628,12 +5020,24 @@
     const better = fx.homes.filter((h) => h.d > 0).length;
     return `${pre}Green on the map: homes within ${fx.radius} tile${fx.radius > 1 ? 's' : ''} get happier. ${better} home${better === 1 ? '' : 's'} there now.`;
   }
+  function renderWorksPanel(box, b) {
+    const w = b.works, cost = hurryCost(b);
+    box.append(panelHead('works', 1, {}, 'Roadworks', [pill(`${fmtClock(w.left)} left`, 'gold'), pill('Homes next to it −15%', 'bad')]));
+    box.append(el('p', 'small', `The crew is working on ${w.job}. It is loud and dusty: the homes right next to it pay 15% less until they finish.`));
+    const grid = el('div', 'actions-grid');
+    grid.append(actionBtn(`Hurry them · ${cost} gold`, 'overtime pay: done in seconds', 'primary', () => hurryWorks(b), state.gold + 1e-6 < cost));
+    grid.append(actionBtn('Let them work', null, '', () => closePanel()));
+    box.append(grid);
+  }
   function renderInfoPanel(box, b) {
     if (!b) { ui.panel = null; return; }
     if (ui.visit) { renderVisitInfo(box, b); return; }
+    if (b.type === 'works') { renderWorksPanel(box, b); return; }
     const p = ui.panel, t = T(b), ci = city(), inf = ci.info.get(b.id) || {}, q = jobFor(b.id), mood = econ().mood;
     const chips = [];
-    if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast('Your firefighters are on their way.'); else openPanel({ kind: 'alert', bid: b.id }); }));
+    if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast(fireStatus(b) + '.'); else openPanel({ kind: 'alert', bid: b.id }); }));
+    if (b.robbed) chips.push(fixPill('Break-in!', () => { if (staffWorking('police') >= 1) toast(robberyStatus(b) + '.'); else staffAction('police', b); }));
+    if (b.shaken && !b.robbed) chips.push(pill(`${capFirst(b.shaken.label || 'shaken')} · −${Math.round(30 * b.shaken.left / b.shaken.total)}%`, 'bad'));
     if (b.site) chips.push(pill('Construction site', 'gold'));
     else if (b.ruin) chips.push(pill('Broken', 'bad'));
     else if (t.cat === 'landmark') chips.push(pill('Landmark', 'gold'));
@@ -4650,7 +5054,6 @@
     if (live(b) && messy(b) && (b.trash || 0) >= 0.5) chips.push(fixPill('Trash outside', () => staffAction('sweeper', b)));
     if (b.type === 'park' && live(b) && (b.overgrown || 0) > 0.3) chips.push(fixPill('Overgrown', () => staffAction('gardener', b)));
     if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && !policeCovers(b)) chips.push(fixPill(nightK() > 0.5 ? 'Not safe at night' : 'Not safe', () => staffAction('police', b)));
-    else if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && nightK() > 0.5 && !lit(b)) chips.push(fixPill('Dark street', () => lampNear(b)));
     if (live(b) && t.cat === 'home' && roleInfo('nurse', ci).needed && stationsOf('nurse').length && !coversB('nurse', b)) chips.push(fixPill('Clinic too far', () => staffAction('nurse', b)));
     if (live(b) && messy(b) && staffWorking('fire') && !coversB('fire', b)) chips.push(fixPill('Far from fire station', () => staffAction('fire', b)));
     if (special(t)) chips.push(pill(t.chest ? `${RARITY[t.chest].name} chest find` : `${SEASONS[t.season].fest} find`, 'gold'));
@@ -4726,7 +5129,7 @@
     if (b.site) { box.append(el('p', 'small', `${q && bigQ(q) ? `A big project: ${state.builder} builds it while you focus.` : `${state.builder} builds it while you play.`} ${q && q.done > 0 ? `${Math.round(q.done / q.work * 100)}% done.` : 'Not started yet.'}`), el('p', 'small muted', t.blurb)); return; }
     if (b.ruin) { box.append(el('p', 'small', `Broken and empty.${b.resident ? ` ${b.resident} is waiting to move back in.` : ''} Once repaired: ${t.blurb.charAt(0).toLowerCase() + t.blurb.slice(1)}`)); return; }
     if (t.cat === 'home') {
-      box.append(el('p', 'small muted', `${inf.residents} residents × 3 gold an hour${inf.from.length ? ', changed by its neighbours (tap one to see it):' : '. Nothing nearby makes them happier yet.'}`));
+      box.append(el('p', 'small muted', `${inf.residents} residents × ${g1(HOME_TAX)} gold an hour${inf.from.length ? ', changed by its neighbours (tap one to see it):' : '. Nothing nearby makes them happier yet.'}`));
       if (inf.from.length) {
         const why = el('div', 'chiprow');
         for (const [name, v, src] of inf.from) {
@@ -4739,8 +5142,8 @@
       box.append(el('div', 'quote', homeQuote(b, inf)));
     } else if (t.cat === 'shop') {
       box.append(el('p', 'small', t.blurb));
-      if (t.per[b.level]) box.append(el('p', 'small muted', `${t.base[b.level]} gold an hour + ${t.per[b.level]} for each of the ${inf.near} home${inf.near === 1 ? '' : 's'} within ${t.radius} tiles.`));
-      else box.append(el('p', 'small muted', `${t.base[b.level]} gold an hour, whoever lives nearby.`));
+      if (t.per[b.level]) box.append(el('p', 'small muted', `${g1(t.base[b.level])} gold an hour + ${g1(t.per[b.level])} for each of the ${inf.near} home${inf.near === 1 ? '' : 's'} within ${t.radius} tiles.`));
+      else box.append(el('p', 'small muted', `${g1(t.base[b.level])} gold an hour, whoever lives nearby.`));
       const ru = rushFor(b.type), pk = state.perks[b.type] || 0;
       if (ru || pk) box.append(el('p', 'small', `${ru ? `Chest rush: ×${ru.mult} income for ${fmtMin(Math.max(1, ru.left))} more of play and focus. ` : ''}${pk ? `Perk: +${Math.round(pk * 100)}% income for every ${t.name.toLowerCase()}, for good.` : ''}`));
       if (hasLandmark('lighthouse')) box.append(el('p', 'tiny muted', 'The lighthouse adds 10% to every shop.'));
@@ -4971,25 +5374,57 @@
       state.board.fb = true; state.board.joined = true; save();
       if (board.unsub) { board.unsub(); board.unsub = null; }
       board.kind = 'firebase'; board.last = '';
-      connectBoard(fbDb(FB.api), fbPeople, u.uid).then(() => { boardSoon(); refreshFriends(); });
+      connectBoard(fbDb(FB.api), fbPeople, u.uid).then(() => {
+        // usernames are unique: if someone else already has this one, ask for another
+        const nm = (state.board.name || '').toLowerCase();
+        if (nm && board.docs.some((d) => d.id !== u.uid && String(d.name || '').toLowerCase() === nm)) { ui.fbEdit = true; toast(`Someone already uses "${state.board.name}". Choose another username.`); }
+        else boardSoon();
+        refreshFriends();
+      });
     } else if (board.kind === 'firebase') {
       if (board.unsub) { board.unsub(); board.unsub = null; }
       board.db = null; board.me = null; board.docs = []; board.kind = null; refreshFriends();
     }
   }
   function refreshFriends() { if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const sc = $('sheet').scrollTop; openFriends(); $('sheet').scrollTop = sc; } }
+  /* Google sign-in, done by the page itself: a full-page trip to Google that comes straight back here with an ID token,
+     which Firebase accepts. Firebase's own redirect needs cross-site storage that the iPhone home-screen app blocks. */
+  const GOOGLE_CLIENT = window.MAPLEWICK_GOOGLE_CLIENT_ID || '';
+  const rand = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (x) => x.toString(16).padStart(2, '0')).join('');
+  const backHere = () => location.origin + location.pathname.replace(/index\.html$/, '');
+  function googleStart() {
+    const st = rand(), nonce = rand();
+    try { localStorage.setItem('mw-google', JSON.stringify({ st, nonce, at: Date.now() })); } catch (e) { /* private mode */ }
+    save();
+    const q = new URLSearchParams({ client_id: GOOGLE_CLIENT, redirect_uri: backHere(), response_type: 'id_token', scope: 'openid profile', nonce, state: st, prompt: 'select_account' });
+    location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + q.toString();
+  }
+  // Back from Google: check it is the trip we started, then hand the token to Firebase.
+  function googleReturn() {
+    if (!location.hash || !/id_token=|error=/.test(location.hash)) return;
+    const h = new URLSearchParams(location.hash.slice(1)), tok = h.get('id_token'), err = h.get('error');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ }
+    let saved = null; try { saved = JSON.parse(localStorage.getItem('mw-google') || 'null'); localStorage.removeItem('mw-google'); } catch (e) { /* ignore */ }
+    let nonce = null; try { nonce = JSON.parse(atob(tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).nonce; } catch (e) { /* bad token */ }
+    if (err || !tok || !saved || saved.st !== h.get('state') || nonce !== saved.nonce) { FB.err = err === 'access_denied' ? 'auth/popup-closed-by-user' : 'auth/google-return'; setTimeout(() => toast(fbErrText(FB.err)), 800); return; }
+    FB.busy = true;
+    fbLoad().then((api) => { if (!api) throw { code: 'offline' }; return withTimeout(api.googleIdToken(tok), 25000, 'offline'); })
+      .then((r) => { FB.busy = false; toast(r === 'switched' ? 'Welcome back! Your spot on the board is here.' : 'Signed in. You are on the leaderboard!'); refreshFriends(); })
+      .catch((e) => { FB.busy = false; FB.err = (e && e.code) || 'error'; toast(fbErrText(FB.err)); refreshFriends(); });
+  }
   // The iPhone home-screen app can't use sign-in pop-ups, so Google opens as a full page there.
   const standaloneApp = () => navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   const withTimeout = (p, ms, code) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code }), ms))]);
   async function fbJoin(google) {
     if (FB.busy) return;
     const inp = $('fb-name'), name = (inp ? inp.value : state.board.name || '').trim().slice(0, 20);
-    if (!google && !name) { toast('Pick a name first. Friends will see it on the leaderboard.'); if (inp) inp.focus(); return; }
+    if (!name) { toast('Choose a username first. Friends will see it on the leaderboard.'); if (inp) inp.focus(); return; }
     if (name) state.board.name = name;
     FB.busy = true; FB.err = ''; save(); refreshFriends();
     try {
       const api = await fbLoad();
       if (!api) throw { code: 'offline' };
+      if (google && GOOGLE_CLIENT) { googleStart(); return; }
       if (google) { state.board.fbPending = true; save(); const r = await withTimeout(api.google(standaloneApp()), 90000, 'auth/timeout'); if (r !== 'redirect') { state.board.fbPending = false; save(); } if (r === 'closed') toast('Sign-in closed.'); else if (r === 'switched') toast('Welcome back! That Google account already had a spot.'); }
       else if (!api.current()) await withTimeout(api.joinAnon(), 25000, 'offline');
       else fbUser(api.current());
@@ -5001,6 +5436,8 @@
     if (code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation') return 'This sign-in is not switched on for the leaderboard yet.';
     if (code === 'auth/unauthorized-domain') return 'The leaderboard does not allow this web address yet.';
     if (code === 'permission-denied') return 'The leaderboard refused the update.';
+    if (code === 'auth/google-return') return 'Google sign-in did not finish. Please try again.';
+    if (code === 'auth/invalid-credential') return 'Google sign-in was refused by the leaderboard. Claude has to check the setup.';
     if (code === 'auth/timeout') return 'Google sign-in did not come back. Join with a name instead: it always works.';
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Sign-in closed.';
     return 'Sign-in did not work this time. Joining with a name always works.';
@@ -5018,7 +5455,7 @@
     return { v: 1, town: state.town, builder: state.builder, level: state.level, residents: city().residents, mood: moodNow(now).value, streak: state.streak.count,
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
-      b: state.buildings.filter((b) => TYPES[b.type]).map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0)]),
+      b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0)]),
       staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])) };
   }
   function boardSoon() { if (!board.db || !state.board.joined) return; clearTimeout(board.timer); board.timer = setTimeout(boardPush, 1500); }
@@ -5172,29 +5609,32 @@
     const wrap = el('div', 'list');
     const live = !!(board.db && board.me);
     if (FB.cfg && !inFrame && !live) {
-      // Join the online leaderboard: a name is enough; Google keeps your spot when you change phones.
+      // Join the online leaderboard: choose a username, then sign in with Google.
       const j = el('div', 'req fbjoin');
       j.append(el('div', 'from', 'Online leaderboard'), el('div', 'small', 'Compete on focus minutes with your friends. They see your name, town name, level, residents, streak, focus minutes and your town\'s layout (so they can visit). Never your gold or anything else.'));
-      const f = el('label', 'field'); f.append(el('span', 'label', 'Your name on the board')); const ni = el('input'); ni.id = 'fb-name'; ni.maxLength = 20; ni.autocomplete = 'nickname'; ni.value = state.board.name || ''; ni.placeholder = 'e.g. Navid'; f.append(ni); j.append(f);
-      const jb = el('button', 'btn primary', FB.busy ? 'Joining…' : 'Join with this name'); jb.disabled = FB.busy; jb.addEventListener('click', () => fbJoin(false));
-      const gb = el('button', 'btn', 'Sign in with Google'); gb.disabled = FB.busy; gb.addEventListener('click', () => fbJoin(true));
-      const rr = el('div', 'row'); rr.append(jb, gb); j.append(rr);
+      const f = el('label', 'field'); f.append(el('span', 'label', 'Choose your username')); const ni = el('input'); ni.id = 'fb-name'; ni.maxLength = 20; ni.autocomplete = 'nickname'; ni.value = state.board.name || ''; ni.placeholder = 'e.g. Navid'; f.append(ni); j.append(f);
+      const gb = el('button', 'btn primary full', FB.busy ? 'Signing in…' : 'Sign in with Google'); gb.disabled = FB.busy; gb.addEventListener('click', () => fbJoin(true));
+      j.append(gb);
       if (FB.busy) { const cx = el('button', 'link', 'Cancel'); cx.addEventListener('click', () => { FB.busy = false; state.board.fbPending = false; save(); refreshFriends(); }); j.append(cx); }
-      j.append(el('div', 'tiny muted', standaloneApp() ? 'Google is optional: it keeps your spot if you switch phones. In the home-screen app it opens Google as a full page and comes back here. Joining with a name always works.' : 'Google is optional: it keeps your spot if you switch phones. Joining with a name always works.'));
+      j.append(el('div', 'tiny muted', 'Friends see your username, not your Google name or email. Google keeps your spot on any phone.'));
       if (FB.err) j.append(el('div', 'tiny', fbErrText(FB.err)));
       wrap.append(j);
       if (!FB.api && state.board.fb) fbLoad();
     }
     if (live && board.kind === 'firebase') {
       const u = FB.user || {}, me = el('div', 'fbme');
-      me.append(el('span', 'small', `On the board as ${state.board.name || 'Mayor'}${u.google ? ' · Google' : ''}`));
+      me.append(el('span', 'small', `On the board as ${state.board.name || 'Mayor'}${u.google ? ' · signed in with Google' : ''}`));
       if (!u.google) { const lg = el('button', 'link', 'Link Google'); lg.addEventListener('click', () => fbJoin(true)); me.append(lg); }
       const ed = el('button', 'link', 'Change name'); ed.addEventListener('click', () => { ui.fbEdit = true; refreshFriends(); }); me.append(ed);
       const lv = el('button', 'link', 'Leave'); lv.addEventListener('click', () => { ui.fbLeaveAsk = true; refreshFriends(); }); me.append(lv);
       wrap.append(me);
       if (ui.fbEdit) {
         const box = el('div', 'confirm'); const ni = el('input'); ni.maxLength = 20; ni.value = state.board.name || ''; ni.setAttribute('aria-label', 'Your name on the board');
-        const ok = el('button', 'btn sm primary', 'Save'); ok.addEventListener('click', () => { const v = ni.value.trim().slice(0, 20); if (v) { state.board.name = v; save(); board.last = ''; boardPush(); } ui.fbEdit = false; refreshFriends(); });
+        const ok = el('button', 'btn sm primary', 'Save'); ok.addEventListener('click', () => {
+          const v = ni.value.trim().slice(0, 20); if (!v) return;
+          if (board.docs.some((d) => d.id !== board.me && String(d.name || '').toLowerCase() === v.toLowerCase())) { toast(`Someone already uses "${v}". Try another.`); return; }
+          state.board.name = v; save(); board.last = ''; boardPush(); ui.fbEdit = false; refreshFriends();
+        });
         const no = el('button', 'btn sm', 'Cancel'); no.addEventListener('click', () => { ui.fbEdit = false; refreshFriends(); });
         const rr = el('div', 'row'); rr.append(no, ok); box.append(ni, rr); wrap.append(box);
       }
@@ -5757,14 +6197,6 @@
     if (ro.needed && ro.covered < ro.homes) return { kind: 'build', label: `Build another ${home}`, fn: () => openServiceSpot(r.home, nearB) };
     return null;
   }
-  // A free tile next to a home, to put a lamp post on.
-  function lampNear(h) {
-    const s = sizeOf(h.type); let best = null, bd = Infinity;
-    for (let r = h.r - 2; r < h.r + s + 2; r++) for (let c = h.c - 2; c < h.c + s + 2; c++) { if (!fits('lamp', c, r)) continue; const d = Math.hypot(c - h.c - (s - 1) / 2, r - h.r - (s - 1) / 2) + (c + r < h.c + h.r ? 0 : 0.5); if (d < bd) { bd = d; best = { c, r }; } }
-    if (!best) { showOnMap(h); toast('No free tile next to it for a lamp post.'); return; }
-    ui.spot = best; openPanel({ kind: 'build', c: best.c, r: best.r, tab: 'decor' });
-    toast('A lamp post here keeps the street lit at night.');
-  }
   function staffAction(k, nearB) { const pl = staffPlan(k, nearB); if (pl) pl.fn(); else if (nearB) showOnMap(nearB); }
   function openMood() {
     const ec = econ(), m = ec.mood, playing = ui.screen === 'play';
@@ -5798,9 +6230,10 @@
     const swFar = sw.working && sw.covered < sw.homes ? ` ${sw.homes - sw.covered} of them are more than ${reachOf('sweeper')} tiles from a staffed depot, so nobody cleans there.` : '';
     fac('Clean streets', m.clean, dirty ? `Trash is piling up outside homes and shops.${sw.working ? ' Your street sweepers are cleaning it up.' + swFar : ' Build a cleaning depot and hire a street sweeper.'}` : `The streets are clean.${swFar}`, dirty ? (sw.cover > 0.3 ? 'up' : 'down') : null, [-15, 6]);
     const po = role('police'), safeT = safetyTarget(city()), nk = nightK();
-    if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`} ${nk > 0.5 ? 'It is night: crime rises far from the police, and lamp posts keep streets safer.' : 'Crime rises at night, most of all far from the police and on streets without lamp posts.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
+    if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`} ${nk > 0.5 ? 'It is night: homes far from the police are not safe now, and most break-ins happen after dark.' : 'Crime rises at night, most of all far from the police.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
     const nu = role('nurse');
     if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} more than ${reachOf('nurse')} tiles from a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
+    if (m.trouble <= -0.5) fac('Recent trouble', m.trouble, `${(state.scars || []).slice(-3).map((x) => x.label).join(', ') || 'A break-in'}${state.buildings.some((b) => b.robbed) ? ', and a break-in nobody has solved yet' : ''}. It fades slowly.`, 'up', [-20, 0]);
     if (m.burning) fac('Fire', m.fires, staffWorking('fire') ? 'A building is on fire. Your firefighters are on their way.' : 'A building is on fire and nobody can put it out. Hire a firefighter.', null, [-20, 0]);
     const b = state.boost;
     if (m.landmarks) fac('Landmarks', m.landmarks, `${LANDMARK_ORDER.filter(hasLandmark).map((k) => TYPES[k].name).join(', ')}: the whole town is proud of ${LANDMARK_ORDER.filter(hasLandmark).length > 1 ? 'them' : 'it'}.`, null, [0, 17]);
@@ -5847,12 +6280,12 @@
     if (!b || !b.fire) { ui.panel = b ? { kind: 'info', bid: b.id } : null; if (b) renderInfoPanel(box, b); return; }
     const st = staffBuildings('fire')[0];
     box.append(panelHead(b.type, b.level, { fire: 1 }, `Fire at ${placeName(b)}!`, [pill('Town mood −10', 'bad'), pill('No taxes while it burns', 'bad')]));
-    box.append(el('p', 'small', "Your town has no firefighters yet. Don't worry: it won't burn down. But it pays no taxes and the whole town is upset until the fire is out."));
+    box.append(el('p', 'small', "Your town has no firefighters yet. It won't burn down, but it pays no taxes, it can spread to the buildings next to it, and the whole town is upset. Without help, the neighbours need a few minutes with buckets."));
     const ol = el('ol', 'steps');
     const step = (txt, ok) => ol.append(el('li', ok ? 'ok' : '', txt));
-    step(`Build a fire station (${TYPES.firestation.cost} gold, ${fmtMin(TYPES.firestation.work)} of focus)`, !!st);
+    step(`Build a fire station (${newCost('firestation').cost} gold, built in ${fmtSecs(buildSecs(newCost('firestation').work))})`, !!st);
     step(`Hire a firefighter there (${hireFee('fire')} gold, then ${wageOf('fire', state.staff.fire || 0)} gold an hour)`, staffWorking('fire') >= 1);
-    step('Watch them rush over and put it out', false);
+    step('Watch them gear up, drive over in the fire truck and put it out', false);
     box.append(ol);
     const grid = el('div', 'actions-grid');
     const a = questAction({ action: 'staff', role: 'fire' }, false); if (a) { a.classList.add('wide'); grid.append(a); }
@@ -5959,7 +6392,9 @@
     sec('Play time has limits', el('p', '', `Play time is the reward, so it stays special: you can hold at most ${fmtMin(PLAY_CAP / 60)} at once and earn at most ${fmtMin(DAILY_PLAY / 60)} a day. Focus beyond that still pays gold and XP. Today: ${fmtMin(playDayNow().sec / 60)} of ${fmtMin(DAILY_PLAY / 60)} earned.`));
     const tourBtn = el('button', 'btn full', 'Replay the quick tour'); tourBtn.addEventListener('click', () => { closeSheet(); if (ui.screen === 'play') leavePlay(false, true); setTimeout(() => startTour(true), 250); });
     sec('Quick tour', el('p', '', 'A one-minute walk through Home, your town and focusing.'), tourBtn);
-    sec('About', el('p', '', 'A prototype made with Navid to test the idea before building the real Android and iPhone app. Focus here runs on trust; the real app checks your phone.'));
+    const credit = el('p', 'tiny muted'); credit.append('Music: "Backbay Lounge", "Jazz Brunch", "Apero Hour", "Smooth Lovin’", "Airport Lounge", "Crinoline Dreams", "Bossa Antigua", "Samba Isobel", "Meditation Impromptu 01–03", "Clean Soul", "Winter Reflections", "Silver Blue Light", "Dream Culture", "Bathed in the Light" and "Windswept" by Kevin MacLeod (incompetech.com), licensed under ');
+    const lic = el('a', '', 'Creative Commons: By Attribution 4.0'); lic.href = 'https://creativecommons.org/licenses/by/4.0/'; lic.target = '_blank'; lic.rel = 'noopener'; credit.append(lic, '. Streamed from the Internet Archive.');
+    sec('About', el('p', '', 'A prototype made with Navid to test the idea before building the real Android and iPhone app. Focus here runs on trust; the real app checks your phone.'), credit);
     const stars = el('div', 'stars'); const thanks = el('p', '', state.rating ? `You gave ${state.rating} star${state.rating > 1 ? 's' : ''}. Thank you!` : 'In the real app this opens the app store.');
     for (let i = 1; i <= 5; i++) { const b = el('button', '', i <= state.rating ? '★' : '☆'); b.setAttribute('aria-label', `${i} star${i > 1 ? 's' : ''}`); b.addEventListener('click', () => { state.rating = i; save(); openMenu(); }); stars.append(b); }
     sec('Rate us', stars, thanks);
@@ -5972,12 +6407,12 @@
     sndc.addEventListener('change', () => { state.sound = sndc.checked; save(); if (state.sound) sfx.chime(); });
     snd.append(sndt, sndc);
     const mus = el('label', 'switch');
-    const must = el('span'); must.append(el('b', '', 'Music'), el('div', 'tiny muted', 'Plays on Home and in your town, never while you focus. Pick a tune below, or use ▶ and ⏭ in the top bar.'));
+    const must = el('span'); must.append(el('b', '', 'Music'), el('div', 'tiny muted', 'Relaxed recordings by Kevin MacLeod, on Home and in your town, never while you focus. Pick a station below; ⏭ in the top bar skips a song.'));
     const musc = el('input'); musc.type = 'checkbox'; musc.id = 'set-music'; musc.checked = state.music !== false;
     musc.addEventListener('change', () => { state.music = musc.checked; save(); musicUpdate(); });
     mus.append(must, musc);
     const trk = el('div', 'dp-durs');
-    music.tracks.forEach((nm, i) => { const b = el('button', '', nm); b.type = 'button'; b.setAttribute('aria-pressed', String((state.track | 0) === i)); b.addEventListener('click', () => { state.track = i; state.music = true; AUD.unlocked = true; save(); musicUpdate(); openMenu(); }); trk.append(b); });
+    radio.stations.forEach((nm, i) => { const b = el('button', '', nm); b.type = 'button'; b.setAttribute('aria-pressed', String((state.track | 0) === i)); b.addEventListener('click', () => { state.track = i; state.music = true; AUD.unlocked = true; save(); musicUpdate(); openMenu(); }); trk.append(b); });
     const alm = el('label', 'switch');
     const almt = el('span'); almt.append(el('b', '', 'Focus plan alarm'), el('div', 'tiny muted', 'A bell rings when a planned focus block starts (while Maplewick is open).'));
     const almc = el('input'); almc.type = 'checkbox'; almc.id = 'set-alarm'; almc.checked = state.alarms !== false;
@@ -6135,6 +6570,20 @@
   function renderFocus(now) {
     const f = focusNow(now); if (!f) return;
     const { s, m, sim, cur, job } = f;
+    const rd = inReady(s, now);
+    $('focus').classList.toggle('ready', rd);
+    $('focus-end').textContent = rd ? 'Cancel · free' : 'End session';
+    if (rd) {
+      // Get ready: a short countdown, then the real timer appears.
+      const left = Math.ceil((s.start - now) / 1000);
+      $('focus-eyebrow').textContent = 'Get ready';
+      $('focus-clock').textContent = String(left);
+      $('focus-of').textContent = `${fmtMin(s.duration)} of focus starts in ${left} s · cancel for free until then`;
+      $('focus-meter').style.width = '0%';
+      $('focus-task').textContent = 'Put your phone face down and take a breath.';
+      $('focus-combo').hidden = true; $('focus-list').replaceChildren();
+      return;
+    }
     $('focus-clock').textContent = fmtClock((s.duration - m) * 60);
     $('focus-of').textContent = `left of ${fmtMin(s.duration)}${state.speed > 1 && s.speed === state.speed ? ' · test speed' : s.speed > 1 ? ` · ${s.speed}× speed for the tour` : ''}`;
     $('focus-meter').style.width = (m / s.duration * 100) + '%';
@@ -6526,7 +6975,7 @@
     };
     if (r.reason === 'pickup') row('bad', 'alert', 'Phone picked up', 'no chest', 'bad');
     if (r.lost) for (const l of r.lost) row('bad', 'alert', `Ended early: ${l.text}`, l.gold ? `−${l.gold} gold` : 'lost', 'bad');
-    if (r.grace) row('play', 'alert', 'Ended in the first minute: nothing was lost', 'free', 'play');
+    if (r.noPlay) row('bad', 'play', `Ended before ${MIN_SESSION} minutes: no play time`, 'none', 'bad');
     for (const g of r.gold) row(g.ic === 'heart' || g.ic === 'gift' ? 'req' : g.ic === 'chest' ? 'chest' : g.ic === 'badge' ? 'badge' : 'gold', g.ic, g.label, `${g.n < 0 ? '−' : '+'}${fmtGold(Math.abs(g.n))} gold`, g.n < 0 ? 'bad' : 'gold', g.ic === 'badge' ? `background:${TIER_COLORS[g.tier][0]};color:#3B2A10` : g.ic === 'chest' ? `background:${RARITY[g.rar].body};color:#fff` : '');
     if (r.comboGold) row('combo', 'combo', `Combo ×${r.combo.mult.toFixed(1)} on gold`, `+${fmtGold(r.comboGold)} gold`, 'gold');
     for (const x of r.xpParts) row('xp', x.ic === 'plan' ? 'plan' : 'xp', x.label, `+${x.n} XP`, 'xp');
@@ -6758,9 +7207,9 @@
     const under = () => { const w0 = toWorld(sx, sy), t0 = tileAtWorld(w0.x, w0.y); return t0 && isOpen(t0.c, t0.r) ? at(t0.c, t0.r) || null : null; };
     // A second tap on the same marker reaches the building behind it.
     const lh = ui.lastHit; ui.lastHit = null;
-    if (ui.screen === 'play' && !ui.holding && lh && performance.now() - lh.t < 2500 && Math.hypot(sx - lh.x, sy - lh.y) < 32) {
-      const ub = under();
-      if (ub && ub.id === lh.behind) { ui.barOpen = false; ui.flash = { bid: ub.id, t0: performance.now() }; openPanel({ kind: 'info', bid: ub.id }); return; }
+    if (ui.screen === 'play' && !ui.holding && lh && performance.now() - lh.t < 3000 && Math.hypot(sx - lh.x, sy - lh.y) < 40) {
+      const ub = byId(lh.behind);
+      if (ub) { ui.barOpen = false; ui.flash = { bid: ub.id, t0: performance.now() }; openPanel({ kind: 'info', bid: ub.id }); return; }
     }
     // With a card or the bottom bar open, the first tap on the map just closes it.
     if (ui.screen === 'play' && ui.barOpen) { closeBar(); return; }
@@ -6774,7 +7223,6 @@
       const ub = ui.screen === 'play' ? under() : null;
       const behind = ub && ub.id !== b.id ? ub : null;
       if (behind) ui.lastHit = { t: performance.now(), x: sx, y: sy, behind: behind.id };
-      if (bb && bb.role === 'lamp') { lampNear(b); return; }
       if (bb && bb.role) { staffAction(bb.role, b); return; }
       if (bb && bb.src && byId(bb.src)) { showOnMap(byId(bb.src)); toast(`${b.resident || 'The neighbours'} would like this moved further away from their home.`); return; }
       if (ui.screen === 'home') { showOnMap(b, h.q ? { tab: 'info' } : null); return; }
@@ -6790,8 +7238,8 @@
       const item = heldItem(); if (!item) return;
       const a = anchorFor(item.type, tl.c, tl.r);
       if (!fits(item.type, a.c, a.r, item.moveId)) { toast(!isOpen(tl.c, tl.r) ? 'That land is still wild. Clear it first.' : spotWhy(item.type, a.c, a.r, item.moveId)); return; }
-      if (item.isNew || sizeOf(item.type) > 1) { ui.preview = { c: a.c, r: a.r }; ui.panel = { kind: 'place' }; renderAll(); return; }
-      placeHeld(a.c, a.r); return;
+      // Always a preview card first: see what it does there, then confirm (moving costs gold only when you tap Place).
+      ui.preview = { c: a.c, r: a.r }; ui.panel = { kind: 'place' }; renderAll(); return;
     }
     if (!tl) return;
     if (ui.playExpired) { closePanel(true); leavePlay(true); return; }
@@ -6857,14 +7305,15 @@
   });
   $('focus-end').addEventListener('click', () => {
     const f = focusNow(Date.now());
-    let txt = 'End now? You keep the gold and play time so far, but lose the chest and your combo.';
-    if (f && f.m < 1) txt = 'End now? You are still in the first minute, so nothing is lost. You just get no rewards.';
-    else if (f && f.cur && f.cur.done > f.cur.q.done + 0.05) {
+    if (f && inReady(f.s)) { cancelSession(); return; }
+    const playTxt = f && f.m < MIN_SESSION ? ` Under ${MIN_SESSION} minutes there is no play time.` : ' You get half the play time.';
+    let txt = `End now? You keep the gold so far, but lose the chest and your combo.${playTxt}`;
+    if (f && f.cur && f.cur.done > f.cur.q.done + 0.05) {
       const q = f.cur.q, paid = Math.round(q.paid || 0), gold = paid ? ` and the ${paid} gold you paid is gone` : '';
       txt = keepsWork(q) ? `End now? ${state.builder}'s work on ${jobName(q)} this session is lost (earlier progress is kept), and so is your chest.`
         : q.kind === 'build' ? `End now? The half-built ${TYPES[q.type].name.toLowerCase()} is torn down${gold}. You lose the chest too.`
         : `End now? ${capFirst(jobName(q))} is cancelled${gold}. You lose the chest too.`;
-      txt += ' Anything already finished stays built.';
+      txt += ' Anything already finished stays built.' + playTxt;
     }
     $('focus-confirm-text').textContent = txt;
     $('focus-confirm').hidden = false; $('focus-actions').hidden = true;
@@ -6928,6 +7377,7 @@
   setInterval(tick, 250);
   requestAnimationFrame(loop);
   connectCloud();
+  googleReturn();
   if (FB.cfg && !inFrame && (state.board.fb || state.board.fbPending)) fbLoad(); // back on the online leaderboard
   window.MaplewickDebug = Object.freeze({
     state: () => JSON.parse(JSON.stringify(state)),
@@ -6966,7 +7416,7 @@
     visit: (snap, who, id) => visitTown(snap, who, id),
     visiting: () => !!ui.visit,
     snap: () => townSnap(),
-    music: () => ({ on: music.playing(), mode: music.mode(), track: music.track() }),
+    music: () => ({ on: radio.playing(), mode: music.mode(), track: radio.track(), station: radio.stations[(state.track | 0) % radio.stations.length], fallback: radio.fallback }),
     playDay: () => Object.assign({}, playDayNow(), { left: playLeftToday() }),
     addPlay: (sec) => addPlay(sec),
     playBuild: (sec) => { for (let i = 0; i < Math.ceil(sec); i++) playBuild(1); },
@@ -6985,7 +7435,22 @@
     loot: (rar, n) => { const c = {}; for (let i = 0; i < (n || 200); i++) for (const l of chestLoot(rar)) c[l.kind] = (c[l.kind] || 0) + 1; return c; },
     moveCost: (bid) => moveCost(byId(bid)),
     simulate: (min) => simulate(state.queue, workFor(min)).items.map((x) => ({ type: x.q.type, finished: x.finished, waiting: !!x.waiting, done: x.done })),
-    complaint: () => { const o = complaintFor(); return o ? { bid: o.b.id, text: o.text, role: o.role || null } : null; },
+    skipReady: () => { if (state.session && Date.now() < state.session.start) { state.session.start = Date.now(); save(); } },
+    econ: () => { const e = econ(); return { taxes: e.taxes, wages: e.wages, net: e.net, cap: treasuryCap(), fee: { sweeper: hireFee('sweeper'), fire: hireFee('fire'), police: hireFee('police') } }; },
+    setStaff: (k, n) => { state.staff[k] = n; touch(); syncWalkers(); },
+    rob: (bid) => { const b = bid ? byId(bid) : state.buildings.find((x) => messy(x) && !policeCovers(x)); startRobbery(b); return b && b.id; },
+    works: () => { startWorks(); const w = state.buildings.find((b) => b.type === 'works'); return w ? { id: w.id, c: w.c, r: w.r, left: w.works.left } : null; },
+    vehicles: () => VEH.map((v) => ({ kind: v.kind, state: v.state, target: v.target, c: v.c, r: v.r })),
+    vehRush: () => { for (const v of VEH) v.until = 0; },
+    incident: (sec) => { for (let i = 0; i < sec * 4; i++) incidentTick(0.25); },
+    fires: () => burningAll().map((b) => ({ id: b.id, hp: b.fire.hp, max: b.fire.max })),
+    scars: () => (state.scars || []).map((x) => ({ ...x })),
+    trouble: () => troubleNow(),
+    nightK: () => nightK(),
+    bubbleNow: () => { ui.nextBubble = 0; if (ui.nextBy) { ui.nextBy.urgent = 0; ui.nextBy.bad = 0; ui.nextBy.good = 0; } bubbleTick(performance.now()); return ui.bubbles.map((x) => ({ bid: x.bid, text: x.text, kind: x.kind })); },
+    walkersN: () => ({ res: walkers.filter((w) => !w.role).length, staff: walkers.filter((w) => w.role && !w.asleep).length }),
+    radio: () => ({ playing: radio.playing(), track: radio.track(), fallback: radio.fallback }),
+    complaint: () => { const o = complaintFor(); const f = (x) => (x ? { bid: x.b.id, text: x.text, role: x.role || null } : null); return { urgent: f(o.urgent), bad: f(o.bad), good: f(o.good) }; },
     freeSpot: (c, r) => { for (let d = 0; d < 8; d++) for (let dc = -d; dc <= d; dc++) for (let dr = -d; dr <= d; dr++) { if (Math.max(Math.abs(dc), Math.abs(dr)) !== d) continue; if (freeTile(c + dc, r + dr)) return { c: c + dc, r: r + dr }; } return null; }
   });
 })();
