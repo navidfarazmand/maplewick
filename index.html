@@ -4978,6 +4978,9 @@
     }
   }
   function refreshFriends() { if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const sc = $('sheet').scrollTop; openFriends(); $('sheet').scrollTop = sc; } }
+  // The iPhone home-screen app can't use sign-in pop-ups, so Google opens as a full page there.
+  const standaloneApp = () => navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  const withTimeout = (p, ms, code) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code }), ms))]);
   async function fbJoin(google) {
     if (FB.busy) return;
     const inp = $('fb-name'), name = (inp ? inp.value : state.board.name || '').trim().slice(0, 20);
@@ -4987,10 +4990,10 @@
     try {
       const api = await fbLoad();
       if (!api) throw { code: 'offline' };
-      if (google) { state.board.fbPending = true; save(); const r = await api.google(); if (r !== 'redirect') { state.board.fbPending = false; save(); } if (r === 'closed') toast('Sign-in closed.'); else if (r === 'switched') toast('Welcome back! That Google account already had a spot.'); }
-      else if (!api.current()) await api.joinAnon();
+      if (google) { state.board.fbPending = true; save(); const r = await withTimeout(api.google(standaloneApp()), 90000, 'auth/timeout'); if (r !== 'redirect') { state.board.fbPending = false; save(); } if (r === 'closed') toast('Sign-in closed.'); else if (r === 'switched') toast('Welcome back! That Google account already had a spot.'); }
+      else if (!api.current()) await withTimeout(api.joinAnon(), 25000, 'offline');
       else fbUser(api.current());
-    } catch (e) { FB.err = (e && e.code) || 'error'; toast(fbErrText(FB.err)); }
+    } catch (e) { if (!FB.busy) return; FB.err = (e && e.code) || 'error'; state.board.fbPending = false; save(); toast(fbErrText(FB.err)); }
     FB.busy = false; refreshFriends();
   }
   function fbErrText(code) {
@@ -4998,6 +5001,8 @@
     if (code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation') return 'This sign-in is not switched on for the leaderboard yet.';
     if (code === 'auth/unauthorized-domain') return 'The leaderboard does not allow this web address yet.';
     if (code === 'permission-denied') return 'The leaderboard refused the update.';
+    if (code === 'auth/timeout') return 'Google sign-in did not come back. Join with a name instead: it always works.';
+    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Sign-in closed.';
     return 'Sign-in did not work this time. Joining with a name always works.';
   }
   async function fbLeave() {
@@ -5174,7 +5179,8 @@
       const jb = el('button', 'btn primary', FB.busy ? 'Joining…' : 'Join with this name'); jb.disabled = FB.busy; jb.addEventListener('click', () => fbJoin(false));
       const gb = el('button', 'btn', 'Sign in with Google'); gb.disabled = FB.busy; gb.addEventListener('click', () => fbJoin(true));
       const rr = el('div', 'row'); rr.append(jb, gb); j.append(rr);
-      j.append(el('div', 'tiny muted', 'Google is optional: it keeps your spot if you switch phones. On iPhone, Google sign-in from the home-screen app can be fussy; joining with a name always works.'));
+      if (FB.busy) { const cx = el('button', 'link', 'Cancel'); cx.addEventListener('click', () => { FB.busy = false; state.board.fbPending = false; save(); refreshFriends(); }); j.append(cx); }
+      j.append(el('div', 'tiny muted', standaloneApp() ? 'Google is optional: it keeps your spot if you switch phones. In the home-screen app it opens Google as a full page and comes back here. Joining with a name always works.' : 'Google is optional: it keeps your spot if you switch phones. Joining with a name always works.'));
       if (FB.err) j.append(el('div', 'tiny', fbErrText(FB.err)));
       wrap.append(j);
       if (!FB.api && state.board.fb) fbLoad();
