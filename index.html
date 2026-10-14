@@ -263,7 +263,12 @@
   .in-tap { align-self: center; margin-top: 12px; position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 99px; background: rgba(255,255,255,.92); color: #2B2257; font-weight: 800; font-size: 15px; box-shadow: 0 8px 24px rgba(0,0,0,.18); opacity: 0; }
   .intro.on .in-tap { animation: inUp .5s 1.9s ease-out forwards, inPulse 1.6s 2.4s ease-in-out infinite; }
   .in-ring { width: 14px; height: 14px; border-radius: 50%; background: #A3E635; box-shadow: 0 0 0 0 rgba(163,230,53,.7); animation: inRing 1.4s ease-out infinite; }
-  .in-go { position: fixed; left: var(--gx, 50%); top: var(--gy, 50%); transform: translate(-50%, -50%) scale(.2); font-family: var(--display); font-size: 48px; font-weight: 900; color: #A3E635; -webkit-text-stroke: 2px #1A2E04; text-shadow: 0 5px 0 #1A2E04, 0 10px 30px rgba(0,0,0,.35); opacity: 0; pointer-events: none; white-space: nowrap; z-index: 3; }
+  .in-go { position: fixed; left: var(--gx, 50%); top: var(--gy, 50%); transform: translate(-50%, -50%) scale(.2); font-family: var(--display); font-size: min(56px, 12.5vw); font-weight: 900; letter-spacing: .01em; line-height: 1.1; opacity: 0; pointer-events: none; white-space: nowrap; filter: drop-shadow(0 0 1px #A8410F) drop-shadow(0 3px 0 #C2551A) drop-shadow(0 8px 18px rgba(110,40,10,.35)); }
+  .in-go .gl { display: inline-block; background: linear-gradient(180deg, #FFFBD0 0%, #FFE066 38%, #FFB23F 70%, #FF7A3D 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 .02em; }
+  .intro.go .in-go .gl { animation: inGoChar .62s cubic-bezier(.2, 1.6, .4, 1) both; animation-delay: var(--d, 0s); }
+  .intro.go .in-go .gl.o { animation: inGoChar .62s cubic-bezier(.2, 1.6, .4, 1) both, inGoO .5s ease-in-out infinite alternate; animation-delay: var(--d, 0s), calc(var(--d, 0s) + .62s); }
+  @keyframes inGoChar { 0% { opacity: 0; transform: translateY(34px) scale(.3) rotate(-12deg); } 60% { opacity: 1; transform: translateY(-12px) scale(1.18) rotate(4deg); } 100% { opacity: 1; transform: none; } }
+  @keyframes inGoO { to { transform: translateY(-6px) scaleY(1.08); } }
   .intro.go .in-go { animation: inGoPop .75s cubic-bezier(.2, 1.5, .35, 1) forwards; }
   .intro.go .in-card, .intro.go .in-tap { animation: inAway .35s forwards; }
   .intro.go .in-island { animation: inZoom .9s .25s ease-in forwards; }
@@ -278,7 +283,7 @@
   @keyframes inTwinkle { to { opacity: .55; } } @keyframes inDrift { to { transform: translateX(calc(100vw + 260px)); } }
   @keyframes inFloat { to { transform: translateY(-6px); } } @keyframes inWave { to { transform: scaleX(1.06); opacity: .7; } }
   @keyframes inPulse { 50% { transform: scale(1.05); } } @keyframes inRing { to { box-shadow: 0 0 0 12px rgba(163,230,53,0); } }
-  @keyframes inGoPop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.2) rotate(-10deg); } 55% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(3deg); } 100% { opacity: 1; left: 50%; top: 46%; transform: translate(-50%, -50%) scale(1) rotate(0); } }
+  @keyframes inGoPop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(-8deg); } 45% { opacity: 1; transform: translate(-50%, -50%) scale(1.12) rotate(2deg); } 100% { opacity: 1; left: 50%; top: 46%; transform: translate(-50%, -50%) scale(1) rotate(0); } }
   @keyframes inZoom { to { transform: scale(2.4) translateY(-30px); opacity: 0; } }
   @keyframes inBurst { 0% { opacity: 1; transform: translate(-50%, -50%) rotate(0); } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); } }
   @keyframes inRipple { to { transform: scale(9); opacity: 0; } }
@@ -571,6 +576,8 @@
   .snote.bad { background: var(--bad-soft); color: var(--ink); }
   .staff small.wages { display: block; color: var(--muted); font-size: 11.5px; }
   .vehrow { margin-top: 8px; }
+  .vehrow .stepper button { width: auto; min-width: 64px; padding: 0 14px; white-space: nowrap; font-family: inherit; font-size: 14.5px; }
+  .vehrow .stepper button.playc { background: var(--play); border-color: var(--play); color: var(--play-ink); }
   .meters { display: grid; gap: 10px; margin: 4px 0 8px; } .meters h3 { margin: 0; font-size: 15px; }
   .meter { display: grid; gap: 3px; } .mt-top { display: flex; justify-content: space-between; font-size: 13.5px; }
   .meter .bar span { background: var(--good, #3E8E57); } .meter.mid .bar span { background: var(--gold-bright, #E8A93A); } .meter.low .bar span { background: var(--bad, #C8473D); }
@@ -584,6 +591,15 @@
   .contract { background: #FFFDF6; color: #2B2418; border-radius: 14px; padding: 16px; border: 1px solid #E8DCC0; box-shadow: inset 0 0 0 4px #FBF3DE; display: grid; gap: 8px; }
   .ct-title { font-family: Georgia, 'Times New Roman', serif; font-size: 22px; text-align: center; letter-spacing: .04em; border-bottom: 1px solid #E0D3B5; padding-bottom: 6px; }
   .ct-terms { margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.4; } .ct-terms li { margin: 4px 0; }
+  .ct-lead { margin: 0; font-size: 14.5px; line-height: 1.45; text-align: center; }
+  .ct-deal { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ct-opt { display: grid; gap: 2px; border-radius: 12px; padding: 10px; background: #F6EEDC; border: 1px solid #E3D3AE; text-align: center; }
+  .ct-opt b { font-size: 13.5px; } .ct-opt span { font-size: 13px; font-weight: 700; } .ct-opt small { font-size: 12.5px; font-weight: 800; color: #B5462E; }
+  .ct-opt.good { background: #EFE8FF; border-color: #A98BF0; } .ct-opt.good small { color: #5B3FD0; }
+  .ct-small { margin: 0; color: #6B5E46; text-align: center; }
+  .contract .btn:not(.primary) { background: #F3EBD8; color: #2B2418; border-color: #D8C9A6; }
+  .contract .link { color: #5B3FD0; }
+  .contract .tiny.muted, .contract .muted { color: #6B5E46; }
   .ct-sig { display: grid; gap: 4px; justify-items: start; border-top: 1px dashed #D8C9A6; padding-top: 8px; }
   .ct-pad { width: 100%; max-width: 300px; height: 110px; background: #fff; border: 1px solid #D8C9A6; border-radius: 10px; }
   .ct-img { width: 180px; height: 66px; } .ct-name { font-family: 'Brush Script MT', cursive; font-size: 26px; color: #1E2A5A; }
@@ -1114,7 +1130,7 @@
   const inGrid = (c, r) => c >= 0 && r >= 0 && c < N && r < N;
   const isOpen = (c, r) => inGrid(c, r) && state.land.includes(plotAt(c, r));
   const HW = 32, HH = 16; // tile half-width/height in map units
-  const HOME_TAX = 2; // gold per resident per hour (version 10: 1.2; 10.05: 2, so homes and their upgrades pay off)
+  const HOME_TAX = 1.2; // gold per resident per hour (version 10: 1.2; 10.05 tried 2; 10.06 back to 1.2: the gold should come from focus, not the buildings)
   const AWAY_RATE = 0.1; // taxes when you're not focusing or playing
   const PLAY_CAP = 30 * 60; // most play time you can hold at once
   const DAILY_PLAY = 45 * 60; // most play time you can earn in one day, so a fake 8-hour "focus" can't buy a day of play
@@ -1128,7 +1144,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.05'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.06'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', music: 'Your music', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
@@ -1150,9 +1166,9 @@
       job: { verb: 'Stamp permits', at: 'at the town hall', gold: 0.6, play: 1.3, lines: ['You stamped 212 permits. One of them was a sandwich.', 'You approved a permit to build a permit office.', 'A pigeon filed a complaint. You approved it.'] },
       blurb: 'Holds your gold. Its level is the highest level any other building can reach, and each level lets the town grow bigger.' },
     cottage: { name: 'Cottage', cat: 'home', size: 1, unlock: 1, cost: 15, work: 5, max: 3, repair: 5, color: '#F2E1BE', roof: '#BF5A3E', limit: [0, 4, 7, 10, 14],
-      up: [null, null, [18, 8], [42, 18]], residents: [0, 4, 7, 11], blurb: 'A small home. Every resident pays 2 gold an hour, more when they are happy.' },
+      up: [null, null, [18, 8], [42, 18]], residents: [0, 4, 6, 9], blurb: 'A small home. Every resident pays a little over 1 gold an hour, more when they are happy.' },
     townhouse: { name: 'Townhouse', cat: 'home', size: 1, unlock: 2, cost: 70, work: 15, max: 3, color: '#D9C6E6', roof: '#6A4A86', limit: [0, 0, 3, 5, 8],
-      up: [null, null, [77, 25], [154, 50]], residents: [0, 10, 16, 22], blurb: 'A tall home for a whole family.',
+      up: [null, null, [77, 25], [154, 50]], residents: [0, 10, 14, 18], blurb: 'A tall home for a whole family.',
       needs: [['3 homes in town', () => homesCount() >= 3]] },
     market: { name: 'Market stall', cat: 'shop', size: 1, unlock: 1, cost: 20, work: 6, max: 3, repair: 6, color: '#E9D7B4', roof: '#D2503E', radius: 2, limit: [0, 2, 3, 4, 5],
       up: [null, null, [35, 10], [80, 22]], base: [0, 5, 8, 12], per: [0, 2, 3, 4],
@@ -1199,10 +1215,10 @@
     depot: { name: 'Cleaning depot', cat: 'service', size: 2, unlock: 1, cost: 30, work: 6, max: 2, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3], reach: 6,
       up: [null, null, [60, 15]], staff: 'sweeper', slots: [0, 2, 4], blurb: 'Home of the street sweepers, who clean within 6 tiles. There is a landfill out back: homes right next to it pay 15% less.' },
     shed: { name: 'Garden shed', cat: 'service', size: 1, unlock: 1, cost: 20, work: 5, max: 2, color: '#E4D2AE', roof: '#5E9A4B', limit: [0, 1, 1, 2, 2], reach: 6,
-      up: [null, null, [40, 10]], staff: 'gardener', slots: [0, 2, 4], blurb: 'Home of the gardeners, who keep parks within 6 tiles tidy.' },
-    firestation: { name: 'Fire station', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
+      up: [null, null, [40, 10]], staff: 'gardener', slots: [0, 2, 4], blurb: 'Home of the gardeners. Within 6 tiles they tidy parks, rake leaves, clear fallen trees and keep fires from spreading.' },
+    firestation: { name: 'Fire station', cat: 'service', size: 2, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
       up: [null, null, [90, 20]], staff: 'fire', slots: [0, 2, 4], blurb: 'Home of the firefighters. They rush out when a building catches fire, fastest within 6 tiles.' },
-    police: { name: 'Police station', cat: 'service', size: 1, unlock: 2, cost: 70, work: 12, max: 2, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
+    police: { name: 'Police station', cat: 'service', size: 2, unlock: 2, cost: 70, work: 12, max: 2, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
       up: [null, null, [110, 25]], staff: 'police', slots: [0, 2, 4], blurb: 'Home of the police officers. Homes within 5 tiles of a staffed station feel safe: one station covers most of a town.' },
     school: { name: 'School', cat: 'service', size: 2, unlock: 2, cost: 90, work: 14, max: 2, color: '#F1E2C8', roof: '#B0563A', reach: 6, limit: [0, 0, 1, 2, 2],
       up: [null, null, [150, 30]], staff: 'teacher', slots: [0, 2, 4], blurb: 'Where the town\'s kids learn. With a teacher, homes within 6 tiles earn 12% more (and bored kids cause less trouble).',
@@ -1234,6 +1250,7 @@
       perk: 'A proud town: homes pay 10% more and the treasury holds 1,000 more gold.', blurb: 'The crown of your town. Homes pay 10% more taxes, the treasury holds 1,000 more gold, and the town is 8% happier.' },
     // Roadworks: an incident, not something you build. It blocks its tile and is noisy for the homes next to it.
     works: { name: 'Roadworks', cat: 'works', size: 1, max: 1, color: '#E8A93A', roof: '#5C5F66', near: { r: 1, v: -0.15, label: 'roadworks noise' }, blurb: 'A crew is digging up the street. The homes next to it pay 15% less until they are done.' },
+    fallen: { name: 'Fallen tree', cat: 'works', size: 1, max: 1, color: '#7A5A3E', roof: '#3E8E57', near: { r: 1, v: -0.08, label: 'a fallen tree' }, blurb: 'The storm blew a tree over. Gardeners clear it; out of their reach it stays until you pay the crew.' },
     // Seasonal finds: earned by focusing during that season's festival.
     pumpkins: { name: 'Pumpkin patch', cat: 'joy', size: 1, season: 'autumn', max: 1, color: '#E8782A', roof: '#5E8A3A', radius: 2, boost: [0, 0.12], blurb: 'Big orange pumpkins from the autumn festival.' },
     snowman: { name: 'Snowman', cat: 'joy', size: 1, season: 'winter', max: 1, color: '#F6F9FB', roof: '#C8473D', radius: 2, boost: [0, 0.12], blurb: 'A jolly snowman from the winter festival.' },
@@ -1260,8 +1277,8 @@
   const STAFF = {
     sweeper: { name: 'Street sweeper', plural: 'street sweepers', home: 'depot', fee: 60, wage: 4, look: { shirt: '#3E8E57', hat: '#F3C64B', hair: '#5A3A22', skin: '#E0AC7E' }, what: 'Cleans up trash around homes and shops.',
       needed: () => true, need: (ci) => Math.max(1, Math.ceil(ci.residents / 15)), needText: '1 for every 15 residents' },
-    gardener: { name: 'Gardener', plural: 'gardeners', home: 'shed', fee: 60, wage: 4, look: { shirt: '#6EA453', hat: '#D8B26A', hair: '#2B1E16', skin: '#C68B5E' }, what: 'Keeps parks tidy so they keep homes happy.',
-      needed: () => countLive('park') >= 1, neededText: 'Needed once you have a park', need: () => Math.max(1, Math.ceil(countLive('park') / 2)), needText: '1 for every 2 parks' },
+    gardener: { name: 'Gardener', plural: 'gardeners', home: 'shed', fee: 60, wage: 4, look: { shirt: '#6EA453', hat: '#D8B26A', hair: '#2B1E16', skin: '#C68B5E' }, what: 'Keeps parks tidy, rakes the dry autumn leaves (they catch fire), clears trees that fall in storms, trims the grass so fires spread less, and clears snowy paths.',
+      needed: (ci) => countLive('park') >= 1 || ci.residents >= 20, neededText: 'Needed once you have a park or 20 residents', need: (ci) => Math.max(1, Math.ceil(countLive('park') / 2), Math.ceil(ci.residents / 40)), needText: '1 for every 2 parks or 40 residents' },
     fire: { name: 'Firefighter', plural: 'firefighters', home: 'firestation', fee: 180, wage: 10, look: { shirt: '#C8473D', hat: '#F3C64B', hair: '#1A1A1A', skin: '#F2C9A0' }, what: 'Rushes out to put out fires.',
       needed: (ci) => ci.residents >= 16, neededText: 'Needed from 16 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
     police: { name: 'Police officer', plural: 'police officers', home: 'police', fee: 240, wage: 10, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
@@ -1351,15 +1368,22 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const T = (b) => TYPES[b.type];
   const sizeOf = (type) => TYPES[type].size || 1;
+  // 10.06 (Navid): the fire station, police station and clinic are two tiles long and one wide, turned either way
+  // (b.rot: 0 = long along c, 1 = long along r). Everything else is square.
+  const FOOT = { firestation: [2, 1], police: [2, 1], clinic: [2, 1] };
+  const dimsOf = (type, rot) => { const f = FOOT[type]; if (f) return rot ? [f[1], f[0]] : f; const s = sizeOf(type); return [s, s]; };
+  const dimsB = (b) => (b.fp1 ? [1, 1] : dimsOf(b.type, b.rot));
+  const rotFor = (type) => (FOOT[type] ? (ui.rot || 0) : 0);
+  const spaceWord = (type) => { const [w, d] = dimsOf(type, 0); return w * d > 1 ? `${w}×${d} space` : 'tile'; };
   // How far the farthest tile of b is from a: a building counts as within reach only if all of it is (10.05).
   const distFull = (a, b) => {
-    const as = sizeOf(a.type), bs = sizeOf(b.type);
-    return Math.max(0, a.c - b.c, (b.c + bs - 1) - (a.c + as - 1), a.r - b.r, (b.r + bs - 1) - (a.r + as - 1));
+    const [aw, ad] = dimsB(a), [bw, bd] = dimsB(b);
+    return Math.max(0, a.c - b.c, (b.c + bw - 1) - (a.c + aw - 1), a.r - b.r, (b.r + bd - 1) - (a.r + ad - 1));
   };
   const dist = (a, b) => {
-    const as = sizeOf(a.type), bs = sizeOf(b.type);
-    const dx = Math.max(0, a.c - (b.c + bs - 1), b.c - (a.c + as - 1));
-    const dy = Math.max(0, a.r - (b.r + bs - 1), b.r - (a.r + as - 1));
+    const [aw, ad] = dimsB(a), [bw, bd] = dimsB(b);
+    const dx = Math.max(0, a.c - (b.c + bw - 1), b.c - (a.c + aw - 1));
+    const dy = Math.max(0, a.r - (b.r + bd - 1), b.r - (a.r + ad - 1));
     return Math.max(dx, dy);
   };
   const fmtGold = (n) => Math.floor(n + 1e-6).toLocaleString('en-US');
@@ -1484,6 +1508,7 @@
     if (s.loan && !s.loan.perHour) { s.loan.total = s.loan.owed; s.loan.h = 8; s.loan.perHour = Math.max(10, Math.ceil(s.loan.owed / 8)); } // 10.04: old loans become an 8-hour plan
     if (!Array.isArray(s.loans)) s.loans = [];
     if (s.loan) { s.loans.push(Object.assign({ id: s.nextId++, hoursDone: 0, rate: 0.5, amount: Math.round((s.loan.total || s.loan.owed) / 1.5), signer: '' }, s.loan)); s.loan = null; } // 10.05: several loans
+    for (const L of s.loans || []) if (L.v !== 6) { const k = L.amount / (L.total || L.owed || L.amount || 1); L.owed = Math.max(0, L.owed * k); L.total = L.amount; L.perHour = Math.max(5, Math.ceil(L.amount / (L.h || 8))); L.interest = 0; L.saved = 0; L.v = 6; } // 10.06: no interest while focusing
     if (!(s.vol >= 0 && s.vol <= 1)) s.vol = 0.7;
     if (!(s.noiseVol >= 0 && s.noiseVol <= 1)) s.noiseVol = 0.4;
     if (!BG_SOUNDS[s.noise]) s.noise = 'off';
@@ -1564,7 +1589,19 @@
       shake: (i) => { tone(300 + i * 60, 0, 0.07, 'square', 0.03); noise(0, 0.06, 0.04, 900, 1); },
       step: (i) => [0, 4, 7].forEach((k, j) => tone(440 * Math.pow(2, (i * 5 + k) / 12), j * 0.05, 0.3, 'triangle', 0.06)),
       open: (rar) => { noise(0, 0.35, 0.09, 1200, 0.6); [523, 659, 784, 1047, 1319].slice(0, 3 + rar).forEach((f, i) => tone(f * (1 + rar * 0.06), 0.08 + i * 0.07, 0.45, 'triangle', 0.07)); },
-      levelup: () => [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, i === 4 ? 0.8 : 0.22, 'square', 0.035))
+      levelup: () => [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, i === 4 ? 0.8 : 0.22, 'square', 0.035)),
+      // "Let's goooo!": a bright little fanfare with drums (10.06)
+      fanfare: () => {
+        const b = 0.13; // a sixteenth at about 115 bpm
+        const kick = (t) => tone(130, t, 0.22, 'sine', 0.22, 45), snare = (t) => { noise(t, 0.14, 0.09, 1900, 0.9); tone(220, t, 0.06, 'triangle', 0.04, 160); };
+        const brass = (f, t, d, v) => { tone(f, t, d, 'square', (v || 0.03) * 0.6); tone(f * 1.003, t, d, 'triangle', v || 0.05); tone(f / 2, t, d, 'triangle', (v || 0.05) * 0.5); };
+        [[392, 0], [523, 1], [659, 2], [784, 3]].forEach(([f, i]) => brass(f, i * b, b * 1.2, 0.045));
+        [0, 2].forEach((i) => kick(i * b * 2)); snare(b * 3);
+        brass(659, b * 4, b * 1.6, 0.05); brass(784, b * 6, b * 1.6, 0.05);
+        kick(b * 4); kick(b * 6); snare(b * 7);
+        [523, 659, 784, 1047].forEach((f) => brass(f, b * 8, b * 7, 0.035)); kick(b * 8); noise(b * 8, 0.9, 0.05, 6500, 0.6);
+        tone(131, b * 8, b * 7, 'triangle', 0.08); tone(1568, b * 8.5, 0.5, 'sine', 0.025); tone(2093, b * 9.5, 0.6, 'sine', 0.02); tone(2637, b * 10.5, 0.7, 'sine', 0.016);
+      }
     };
   })();
 
@@ -2105,21 +2142,23 @@
   }
   let cityCache = null, occCache = null, hintCache = null;
   const city = () => cityCache || (cityCache = computeCity(state.buildings));
-  function touch() { cityCache = null; occCache = null; hintCache = null; }
+  let touchSeq = 0;
+  function touch() { touchSeq++; cityCache = null; occCache = null; hintCache = null; }
 
   function occupancy() {
     if (occCache) return occCache;
     const m = new Map();
-    for (const b of state.buildings) { const s = sizeOf(b.type); for (let i = 0; i < s; i++) for (let j = 0; j < s; j++) m.set((b.c + i) + ',' + (b.r + j), b); }
+    for (const b of state.buildings) { const [w, d] = dimsB(b); for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) m.set((b.c + i) + ',' + (b.r + j), b); }
     return (occCache = m);
   }
   const at = (c, r) => occupancy().get(c + ',' + r);
-  function fits(type, c, r, ignoreId) {
-    const s = sizeOf(type);
-    if (c < 0 || r < 0 || c + s > N || r + s > N) return false;
+  function fits(type, c, r, ignoreId, rot) {
+    if (rot == null) rot = rotFor(type);
+    const [w, d] = dimsOf(type, rot);
+    if (c < 0 || r < 0 || c + w > N || r + d > N) return false;
     const occ = occupancy();
-    for (let i = 0; i < s; i++) for (let j = 0; j < s; j++) { if (!isOpen(c + i, r + j)) return false; const b = occ.get((c + i) + ',' + (r + j)); if (b && b.id !== ignoreId) return false; }
-    return whereOk(type, c, r);
+    for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) { if (!isOpen(c + i, r + j)) return false; const b = occ.get((c + i) + ',' + (r + j)); if (b && b.id !== ignoreId) return false; }
+    return whereOk(type, c, r, rot);
   }
   // Some buildings only make sense in certain places: a lighthouse by the sea, the castle up on the hill.
   const WHERE = {
@@ -2128,19 +2167,19 @@
     far: { text: 'at least 5 tiles from the town hall, where the sky is dark', short: 'away from the lights' },
     center: { text: 'downtown, within 4 tiles of the town hall', short: 'downtown' }
   };
-  function whereOk(type, c, r) {
+  function whereOk(type, c, r, rot) {
     const w = TYPES[type] && TYPES[type].where; if (!w) return true;
-    const s = sizeOf(type);
-    if (w === 'shore') return c === 0 || r === 0 || c + s === N || r + s === N;
+    const [sw, sd] = dimsOf(type, rot);
+    if (w === 'shore') return c === 0 || r === 0 || c + sw === N || r + sd === N;
     if (w === 'hill') return c >= 12 && r >= 12;
     const hall = state.buildings.find((b) => b.type === 'townhall'); if (!hall) return true;
-    const d = dist({ type, c, r }, hall);
+    const d = dist({ type, c, r, rot }, hall);
     return w === 'far' ? d >= 5 : d <= 4;
   }
   const whereText = (type) => { const w = TYPES[type].where; return w ? `The ${TYPES[type].name.toLowerCase()} goes ${WHERE[w].text}.` : ''; };
   // Is there any spot in town where this could go?
-  function anySpot(type, ignoreId) { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r, ignoreId)) return true; return false; }
-  const anchorFor = (type, c, r) => { const off = Math.floor((sizeOf(type) - 1) / 2); return { c: c - off, r: r - off }; };
+  function anySpot(type, ignoreId) { for (const ro of FOOT[type] ? [0, 1] : [0]) for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r, ignoreId, ro)) return true; return false; }
+  const anchorFor = (type, c, r, rot) => { const [w, d] = dimsOf(type, rot == null ? rotFor(type) : rot); return { c: c - Math.floor((w - 1) / 2), r: r - Math.floor((d - 1) / 2) }; };
   const byId = (id) => state.buildings.find((b) => b.id === id);
   const jobFor = (bid) => state.queue.find((q) => q.bid === bid);
   /* Build times (10.04, Navid): new homes, shops, parks and decorations are built by the crew while you play, in 2–5
@@ -2221,16 +2260,25 @@
   // (staff fill their buildings one each first, so a second building only helps once someone works there).
   const SERVES = {
     sweeper: { what: (b) => messy(b), word: 'homes and shops', tag: 'clean', rgb: '62,142,87' },
-    gardener: { what: (b) => b.type === 'park' && live(b), word: 'parks', tag: 'tidy', rgb: '96,150,60' },
-    fire: { what: (b) => messy(b), word: 'homes and shops', tag: 'covered', rgb: '205,70,50' },
-    police: { what: (b) => live(b) && T(b).cat === 'home', word: 'homes', tag: 'safe', rgb: '50,90,200' },
+    gardener: { what: (b) => (b.type === 'park' || messy(b)) && live(b), word: 'parks, homes and shops', tag: 'tended', rgb: '96,150,60' },
+    // 10.06: fire and police look after every building that can burn or be broken into, service buildings too
+    fire: { what: (b) => canBurn(b), word: 'buildings', tag: 'covered', rgb: '205,70,50' },
+    police: { what: (b) => robbable(b), word: 'buildings', tag: 'safe', rgb: '50,90,200' },
     nurse: { what: (b) => live(b) && T(b).cat === 'home', word: 'homes', tag: 'care', rgb: '194,71,122' },
     teacher: { what: (b) => live(b) && T(b).cat === 'home', word: 'homes', tag: 'school', rgb: '123,94,167' }
   };
   const reachOf = (k) => TYPES[STAFF[k].home].reach;
   const stationsOf = (k) => staffBuildings(k).slice(0, staffWorking(k));
-  // A station with its own vehicle reaches half again as far (10.02).
-  const stationReach = (x) => Math.round(TYPES[x.type].reach * (x.vehicle ? 1.5 : 1));
+  // A station with its own vehicle reaches half again as far (10.02). Every level adds a tile of reach, and its people get
+  // ready 20% sooner and work 20% better (10.06).
+  const stLevel = (st) => (st ? clamp(st.level || 1, 1, 4) : 1);
+  const stationK = (st) => 1 + 0.2 * (stLevel(st) - 1);
+  const prepK = (st) => Math.max(0.4, 1 - 0.2 * (stLevel(st) - 1));
+  const baseReach = (type, level) => (TYPES[type].reach || 0) + Math.max(0, (level || 1) - 1);
+  const stationReach = (x) => Math.round(baseReach(x.type, x.level) * (x.vehicle ? 1.5 : 1));
+  // The best of the staffed stations that reach this building (0 when none does).
+  const coverK = (k, b, st) => (st || stationsOf(k)).reduce((m, x) => (distFull(x, b) <= stationReach(x) ? Math.max(m, stationK(x)) : m), 0);
+  const catchChance = (v) => Math.min(0.97, (v.foot ? 0.6 : 0.9) + 0.08 * (stLevel(byId(v.station)) - 1));
   const coversB = (k, b, st) => (st || stationsOf(k)).some((x) => distFull(x, b) <= stationReach(x));
   // Vehicles you can buy for a service building (from level 2): more reach and faster help, but they cost upkeep every hour.
   const FLEET = {
@@ -2255,7 +2303,7 @@
     if (b.level < 2) { toast(`A ${f.name.toLowerCase()} needs the ${T(b).name.toLowerCase()} at level 2 (a garage).`); return; }
     if (state.gold + 1e-6 < f.cost) { toast(`A ${f.name.toLowerCase()} costs ${f.cost} gold.`); return; }
     accrue(Date.now()); goldChange(-f.cost, `Bought a ${f.name.toLowerCase()}`, 'buy'); b.vehicle = true; touch(); save(); sfx.coin(); renderAll();
-    toast(`New ${f.name.toLowerCase()}! Reach ${TYPES[b.type].reach} → ${stationReach(b)} tiles. Upkeep ${f.upkeep} gold an hour.`);
+    toast(`New ${f.name.toLowerCase()}! It is on duty right away: reach ${baseReach(b.type, b.level)} → ${stationReach(b)} tiles. Upkeep ${f.upkeep} gold an hour.`);
   }
   function sellVehicle(id) {
     const b = byId(id), f = b && FLEET[b.type]; if (!f || !b.vehicle) return;
@@ -2284,6 +2332,7 @@
     return sum / hs.length * po.ratio;
   }
   const messy = (b) => live(b) && (T(b).cat === 'home' || T(b).cat === 'shop');
+  const robbable = (b) => live(b) && ['home', 'shop', 'service'].includes(T(b).cat);
   // The town keeps living: trash piles up without sweepers, parks grow wild without gardeners,
   // and people feel safe and healthy only with enough police and nurses. Minutes are town minutes
   // (real minutes while you focus or play, a tenth of that otherwise).
@@ -2294,8 +2343,14 @@
     const swR = roleInfo('sweeper', ci).ratio, gdR = roleInfo('gardener', ci).ratio, swSt = stationsOf('sweeper'), gdSt = stationsOf('gardener');
     for (const b of state.buildings) {
       // out of reach of a staffed depot or shed, nobody comes to clean
-      if (messy(b)) { const sw = coversB('sweeper', b, swSt) ? swR : 0, bins = nearType(b, ['bin'], 2) ? 0.6 : 1; b.trash = clamp((b.trash || 0) + min * (0.05 * bins * (1 - sw) - 0.16 * sw), 0, 3); }
-      if (b.type === 'park' && live(b)) { const gd = coversB('gardener', b, gdSt) ? gdR : 0; b.overgrown = clamp((b.overgrown || 0) + min * (0.03 * (1 - gd) - 0.08 * gd), 0, 1); }
+      if (messy(b)) { const kk = coverK('sweeper', b, swSt), sw = kk ? swR : 0, bins = nearType(b, ['bin'], 2) ? 0.6 : 1; b.trash = clamp((b.trash || 0) + min * (0.05 * bins * (1 - sw) - 0.16 * sw * (kk || 1)), 0, 3); }
+      if (b.type === 'park' && live(b)) { const kk = coverK('gardener', b, gdSt), gd = kk ? gdR : 0; b.overgrown = clamp((b.overgrown || 0) + min * (0.03 * (1 - gd) - 0.08 * gd * (kk || 1)), 0, 1); }
+      // 10.06: in autumn dry leaves pile up around homes and shops (more next to trees and parks); gardeners rake them
+      if (messy(b)) {
+        const kk = coverK('gardener', b, gdSt), gd = kk ? gdR : 0, fall = SEA.k === 'autumn' ? 0.035 * (nearType(b, ['tree', 'park', 'cherry'], 1) ? 1.6 : 1) : 0;
+        b.leaves = clamp((b.leaves || 0) + min * (fall * (1 - gd) - (0.12 * gd * (kk || 1) + (SEA.k === 'autumn' ? 0 : 0.02))), 0, 1);
+        if (b.leaves < 0.01) delete b.leaves;
+      }
     }
     // Trouble fades slowly: recent incidents, and homes shaken by one.
     if (state.scars && state.scars.length) { for (const sc of state.scars) sc.left -= min; state.scars = state.scars.filter((sc) => sc.left > 0); }
@@ -2335,6 +2390,7 @@
     let r = (FIRE_RISK[b.type] || 1) * (LEVEL_FIRE[b.level] || 1) * (1 + 0.25 * crowd(b));
     if (!coversB('fire', b)) r *= 1.4; // nobody checks the wiring out there
     if (nearType(b, ['hydrant'], 2)) r *= 0.5;
+    if (b.leaves) r *= 1 + 1.2 * b.leaves; // dry autumn leaves catch fire easily (10.06)
     return r;
   }
   function weighted(list, wf) {
@@ -2475,7 +2531,7 @@
   function startWorks() {
     const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home');
     const spots = [];
-    for (const h of homes) for (let dc = -1; dc <= sizeOf(h.type); dc++) for (let dr = -1; dr <= sizeOf(h.type); dr++) { const c = h.c + dc, r = h.r + dr; if (fits('works', c, r) && !spots.some((s) => s.c === c && s.r === r)) spots.push({ c, r }); }
+    for (const h of homes) for (let dc = -1; dc <= dimsB(h)[0]; dc++) for (let dr = -1; dr <= dimsB(h)[1]; dr++) { const c = h.c + dc, r = h.r + dr; if (fits('works', c, r) && !spots.some((s) => s.c === c && s.r === r)) spots.push({ c, r }); }
     if (!spots.length) return;
     const sp = pick(spots), secs = 100 + Math.random() * 60;
     const b = { id: state.nextId++, type: 'works', c: sp.c, r: sp.r, level: 1, origin: 'incident', works: { left: secs, total: secs, job: pick(WORKS_JOBS) } };
@@ -2483,6 +2539,38 @@
     touch(); save();
     toast(`Roadworks: ${b.works.job}. The homes next to it pay 15% less until the crew is done.`);
     renderAll();
+  }
+  // A tree blown over in a storm, on a free tile next to a home, a shop or a park (10.06).
+  function startFallen() {
+    const near = state.buildings.filter((b) => live(b) && (messy(b) || b.type === 'park' || b.type === 'tree'));
+    const spots = [];
+    for (const h of near) { const [w, d] = dimsB(h); for (let dc = -1; dc <= w; dc++) for (let dr = -1; dr <= d; dr++) { const c = h.c + dc, r = h.r + dr; if (fits('fallen', c, r) && !spots.some((s) => s.c === c && s.r === r)) spots.push({ c, r }); } }
+    if (!spots.length) return null;
+    const sp = pick(spots), b = { id: state.nextId++, type: 'fallen', c: sp.c, r: sp.r, level: 1, origin: 'incident', fallen: { at: Date.now() } };
+    state.buildings.push(b); touch(); save();
+    const gd = coversB('gardener', b);
+    toast(gd ? 'The storm blew a tree over! A gardener is on the way to clear it.' : 'The storm blew a tree over! No gardener reaches it: tap it to have the crew clear it, or build a garden shed nearby.');
+    renderAll(); return b;
+  }
+  function endFallen(b, by) {
+    if (!b || b.type !== 'fallen') return;
+    state.buildings = state.buildings.filter((x) => x !== b);
+    if (ui.panel && ui.panel.bid === b.id) closePanel(true);
+    const p = centerOf(b);
+    for (let i = 0; i < 12; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 30, y: p.y - 4, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 40, life: 0, max: 0.9, color: i % 2 ? '#6B9B3A' : '#8A6A48', w: 3, h: 2, rot: 0, vr: 6 });
+    floats.push({ x: p.x, y: p.y - 30, t0: performance.now(), text: by === 'gardener' ? 'Cleared!' : 'Crew cleared it', soft: true });
+    state.stats.fallenCleared = (state.stats.fallenCleared || 0) + 1;
+    touch(); save(); renderAll();
+  }
+  const fallenCost = () => 6;
+  function renderFallenPanel(box, b) {
+    const gd = coversB('gardener', b), cost = fallenCost();
+    box.append(panelHead('fallen', 1, {}, 'Fallen tree', [pill('Homes next to it −8%', 'bad')]));
+    const p0 = el('p', 'small'); p0.append(colorize(gd ? 'The storm blew it over. A gardener is coming to saw it up and clear the street.' : `The storm blew it over and no gardener reaches it here. The crew can clear it for ${cost} gold, or build a garden shed within 6 tiles.`)); box.append(p0);
+    const grid = el('div', 'actions-grid');
+    grid.append(actionBtn(`Crew clears it · ${cost} gold`, 'done in a few seconds', gd ? '' : 'primary', () => { if (state.gold + 1e-6 < cost) { toast(`The crew costs ${cost} gold.`); return; } goldChange(-cost, 'The crew cleared a fallen tree', 'buy'); sfx.coin(); endFallen(b, 'crew'); }, state.gold + 1e-6 < cost));
+    grid.append(actionBtn('Leave it', null, '', () => closePanel()));
+    box.append(grid);
   }
   const WORKS_JOBS = ['a burst water pipe', 'new cables for the street lights', 'fixing a pothole the size of a bathtub', 'a leaking gas pipe', 'new drains for the rain'];
   const hurryCost = (b) => Math.max(10, Math.round(8 + econ().taxes * 0.25 * (b.works.left / b.works.total)));
@@ -2520,18 +2608,18 @@
   // A firefighter sets off: in the fire engine if the station has one that is free, otherwise on foot.
   function respondFire(st, b) {
     const engineFree = st.vehicle && !VEH.some((v) => v.kind === 'fire' && v.station === st.id && !v.foot && v.state !== 'back');
-    const v = dispatch('fire', st, b, PREP.fire[engineFree ? 1 : 0], !engineFree);
+    const v = dispatch('fire', st, b, PREP.fire[engineFree ? 1 : 0] * prepK(st), !engineFree);
     if (engineFree) floats.push({ x: centerOf(st).x, y: centerOf(st).y - 40, t0: performance.now(), text: 'Fire engine out!', soft: true });
     return v;
   }
   // Sends the station's people (on foot, or in its vehicle) to this building.
   function respond(kind, role, st, b) {
-    const foot = !st.vehicle, v = dispatch(kind, st, b, PREP[kind][foot ? 0 : 1], foot);
+    const foot = !st.vehicle, v = dispatch(kind, st, b, PREP[kind][foot ? 0 : 1] * prepK(st), foot);
     if (!foot) floats.push({ x: centerOf(st).x, y: centerOf(st).y - 40, t0: performance.now(), text: kind === 'fire' ? 'Fire engine out!' : kind === 'police' ? 'Patrol car out!' : 'Ambulance out!', soft: true });
     return v;
   }
   function routeTo(v, b) {
-    const d = doorTile(b, v.c, v.r) || { c: clamp(b.c, 0, N - 1), r: clamp(b.r + sizeOf(b.type), 0, N - 1) };
+    const d = doorTile(b, v.c, v.r) || { c: clamp(b.c, 0, N - 1), r: clamp(b.r + dimsB(b)[1], 0, N - 1) };
     v.path = bfs(Math.floor(v.c), Math.floor(v.r), d.c, d.r) || [{ c: d.c + 0.5, r: d.r + 0.5 }];
     v.state = 'drive';
   }
@@ -2551,7 +2639,8 @@
         v.state = 'work'; v.workT = 0;
         continue;
       }
-      const dx = tg.c - v.c, dr = tg.r - v.r, dd = Math.hypot(dx, dr), step = (v.foot ? ON_FOOT : VEH_SPEED[v.kind] || 2.6) * dt;
+      const snowy = v.foot && SEA.k === 'winter' && skyNow().w.kind === 'snow' && skyNow().w.k > 0.3 && !coversB('gardener', { type: 'tree', c: Math.floor(v.c), r: Math.floor(v.r) });
+      const dx = tg.c - v.c, dr = tg.r - v.r, dd = Math.hypot(dx, dr), step = (v.foot ? ON_FOOT * (snowy ? 0.7 : 1) : VEH_SPEED[v.kind] || 2.6) * dt;
       if (v.foot) v.walk += dt * 9;
       if (Math.abs(dx) > Math.abs(dr)) v.dir = { dc: Math.sign(dx), dr: 0 }; else if (dr) v.dir = { dc: 0, dr: Math.sign(dr) };
       if (dd <= step) { v.c = tg.c; v.r = tg.r; v.path.shift(); } else { v.c += dx / dd * step; v.r += dr / dd * step; }
@@ -2591,7 +2680,7 @@
     for (const b of burningAll()) {
       const f = b.fire; if (!f.max) { f.max = fireHp(b); f.hp = f.hp == null ? f.max : f.hp; f.spreadIn = f.spreadIn || 20; }
       const crews = VEH.filter((v) => v.kind === 'fire' && v.state === 'work' && v.target === b.id), crew = crews[0] || null;
-      if (crews.length) f.hp -= dt * crews.reduce((a, v) => a + (v.foot ? 0.65 : 0.9), 0) * (nearType(b, ['hydrant'], 2) ? 1.3 : 1);
+      if (crews.length) f.hp -= dt * crews.reduce((a, v) => a + (v.foot ? 0.65 : 0.9) * stationK(byId(v.station)), 0) * (nearType(b, ['hydrant'], 2) ? 1.3 : 1);
       else if (f.first) f.hp -= dt * 0.12; // the lesson fire: neighbours with buckets get it out after a couple of minutes
       if (!crew && !f.first) {
         f.spreadIn -= dt;
@@ -2600,7 +2689,8 @@
           // parks and fountains are firebreaks: the fire rarely jumps past them
           const near = state.buildings.filter((o) => dist(o, b) <= 1 && fireRisk(o) > 0);
           const breakK = (o) => fireRisk(o) * (nearType(o, ['park', 'fountain'], 1) ? 0.3 : 1);
-          if (near.length && burningAll().length < 3 && Math.random() < 0.4 * (1 + 0.12 * crowd(b)) * weatherK(0.5, 1.1)) startFire(weighted(near, breakK) || pick(near), true);
+          const trimmed = coversB('gardener', b) ? 0.6 : 1; // gardeners keep the grass short and the hedges trimmed: fires jump less (10.06)
+          if (near.length && burningAll().length < 3 && Math.random() < 0.4 * (1 + 0.12 * crowd(b)) * weatherK(0.5, 1.1) * trimmed) startFire(weighted(near, breakK) || pick(near), true);
         }
       }
       if (!f.first && b.fire) { b.health = healthOf(b) - dt * 100 / (BURN_SEC[b.level] || 75) * fireK(b) * (crew ? 0.6 : 1); if (b.health <= 0) { burnDownLevel(b); if (!b.fire) { if (crew) sendHome(crew); continue; } } }
@@ -2626,7 +2716,7 @@
       const v = VEH.find((x) => x.kind === 'police' && x.target === b.id);
       if (v && v.state === 'work') {
         v.workT += dt;
-        if (v.workT >= (v.foot ? 14 : 10)) { endRobbery(b, Math.random() < (v.foot ? 0.6 : 0.9), v.foot); sendHome(v); }
+        if (v.workT >= (v.foot ? 14 : 10) / stationK(byId(v.station))) { endRobbery(b, Math.random() < catchChance(v), v.foot); sendHome(v); }
         continue;
       }
       if (!v) {
@@ -2640,7 +2730,7 @@
     for (const b of state.buildings) {
       if (!b.sick) continue;
       const v = VEH.find((x) => x.kind === 'nurse' && x.target === b.id);
-      if (v && v.state === 'work') { v.workT += dt; if (v.workT >= 12) { endSick(b, true); sendHome(v); } continue; }
+      if (v && v.state === 'work') { v.workT += dt; if (v.workT >= 12 / stationK(byId(v.station))) { endSick(b, true); sendHome(v); } continue; }
       if (!v) {
         const st = responderFor('nurse', b);
         if (st && VEH.filter((x) => x.kind === 'nurse' && x.state !== 'back').length < Math.max(1, stationsOf('nurse').length)) { respond('nurse', 'nurse', st, b); continue; }
@@ -2698,6 +2788,12 @@
       ui.sickIn -= dt * (SEA.k === 'winter' ? 1.4 : 1);
       if (ui.sickIn <= 0 && ui.playVisit >= 30 && !ui.panel) { ui.sickIn = null; startSick(weighted(state.buildings, sickRisk)); }
     }
+    // 10.06: storms blow trees over; gardeners clear them
+    { const w = skyNow().w; if (w.kind === 'storm' && w.k > 0.5 && homesCount() >= 4 && state.buildings.filter((b) => b.type === 'fallen').length < 3) {
+      if (ui.fallIn == null) ui.fallIn = 25 + Math.random() * 40;
+      ui.fallIn -= dt;
+      if (ui.fallIn <= 0) { ui.fallIn = null; startFallen(); }
+    } }
     if (homesCount() >= 6 && !state.buildings.some((b) => b.type === 'works')) {
       if (ui.worksIn == null) ui.worksIn = 420 + Math.random() * 300;
       ui.worksIn -= dt;
@@ -2852,8 +2948,8 @@
     const wages = staffWages + fleet + running + jail;
     const taxes = ci.total * mood.mult, net = taxes - wages;
     // An open loan takes its instalment every hour you play or focus (shown as its own red line).
-    const loanPay = loans().reduce((a, L) => a + (L.owed > 0 ? Math.min(L.perHour || 20, L.owed) : 0), 0);
-    return { ci, mood, taxes, wages, staffWages, fleet, running, jail, net, loanPay, keep: net - loanPay };
+    const loanPay = loans().reduce((a, L) => a + (L.owed > 0 ? playInstalment(L) : 0), 0), loanFocus = loans().reduce((a, L) => a + (L.owed > 0 ? focusInstalment(L) : 0), 0);
+    return { ci, mood, taxes, wages, staffWages, fleet, running, jail, net, loanPay, loanFocus, keep: net - loanPay };
   }
   // 10.03: focusing pays twice the gold: your job pays double, and the town's shops are twice as busy while you focus.
   const FOCUS_PAY = 2;
@@ -2930,19 +3026,19 @@
     if (missing.length) return { ok: false, locked: true, why: `Needs ${missing.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(' and ')}.`, cost, work };
     if (countType(type) >= capFor(type)) return { ok: false, capped: true, why: capWhy(type), cost, work };
     if (c != null) { const a = anchored ? { c, r } : anchorFor(type, c, r); if (!fits(type, a.c, a.r)) return { ok: false, spot: true, why: spotWhy(type, a.c, a.r), cost, work }; }
-    else if (!anySpot(type)) return { ok: false, nospot: true, why: TYPES[type].where ? `${whereText(type)} No free spot there yet.` : `No free ${sizeOf(type) > 1 ? `${sizeOf(type)}×${sizeOf(type)} space` : 'tile'} left. Clear more land or move something.`, cost, work };
+    else if (!anySpot(type)) return { ok: false, nospot: true, why: TYPES[type].where ? `${whereText(type)} No free spot there yet.` : `No free ${spaceWord(type)} left. Clear more land or move something.`, cost, work };
     if (queueFull(mode)) return { ok: false, why: fullWhy(mode), cost, work };
     if (state.gold + 1e-6 < cost) return { ok: false, why: `Needs ${fmtGold(cost - state.gold + 0.999)} more gold.`, cost, work, secs, mode, gold: true };
     return { ok: true, cost, work, secs, mode };
   }
   // Why something can't go at this exact spot.
   function spotWhy(type, c, r, ignoreId) {
-    const s = sizeOf(type);
-    let free = c >= 0 && r >= 0 && c + s <= N && r + s <= N;
-    for (let i = 0; free && i < s; i++) for (let j = 0; j < s; j++) { const b = at(c + i, r + j); if (!isOpen(c + i, r + j) || (b && b.id !== ignoreId)) { free = false; break; } }
-    if (free && !whereOk(type, c, r)) return whereText(type);
-    if (!isOpen(c + Math.floor((s - 1) / 2), r + Math.floor((s - 1) / 2))) return 'That land is still wild. Clear it first.';
-    return s > 1 ? `It needs a free ${s}×${s} space there.` : 'That spot is taken. Pick a free tile.';
+    const rot = rotFor(type), [w, d] = dimsOf(type, rot);
+    let free = c >= 0 && r >= 0 && c + w <= N && r + d <= N;
+    for (let i = 0; free && i < w; i++) for (let j = 0; j < d; j++) { const b = at(c + i, r + j); if (!isOpen(c + i, r + j) || (b && b.id !== ignoreId)) { free = false; break; } }
+    if (free && !whereOk(type, c, r, rot)) return whereText(type);
+    if (!isOpen(c + Math.floor((w - 1) / 2), r + Math.floor((d - 1) / 2))) return 'That land is still wild. Clear it first.';
+    return w * d > 1 ? `It needs a free ${w}×${d} space there${FOOT[type] ? ' (tap Turn it to try it the other way)' : ''}.` : 'That spot is taken. Pick a free tile.';
   }
   function checkJob(kind, b) {
     if (state.session) return { ok: false, why: 'A session is running.' };
@@ -2981,6 +3077,7 @@
     const a = anchored ? { c, r } : anchorFor(type, c, r);
     goldChange(-chk.cost, `New ${TYPES[type].name.toLowerCase()}`, 'buy');
     const b = { id: state.nextId++, type, c: a.c, r: a.r, level: 1, site: true, origin: 'built' };
+    if (FOOT[type]) { b.rot = rotFor(type); b.fp6 = true; }
     if (TYPES[type].cat === 'home') b.resident = nextName();
     state.buildings.push(b);
     const q = { id: state.nextId++, kind: 'build', type, bid: b.id, fromLevel: 0, toLevel: 1, work: chk.work, done: 0, paid: chk.cost, mode: chk.mode };
@@ -3424,7 +3521,7 @@
     if (r.taxes >= 0.5) r.gold.push({ ic: 'home', label: 'Taxes while you focused', n: r.taxes });
     else if (r.taxes <= -0.5) r.gold.push({ ic: 'home', label: 'Wages were more than taxes', n: r.taxes });
     const lp = payLoan(m / 60, true);
-    if (lp >= 0.5) r.gold.push({ ic: 'home', label: 'Loan instalments', n: -lp });
+    if (lp >= 0.5) r.gold.push({ ic: 'home', label: 'Loan paid back (no interest while you focus)', n: -lp });
     // While you focused, the town lived on: sweepers cleaned, gardeners weeded (or trash piled up).
     const trashBefore = moodNow(now).avgTrash;
     townStep(m);
@@ -3670,7 +3767,7 @@
     if (ui.screen !== 'play') return;
     accrue(Date.now());
     // Crews already at work finish the job; everyone else heads back and comes again next time you play.
-    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, Math.random() < (v.foot ? 0.6 : 0.9), v.foot); if (v.kind === 'nurse' && b.sick) endSick(b, true); } }
+    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, Math.random() < catchChance(v), v.foot); if (v.kind === 'nurse' && b.sick) endSick(b, true); } }
     VEH.length = 0;
     ui.screen = 'home'; ui.holding = null; ui.preview = null; ui.playExpired = false; ui.spark = null; ledgerFlush();
     closePanel(true);
@@ -3680,14 +3777,22 @@
   }
   function afterAction() { if (ui.playExpired) leavePlay(true); }
 
-  function setHolding(h) { ui.holding = h; ui.preview = null; hintCache = null; }
+  function setHolding(h) { ui.holding = h; ui.preview = null; hintCache = null; if (h && h.id != null && byId(h.id)) ui.rot = byId(h.id).rot || 0; }
   function heldItem() {
     const h = ui.holding; if (!h) return null;
-    if (h.kind === 'new') return { type: h.type, level: 1, moveId: null, isNew: true };
-    const b = byId(h.id); return b ? { type: b.type, level: b.level, moveId: b.id, resident: b.resident } : null;
+    if (h.kind === 'new') return { type: h.type, level: 1, moveId: null, isNew: true, rot: rotFor(h.type) };
+    const b = byId(h.id); return b ? { type: b.type, level: b.level, moveId: b.id, resident: b.resident, rot: rotFor(b.type) } : null;
+  }
+  // Turn a two-tile building around while placing it (10.06).
+  function turnHeld() {
+    const item = heldItem(), pv = ui.preview; if (!item || !pv || !FOOT[item.type]) return;
+    const old = ui.rot || 0; ui.rot = old ^ 1; hintCache = null;
+    const ok = [[0, 0], [-1, 0], [0, -1], [-1, 1], [1, -1]].map(([dc, dr]) => [pv.c + dc, pv.r + dr]).find(([c, r]) => fits(item.type, c, r, item.moveId));
+    if (!ok) { ui.rot = old; hintCache = null; toast('No room to turn it here. Tap another spot, or turn it first.'); return; }
+    ui.preview = { c: ok[0], r: ok[1] }; sfx.pop(); renderAll();
   }
   function placementTotal(item, c, r) {
-    const bs = state.buildings.filter((b) => b.id !== item.moveId).concat([{ id: -1, type: item.type, level: item.level, c, r }]);
+    const bs = state.buildings.filter((b) => b.id !== item.moveId).concat([{ id: -1, type: item.type, level: item.level, c, r, rot: item.rot != null ? item.rot : rotFor(item.type) }]);
     return computeCity(bs).total;
   }
   // Where the held item can go. Each free spot says what the item adds to the town there (compared with the town
@@ -3709,7 +3814,7 @@
     for (const h of out) { h.bad = h.delta <= -0.5; h.label = spread >= 0.5 && h.delta >= 0.5 && h.delta >= out.max - spread * 0.34; }
     return (hintCache = out);
   }
-  const deltaAt = (type, c, r) => { const a = anchorFor(type, c, r); if (!fits(type, a.c, a.r)) return null; return (placementTotal({ type, level: 1 }, a.c, a.r) - city().total) * econ().mood.mult; };
+  const deltaAt = (type, c, r) => { const a = anchorFor(type, c, r); if (!fits(type, a.c, a.r)) return null; return (placementTotal({ type, level: 1, rot: rotFor(type) }, a.c, a.r) - city().total) * econ().mood.mult; };
 
   // Moving a building costs a little gold for the moving crew (more for big and upgraded ones), or one free move from a chest.
   function moveCost(b) {
@@ -3720,14 +3825,14 @@
   function placeHeld(c, r) {
     const h = ui.holding, item = heldItem(); if (!h || !item) return;
     if (!fits(item.type, c, r, item.moveId)) return;
-    const b = byId(h.id);
-    if (b && (b.c !== c || b.r !== r)) {
+    const b = byId(h.id), turned = b && FOOT[b.type] && (b.rot || 0) !== (ui.rot || 0);
+    if (b && (b.c !== c || b.r !== r || turned)) {
       accrue(Date.now());
       if (state.freeMoves > 0) { state.freeMoves -= 1; toast(`Free move used. ${state.freeMoves} left.`); }
       else { const mc = moveCost(b); if (state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold.`); return; } goldChange(-mc, `Moving the ${T(b).name.toLowerCase()}`, 'buy'); floats.push({ x: tileCenter(c, r).x, y: tileCenter(c, r).y - 40, t0: performance.now(), text: `−${mc} gold`, soft: true }); }
     }
-    const moved = b && (b.c !== c || b.r !== r);
-    if (b) { b.c = c; b.r = r; }
+    const moved = b && (b.c !== c || b.r !== r || turned);
+    if (b) { b.c = c; b.r = r; if (FOOT[b.type]) b.rot = ui.rot || 0; if (b.fp1) delete b.fp1; }
     setHolding(null); touch(); accrue(Date.now()); sfx.place(); bump(h.id);
     // the moving crew drives over and sets it up (10.04)
     if (moved && ui.screen === 'play') { const v = dispatch('builders', townHall(), b, 0.3); v.short = 6; }
@@ -3888,7 +3993,9 @@
     const c = Math.floor((a + b) / 2), r = Math.floor((b - a) / 2);
     return c >= 0 && r >= 0 && c < N && r < N ? { c, r } : null;
   }
-  const centerOf = (b) => { const s = sizeOf(b.type); return tileCenter(b.c + (s - 1) / 2, b.r + (s - 1) / 2); };
+  const centerOf = (b) => { const [w, d] = dimsB(b); return tileCenter(b.c + (w - 1) / 2, b.r + (d - 1) / 2); };
+  // The outline of a w×d footprint on the ground (top, right, bottom, left corners).
+  const footPts = (c0, r0, w, d) => { const a = tileCenter(c0, r0), b = tileCenter(c0 + w - 1, r0), e = tileCenter(c0 + w - 1, r0 + d - 1), f = tileCenter(c0, r0 + d - 1); return [[a.x, a.y - HH], [b.x + HW, b.y], [e.x, e.y + HH], [f.x - HW, f.y]]; };
   function homeView() { animateCam({ x: centerOf(townHall()).x, y: centerOf(townHall()).y - 10, z: playZoom() }, 400); }
   function zoomAt(sx, sy, z) {
     camAnim = null;
@@ -3937,16 +4044,43 @@
   const SEA = { k: seasonOf(Date.now()) };
   const lerpPt = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   function outline(c, pts) { c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); c.closePath(); c.stroke(); }
+  // A wall face lit from above: a touch darker at the foot, lighter under the eaves (10.06).
+  function wallFill(c, pts, color, k, h) {
+    if (!ART.w || h < 6 * (ART.u || 1)) return poly(c, pts, shade(color, k));
+    const yb = Math.max(pts[0][1], pts[1][1]), g = c.createLinearGradient(0, yb, 0, yb - h);
+    g.addColorStop(0, shade(color, k * 0.9)); g.addColorStop(1, shade(color, Math.min(1.25, k * 1.06)));
+    return poly(c, pts, g);
+  }
   function box(c, x, y, hw, hh, s, h, color) {
     const L = [x - hw * s, y], R = [x + hw * s, y], B = [x, y + hh * s], Tp = [x, y - hh * s];
-    poly(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], shade(color, 0.8));
-    poly(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], shade(color, 0.93));
+    wallFill(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], color, 0.8, h);
+    wallFill(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], color, 0.93, h);
     poly(c, [[Tp[0], Tp[1] - h], [R[0], R[1] - h], [B[0], B[1] - h], [L[0], L[1] - h]], shade(color, 1.1));
     if (ART.w && h > 3 * ART.u) {
       // a darker footing where the walls meet the ground, then crisp edges
       const fh = Math.min(h * 0.12, 1.8 * ART.u);
       poly(c, [L, B, [B[0], B[1] - fh], [L[0], L[1] - fh]], shade(color, 0.66));
       poly(c, [B, R, [R[0], R[1] - fh], [B[0], B[1] - fh]], shade(color, 0.76));
+      c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; c.lineJoin = 'round';
+      outline(c, [L, B, R, [R[0], R[1] - h], [Tp[0], Tp[1] - h], [L[0], L[1] - h]]);
+      c.beginPath(); c.moveTo(B[0], B[1]); c.lineTo(B[0], B[1] - h); c.lineTo(L[0], L[1] - h); c.moveTo(B[0], B[1] - h); c.lineTo(R[0], R[1] - h); c.stroke();
+    }
+    return { L, R, B, T: Tp };
+  }
+  // 10.06: boxes on a w×d footprint. ac/ar are half the footprint along the c and the r axis (screen vectors).
+  function footVec(type, rot, hwT, hhT) { const [w, d] = dimsOf(type, rot); return { ac: [w / 2 * hwT, w / 2 * hhT], ar: [-d / 2 * hwT, d / 2 * hhT], w, d }; }
+  function rectPts(x, y, F, s) { const { ac, ar } = F; return { T: [x - s * (ac[0] + ar[0]), y - s * (ac[1] + ar[1])], R: [x + s * (ac[0] - ar[0]), y + s * (ac[1] - ar[1])], B: [x + s * (ac[0] + ar[0]), y + s * (ac[1] + ar[1])], L: [x - s * (ac[0] - ar[0]), y - s * (ac[1] - ar[1])] }; }
+  function boxF(c, x, y, F, s, h, color) {
+    const { L, R, B, T: Tp } = rectPts(x, y, F, s);
+    wallFill(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], color, 0.8, h);
+    wallFill(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], color, 0.93, h);
+    poly(c, [[Tp[0], Tp[1] - h], [R[0], R[1] - h], [B[0], B[1] - h], [L[0], L[1] - h]], shade(color, 1.1));
+    if (ART.w && h > 3 * ART.u) {
+      const fh = Math.min(h * 0.12, 1.8 * ART.u);
+      poly(c, [L, B, [B[0], B[1] - fh], [L[0], L[1] - fh]], shade(color, 0.66));
+      poly(c, [B, R, [R[0], R[1] - fh], [B[0], B[1] - fh]], shade(color, 0.76));
+    }
+    if (ART.w) {
       c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; c.lineJoin = 'round';
       outline(c, [L, B, R, [R[0], R[1] - h], [Tp[0], Tp[1] - h], [L[0], L[1] - h]]);
       c.beginPath(); c.moveTo(B[0], B[1]); c.lineTo(B[0], B[1] - h); c.lineTo(L[0], L[1] - h); c.moveTo(B[0], B[1] - h); c.lineTo(R[0], R[1] - h); c.stroke();
@@ -4057,6 +4191,15 @@
     for (let i = 0; i < bags; i++) { const [a, b] = spots[i]; trashBag(c, x + a * hw, y + b * hh, u * (i === 0 ? 1.1 : 0.95), i % 2 ? '#46524B' : '#33403A'); }
     if (trash > 1.8 && !reduced) { c.fillStyle = '#1E1E1E'; for (let i = 0; i < 3; i++) { const a = ART.t / 180 + i * 2.1; c.beginPath(); c.arc(x + spots[0][0] * hw + Math.cos(a) * 4 * u, y + spots[0][1] * hh - 9 * u + Math.sin(a * 1.3) * 2 * u, 0.6 * u, 0, Math.PI * 2); c.fill(); } }
   }
+  // Dry autumn leaves blown against the walls (10.06): gardeners rake them.
+  function leafPiles(c, x, y, hw, hh, u, k) {
+    const spots = [[-0.55, 0.3], [0.5, 0.42], [0.05, 0.78], [-0.2, 0.62], [0.7, 0.15]], n = Math.ceil(k * 5);
+    for (let i = 0; i < n; i++) {
+      const [a, b] = spots[i], lx = x + a * hw, ly = y + b * hh, r = (3.4 + k * 2) * u;
+      c.fillStyle = '#9A5A26'; c.beginPath(); c.ellipse(lx, ly, r, r * 0.5, 0, Math.PI, 0); c.fill();
+      for (let j = 0; j < 5; j++) { c.fillStyle = ['#D9822B', '#C8553D', '#E3B23C', '#B5652E', '#E8A93A'][(i + j) % 5]; c.beginPath(); c.ellipse(lx + (j - 2) * r * 0.32, ly - r * 0.25 - (j % 2) * r * 0.18, r * 0.3, r * 0.17, (j - 2) * 0.5, 0, Math.PI * 2); c.fill(); }
+    }
+  }
   // Long grass and weeds when nobody tends a park.
   function tallGrass(c, x, y, hw, hh, u, og) {
     const n = Math.round(8 + og * 18);
@@ -4095,8 +4238,9 @@
     opt = opt || {};
     const t = TYPES[type]; if (!t) return;
     const now = opt.time || 0, ruin = !!opt.ruin, size = t.size || 1;
-    const u = (hw / size) / 30 * (1 + 0.35 * (size - 1));
-    if (opt.site) { drawSite(c, type, x, y, hw, hh, u, opt); return; }
+    const fpv = FOOT[type] ? footVec(type, opt.rot || 0, hw / size, hh / size) : null;
+    const u = fpv ? (hw / size) / 30 * 1.12 : (hw / size) / 30 * (1 + 0.35 * (size - 1));
+    if (opt.site) { drawSite(c, type, x, y, hw, hh, u, opt, fpv); return; }
     let col = ruin ? weather(t.color) : t.color;
     const roofc = ruin ? weather(t.roof) : t.roof;
     if (type === 'park' && !ruin) col = { winter: '#DCE6EA', autumn: '#A9B65F', summer: '#86B852' }[SEA.k] || col;
@@ -4105,7 +4249,8 @@
     ART.w = 0.75 * u; ART.u = u; ART.t = now;
     c.save();
     if (opt.alpha) c.globalAlpha = opt.alpha;
-    if (t.cat !== 'decor') { c.fillStyle = 'rgba(30,50,30,.18)'; c.beginPath(); c.ellipse(x, y + 2 * u, hw * 0.8, hh * 0.8, 0, 0, Math.PI * 2); c.fill(); }
+    if (fpv) { const q = rectPts(x + 3 * u, y + 2.5 * u, fpv, 1); poly(c, [q.T, q.R, q.B, q.L], 'rgba(30,50,30,.2)'); }
+    else if (t.cat !== 'decor') { c.fillStyle = 'rgba(30,50,30,.2)'; c.beginPath(); c.ellipse(x + 3 * u, y + 2.5 * u, hw * 0.82, hh * 0.82, 0, 0, Math.PI * 2); c.fill(); }
     switch (type) {
       case 'townhall': {
         const h = (20 + level * 5) * u;
@@ -4258,13 +4403,20 @@
         break;
       }
       case 'clinic': {
-        const h = (18 + level * 3) * u;
-        const f = box(c, x, y, hw, hh, 0.72, h, col);
-        wallQuad(c, f.B, f.R, 0.42, 0.58, 0, h * 0.5, '#9ED0E0');
-        for (const uu of [0.1, 0.25, 0.68, 0.82]) wallQuad(c, f.B, f.R, uu, uu + 0.08, h * 0.55, h * 0.8, '#BFD8E6');
-        wallQuad(c, f.L, f.B, 0.42, 0.58, h * 0.3, h * 0.88, roofc);
-        wallQuad(c, f.L, f.B, 0.3, 0.7, h * 0.5, h * 0.68, roofc);
-        box(c, x, y - h, hw, hh, 0.74, 3 * u, '#DCE2E6');
+        // 10.06: a long white clinic: glass doors under a canopy, a row of windows, red crosses
+        const F = fpv, h = (16 + level * 3) * u, f = boxF(c, x, y, F, 0.88, h, col), long = F.w >= F.d;
+        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
+        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
+        W(lf, 0, 1, 0, h * 0.1, '#8FC7B8'); W(sf, 0, 1, 0, h * 0.1, '#7DB5A6');
+        W(lf, 0.42, 0.58, 0, h * 0.46, '#9ED0E0'); line(c, wallPt(lf[0], lf[1], 0.5, 0), wallPt(lf[0], lf[1], 0.5, h * 0.46), '#F4F6F7', 0.8 * u);
+        W(lf, 0.38, 0.62, h * 0.46, h * 0.54, roofc);
+        for (const a1 of [0.06, 0.2, 0.68, 0.82]) windowQ(c, lf[0], lf[1], a1, a1 + 0.1, h * 0.22, h * 0.42, glass, u);
+        for (const a1 of [0.06, 0.2, 0.34, 0.56, 0.7, 0.84]) windowQ(c, lf[0], lf[1], a1, a1 + 0.09, h * 0.6, h * 0.82, glass, u, level >= 2 && a1 === 0.2);
+        W(sf, 0.42, 0.58, h * 0.3, h * 0.86, roofc); W(sf, 0.26, 0.74, h * 0.5, h * 0.66, roofc);
+        boxF(c, x, y - h, F, 0.9, 2.2 * u, '#DCE2E6');
+        const rt = rectPts(x, y - h - 2.2 * u, F, 0.5);
+        if (level >= 3) { poly(c, [rt.T, rt.R, rt.B, rt.L], '#9AA4AB'); c.fillStyle = '#F4F6F7'; c.font = `800 ${7 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('H', x, y - h - 2.2 * u); }
+        else { const cx = x, cy = y - h - 2.2 * u - 5 * u; c.fillStyle = '#FFFFFF'; roundRect(c, cx - 4.5 * u, cy - 4.5 * u, 9 * u, 9 * u, 1.5 * u); c.fill(); c.fillStyle = roofc; c.fillRect(cx - 1.2 * u, cy - 3.4 * u, 2.4 * u, 6.8 * u); c.fillRect(cx - 3.4 * u, cy - 1.2 * u, 6.8 * u, 2.4 * u); line(c, [cx, cy + 4.5 * u], [cx, y - h - 2.2 * u], '#8A9096', 0.8 * u); }
         break;
       }
       case 'stadium': {
@@ -4322,30 +4474,48 @@
         break;
       }
       case 'firestation': {
-        const h = (16 + level * 2) * u;
-        const f = box(c, x, y, hw, hh, 0.66, h, col);
-        wallQuad(c, f.L, f.B, 0, 1, h * 0.8, h * 0.9, roofc); wallQuad(c, f.B, f.R, 0, 1, h * 0.8, h * 0.9, roofc);
-        for (const [a, b] of [[0.08, 0.45], [0.55, 0.92]]) { wallQuad(c, f.B, f.R, a - 0.02, b + 0.02, 0, h * 0.64, '#F4EEE0'); wallQuad(c, f.B, f.R, a, b, 0, h * 0.6, '#C8473D'); for (let i = 1; i < 4; i++) wallQuad(c, f.B, f.R, a, b, h * 0.6 * i / 4 - 0.3 * u, h * 0.6 * i / 4 + 0.3 * u, '#A23A30'); }
-        windowQ(c, f.L, f.B, 0.3, 0.7, h * 0.42, h * 0.7, glass, u);
-        box(c, x, y - h, hw, hh, 0.68, 2.5 * u, shade(col, 0.9));
-        const tx = x - hw * 0.32, ty = y - h - 2.5 * u;
-        box(c, tx, ty, 5.5 * u, 2.75 * u, 1, 9 * u, col);
-        pyramid(c, tx, ty, 5.5 * u, 2.75 * u, 1, 9 * u, 6 * u, roofc);
-        c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(tx, ty - 5.5 * u, 1.7 * u, 0, Math.PI * 2); c.fill();
+        // 10.06: two big red garage doors on the long side, a hose tower with a bell at the back
+        const F = fpv, h = (15 + level * 2) * u, f = boxF(c, x, y, F, 0.9, h, col), long = F.w >= F.d;
+        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
+        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
+        W(lf, 0, 1, h * 0.8, h * 0.93, roofc); W(sf, 0, 1, h * 0.8, h * 0.93, shade(roofc, 0.9));
+        for (const [a1, b1] of [[0.07, 0.44], [0.53, 0.9]]) {
+          W(lf, a1 - 0.015, b1 + 0.015, 0, h * 0.68, '#F4EEE0'); W(lf, a1, b1, 0, h * 0.64, '#C8473D');
+          for (let i = 1; i < 5; i++) W(lf, a1, b1, h * 0.64 * i / 5 - 0.22 * u, h * 0.64 * i / 5 + 0.22 * u, '#A23A30');
+          for (let i = 0; i < 3; i++) W(lf, a1 + (b1 - a1) * (0.1 + i * 0.29), a1 + (b1 - a1) * (0.32 + i * 0.29), h * 0.4, h * 0.5, 'rgba(205,228,240,.92)');
+        }
+        doorQ(c, sf[0], sf[1], 0.18, 0.44, h * 0.52, '#7A5230', u);
+        windowQ(c, sf[0], sf[1], 0.58, 0.84, h * 0.38, h * 0.66, glass, u);
+        boxF(c, x, y - h, F, 0.94, 2.4 * u, shade(col, 0.9));
+        const Lv = long ? F.ac : F.ar, tx = x - Lv[0] * 0.52, ty = y - h - 2.4 * u - Lv[1] * 0.52;
+        const tf = box(c, tx, ty, 5.6 * u, 2.8 * u, 1, 13 * u, col);
+        wallQuad(c, tf.L, tf.B, 0, 1, 10 * u, 12 * u, roofc); wallQuad(c, tf.B, tf.R, 0, 1, 10 * u, 12 * u, roofc);
+        windowQ(c, tf.B, tf.R, 0.3, 0.7, 4 * u, 8 * u, glass, u);
+        pyramid(c, tx, ty, 5.6 * u, 2.8 * u, 1, 13 * u, 6 * u, roofc);
+        c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(tx, ty - 14.5 * u, 1.8 * u, 0, Math.PI * 2); c.fill();
+        if (level >= 2) { const fp = wallPt(lf[0], lf[1], 0.48, h + 2.4 * u); const on = reduced || Math.floor(now / 400) % 2; c.fillStyle = on ? '#FF5A4A' : '#9A2A22'; c.beginPath(); c.arc(fp[0], fp[1] - 1.5 * u, 1.5 * u, 0, Math.PI * 2); c.fill(); }
         break;
       }
       case 'police': {
-        const h = (16 + level * 2) * u;
-        const f = box(c, x, y, hw, hh, 0.62, h, col);
-        doorQ(c, f.B, f.R, 0.4, 0.6, h * 0.55, '#2F4E8C', u);
-        windowQ(c, f.B, f.R, 0.1, 0.3, h * 0.45, h * 0.74, glass, u); windowQ(c, f.B, f.R, 0.7, 0.9, h * 0.45, h * 0.74, glass, u);
-        windowQ(c, f.L, f.B, 0.3, 0.7, h * 0.45, h * 0.74, glass, u);
-        wallQuad(c, f.B, f.R, 0, 1, h * 0.86, h, roofc); wallQuad(c, f.L, f.B, 0, 1, h * 0.86, h, shade(roofc, 0.85));
-        box(c, x, y - h, hw, hh, 0.64, 2.5 * u, shade(col, 0.88));
-        const blink = reduced ? 0.5 : (Math.sin(now / 260) + 1) / 2;
-        c.fillStyle = `rgba(80,150,255,${0.2 + 0.5 * blink})`; c.beginPath(); c.arc(x, y - h - 6 * u, 5 * u, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#4C8DFF'; c.fillRect(x - 1.7 * u, y - h - 7.5 * u, 3.4 * u, 3 * u);
-        const sp = wallPt(f.B, f.R, 0.5, h * 0.72); starShape(c, sp[0], sp[1], 2.6 * u, '#F3C64B');
+        // 10.06: a long blue-and-grey station: a blue door with a star, windows (with bars on the cells from level 2),
+        // a blue lamp over the door and a flag at the back
+        const F = fpv, h = (14 + level * 2) * u, f = boxF(c, x, y, F, 0.88, h, col), long = F.w >= F.d;
+        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
+        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
+        W(lf, 0, 1, h * 0.84, h, roofc); W(sf, 0, 1, h * 0.84, h, shade(roofc, 0.85));
+        W(lf, 0, 1, 0, h * 0.08, shade(col, 0.7)); W(sf, 0, 1, 0, h * 0.08, shade(col, 0.66));
+        doorQ(c, lf[0], lf[1], 0.43, 0.57, h * 0.58, '#2F4E8C', u);
+        for (const a1 of [0.07, 0.24]) windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.38, h * 0.7, glass, u);
+        for (const a1 of [0.64, 0.81]) { windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.38, h * 0.7, glass, u); if (level >= 2) for (let i = 1; i < 4; i++) line(c, wallPt(lf[0], lf[1], a1 + 0.03 * i, h * 0.38), wallPt(lf[0], lf[1], a1 + 0.03 * i, h * 0.7), '#4A5360', 0.7 * u); }
+        windowQ(c, sf[0], sf[1], 0.3, 0.7, h * 0.38, h * 0.7, glass, u);
+        const sp = wallPt(lf[0], lf[1], 0.5, h * 0.72); starShape(c, sp[0], sp[1], 2.4 * u, '#F3C64B');
+        boxF(c, x, y - h, F, 0.9, 2.4 * u, shade(col, 0.88));
+        const lp = wallPt(lf[0], lf[1], 0.5, h + 2.4 * u), blink = reduced ? 0.5 : (Math.sin(now / 260) + 1) / 2;
+        c.fillStyle = `rgba(80,150,255,${0.2 + 0.5 * blink})`; c.beginPath(); c.arc(lp[0], lp[1] - 3 * u, 5 * u, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#4C8DFF'; c.fillRect(lp[0] - 1.7 * u, lp[1] - 4.5 * u, 3.4 * u, 3 * u);
+        const Lv = long ? F.ac : F.ar, fx0 = x - Lv[0] * 0.7, fy0 = y - h - 2.4 * u - Lv[1] * 0.7, wave = reduced ? 0 : Math.sin(now / 280) * 1.2 * u;
+        line(c, [fx0, fy0], [fx0, fy0 - 16 * u], '#59606A', 0.9 * u);
+        poly(c, [[fx0, fy0 - 16 * u], [fx0 + 7 * u, fy0 - 14.5 * u + wave], [fx0, fy0 - 12 * u]], '#2F4E8C');
         break;
       }
       case 'gnome': {
@@ -4556,6 +4726,18 @@
         wallQuad(c, [x - hw * 0.55, y], [x, y + hh * 0.18], 0, 1, 7 * u, 10 * u, roofc);
         break;
       }
+      case 'fallen': {
+        // a tree blown over: the broken stump, the trunk on the ground, the crown in a heap
+        c.fillStyle = 'rgba(30,50,30,.2)'; c.beginPath(); c.ellipse(x, y + 1 * u, hw * 0.62, hh * 0.5, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#6B4A33'; c.beginPath(); c.ellipse(x - 9 * u, y - 1 * u, 3 * u, 1.6 * u, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#8A6A48'; c.fillRect(x - 12 * u, y - 5 * u, 6 * u, 4 * u); c.fillStyle = '#C9A66B'; c.beginPath(); c.ellipse(x - 9 * u, y - 5 * u, 3 * u, 1.4 * u, 0, 0, Math.PI * 2); c.fill();
+        poly(c, [[x - 7 * u, y - 3.4 * u], [x + 8 * u, y + 3 * u], [x + 9 * u, y + 0.4 * u], [x - 6 * u, y - 6 * u]], '#7A5A3E');
+        line(c, [x - 6.5 * u, y - 4.6 * u], [x + 8.5 * u, y + 1.6 * u], '#5E4430', 0.6 * u);
+        const sea = SEA.k === 'autumn' ? ['#D9822B', '#C8553D', '#E3B23C'] : SEA.k === 'winter' ? ['#557F69', '#4A6F5C', '#6A8F7C'] : ['#3E8E57', '#2F7A47', '#57A56C'];
+        for (const [dx, dy, r, i] of [[10, 2, 6, 0], [14, -1, 5, 1], [8, -2, 4.5, 2], [13, 4, 4, 0], [16, 2, 3.6, 2]]) { c.fillStyle = sea[i]; c.beginPath(); c.arc(x + dx * u, y + dy * u - 2 * u, r * u, 0, Math.PI * 2); c.fill(); }
+        line(c, [x + 4 * u, y + 1 * u], [x + 6 * u, y - 4 * u], '#6B4A33', 0.9 * u);
+        break;
+      }
       case 'works': {
         // a dug-up patch with a barrier, cones and a pile of dirt
         diamond(c, x, y, hw * 0.62, hh * 0.62, '#7A5A3C'); diamond(c, x, y + 1 * u, hw * 0.4, hh * 0.4, '#4E3826');
@@ -4612,25 +4794,28 @@
         break;
       }
     }
+    const hwO = fpv ? hw * 0.75 : hw, hhO = fpv ? hh * 0.75 : hh;
     if (!ruin && type === 'park' && (opt.overgrown || 0) > 0.15) tallGrass(c, x, y, hw, hh, u, opt.overgrown);
-    if (!ruin && (opt.trash || 0) > 0.25) trashPile(c, x, y, hw, hh, u, opt.trash);
-    if (opt.fire) flames(c, x, y, hw, u, topOf(type, level), opt.fire);
-    if (opt.scaffold) scaffold(c, x, y, hw, hh, u, opt.progress || 0);
+    if (!ruin && (opt.trash || 0) > 0.25) trashPile(c, x, y, hwO, hhO, u, opt.trash);
+    if (!ruin && (opt.leaves || 0) > 0.15) leafPiles(c, x, y, hwO, hhO, u, opt.leaves);
+    if (opt.fire) flames(c, x, y, hwO, u, topOf(type, level), opt.fire);
+    if (opt.scaffold) scaffold(c, x, y, hwO, hhO, u, opt.progress || 0);
     c.restore();
     ART.w = prevArt.w; ART.u = prevArt.u; ART.t = prevArt.t;
   }
   // A construction site: foundation, a faint outline of what is coming, the finished part rising, scaffolding.
-  function drawSite(c, type, x, y, hw, hh, u, opt) {
+  function drawSite(c, type, x, y, hw, hh, u, opt, fpv) {
     c.save();
     if (opt.alpha) c.globalAlpha = opt.alpha;
-    const a0 = c.globalAlpha;
-    diamond(c, x, y, hw * 0.86, hh * 0.86, '#D9CDB0');
-    diamond(c, x, y - 1.5 * u, hw * 0.72, hh * 0.72, '#C9BC9C');
-    c.globalAlpha = a0 * 0.25; drawBuilding(c, type, 1, x, y, hw, hh, { time: 0 }); c.globalAlpha = a0;
+    const a0 = c.globalAlpha, rot = opt.rot || 0;
+    if (fpv) { const q1 = rectPts(x, y, fpv, 0.92), q2 = rectPts(x, y - 1.5 * u, fpv, 0.78); poly(c, [q1.T, q1.R, q1.B, q1.L], '#D9CDB0'); poly(c, [q2.T, q2.R, q2.B, q2.L], '#C9BC9C'); }
+    else { diamond(c, x, y, hw * 0.86, hh * 0.86, '#D9CDB0'); diamond(c, x, y - 1.5 * u, hw * 0.72, hh * 0.72, '#C9BC9C'); }
+    c.globalAlpha = a0 * 0.25; drawBuilding(c, type, 1, x, y, hw, hh, { time: 0, rot }); c.globalAlpha = a0;
     const p = clamp(opt.progress || 0, 0, 1);
-    if (p > 0.01) rising(c, x, y, hw, hh, p, () => drawBuilding(c, type, 1, x, y, hw, hh, { time: opt.time }));
-    for (let i = 0; i < 3; i++) { c.fillStyle = i % 2 ? '#B08356' : '#9A6B43'; c.fillRect(x + hw * 0.25, y + hh * 0.25 - i * 2.6 * u, 11 * u, 2.2 * u); }
-    scaffold(c, x, y, hw, hh, u, p);
+    if (p > 0.01) rising(c, x, y, hw, hh, p, () => drawBuilding(c, type, 1, x, y, hw, hh, { time: opt.time, rot }));
+    const hwO = fpv ? hw * 0.7 : hw, hhO = fpv ? hh * 0.7 : hh;
+    for (let i = 0; i < 3; i++) { c.fillStyle = i % 2 ? '#B08356' : '#9A6B43'; c.fillRect(x + hwO * 0.25, y + hhO * 0.25 - i * 2.6 * u, 11 * u, 2.2 * u); }
+    scaffold(c, x, y, hwO, hhO, u, p);
     c.restore();
   }
   function scaffold(c, x, y, hw, hh, u, p) {
@@ -4744,7 +4929,7 @@
   /* ---------- Vehicles: a small box on wheels, turned along the street it drives on ---------- */
   const VEH_LOOK = {
     fire: { top: '#E2483A', a: '#B8342A', b: '#9A2A22', stripe: '#F4F1EA' },
-    police: { top: '#F4F6F8', a: '#D8DDE3', b: '#C3C9D1', stripe: '#2F4E8C' },
+    police: { top: '#F4F6F8', a: '#2C4C8C', b: '#22396B', stripe: '#F4F6F8' },
     crew: { top: '#F4BE3E', a: '#D99F22', b: '#BF8A18', stripe: '#3B3B3B' },
     builders: { top: '#E07A2F', a: '#C2621F', b: '#A35118', stripe: '#F4F1EA' },
     bus: { top: '#F6C431', a: '#E0A91C', b: '#C99516', stripe: '#3B3B3B' },
@@ -4783,36 +4968,115 @@
     }
     else person(c, bp.x - 12, bp.y + 6, 1, BUILDER_LOOK, { facing: 1, arms: 'hammer', tool: 'hammer', swing: reduced ? 0.5 : (Math.sin(now / 200) + 1) / 2 });
   }
+  // Vehicles (10.06 redraw): an oriented body made of boxes, wheels only on the long side that faces you, a cab with
+  // a windscreen at the front, and each service's own details (ladder, light bar, red cross, bus windows).
+  const VEH_SHAPE = {
+    fire: { len: 0.66, wid: 0.3, cab: 0.3, hc: 10, hb: 9.5 },
+    police: { len: 0.5, wid: 0.27, car: true },
+    ambulance: { len: 0.54, wid: 0.29, cab: 0.26, hc: 8.5, hb: 10.5 },
+    garbage: { len: 0.6, wid: 0.3, cab: 0.28, hc: 9, hb: 11 },
+    van: { len: 0.5, wid: 0.27, cab: 0.3, hc: 8, hb: 8.5 },
+    builders: { len: 0.52, wid: 0.28, cab: 0.32, hc: 8.5, hb: 7 },
+    crew: { len: 0.52, wid: 0.28, cab: 0.32, hc: 8.5, hb: 6 },
+    bus: { len: 0.72, wid: 0.3, bus: true, hb: 10.5 }
+  };
   function drawVehicle(c, v, now, after) {
     if (v.foot) { drawOnFoot(c, v, now, after); return; }
-    const p = tileCenter(v.c - 0.5, v.r - 0.5), L = VEH_LOOK[LOOK_OF[v.kind] || v.kind] || VEH_LOOK.crew;
+    const kind = LOOK_OF[v.kind] || v.kind, L = VEH_LOOK[kind] || VEH_LOOK.crew, S = VEH_SHAPE[kind] || VEH_SHAPE.crew;
+    const p = tileCenter(v.c - 0.5, v.r - 0.5);
     const ec = [HW, HH], er = [-HW, HH];
     const A = v.dir.dc ? [ec[0] * v.dir.dc, ec[1] * v.dir.dc] : [er[0] * (v.dir.dr || 1), er[1] * (v.dir.dr || 1)], B = v.dir.dc ? er : ec;
-    const len = v.kind === 'fire' ? 0.62 : 0.48, wid = 0.32, h = v.kind === 'fire' ? 11 : 8;
+    const len = S.len, wid = S.wid, a0 = -len / 2, a1 = len / 2, b0 = -wid / 2, b1 = wid / 2;
     const pt = (a, b, up) => [p.x + A[0] * a + B[0] * b, p.y + A[1] * a + B[1] * b - (up || 0)];
-    const q = [pt(len / 2, wid / 2), pt(len / 2, -wid / 2), pt(-len / 2, -wid / 2), pt(-len / 2, wid / 2)];
-    c.fillStyle = 'rgba(20,30,25,.22)'; c.beginPath(); c.ellipse(p.x, p.y + 2, HW * 0.36, HH * 0.36, 0, 0, Math.PI * 2); c.fill();
-    // the two sides that face us, then the roof
-    const sides = [[0, 1], [1, 2], [2, 3], [3, 0]].map(([i, j]) => ({ i, j, y: (q[i][1] + q[j][1]) / 2 })).sort((m, n) => m.y - n.y).slice(2);
-    for (const sd of sides) { const a = q[sd.i], b = q[sd.j]; poly(c, [a, b, [b[0], b[1] - h], [a[0], a[1] - h]], sd === sides[1] ? L.a : L.b); }
-    for (const sd of sides) { const a = q[sd.i], b = q[sd.j]; c.fillStyle = '#1E1E1E'; for (const k of [0.22, 0.78]) { c.beginPath(); c.ellipse(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k - 1, 2.6, 2.2, 0, 0, Math.PI * 2); c.fill(); } }
-    for (const sd of sides) { const a = q[sd.i], b = q[sd.j]; line(c, [a[0], a[1] - h * 0.45], [b[0], b[1] - h * 0.45], L.stripe, 1.6); }
-    poly(c, q.map(([x, y]) => [x, y - h]), L.top);
-    // windscreen at the front, and the extras
-    const f1 = pt(len / 2 - 0.02, wid / 2 - 0.03, h), f2 = pt(len / 2 - 0.02, -wid / 2 + 0.03, h), f3 = pt(len / 2 - 0.16, -wid / 2 + 0.03, h), f4 = pt(len / 2 - 0.16, wid / 2 - 0.03, h);
-    poly(c, [f1, f2, f3, f4], 'rgba(150,200,230,.95)');
-    if (v.kind === 'fire') { const l1 = pt(-len / 2 + 0.05, 0, h + 2), l2 = pt(len / 2 - 0.2, 0, h + 2); line(c, l1, l2, '#C9CDD2', 2.4); for (let i = 1; i < 6; i++) { const m = pt(-len / 2 + 0.05 + (len - 0.25) * i / 6, 0.06, h + 2), n = pt(-len / 2 + 0.05 + (len - 0.25) * i / 6, -0.06, h + 2); line(c, m, n, '#C9CDD2', 1); } }
-    if (v.kind === 'crew' || v.kind === 'builders') { const b1 = pt(-len / 2 + 0.04, wid / 2 - 0.04, h), b2 = pt(-0.04, -wid / 2 + 0.04, h); c.fillStyle = 'rgba(60,60,60,.35)'; c.fillRect(Math.min(b1[0], b2[0]), Math.min(b1[1], b2[1]), Math.abs(b2[0] - b1[0]), Math.abs(b2[1] - b1[1])); }
-    if (v.kind === 'builders') { const pl = pt(-len / 2 + 0.12, 0, h + 1.5), pr = pt(-0.06, 0, h + 1.5); line(c, pl, pr, '#B5875A', 2.6); }
+    const front = A[1] > 0, bs = B[1] > 0 ? b1 : b0; // the end and the long side we can see
+    const ink = 'rgba(30,24,20,.45)';
+    const face = (pts, col) => { poly(c, pts, col); c.strokeStyle = ink; c.lineWidth = 0.5; c.stroke(); };
+    // one box: the long side, the visible end, then the top
+    const box = (x0, x1, y0, y1, z0, z1, col) => {
+      face([pt(x0, bs === b1 ? y1 : y0, z0), pt(x1, bs === b1 ? y1 : y0, z0), pt(x1, bs === b1 ? y1 : y0, z1), pt(x0, bs === b1 ? y1 : y0, z1)], shade(col, 0.86));
+      const xe = front ? x1 : x0;
+      face([pt(xe, y0, z0), pt(xe, y1, z0), pt(xe, y1, z1), pt(xe, y0, z1)], shade(col, 0.72));
+      face([pt(x0, y0, z1), pt(x1, y0, z1), pt(x1, y1, z1), pt(x0, y1, z1)], shade(col, 1.06));
+    };
+    // a flat panel on the visible long side / the visible end of a box
+    const sidePanel = (x0, x1, z0, z1, col, yEdge) => poly(c, [pt(x0, yEdge, z0), pt(x1, yEdge, z0), pt(x1, yEdge, z1), pt(x0, yEdge, z1)], col);
+    const endPanel = (xe, y0, y1, z0, z1, col) => poly(c, [pt(xe, y0, z0), pt(xe, y1, z0), pt(xe, y1, z1), pt(xe, y0, z1)], col);
+    // soft shadow on the road
+    c.fillStyle = 'rgba(20,30,25,.24)'; poly(c, [pt(a0 - 0.04, b0 - 0.03, -1), pt(a1 + 0.04, b0 - 0.03, -1), pt(a1 + 0.04, b1 + 0.05, -1), pt(a0 - 0.04, b1 + 0.05, -1)], 'rgba(20,30,25,.24)');
+    const wr = 2.7, wz = 2.6, ys = bs * 1.02;
+    // the wheels on the far side peek out under the body; the near ones go on top later
+    const wheel = (a, yb) => {
+      const al = Math.hypot(A[0], A[1]), ax = A[0] / al, ay = A[1] / al, ctr = pt(a, yb, wz);
+      c.fillStyle = '#1D1D1F'; c.beginPath();
+      for (let i = 0; i <= 16; i++) { const t = i / 16 * Math.PI * 2, x = ctr[0] + Math.cos(t) * wr * ax, y = ctr[1] + Math.cos(t) * wr * ay - Math.sin(t) * wr; i ? c.lineTo(x, y) : c.moveTo(x, y); }
+      c.fill();
+      c.fillStyle = '#A9AFB6'; c.beginPath();
+      for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI * 2, x = ctr[0] + Math.cos(t) * wr * 0.45 * ax, y = ctr[1] + Math.cos(t) * wr * 0.45 * ay - Math.sin(t) * wr * 0.45; i ? c.lineTo(x, y) : c.moveTo(x, y); }
+      c.fill();
+    };
+    const wa = [a0 + len * 0.2, a1 - len * 0.2];
+    for (const a of wa) wheel(a, -ys);
+    const zb = 2.2; // the body sits above the road
+    const cabFront = (x0, x1) => (front ? [x1 - (x1 - x0), x1] : [x0, x0 + (x1 - x0)]);
+    const glass = 'rgba(160,205,232,.96)', glassDk = 'rgba(96,140,170,.96)';
+    let roofZ = 0, lightAt = null;
+    if (S.car) {
+      // a car: a low body, then a glass cabin in the middle
+      box(a0, a1, b0, b1, zb, zb + 4.6, L.a);
+      sidePanel(a0 + 0.03, a1 - 0.03, zb + 1.6, zb + 2.6, L.stripe, bs);
+      const c0 = a0 + len * 0.26, c1 = a1 - len * 0.2;
+      box(c0, c1, b0 + 0.03, b1 - 0.03, zb + 4.6, zb + 8.4, L.top);
+      sidePanel(c0 + 0.03, c1 - 0.03, zb + 5.2, zb + 7.9, glassDk, bs === b1 ? b1 - 0.03 : b0 + 0.03);
+      endPanel(front ? c1 : c0, b0 + 0.05, b1 - 0.05, zb + 5.1, zb + 8, glass);
+      roofZ = zb + 8.4; lightAt = [(c0 + c1) / 2, 0];
+    } else if (S.bus) {
+      box(a0, a1, b0, b1, zb, zb + S.hb, L.a);
+      const n = 5; for (let i = 0; i < n; i++) { const x0 = a0 + 0.06 + i * (len - 0.12) / n, x1 = x0 + (len - 0.12) / n - 0.025; sidePanel(x0, x1, zb + S.hb * 0.55, zb + S.hb * 0.9, glassDk, bs); }
+      sidePanel(a0 + 0.02, a1 - 0.02, zb + S.hb * 0.3, zb + S.hb * 0.4, L.stripe, bs);
+      endPanel(front ? a1 : a0, b0 + 0.03, b1 - 0.03, zb + S.hb * 0.5, zb + S.hb * 0.9, front ? glass : glassDk);
+      roofZ = zb + S.hb;
+    } else {
+      // a truck or van: the cab in front, the body behind
+      const cl = len * S.cab, ca0 = a1 - cl, ba1 = ca0 - 0.012;
+      const drawCab = () => {
+        box(ca0, a1, b0, b1, zb, zb + S.hc, L.top === '#F6F7F9' || L.top === '#F4F6F8' ? L.a : L.a);
+        sidePanel(ca0 + 0.04, a1 - 0.03, zb + S.hc * 0.52, zb + S.hc * 0.9, glassDk, bs);
+        if (front) endPanel(a1, b0 + 0.03, b1 - 0.03, zb + S.hc * 0.5, zb + S.hc * 0.9, glass);
+      };
+      const drawBody = () => {
+        box(a0, ba1, b0, b1, zb, zb + S.hb, kind === 'garbage' ? '#2F7046' : kind === 'ambulance' ? '#F1F3F6' : L.a);
+        sidePanel(a0 + 0.02, ba1 - 0.02, zb + S.hb * 0.42, zb + S.hb * 0.56, L.stripe, bs);
+        if (!front) { endPanel(a0, b0 + 0.04, b1 - 0.04, zb + 1, zb + S.hb - 1.2, shade(L.a, 0.62)); const m = pt(a0, 0, zb + 1); line(c, m, pt(a0, 0, zb + S.hb - 1.2), 'rgba(0,0,0,.35)', 0.7); }
+      };
+      // the part nearer the viewer is drawn last
+      if (front) { drawBody(); drawCab(); } else { drawCab(); drawBody(); }
+      if (kind === 'ambulance') { const m = pt((a0 + ba1) / 2, bs, zb + S.hb * 0.72); c.fillStyle = '#D9342B'; c.fillRect(m[0] - 1.1, m[1] - 3.3, 2.2, 6.6); c.fillRect(m[0] - 3.3, m[1] - 1.1, 6.6, 2.2); }
+      if (kind === 'fire') {
+        // a silver ladder on top of the body
+        const z = zb + S.hb + 1.2, l0 = pt(a0 + 0.04, -0.07, z), l1 = pt(ba1 - 0.02, -0.07, z), r0 = pt(a0 + 0.04, 0.07, z), r1 = pt(ba1 - 0.02, 0.07, z);
+        line(c, l0, l1, '#D9DEE3', 1.3); line(c, r0, r1, '#D9DEE3', 1.3);
+        for (let i = 0; i <= 6; i++) { const t = a0 + 0.04 + (ba1 - a0 - 0.06) * i / 6; line(c, pt(t, -0.07, z), pt(t, 0.07, z), '#C3C9CF', 0.9); }
+      }
+      if (kind === 'garbage') { const m = pt(a0 + 0.06, bs, zb + S.hb * 0.78); c.fillStyle = L.stripe; c.beginPath(); c.arc(m[0], m[1], 1.6, 0, Math.PI * 2); c.fill(); }
+      if (kind === 'builders') { const z = zb + S.hb + 0.8; line(c, pt(a0 + 0.04, -0.05, z), pt(ba1 - 0.02, -0.05, z), '#C9965E', 2.2); line(c, pt(a0 + 0.06, 0.05, z + 1.2), pt(ba1 - 0.04, 0.05, z + 1.2), '#B5875A', 2.2); }
+      if (kind === 'crew') { for (let i = 0; i < 3; i++) { const m = pt(a0 + 0.08 + i * 0.09, 0, zb + S.hb); c.fillStyle = '#F07A28'; c.beginPath(); c.moveTo(m[0], m[1] - 4.5); c.lineTo(m[0] + 1.8, m[1]); c.lineTo(m[0] - 1.8, m[1]); c.closePath(); c.fill(); } }
+      roofZ = zb + S.hc; lightAt = [(ca0 + a1) / 2, 0];
+    }
+    for (const a of wa) wheel(a, ys);
+    // headlights at the front
+    if (front) for (const y of [b0 + 0.05, b1 - 0.05]) { const h = pt(a1, y, zb + 1.8); c.fillStyle = '#FFF4C2'; c.beginPath(); c.arc(h[0], h[1], 1.1, 0, Math.PI * 2); c.fill(); }
     // flashing lights while it is on a job
     const on = v.state !== 'back' && (reduced || Math.floor(now / 220) % 2 === 0);
-    const lb = pt(len / 2 - 0.22, 0, h + 1.5);
-    if (v.kind === 'crew' || v.kind === 'builders') { c.fillStyle = on ? '#FFB020' : '#9A7A30'; c.beginPath(); c.arc(lb[0], lb[1] - 1, 2.2, 0, Math.PI * 2); c.fill(); }
-    else {
-      const l = pt(len / 2 - 0.22, 0.07, h + 1.5), r2 = pt(len / 2 - 0.22, -0.07, h + 1.5);
-      c.fillStyle = on ? '#FF3B30' : '#7A2A26'; c.beginPath(); c.arc(l[0], l[1] - 1, 2.2, 0, Math.PI * 2); c.fill();
-      c.fillStyle = !on ? (v.kind === 'police' ? '#3D7BFF' : '#FF3B30') : (v.kind === 'police' ? '#22346B' : '#7A2A26'); c.beginPath(); c.arc(r2[0], r2[1] - 1, 2.2, 0, Math.PI * 2); c.fill();
-      if (on && !reduced) { c.fillStyle = v.kind === 'police' ? 'rgba(80,130,255,.18)' : 'rgba(255,70,50,.18)'; c.beginPath(); c.arc(lb[0], lb[1], 14, 0, Math.PI * 2); c.fill(); }
+    if (lightAt && kind !== 'van' && kind !== 'garbage' && kind !== 'bus') {
+      const lz = roofZ + 1.2;
+      if (kind === 'crew' || kind === 'builders') { const lb = pt(lightAt[0], 0, lz); c.fillStyle = on ? '#FFB020' : '#9A7A30'; c.beginPath(); c.arc(lb[0], lb[1], 1.9, 0, Math.PI * 2); c.fill(); }
+      else {
+        const l = pt(lightAt[0], -0.06, lz), r2 = pt(lightAt[0], 0.06, lz), lb = pt(lightAt[0], 0, lz);
+        line(c, l, r2, '#3A3F46', 2.6);
+        c.fillStyle = on ? '#FF3B30' : '#7A2A26'; c.beginPath(); c.arc(l[0], l[1], 1.5, 0, Math.PI * 2); c.fill();
+        c.fillStyle = !on ? (kind === 'police' ? '#3D7BFF' : '#FF3B30') : (kind === 'police' ? '#22346B' : '#7A2A26'); c.beginPath(); c.arc(r2[0], r2[1], 1.5, 0, Math.PI * 2); c.fill();
+        if (on && !reduced) { c.fillStyle = kind === 'police' ? 'rgba(80,130,255,.18)' : 'rgba(255,70,50,.18)'; c.beginPath(); c.arc(lb[0], lb[1], 13, 0, Math.PI * 2); c.fill(); }
+      }
     }
     if (v.state === 'work') drawAtWork(c, v, now, after, pt(0, -wid / 2 - 0.28));
   }
@@ -4842,8 +5106,9 @@
   }
   // The free tile next to a building where someone would stand (front sides first).
   function doorTile(b, fc, fr) {
-    const s = sizeOf(b.type), cand = [];
-    for (let i = 0; i < s; i++) cand.push([b.c + i, b.r + s, 0], [b.c + s, b.r + i, 0], [b.c + i, b.r - 1, 1.5], [b.c - 1, b.r + i, 1.5]);
+    const [w, d] = dimsB(b), cand = [];
+    for (let i = 0; i < w; i++) cand.push([b.c + i, b.r + d, 0], [b.c + i, b.r - 1, 1.5]);
+    for (let j = 0; j < d; j++) cand.push([b.c + w, b.r + j, 0], [b.c - 1, b.r + j, 1.5]);
     let best = null, bd = Infinity;
     for (const [c, r, pen] of cand) { if (!freeTile(c, r)) continue; const d = Math.hypot(c + 0.5 - fc, r + 0.5 - fr) + pen; if (d < bd) { bd = d; best = { c, r }; } }
     return best;
@@ -4891,8 +5156,10 @@
       for (const b of dirty.slice(0, 3)) { const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'sweep', bid: b.id, dur: 1600 + (b.trash || 0) * 700 }; break; } }
     } else if (w.role === 'gardener') {
       const st = stationsOf('gardener');
-      const parks = state.buildings.filter((b) => b.type === 'park' && live(b) && (b.overgrown || 0) > 0.2 && !claimed(w, b.id) && coversB('gardener', b, st)).sort((a, b) => b.overgrown - a.overgrown);
-      for (const b of parks) { const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'trim', bid: b.id, dur: 2800 }; break; } }
+      // 10.06: fallen trees first, then dry leaves, then the parks
+      const jobs = state.buildings.filter((b) => !claimed(w, b.id) && coversB('gardener', b, st) && (b.type === 'fallen' || (messy(b) && (b.leaves || 0) > 0.35) || (b.type === 'park' && live(b) && (b.overgrown || 0) > 0.2)))
+        .map((b) => ({ b, k: b.type === 'fallen' ? 3 : b.leaves ? 1 + b.leaves : b.overgrown })).sort((a, b) => b.k - a.k);
+      for (const { b } of jobs) { const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: b.type === 'fallen' ? 'chop' : b.type === 'park' ? 'trim' : 'rake', bid: b.id, dur: b.type === 'fallen' ? 4200 : 2800 }; break; } }
     } else if (w.role === 'nurse' || !w.role) {
       const spots = state.buildings.filter((b) => live(b) && !b.fire && (w.role ? T(b).cat === 'home' && coversB('nurse', b) : ['shop', 'joy', 'home'].includes(T(b).cat)));
       if (spots.length && Math.random() < (w.role ? 0.8 : 0.55)) { const b = pick(spots); const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'visit', bid: b.id, dur: 1200 + Math.random() * 2200 }; } }
@@ -4917,7 +5184,13 @@
       for (let i = 0; i < 10; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 40, y: p.y, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 40, life: 0, max: 0.9, color: i % 2 ? '#6B9B3A' : '#8FC25A', w: 3, h: 2, rot: 0, vr: 6 });
       floats.push({ x: p.x, y: p.y - HH * s - 26, t0: now, text: 'Tidy!', soft: true });
       touch(); save();
-    } else if (w.act.kind === 'spray') extinguish(b);
+    } else if (w.act.kind === 'rake' && (b.leaves || 0) > 0.1) {
+      delete b.leaves;
+      for (let i = 0; i < 12; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 30, y: p.y + 2, vx: (Math.random() - 0.5) * 60, vy: -30 - Math.random() * 40, life: 0, max: 0.9, color: ['#D9822B', '#C8553D', '#E3B23C'][i % 3], w: 3, h: 2, rot: 0, vr: 6 });
+      floats.push({ x: p.x, y: p.y - HH * s - 26, t0: now, text: 'Leaves raked!', soft: true });
+      touch(); save();
+    } else if (w.act.kind === 'chop' && b.type === 'fallen') endFallen(b, 'gardener');
+    else if (w.act.kind === 'spray') extinguish(b);
   }
   function stepWalker(w, dt, now) {
     if (w.state === 'walk') {
@@ -4986,8 +5259,8 @@
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
   const ROOF = { townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 33 + 4 * L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
-    workshop: (L) => 36 + 3 * L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 24 + 3 * L, stadium: (L) => 44 + 4 * L, depot: (L) => 30 + 2 * L,
-    shed: (L) => 19 + 2 * L, firestation: (L) => 34 + 2 * L, police: (L) => 25 + 2 * L, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
+    workshop: (L) => 36 + 3 * L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 23 + 2.5 * L, stadium: (L) => 44 + 4 * L, depot: (L) => 30 + 2 * L,
+    shed: (L) => 19 + 2 * L, firestation: (L) => 31 + 1.7 * L, police: (L) => 23 + 1.7 * L, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
     cherry: () => 26, statue: () => 25, goldstatue: () => 25, rainbow: () => 21, arcade: (L) => 33 + 3 * L, bank: (L) => 30 + 3 * L, lighthouse: () => 66, observatory: () => 40, castle: () => 50,
     pumpkins: () => 10, snowman: () => 27, tulips: () => 11, parasol: () => 26 };
   function labelY(b) { const p = centerOf(b), s = sizeOf(b.type), u = (HW / 30) * (1 + 0.35 * (s - 1)); return p.y - (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u - 4; }
@@ -5189,6 +5462,19 @@
     }
   }
   let SZN = SEASONS.spring;
+  // 10.06: smooth, gently varied ground (soft value noise over the island) instead of a checkerboard with gaps;
+  // a faint grid, clearer while you place something.
+  const groundCache = new Map();
+  function groundCol(cc, r, wildLand) {
+    const key = SEA.k + (wildLand ? 'w' : 'g') + cc + ',' + r; let v = groundCache.get(key); if (v) return v;
+    const hv = (x, y) => ((tileHash(x + 40, y + 40) >> 3) % 1000) / 1000, sm = (t) => t * t * (3 - 2 * t);
+    const x0 = Math.floor(cc / 3), y0 = Math.floor(r / 3), fx = sm(cc / 3 - x0), fy = sm(r / 3 - y0);
+    const a = hv(x0, y0), b = hv(x0 + 1, y0), c2 = hv(x0, y0 + 1), d2 = hv(x0 + 1, y0 + 1);
+    const n = a + (b - a) * fx + (c2 - a) * fy + (a - b - c2 + d2) * fx * fy, j = (tileHash(cc, r) % 7) * 0.004;
+    const base = (wildLand ? SZN.wild : SZN.grass)[0];
+    v = shade(base, 0.93 + 0.11 * n + j); groundCache.set(key, v); if (groundCache.size > 3000) groundCache.clear();
+    return v;
+  }
   function draw(now) {
     SEA.k = curSeason(); SZN = SEASONS[SEA.k];
     stepCam(now);
@@ -5210,13 +5496,13 @@
       if (!isOpen(cc, r)) {
         // Wild land you have not cleared yet: darker grass, bushes, rocks and trees.
         const h = tileHash(cc, r);
-        diamond(c, p.x, p.y, HW - 0.7, HH - 0.35, SZN.wild[(cc + r) % 2 ? 0 : 1]);
+        diamond(c, p.x, p.y, HW + 0.4, HH + 0.2, groundCol(cc, r, true));
         if (h % 3 === 0) wild.push({ depth: cc + r, draw: () => treeAt(c, p.x + ((h >> 5) % 14 - 7), p.y + ((h >> 8) % 6 - 3), 17 + (h % 7), (h >> 4) % 3 ? '#2F7A47' : '#3A8A4E') });
         else if (h % 5 === 1) { c.fillStyle = '#4F7D3C'; c.beginPath(); c.ellipse(p.x + 4, p.y, 9, 5, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#5E8F47'; c.beginPath(); c.ellipse(p.x + 1, p.y - 2, 6, 3.6, 0, 0, Math.PI * 2); c.fill(); }
         else if (h % 7 === 2) { c.fillStyle = '#9B958B'; c.beginPath(); c.ellipse(p.x - 3, p.y + 1, 6, 3.4, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#B5AFA4'; c.beginPath(); c.ellipse(p.x - 4, p.y - 0.5, 3.6, 2, 0, 0, Math.PI * 2); c.fill(); }
         continue;
       }
-      diamond(c, p.x, p.y, HW - 0.7, HH - 0.35, SZN.grass[(cc + r) % 2 ? 0 : 1]);
+      diamond(c, p.x, p.y, HW + 0.4, HH + 0.2, groundCol(cc, r, false));
       if (occ.has(cc + ',' + r) || SEA.k === 'winter') continue;
       // a little life on empty grass: tufts, tiny flowers, pebbles
       const h = tileHash(cc, r), ox = (h >> 4) % 22 - 11, oy = (h >> 9) % 10 - 5;
@@ -5225,6 +5511,11 @@
       if (h % 9 === 2) { c.fillStyle = '#B9B2A4'; c.beginPath(); c.ellipse(p.x + oy, p.y + ox * 0.3, 2.2, 1.3, 0, 0, Math.PI * 2); c.fill(); }
     }
     const item = playing ? heldItem() : null;
+    { // the grid: faint, clearer while placing
+      c.save(); c.strokeStyle = item ? 'rgba(255,255,255,.34)' : (SEA.k === 'winter' ? 'rgba(120,140,155,.16)' : 'rgba(255,255,255,.13)'); c.lineWidth = item ? 1 : 0.8; c.beginPath();
+      for (let r = 0; r < N; r++) for (let cc = 0; cc < N; cc++) { if (!isOpen(cc, r)) continue; const p = tileCenter(cc, r); c.moveTo(p.x - HW, p.y); c.lineTo(p.x, p.y - HH); c.lineTo(p.x + HW, p.y); }
+      c.stroke(); c.restore();
+    }
     if (item) {
       const showNums = HW * z >= 20;
       const hs = hints();
@@ -5238,38 +5529,38 @@
     }
     // While placing: tint the area the building affects (green helps, red bothers, gold = its customers, blue = kept safe).
     let placeFx = null;
-    const drawRange = (fxr, ac, ar, sz) => {
+    const drawRange = (fxr, ac, ar, sw, sd) => {
       // a service building's reach: a light tint and a dashed edge in its staff colour
       if (fxr.reach) {
         const R2 = fxr.reach, rgb = SERVES[fxr.staff].rgb;
-        for (let rr = ar - R2; rr < ar + sz + R2; rr++) for (let cc = ac - R2; cc < ac + sz + R2; cc++) {
-          if (!isOpen(cc, rr) || (cc >= ac && cc < ac + sz && rr >= ar && rr < ar + sz)) continue;
+        for (let rr = ar - R2; rr < ar + sd + R2; rr++) for (let cc = ac - R2; cc < ac + sw + R2; cc++) {
+          if (!isOpen(cc, rr) || (cc >= ac && cc < ac + sw && rr >= ar && rr < ar + sd)) continue;
           const tp = tileCenter(cc, rr); diamond(c, tp.x, tp.y, HW - 1.5, HH - 0.8, `rgba(${rgb},.13)`);
         }
-        const e0 = tileCenter(ac - R2, ar - R2), e1 = tileCenter(ac + sz - 1 + R2, ar - R2), e2 = tileCenter(ac + sz - 1 + R2, ar + sz - 1 + R2), e3 = tileCenter(ac - R2, ar + sz - 1 + R2);
+        const e0 = tileCenter(ac - R2, ar - R2), e1 = tileCenter(ac + sw - 1 + R2, ar - R2), e2 = tileCenter(ac + sw - 1 + R2, ar + sd - 1 + R2), e3 = tileCenter(ac - R2, ar + sd - 1 + R2);
         c.save(); c.setLineDash([6 * px, 4 * px]); c.lineWidth = 1.8 * px; c.strokeStyle = `rgba(${rgb},.85)`;
         outline(c, [[e0.x, e0.y - HH], [e1.x + HW, e1.y], [e2.x, e2.y + HH], [e3.x - HW, e3.y]]); c.restore();
       }
       const R = fxr.radius; if (!R) return;
       const col = { good: 'rgba(110,200,80,.3)', bad: 'rgba(225,70,45,.3)', shop: 'rgba(245,185,60,.26)', police: 'rgba(80,130,235,.28)' }[fxr.kind];
-      for (let rr = ar - R; rr < ar + sz + R; rr++) for (let cc = ac - R; cc < ac + sz + R; cc++) {
-        if (!isOpen(cc, rr) || (cc >= ac && cc < ac + sz && rr >= ar && rr < ar + sz)) continue;
+      for (let rr = ar - R; rr < ar + sd + R; rr++) for (let cc = ac - R; cc < ac + sw + R; cc++) {
+        if (!isOpen(cc, rr) || (cc >= ac && cc < ac + sw && rr >= ar && rr < ar + sd)) continue;
         const tp = tileCenter(cc, rr); diamond(c, tp.x, tp.y, HW - 1.5, HH - 0.8, col);
       }
       // a dashed edge so the reach is easy to read
-      const e0 = tileCenter(ac - R, ar - R), e1 = tileCenter(ac + sz - 1 + R, ar - R), e2 = tileCenter(ac + sz - 1 + R, ar + sz - 1 + R), e3 = tileCenter(ac - R, ar + sz - 1 + R);
+      const e0 = tileCenter(ac - R, ar - R), e1 = tileCenter(ac + sw - 1 + R, ar - R), e2 = tileCenter(ac + sw - 1 + R, ar + sd - 1 + R), e3 = tileCenter(ac - R, ar + sd - 1 + R);
       c.save(); c.setLineDash([5 * px, 4 * px]); c.lineWidth = 1.6 * px;
       c.strokeStyle = { good: 'rgba(60,140,40,.75)', bad: 'rgba(190,50,30,.75)', shop: 'rgba(190,130,20,.75)', police: 'rgba(50,90,200,.8)' }[fxr.kind];
       outline(c, [[e0.x, e0.y - HH], [e1.x + HW, e1.y], [e2.x, e2.y + HH], [e3.x - HW, e3.y]]); c.restore();
     };
     if (item) {
       const sp = ui.preview ? { c: ui.preview.c, r: ui.preview.r } : (ui.hover ? anchorFor(item.type, ui.hover.c, ui.hover.r) : null);
-      if (sp && fits(item.type, sp.c, sp.r, item.moveId)) { placeFx = placeEffects(item, sp.c, sp.r); drawRange(placeFx, sp.c, sp.r, sizeOf(item.type)); }
+      if (sp && fits(item.type, sp.c, sp.r, item.moveId)) { placeFx = placeEffects(item, sp.c, sp.r); drawRange(placeFx, sp.c, sp.r, ...dimsOf(item.type, rotFor(item.type))); }
     }
     // A selected building shows its reach again: the same area you saw while placing it.
     if (playing && !item && !ui.visit && ui.panel && ui.panel.kind === 'info' && ui.selected != null) {
       const sb = byId(ui.selected);
-      if (sb && live(sb)) { placeFx = placeEffects({ type: sb.type, level: sb.level, moveId: sb.id }, sb.c, sb.r); drawRange(placeFx, sb.c, sb.r, sizeOf(sb.type)); }
+      if (sb && live(sb)) { placeFx = placeEffects({ type: sb.type, level: sb.level, moveId: sb.id, rot: sb.rot || 0 }, sb.c, sb.r); drawRange(placeFx, sb.c, sb.r, ...dimsB(sb)); }
     }
     if (playing && ui.spot) {
       const p = tileCenter(ui.spot.c, ui.spot.r);
@@ -5285,16 +5576,16 @@
     const objs = [], after = [];
     for (const b of state.buildings) {
       if (item && ui.holding.id === b.id) continue;
-      const s = sizeOf(b.type);
-      objs.push({ depth: b.c + b.r + (s - 1), draw: () => {
+      const s = b.fp1 ? 1 : sizeOf(b.type), [bw, bd] = dimsB(b), rot = b.rot || 0;
+      objs.push({ depth: b.c + b.r + (bw - 1) / 2 + (bd - 1) / 2, draw: () => {
         const p = centerOf(b), hw = HW * s, hh = HH * s, u = HW / 30;
         const q = jobFor(b.id);
         const rv = revealFor(b.id);
         if (rv) {
           if (rv.t0 == null || now < rv.t0) {
             // Before its moment: still the construction site, the ruin or the old level.
-            if (rv.kind === 'build') drawBuilding(c, b.type, 1, p.x, p.y, hw, hh, { site: true, progress: 0.97, time: now });
-            else drawBuilding(c, b.type, rv.kind === 'upgrade' ? rv.from : b.level, p.x, p.y, hw, hh, { ruin: rv.kind === 'repair', time: now, scaffold: true, progress: 0.97 });
+            if (rv.kind === 'build') drawBuilding(c, b.type, 1, p.x, p.y, hw, hh, { site: true, progress: 0.97, time: now, rot });
+            else drawBuilding(c, b.type, rv.kind === 'upgrade' ? rv.from : b.level, p.x, p.y, hw, hh, { ruin: rv.kind === 'repair', time: now, scaffold: true, progress: 0.97, rot });
             return;
           }
           const k = (now - rv.t0) / 650;
@@ -5309,7 +5600,7 @@
           if (k < 1) {
             const sc = Math.max(0.05, easeBack(clamp(k, 0, 1)));
             c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3));
-            drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { time: now });
+            drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { time: now, rot });
             c.restore();
             return;
           }
@@ -5318,7 +5609,7 @@
         let sc = 1;
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
-        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, fire: b.fire ? fireK(b) : 0 });
+        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
         if (sc !== 1) c.restore();
         if (q && q.done === 0 && bigQ(q)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#5B2DB8', String(focusJobs().indexOf(q) + 1));
         else if (q && !bigQ(q) && !crewOnSite(q.bid)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
@@ -5360,6 +5651,8 @@
           const kind = w.act.kind;
           if (kind === 'sweep') pose.arms = 'sweep';
           else if (kind === 'trim') { pose.arms = 'trim'; pose.tool = 'shears'; }
+          else if (kind === 'rake') { pose.arms = 'sweep'; pose.tool = 'broom'; }
+          else if (kind === 'chop') { pose.arms = 'hammer'; pose.tool = 'hammer'; pose.swing = reduced ? 0.5 : (Math.sin(now / 160) + 1) / 2; }
           else if (kind === 'spray') { pose.arms = 'spray'; pose.tool = 'hose'; }
         }
         const hand = person(c, p.x, p.y, w.role ? 1 : 0.92, w.look, pose);
@@ -5389,6 +5682,11 @@
     objs.sort((a, b) => a.depth - b.depth);
     for (const o of objs) o.draw();
     for (const fn of after) fn();
+    // 10.06: warm sunlight from the top left and a soft vignette, so the town has depth (only by day)
+    { const dk = skyNow().dark || 0; if (dk < 0.6) { c.save(); c.setTransform(d, 0, 0, d, 0, 0);
+      const g = c.createRadialGradient(geo.w * 0.15, geo.h * 0.05, 0, geo.w * 0.15, geo.h * 0.05, Math.max(geo.w, geo.h) * 1.1);
+      g.addColorStop(0, `rgba(255,236,190,${(0.14 * (1 - dk / 0.6)).toFixed(3)})`); g.addColorStop(0.55, 'rgba(255,236,190,0)'); g.addColorStop(1, `rgba(20,30,60,${(0.12 * (1 - dk / 0.6)).toFixed(3)})`);
+      c.fillStyle = g; c.fillRect(0, 0, geo.w, geo.h); c.restore(); } }
     // a soft evening or night light over the town (labels stay bright)
     const tint = skyNow().tint;
     if (tint[3] > 0.005) { c.save(); c.setTransform(d, 0, 0, d, 0, 0); c.fillStyle = css(tint); c.fillRect(0, 0, geo.w, geo.h); c.restore(); }
@@ -5471,18 +5769,21 @@
       const p = centerOf(b);
       // a request bubble pops up for 6 seconds every 30 (each at its own moment); in between, a small "!" (10.05)
       const ph = ((now / 1000 + (b.id * 7) % 30) % 30);
+      // between showings the "!" rests on the building itself (10.06: it used to float above the roof, over the tile behind)
+      const yRest = p.y - (p.y - labelY(b)) * 0.45;
       if (q.alert || ph < 6) {
-        const k = q.alert ? 1 : clamp(ph / 0.35, 0, 1), fade = q.alert ? 1 : clamp((6 - ph) / 0.4, 0, 1), y = labelY(b) - (reduced ? 0 : Math.abs(Math.sin(now / 380)) * 4);
-        c.save(); c.globalAlpha = fade; hit(b, p.x, y, speech(c, p.x, y, q.from === 'Town council' ? 'Town council' : q.from, px, 'req', k), q); c.restore();
-      } else { const y = labelY(b) - 6; badge(c, p.x, y, 7 * px, '#C2477A', '!'); const sp = toScreen(p.x, y); ui.hits.push({ x0: sp.x - 16, x1: sp.x + 16, y0: sp.y - 16, y1: sp.y + 16, bid: b.id, q, bubble: null }); }
+        const fade = q.alert ? 1 : clamp((6 - ph) / 0.45, 0, 1), k = q.alert ? 1 : ph < 0.35 ? clamp(ph / 0.35, 0, 1) : 0.15 + 0.85 * fade;
+        const y0 = labelY(b) - (reduced ? 0 : Math.abs(Math.sin(now / 380)) * 4), y = yRest + (y0 - yRest) * (fade < 1 ? fade * fade : 1);
+        c.save(); c.globalAlpha = Math.min(1, fade * 1.4); const sz = speech(c, p.x, y, q.from === 'Town council' ? 'Town council' : q.from, px, 'req', k); if (fade > 0.6) hit(b, p.x, y, sz, q); c.restore();
+      } else { badge(c, p.x, yRest, 6.5 * px, '#C2477A', '!'); const sp = toScreen(p.x, yRest), r0 = Math.max(9, 7 * px * z); ui.hits.push({ x0: sp.x - r0, x1: sp.x + r0, y0: sp.y - r0, y1: sp.y + r0, bid: b.id, q, bubble: null }); }
       labelled.add(b.id);
     }
     if (item) {
       const spot = ui.preview ? { c: ui.preview.c, r: ui.preview.r } : (ui.hover ? anchorFor(item.type, ui.hover.c, ui.hover.r) : null);
       if (spot && fits(item.type, spot.c, spot.r, item.moveId)) {
-        const s = sizeOf(item.type), p = tileCenter(spot.c + (s - 1) / 2, spot.r + (s - 1) / 2);
-        diamond(c, p.x, p.y, HW * s, HH * s, 'rgba(255,244,194,.55)');
-        drawBuilding(c, item.type, item.level, p.x, p.y, HW * s, HH * s, { alpha: ui.preview ? 0.92 : 0.6, time: now });
+        const s = sizeOf(item.type), ro = rotFor(item.type), [w, d] = dimsOf(item.type, ro), p = tileCenter(spot.c + (w - 1) / 2, spot.r + (d - 1) / 2);
+        poly(c, footPts(spot.c, spot.r, w, d), 'rgba(255,244,194,.55)');
+        drawBuilding(c, item.type, item.level, p.x, p.y, HW * s, HH * s, { alpha: ui.preview ? 0.92 : 0.6, time: now, rot: ro });
       }
     }
     // Birds now and then.
@@ -5805,12 +6106,13 @@
       if (ov.classList.contains('go')) return;
       const x = e && e.clientX != null ? e.clientX : innerWidth / 2, y = e && e.clientY != null ? e.clientY : innerHeight / 2;
       const go = $('in-go'); go.style.setProperty('--gx', x + 'px'); go.style.setProperty('--gy', y + 'px');
+      go.replaceChildren(...[..."Let's goooo!"].map((ch, i) => { const sp = el('span', 'gl' + (ch === 'o' ? ' o' : ''), ch === ' ' ? '\u00a0' : ch); sp.style.setProperty('--d', `${0.05 + i * 0.045}s`); return sp; }));
       const burst = $('in-burst'), cols = ['#A3E635', '#F6C65B', '#FF8FB1', '#7FB2FF', '#FFFFFF', '#8B5CF6'];
       const ring = el('b'); ring.style.setProperty('--x', x + 'px'); ring.style.setProperty('--y', y + 'px'); burst.append(ring);
       for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, c = el('i'); c.style.setProperty('--x', x + 'px'); c.style.setProperty('--y', y + 'px'); c.style.setProperty('--dx', `${Math.cos(a) * d}px`); c.style.setProperty('--dy', `${Math.sin(a) * d + 40}px`); c.style.setProperty('--r', `${Math.round(Math.random() * 720 - 360)}deg`); c.style.setProperty('--c', cols[i % cols.length]); c.style.animationDelay = `${Math.random() * 0.08}s`; burst.append(c); }
-      ov.classList.add('go'); if (state.sound) { sfx.chime(); setTimeout(() => sfx.pop && sfx.pop(), 120); }
-      setTimeout(() => ov.classList.add('out'), reduced ? 300 : 1150);
-      setTimeout(() => { ov.hidden = true; ov.classList.remove('on', 'go', 'out'); burst.replaceChildren(); }, reduced ? 650 : 1650);
+      ov.classList.add('go'); if (state.sound) sfx.fanfare();
+      setTimeout(() => ov.classList.add('out'), reduced ? 300 : 1500);
+      setTimeout(() => { ov.hidden = true; ov.classList.remove('on', 'go', 'out'); burst.replaceChildren(); }, reduced ? 650 : 2000);
     };
   }
   function renderBanner() {
@@ -6001,7 +6303,8 @@
     row.append(vehIcon(f.kind === 'fire' ? 'fire' : f.kind === 'police' ? 'police' : f.kind));
     const tx = el('div'); tx.append(el('b', '', f.name));
     const faster = ['firestation', 'police', 'clinic'].includes(b.type) ? ' They get there much faster than on foot.' : '';
-    tx.append(el('small', '', b.vehicle ? `On duty. Reach ${stationReach(b)} tiles instead of ${t.reach}.${faster}` : `Without it your ${STAFF[t.staff].plural} go on foot: slow, and only ${t.reach} tiles. With it: ${Math.round(t.reach * 1.5)} tiles.${faster}`));
+    const br = baseReach(b.type, b.level);
+    tx.append(el('small', '', b.vehicle ? `On duty. Reach ${stationReach(b)} tiles instead of ${br}.${faster}` : `Without it your ${STAFF[t.staff].plural} go on foot: slow, and only ${br} tiles. With it: ${Math.round(br * 1.5)} tiles.${faster}`));
     tx.append(el('span', 'fee', b.vehicle ? `Upkeep ${f.upkeep} gold an hour` : `${f.cost} gold, then ${f.upkeep} gold an hour`));
     row.append(tx);
     const stp = el('div', 'stepper');
@@ -6072,6 +6375,7 @@
     if (!b) { ui.panel = null; return; }
     if (ui.visit) { renderVisitInfo(box, b); return; }
     if (b.type === 'works') { renderWorksPanel(box, b); return; }
+    if (b.type === 'fallen') { renderFallenPanel(box, b); return; }
     const p = ui.panel, t = T(b), ci = city(), inf = ci.info.get(b.id) || {}, q = jobFor(b.id), mood = econ().mood;
     const chips = [];
     if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast(fireStatus(b) + '.'); else openPanel({ kind: 'alert', bid: b.id }); }));
@@ -6117,7 +6421,7 @@
     }
     const row = el('div', 'acts3');
     const moveBtn = () => { const fm = state.freeMoves || 0, mc = moveCost(b);
-      return actionBtn('Move', fm ? `free move · ${fm} left` : `${mc} gold`, '', () => { if (!fm && state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold. You need ${fmtGold(mc - state.gold + 0.999)} more.`); return; } ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); renderAll(); }); };
+      return actionBtn(FOOT[b.type] ? 'Move or turn' : 'Move', fm ? `free move · ${fm} left` : `${mc} gold`, '', () => { if (!fm && state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold. You need ${fmtGold(mc - state.gold + 0.999)} more.`); return; } ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); if (FOOT[b.type]) { ui.preview = { c: b.c, r: b.r }; ui.panel = { kind: 'place' }; } renderAll(); }); };
     let why = null;
     if (q && bigQ(q)) {
       const left = exactMinutes(q.work - q.done);
@@ -6181,7 +6485,9 @@
     const t = TYPES[type], L = level || 1, out = [];
     if (t.job) out.push(`Your job here while you focus: ${t.job.verb.toLowerCase()} · ${(t.job.gold * FOCUS_PAY).toFixed(1)} gold a minute · ${t.job.play === 1 ? 'normal play time' : `${t.job.play}× play time`}`);
     if (t.near) out.push(t.near.v < 0 ? `Homes right next to it pay ${Math.round(-t.near.v * 100)}% less (${t.near.label})` : `Homes right next to it pay ${Math.round(t.near.v * 100)}% more (${t.near.label})`);
-    if (t.staff) out.push(`${capFirst(STAFF[t.staff].plural)} work here (room for ${t.slots[L]}) and look after everything fully within ${t.reach} tiles`);
+    if (t.staff) out.push(`${capFirst(STAFF[t.staff].plural)} work here (room for ${t.slots[L]}) and look after every building fully within ${baseReach(type, L)} tiles`);
+    if (t.staff && L < t.max) out.push(`Level ${L + 1}: reach ${baseReach(type, L)} → ${baseReach(type, L + 1)} tiles, its ${STAFF[t.staff].plural} get ready 20% sooner and work 20% better`);
+    else if (t.staff && L > 1) out.push(`Level ${L}: ready ${Math.round((1 - prepK({ level: L })) * 100)}% sooner and ${Math.round((stationK({ level: L }) - 1) * 100)}% better than level 1`);
     if (type === 'workshop') out.push('While you have one, the crew builds 20% faster');
     if (type === 'bank') out.push(`You can borrow up to ${BANK_LIMIT[Math.min(L, 3)]} gold, and the treasury holds ${BANK_SAFE[Math.min(L, 3)]} gold more`);
     if (type === 'bakery' || type === 'cafe') out.push(`Next to a ${type === 'bakery' ? 'café' : 'bakery'} (2 tiles), both earn 10% more`);
@@ -6393,7 +6699,7 @@
         else if (t.cat === 'landmark') { note = t.perk; nc = 'pos'; }
         else if (t.near && t.near.v < 0) { note = `−${Math.round(-t.near.v * 100)}% next door (${t.near.label})`; nc = 'neg'; }
         else if (t.near) { note = `+${Math.round(t.near.v * 100)}% next door`; nc = 'pos'; }
-        else if (type === 'police') { note = `Keeps homes within ${t.reach} tiles safe`; nc = 'pos'; }
+        else if (type === 'police') { note = `Keeps buildings within ${t.reach} tiles safe`; nc = 'pos'; }
         else if (t.staff) { note = `Home of the ${STAFF[t.staff].plural}`; }
         else if (t.job && (t.job.play >= 2 || t.job.gold >= 2.5)) { note = `Job: ${jobLine(Object.assign({ gold: t.job.gold }, t.job))}`; nc = 'pos'; }
         else if (!chk.ok && chk.why) { note = chk.why; nc = 'lock'; }
@@ -6416,8 +6722,8 @@
     setHolding({ kind: 'new', type });
     if (spot) { const a = anchorFor(type, spot.c, spot.r); if (fits(type, a.c, a.r)) { ui.preview = { c: a.c, r: a.r }; ui.panel = { kind: 'place' }; } }
     renderAll(); sfx.pop();
-    if (ui.preview) { const s = sizeOf(type), p = tileCenter(ui.preview.c + (s - 1) / 2, ui.preview.r + (s - 1) / 2); requestAnimationFrame(() => keepVisible(p.x, p.y - 14)); }
-    else toast(`Tap a free ${sizeOf(type) > 1 ? `${sizeOf(type)}×${sizeOf(type)} space` : 'tile'} for the ${TYPES[type].name.toLowerCase()}.`);
+    if (ui.preview) { const [w, d] = dimsOf(type, rotFor(type)), p = tileCenter(ui.preview.c + (w - 1) / 2, ui.preview.r + (d - 1) / 2); requestAnimationFrame(() => keepVisible(p.x, p.y - 14)); }
+    else toast(`Tap a free ${spaceWord(type)} for the ${TYPES[type].name.toLowerCase()}.`);
     return true;
   }
   function confirmPlace() {
@@ -6438,10 +6744,11 @@
   // What a building at this spot does to the town: homes it helps or bothers, customers, homes kept safe.
   const fxCache = { key: '', val: null };
   function placeEffects(item, ac, ar) {
-    const key = `${item.type}:${item.moveId}:${ac},${ar}:${state.buildings.length}:${cityCache ? 1 : 0}`;
+    const rot = item.rot != null ? item.rot : rotFor(item.type);
+    const key = `${item.type}:${item.moveId}:${item.level}:${rot}:${ac},${ar}:${state.buildings.length}:${touchSeq}`; // 10.06: a bought vehicle shows its reach at once
     if (fxCache.key === key) return fxCache.val;
     const t = TYPES[item.type], others = state.buildings.filter((b) => b.id !== item.moveId);
-    const me = { id: -1, type: item.type, level: item.level, c: ac, r: ar };
+    const me = { id: -1, type: item.type, level: item.level, c: ac, r: ar, rot };
     const before = computeCity(others), after = computeCity(others.concat([me]));
     const homes = [];
     for (const h of others) { if (!live(h) || T(h).cat !== 'home') continue; const a = after.info.get(h.id), b0 = before.info.get(h.id); if (a && b0 && Math.abs(a.mult - b0.mult) > 0.004) homes.push({ b: h, d: a.mult - b0.mult }); }
@@ -6454,7 +6761,7 @@
     const customers = t.cat === 'shop' ? others.filter((h) => live(h) && T(h).cat === 'home' && dist(h, me) <= t.radius).length : 0;
     // A service building's reach and the places its staff would look after from here.
     const vb = item.moveId != null ? byId(item.moveId) : null;
-    const sk = t.staff, reach = sk ? Math.round(t.reach * (vb && vb.vehicle ? 1.5 : 1)) : 0;
+    const sk = t.staff, reach = sk ? Math.round(baseReach(item.type, vb ? vb.level : 1) * (vb && vb.vehicle ? 1.5 : 1)) : 0;
     const safeList = sk ? others.filter((h) => SERVES[sk].what(h) && distFull(me, h) <= reach) : null, safe = safeList ? safeList.length : 0;
     const val = { homes, radius, kind, customers, safe, safeList, reach, staff: sk, gold: (after.total - before.total) * econ().mood.mult };
     fxCache.key = key; fxCache.val = val;
@@ -6479,7 +6786,7 @@
     if (t.cat === 'joy' && t.boost && t.boost[L]) out.push(`Homes within ${t.radius} tile${t.radius > 1 ? 's' : ''} pay ${Math.round(t.boost[L] * 100)}% more`);
     if (t.cat === 'decor' && !special(t)) out.push('Homes right next to it pay 5% more (up to 15% from decorations)');
     if (t.near) out.push(t.near.v < 0 ? `Homes right next to it pay ${Math.round(-t.near.v * 100)}% less (${t.near.label})` : `Homes right next to it pay ${Math.round(t.near.v * 100)}% more (${t.near.label})`);
-    if (t.staff) out.push(`${capFirst(STAFF[t.staff].plural)} work here (room for ${t.slots[L]}) and look after everything within ${t.reach} tiles`);
+    if (t.staff) out.push(`${capFirst(STAFF[t.staff].plural)} work here (room for ${t.slots[L]}) and look after every building within ${baseReach(type, L)} tiles`);
     if (RUNNING[type]) out.push(`Costs ${RUNNING[type] * L} gold an hour to run${t.staff ? ', plus wages' : ''}`);
     if (type === 'workshop') out.push('While you have one, the crew builds 20% faster');
     if (type === 'bank') out.push(`You can borrow up to ${BANK_LIMIT[Math.min(L, 3)]} gold from neighbour towns, and the treasury holds ${BANK_SAFE[Math.min(L, 3)]} more`);
@@ -6521,7 +6828,8 @@
     box.append(ul);
     const grid = el('div', 'actions-grid');
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); grid.append(actionBtn(`Build it · ${chk.cost} gold`, big ? 'then focus to build it' : `${state.builder} starts right away`, 'playc', confirmPlace)); }
-    else { const mb = byId(item.moveId); grid.append(actionBtn('Place here', state.freeMoves > 0 ? 'free move' : `moving crew · ${moveCost(mb)} gold`, 'playc', () => { const pv = ui.preview; ui.panel = null; placeHeld(pv.c, pv.r); })); }
+    else { const mb = byId(item.moveId), same = mb && ui.preview.c === mb.c && ui.preview.r === mb.r && (ui.rot || 0) === (mb.rot || 0); grid.append(actionBtn('Place here', same ? 'no change: free' : state.freeMoves > 0 ? 'free move' : `moving crew · ${moveCost(mb)} gold`, 'playc', () => { const pv = ui.preview; ui.panel = null; placeHeld(pv.c, pv.r); })); }
+    if (FOOT[item.type]) grid.append(actionBtn('Turn it', item.isNew ? 'free while you build it' : 'part of the move', '', turnHeld));
     grid.append(actionBtn('Cancel', null, '', () => { ui.panel = null; setHolding(null); renderAll(); afterAction(); }));
     box.append(grid);
     box.append(el('p', 'tiny muted', 'Tap another spot on the map to try it there.'));
@@ -6546,7 +6854,7 @@
   }
   // Firestore can't hold lists inside lists, so the town layout travels as one short string.
   const packB = (b) => (b || []).map((x) => x.join(':')).join(';');
-  const unpackB = (str) => String(str || '').split(';').filter(Boolean).map((x) => { const p = x.split(':'); return [p[0], +p[1], +p[2], +p[3], +p[4]]; });
+  const unpackB = (str) => String(str || '').split(';').filter(Boolean).map((x) => { const p = x.split(':'); return p[5] != null ? [p[0], +p[1], +p[2], +p[3], +p[4], +p[5]] : [p[0], +p[1], +p[2], +p[3], +p[4]]; });
   function fbDb(api) {
     const docs = async () => { const list = await api.list(); return { docs: list.map((d) => { const o = Object.assign({}, d); o.b = unpackB(o.bs); delete o.bs; delete o.id; return { id: d.id, data: () => o }; }) }; };
     const out = (b) => { const o = Object.assign({}, b); if (o.b) { o.bs = packB(o.b); delete o.b; } return o; };
@@ -6676,7 +6984,7 @@
     return { v: 1, town: state.town, builder: state.builder, level: state.level, residents: city().residents, mood: moodNow(now).value, streak: state.streak.count,
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
-      b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0)]),
+      b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works' && b.type !== 'fallen').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0), b.rot ? 1 : 0]),
       staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])) };
   }
   function boardSoon() { if (!board.db || !state.board.joined) return; clearTimeout(board.timer); board.timer = setTimeout(boardPush, 1500); }
@@ -6760,7 +7068,7 @@
       staff: Object.assign(noStaff(), snap.staff || {}), flags: { tourDone: true, fireSeen: true } });
     vs.streak.count = snap.streak | 0;
     let nid = 1;
-    vs.buildings = snap.b.filter((x) => Array.isArray(x) && TYPES[x[0]]).map((x) => ({ id: nid++, type: x[0], c: clamp(x[1] | 0, 0, N - 1), r: clamp(x[2] | 0, 0, N - 1), level: clamp(x[3] | 0, 1, TYPES[x[0]].max || 1), ruin: !!(x[4] & 1), site: !!(x[4] & 2), origin: 'built' }));
+    vs.buildings = snap.b.filter((x) => Array.isArray(x) && TYPES[x[0]]).map((x) => ({ id: nid++, type: x[0], c: clamp(x[1] | 0, 0, N - 1), r: clamp(x[2] | 0, 0, N - 1), level: clamp(x[3] | 0, 1, TYPES[x[0]].max || 1), ruin: !!(x[4] & 1), site: !!(x[4] & 2), origin: 'built', rot: x[5] ? 1 : 0, fp6: true, fp1: FOOT[x[0]] && x[5] == null ? true : undefined }));
     if (!vs.buildings.some((b) => b.type === 'townhall')) vs.buildings.unshift({ id: nid++, type: 'townhall', c: 5, r: 5, level: 1 });
     for (const b of vs.buildings) if (TYPES[b.type].cat === 'home') b.resident = NAMES[b.id % NAMES.length];
     closeSheet(); closePanel(true); setHolding(null);
@@ -6811,10 +7119,10 @@
       let seed = 1234567 + i * 7919; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
       const hall = level >= 12 ? 4 : level >= 8 ? 3 : level >= 5 ? 2 : 1;
       const land = ['base'].concat(level >= 6 ? ['east'] : [], level >= 10 ? ['south'] : []);
-      const b = [['townhall', 5, 5, hall, 0]], occ = new Set(); const put = (type, c, r) => { const sz = sizeOf(type); for (let x = 0; x < sz; x++) for (let y = 0; y < sz; y++) occ.add((c + x) + ',' + (r + y)); };
+      const b = [['townhall', 5, 5, hall, 0]], occ = new Set(); const put = (type, c, r) => { const [sw, sd] = dimsOf(type, 0); for (let x = 0; x < sw; x++) for (let y = 0; y < sd; y++) occ.add((c + x) + ',' + (r + y)); };
       put('townhall', 5, 5);
       const open = (c, r) => (c < 12 && r < 12) || (land.includes('east') && c >= 12 && r < 12) || (land.includes('south') && c < 12 && r >= 12);
-      const fitsBot = (type, c, r) => { const sz = sizeOf(type); for (let x = 0; x < sz; x++) for (let y = 0; y < sz; y++) { const cc = c + x, rr = r + y; if (cc < 0 || rr < 0 || cc >= N || rr >= N || !open(cc, rr) || occ.has(cc + ',' + rr)) return false; } return true; };
+      const fitsBot = (type, c, r) => { const [sw, sd] = dimsOf(type, 0); for (let x = 0; x < sw; x++) for (let y = 0; y < sd; y++) { const cc = c + x, rr = r + y; if (cc < 0 || rr < 0 || cc >= N || rr >= N || !open(cc, rr) || occ.has(cc + ',' + rr)) return false; } return true; };
       const want = ['cottage', 'cottage', 'cottage', 'market', 'cafe', 'park', 'tree', 'flowers', 'cottage', 'depot', 'firestation', 'townhouse', 'bakery', 'fountain', 'police', 'cottage', 'tree', 'workshop', 'townhouse', 'arcade', 'bookshop', 'clinic', 'cottage', 'bench', 'lighthouse', 'bank', 'tree', 'flowers'];
       const count = Math.min(want.length, 8 + level * 2);
       for (let k = 0; k < count; k++) {
@@ -7402,21 +7710,21 @@
     const room = loanRoom(); if (room < 20) return [];
     return [...new Set([0.25, 0.5, 1].map((k) => Math.max(20, Math.floor(room * k / 10) * 10)))].filter((x) => x <= room).map((amount) => ({ amount }));
   }
-  const planFor = (amount, p) => { const owed = Math.round(amount * (1 + p.rate)); return { h: p.h, rate: p.rate, owed, perHour: Math.ceil(owed / p.h) }; };
-  // Paying off now: what's left of the money you got, plus interest only for the hours used so far.
-  function payoffNow(L) {
-    const paid = (L.total || L.owed) - L.owed, used = clamp((L.hoursDone || 0) / (L.h || 8), 0, 1);
-    const due = Math.max(0, Math.ceil(L.amount * (1 + (L.rate || 0) * used) - paid));
-    return { due: Math.min(due, Math.ceil(L.owed)), saves: Math.max(0, Math.floor(L.owed - Math.min(due, L.owed))) };
-  }
+  // 10.06 (Navid): a loan is paid back without interest while you focus; only what you pay while you play carries the
+  // plan's interest. L.owed is what is left of the gold you got; L.perHour is the hourly part of it.
+  const planFor = (amount, p) => { const perHour = Math.ceil(amount / p.h), extra = Math.ceil(perHour * p.rate); return { h: p.h, rate: p.rate, perHour, extra, playHour: perHour + extra, owedPlay: Math.round(amount * (1 + p.rate)), owed: amount }; };
+  const playInstalment = (L) => Math.min(L.perHour || 20, L.owed) * (1 + (L.rate || 0));
+  const focusInstalment = (L) => Math.min(L.perHour || 20, L.owed);
+  // Paying off now: just what is left of the gold you got. No interest.
+  function payoffNow(L) { return { due: Math.ceil(L.owed - 1e-6), saves: Math.floor(L.owed * (L.rate || 0)) }; }
   function takeLoan(amount, h, sig, lender) {
     if (!loanOffers().some((x) => x.amount === amount) && amount > loanRoom()) { toast(bankLevel() ? 'That is more than your bank can arrange right now.' : 'You need a bank to borrow gold.'); return; }
     const p = planFor(amount, LOAN_PLANS.find((x) => x.h === h) || LOAN_PLANS[1]);
-    const L = { id: state.nextId++, lender: lender || pick(LENDERS), amount, owed: p.owed, total: p.owed, perHour: p.perHour, h: p.h, rate: p.rate, at: Date.now(), hoursDone: 0, sig: sig || null, signer: playerName() || 'Mayor' };
+    const L = { id: state.nextId++, v: 6, lender: lender || pick(LENDERS), amount, owed: amount, total: amount, perHour: p.perHour, h: p.h, rate: p.rate, at: Date.now(), hoursDone: 0, interest: 0, saved: 0, sig: sig || null, signer: playerName() || 'Mayor' };
     loans().push(L);
     goldChange(amount, `Loan from ${L.lender}`, 'loan');
     ui.loanAmt = null; ui.loanPlan = null; sfx.coin(); touch(); save(); renderAll();
-    toast(`${L.lender} lent you ${amount} gold. You pay back ${p.owed}: ${p.perHour} gold an hour while you play or focus.`);
+    toast(`${L.lender} lent you ${amount} gold. Pay it back while you focus and it costs no interest: ${p.perHour} gold an hour (${p.playHour} while you play).`);
     openTown('loans');
   }
   // Instalments for every loan: hours of play or focus (never while the app is closed).
@@ -7424,8 +7732,9 @@
     if (!(hours > 0)) return 0;
     let total = 0;
     for (const L of loans().slice()) {
-      const pay = Math.min(L.owed, (L.perHour || 20) * hours);
-      state.gold -= pay; L.owed -= pay; L.hoursDone = (L.hoursDone || 0) + hours; total += pay; if (!inSession) ledgerAcc('loan', -pay);
+      const base = Math.min(L.owed, (L.perHour || 20) * hours), extra = base * (L.rate || 0), pay = base + (inSession ? 0 : extra);
+      state.gold -= pay; L.owed -= base; L.hoursDone = (L.hoursDone || 0) + hours; total += pay;
+      if (inSession) L.saved = (L.saved || 0) + extra; else { L.interest = (L.interest || 0) + extra; ledgerAcc('loan', -pay); }
       if (L.owed <= 0.01) loanDone(L);
     }
     return total;
@@ -7442,8 +7751,8 @@
     const L = loans().find((x) => x.id === id); if (!L) return;
     const { due, saves } = payoffNow(L);
     if (state.gold + 1e-6 < due) { toast(`Paying it off takes ${due} gold. You have ${fmtGold(Math.max(0, state.gold))}.`); return; }
-    goldChange(-due, `Paid off the loan from ${L.lender} early`, 'loan'); L.owed = 0; loanDone(L);
-    sfx.coin(); save(); renderAll(); toast(`Loan paid off early! You saved ${saves} gold of interest.`); openTown('loans');
+    goldChange(-due, `Paid off the loan from ${L.lender}`, 'loan'); L.owed = 0; loanDone(L);
+    sfx.coin(); save(); renderAll(); toast(`Loan paid off, with no interest! (Paid while playing, it would have cost ${saves} more.)`); openTown('loans');
   }
   function payPart(id) {
     const L = loans().find((x) => x.id === id); if (!L) return;
@@ -7489,7 +7798,7 @@
     if (ec.running) frow('Running the service buildings', `−${Math.round(ec.running)}/h`, 'neg');
     if (ec.fleet) frow('Vehicles', `−${Math.round(ec.fleet)}/h`, 'neg');
     if (ec.jail) frow(`Prisoners in the cells (${state.jail.length})`, `−${Math.round(ec.jail)}/h`, 'neg');
-    if (loans().length) frow(`Loan instalments (${loans().length})`, `−${Math.round(ec.loanPay)}/h`, 'neg');
+    if (loans().length) frow(`Loan instalments while you play (${loans().length}) · ${Math.round(ec.loanFocus)}/h while you focus, no interest`, `−${Math.round(ec.loanPay)}/h`, 'neg');
     frow('You get', `${ec.keep < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep))}/h`, ec.keep >= 0 ? 'pos' : 'neg');
     wrap.append(fl);
     wrap.append(el('p', 'small muted', 'While you focus, the town earns twice the taxes (costs stay the same). The rest of the time (app closed, or resting on Home) everything runs at a tenth of the speed, and no instalments are taken.'));
@@ -7536,10 +7845,11 @@
     for (const L of loans()) {
       const card = el('div', 'loanbox'), po = payoffNow(L), left = Math.ceil(L.owed), hrs = L.owed / (L.perHour || 20);
       card.append(el('b', '', `${L.lender} · ${L.amount} gold`));
-      card.append(el('div', 'small', `${left} of ${Math.round(L.total || L.owed)} gold still to pay · ${L.perHour} gold an hour while you play or focus · about ${fmtMin(Math.ceil(hrs * 60))} left.`));
+      const ln = el('div', 'small'); ln.append(colorize(`${left} of ${L.amount} gold left · about ${fmtMin(Math.ceil(hrs * 60))} to go. While you focus: ${Math.ceil(focusInstalment(L))} gold an hour, no interest. While you play: ${Math.ceil(playInstalment(L))} gold an hour (+${Math.round((L.rate || 0) * 100)}% interest).`)); card.append(ln);
+      if ((L.saved || 0) >= 1 || (L.interest || 0) >= 1) card.append(el('div', 'tiny muted', `Interest so far: ${Math.round(L.interest || 0)} gold · saved by focusing: ${Math.round(L.saved || 0)} gold`));
       const bar = el('div', 'bar'); const sp = el('span'); sp.style.width = clamp((1 - L.owed / (L.total || L.owed)) * 100, 0, 100) + '%'; sp.style.background = 'var(--good, #3E8E57)'; bar.append(sp); card.append(bar);
       const row = el('div', 'row');
-      const off = el('button', 'btn sm primary', `Pay off now · ${po.due} gold${po.saves ? ` (save ${po.saves})` : ''}`); off.disabled = state.gold + 1e-6 < po.due; off.addEventListener('click', () => payOffLoan(L.id)); row.append(off);
+      const off = el('button', 'btn sm primary', `Pay off now · ${po.due} gold, no interest`); off.disabled = state.gold + 1e-6 < po.due; off.addEventListener('click', () => payOffLoan(L.id)); row.append(off);
       if (state.gold >= 1 && state.gold < po.due) { const pp = el('button', 'btn sm', `Pay ${Math.floor(state.gold)} now`); pp.addEventListener('click', () => payPart(L.id)); row.append(pp); }
       const vc = el('button', 'link', 'Contract'); vc.addEventListener('click', () => openContract(null, L)); row.append(vc);
       card.append(row); wrap.append(card);
@@ -7558,33 +7868,29 @@
     const pl = el('div', 'loanplans');
     for (const p0 of LOAN_PLANS) {
       const p = planFor(ui.loanAmt, p0), b = el('button', 'loanplan'); b.type = 'button'; b.setAttribute('aria-pressed', String(p.h === ui.loanPlan));
-      b.append(el('b', '', `${p.h} h of play or focus`), el('span', '', `+${Math.round(p.rate * 100)}% · pay back ${p.owed}`), el('small', '', `${p.perHour} gold an hour`));
+      b.append(el('b', '', `${p.h} hours`), el('span', 'fc', `Focus: ${p.perHour}/h, no interest`), el('small', '', `Play: ${p.playHour}/h (+${Math.round(p.rate * 100)}%)`));
       b.addEventListener('click', () => { ui.loanPlan = p.h; openTown('loans'); }); pl.append(b);
     }
     bx.append(pl);
     const cho = planFor(ui.loanAmt, LOAN_PLANS.find((x) => x.h === ui.loanPlan) || LOAN_PLANS[1]);
-    if (cho.perHour + ec.loanPay > Math.max(0, ec.net)) bx.append(el('div', 'small warnline', `Careful: ${cho.perHour + ec.loanPay} gold an hour in instalments is more than your town makes after costs (${Math.max(0, Math.round(ec.net))} an hour). Your gold would go down while you play. A longer plan pays less each hour.`));
+    if (cho.playHour + ec.loanPay > Math.max(0, ec.net)) bx.append(el('div', 'small warnline', `Careful: ${Math.round(cho.playHour + ec.loanPay)} gold an hour in instalments while you play is more than your town makes after costs (${Math.max(0, Math.round(ec.net))} an hour). Your gold would go down while you play. A longer plan pays less each hour.`));
     const go = el('button', 'btn sm primary', `Read and sign the contract · ${ui.loanAmt} gold`); go.addEventListener('click', () => openContract({ amount: ui.loanAmt, h: ui.loanPlan })); bx.append(go);
     wrap.append(bx);
     if ((state.loansDone || []).length) { wrap.append(el('h3', 'plan-h', 'Paid off')); const ul = el('ul', 'earners'); for (const d of state.loansDone.slice().reverse().slice(0, 8)) { const li = el('li'); li.append(el('span', '', `${d.lender} · ${d.amount} gold${d.forgiven ? ' (forgiven)' : ''}`), el('span', 'tiny muted', new Date(d.done).toLocaleDateString())); ul.append(li); } wrap.append(ul); }
   }
   // The loan contract: the terms, and a place to sign with your finger (10.05).
   function openContract(offer, existing) {
-    const L = existing, p = L ? { owed: L.total, perHour: L.perHour, h: L.h, rate: L.rate } : planFor(offer.amount, LOAN_PLANS.find((x) => x.h === offer.h) || LOAN_PLANS[1]);
+    const L = existing, p = planFor(L ? L.amount : offer.amount, L ? { h: L.h || 8, rate: L.rate || 0 } : (LOAN_PLANS.find((x) => x.h === offer.h) || LOAN_PLANS[1]));
     const amount = L ? L.amount : offer.amount, lender = L ? L.lender : (ui.nextLender = ui.nextLender || pick(LENDERS));
     const wrap = el('div', 'contract');
     wrap.append(el('div', 'ct-title', 'Loan contract'));
     const who = L ? L.signer : playerName();
-    wrap.append(el('p', 'small', `Between ${lender} (the lender) and ${who && who !== 'Mayor' ? `${who}, Mayor of ${state.town}` : `the Mayor of ${state.town}`} (the borrower).`));
-    const ul = el('ol', 'ct-terms');
-    for (const x of [
-      `The lender gives the borrower ${amount} gold now.`,
-      `The borrower pays back ${p.owed} gold in total (${Math.round(p.rate * 100)}% interest), within ${p.h} hours of play or focus.`,
-      `Instalments of ${p.perHour} gold an hour are taken only while the borrower plays or focuses. Nothing is taken while the app is closed.`,
-      'The borrower may pay it all off early at any time, and then pays interest only for the hours used so far.',
-      'If the treasury runs short, instalments are still taken and the town can go into debt.'
-    ]) ul.append(el('li', '', x));
-    wrap.append(ul);
+    wrap.append(el('p', 'ct-lead', `${lender} lends ${who && who !== 'Mayor' ? who : 'the Mayor'} of ${state.town} ${amount} gold, to pay back within ${p.h} hours of focus or play.`));
+    const deal = el('div', 'ct-deal');
+    const a = el('div', 'ct-opt good'); a.append(el('b', '', 'Pay it back by focusing'), el('span', '', `${p.perHour} gold an hour · ${amount} in total`), el('small', '', 'No interest'));
+    const b = el('div', 'ct-opt'); b.append(el('b', '', 'Pay it back while playing'), el('span', '', `${p.playHour} gold an hour · ${p.owedPlay} in total`), el('small', '', `+${Math.round(p.rate * 100)}% interest`));
+    deal.append(a, b); wrap.append(deal);
+    wrap.append(el('p', 'tiny ct-small', 'Instalments are taken only while the app is open. You can pay the rest off any time, with no interest.'));
     const sigBox = el('div', 'ct-sig');
     if (L) {
       sigBox.append(el('span', 'tiny muted', `Signed ${new Date(L.at).toLocaleString()}`));
@@ -7609,7 +7915,7 @@
       let sig = null; try { const sm = document.createElement('canvas'); sm.width = 180; sm.height = 66; sm.getContext('2d').drawImage(cv, 0, 0, 180, 66); sig = sm.toDataURL('image/png'); } catch (e) { /* no image */ }
       ui.nextLender = null; closeSheet(); takeLoan(amount, p.h, sig, lender);
     });
-    const back = el('button', 'btn full', 'Not now'); back.addEventListener('click', () => openTown('loans'));
+    const back = el('button', 'btn full ct-back', 'Not now'); back.addEventListener('click', () => openTown('loans'));
     wrap.append(sign, back);
     openSheet('Contract', wrap);
   }
@@ -7645,7 +7951,7 @@
     const home = TYPES[r.home].name.toLowerCase(), word = SERVES[k].word;
     if (ro.hasHome && ro.working && ro.homes && ro.covered < ro.homes) {
       const far = ro.homes - ro.covered, nb = state.buildings.find((b) => SERVES[k].what(b) && !coversB(k, b));
-      const n = el('div', 'snote bad'); n.append(el('span', '', `${far} of your ${ro.homes} ${word} ${far === 1 ? 'is' : 'are'} more than ${reachOf(k)} tiles from a staffed ${home}, so nobody comes there.`));
+      const n = el('div', 'snote bad'); n.append(el('span', '', `${far} of your ${ro.homes} ${word} ${far === 1 ? 'is' : 'are'} out of reach of a staffed ${home}, so nobody comes there.`));
       const fx2 = el('button', 'link', `Build a ${home} nearer`); fx2.addEventListener('click', () => { closeSheet(); openServiceSpot(r.home, nb); }); n.append(fx2);
       if (nb) { const sh = el('button', 'link', 'Show me'); sh.addEventListener('click', () => { closeSheet(); showOnMap(nb, { tab: 'info' }); }); n.append(sh); }
       notes.append(n);
@@ -7806,14 +8112,14 @@
     fac('Neighbourhoods', m.neigh, m.neigh >= 1 ? 'Parks and decorations near homes make people happy.' : m.neigh <= -1 ? 'Some homes sit next to something noisy or smelly.' : 'Put parks, flowers and trees right next to homes.', null, [-15, 25]);
     fac('Better buildings', m.quality, m.quality >= 1 ? 'Upgraded buildings make the town feel cared for.' : 'Upgrade buildings to raise this.', null, [0, 20]);
     const sw = role('sweeper'), dirty = m.avgTrash > 0.25;
-    const swFar = sw.working && sw.covered < sw.homes ? ` ${sw.homes - sw.covered} of them are more than ${reachOf('sweeper')} tiles from a staffed depot, so nobody cleans there.` : '';
+    const swFar = sw.working && sw.covered < sw.homes ? ` ${sw.homes - sw.covered} of them are out of reach of a staffed depot, so nobody cleans there.` : '';
     fac('Clean streets', m.clean, dirty ? `Trash is piling up outside homes and shops.${sw.working ? ' Your street sweepers are cleaning it up.' + swFar : ' Build a cleaning depot and hire a street sweeper.'}` : `The streets are clean.${swFar}`, dirty ? (sw.cover > 0.3 ? 'up' : 'down') : null, [-15, 6]);
     const po = role('police'), safeT = safetyTarget(city()), nk = nightK();
     if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`} ${nk > 0.5 ? 'It is night: homes far from the police are not safe now, and most break-ins happen after dark.' : 'Crime rises at night, most of all far from the police.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
     const nu = role('nurse');
     if (m.school) fac('School', m.school, m.school > 0 ? 'Kids near a school with a teacher learn, and their families earn more.' : 'Some homes are too far from a school (or there is no teacher).', null, [-4, 4]);
     if (m.sick) fac('Sick residents', m.sick, `${state.buildings.filter((b) => b.sick).length} home${state.buildings.filter((b) => b.sick).length > 1 ? 's are' : ' is'} sick and can't work. A nurse treats them.`, null, [-9, 0]);
-    if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} more than ${reachOf('nurse')} tiles from a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
+    if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} out of reach of a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
     if (m.debt) fac('Money trouble', m.debt, 'The town is in debt and staff wages are late. Sell a building, take a loan or let someone go: tap your gold to see the options.', null, [-10, 0]);
     if (m.trouble <= -0.5) fac('Recent trouble', m.trouble, `${(state.scars || []).slice(-3).map((x) => x.label).join(', ') || 'A break-in'}${state.buildings.some((b) => b.robbed) ? ', and a break-in nobody has solved yet' : ''}. It fades slowly.`, 'up', [-20, 0]);
     if (m.burning) fac('Fire', m.fires, staffWorking('fire') ? 'A building is on fire. Your firefighters are on their way.' : 'A building is on fire and nobody can put it out. Hire a firefighter.', null, [-20, 0]);
@@ -9122,7 +9428,26 @@
     }
     requestAnimationFrame(loop);
   }
+  // 10.06: older towns had a 1×1 fire station and police station and a 2×2 clinic. Fit them to their new 2×1 footprint:
+  // where they stand if there is room next to them, otherwise the nearest free spot.
+  function fitFootprints() {
+    const moved = [];
+    for (const b of state.buildings) {
+      if (!FOOT[b.type] || b.fp6) continue;
+      b.fp6 = true; delete b.fp1; touch();
+      const tryAt = (c, r, rot) => (fits(b.type, c, r, b.id, rot) ? (b.c = c, b.r = r, b.rot = rot, true) : false);
+      const near = b.type === 'clinic' ? [[b.c, b.r, 0], [b.c, b.r, 1], [b.c, b.r + 1, 0], [b.c + 1, b.r, 1]] : [[b.c, b.r, 0], [b.c, b.r, 1], [b.c - 1, b.r, 0], [b.c, b.r - 1, 1]];
+      if (near.some(([c, r, rot]) => tryAt(c, r, rot))) { touch(); continue; }
+      let best = null, bd = 1e9;
+      for (const rot of [0, 1]) for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const d = Math.abs(c - b.c) + Math.abs(r - b.r); if (d < bd && fits(b.type, c, r, b.id, rot)) { bd = d; best = { c, r, rot }; } }
+      if (best) { b.c = best.c; b.r = best.r; b.rot = best.rot; moved.push(T(b).name.toLowerCase()); } else b.fp1 = true; // no room anywhere: it stays small until you move it
+      touch();
+    }
+    if (state.buildings.some((b) => FOOT[b.type])) save();
+    if (moved.length) setTimeout(() => toast(`Your ${moved.join(' and ')} ${moved.length > 1 ? 'are' : 'is'} now two tiles long, so ${moved.length > 1 ? 'they' : 'it'} moved to the nearest free spot.`), 1500);
+  }
   function boot() {
+    fitFootprints();
     hideResult(); closeSheet(); hideFocus(); hideCelebration();
     CH.active = false; $('chest').hidden = true;
     $('recharge').hidden = true; ui.recharge = null;
@@ -9199,6 +9524,14 @@
     covers: (k, bid) => coversB(k, byId(bid)),
     safety: () => ({ target: safetyTarget(city()), now: state.civic.safety, night: nightK() }),
     townStep: (m) => { townStep(m); },
+    vehShowcase: () => { const kinds = ['fire', 'police', 'nurse', 'garbage', 'van', 'builders', 'crew', 'bus'], dirs = [{ dc: 1, dr: 0 }, { dc: -1, dr: 0 }, { dc: 0, dr: 1 }, { dc: 0, dr: -1 }]; const cv = document.createElement('canvas'), Z = 3; cv.width = 4 * 90 * Z; cv.height = kinds.length * 70 * Z; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, cv.width, cv.height); const p0 = tileCenter(0, 0); kinds.forEach((k, i) => dirs.forEach((d, j) => { c.setTransform(Z, 0, 0, Z, 0, 0); c.translate(j * 90 + 45 - p0.x, i * 70 + 40 - p0.y); drawVehicle(c, { kind: k, c: 0.5, r: 0.5, dir: d, state: 'drive', foot: false }, 0, []); })); return cv.toDataURL('image/png'); },
+    payLoan: (h, inSession) => payLoan(h, inSession),
+    fallen: () => { const b = startFallen(); return b ? { id: b.id, c: b.c, r: b.r, covered: coversB('gardener', b) } : null; },
+    leaves: (bid, k) => { const b = byId(bid); if (k != null) { b.leaves = k; touch(); } return { leaves: b.leaves || 0, risk: fireRisk(b) }; },
+    turn: () => { turnHeld(); return { rot: ui.rot || 0, preview: ui.preview }; },
+    place: (type, c, r) => { startPlacing(type, { c, r }); return { preview: ui.preview, rot: ui.rot || 0 }; },
+    dims: (bid) => { const b = byId(bid); return { c: b.c, r: b.r, rot: b.rot || 0, dims: dimsB(b), fp1: !!b.fp1 }; },
+    stationK: (bid) => { const b = byId(bid); return { reach: stationReach(b), k: stationK(b), prep: prepK(b) }; },
     chestDemo: () => { const loot = [{ kind: 'gold', n: 120 }, { kind: 'play', n: 600, got: 600 }, { kind: 'item', type: 'goldstatue' }, { kind: 'freeze', n: 1 }, { kind: 'moves', n: 2 }, { kind: 'coffee', n: 2 }]; const r = { minutes: 50, chest: { rar: 3, loot }, xp: { gained: 90, from: { level: state.level, xp: 10 }, ups: [{ level: state.level + 1, gold: 50, title: 'Mayor', newTitle: false }] } }; ui.lastResult = null; showChest(r); return true; },
     chestGo: () => { const g = $('chest-go').getBoundingClientRect(); return { top: g.top, bottom: g.bottom, vh: innerHeight, text: $('chest-go').textContent, phase: CH.phase }; },
     loot: (rar, n) => { const c = {}; for (let i = 0; i < (n || 200); i++) for (const l of chestLoot(rar)) c[l.kind] = (c[l.kind] || 0) + 1; return c; },
