@@ -1132,8 +1132,8 @@
   const HW = 32, HH = 16; // tile half-width/height in map units
   const HOME_TAX = 1.2; // gold per resident per hour (version 10: 1.2; 10.05 tried 2; 10.06 back to 1.2: the gold should come from focus, not the buildings)
   const AWAY_RATE = 0.1; // taxes when you're not focusing or playing
-  const PLAY_CAP = 30 * 60; // most play time you can hold at once
-  const DAILY_PLAY = 45 * 60; // most play time you can earn in one day, so a fake 8-hour "focus" can't buy a day of play
+  const PLAY_CAP = 45 * 60; // most play time you can hold at once (10.07, Navid: 45 min)
+  const DAILY_PLAY = 120 * 60; // most play time you can earn in one day (10.07, Navid: 2 hours), so a fake 8-hour "focus" can't buy a day of play
   const QUEUE_MAX = 5;
   const modeOf = (q) => (bigQ(q) ? 'focus' : 'play');
   const queueFull = (mode) => state.queue.filter((q) => modeOf(q) === mode).length >= QUEUE_MAX;
@@ -1144,7 +1144,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.06'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.07'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', music: 'Your music', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
@@ -1590,6 +1590,8 @@
       step: (i) => [0, 4, 7].forEach((k, j) => tone(440 * Math.pow(2, (i * 5 + k) / 12), j * 0.05, 0.3, 'triangle', 0.06)),
       open: (rar) => { noise(0, 0.35, 0.09, 1200, 0.6); [523, 659, 784, 1047, 1319].slice(0, 3 + rar).forEach((f, i) => tone(f * (1 + rar * 0.06), 0.08 + i * 0.07, 0.45, 'triangle', 0.07)); },
       levelup: () => [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, i === 4 ? 0.8 : 0.22, 'square', 0.035)),
+      // a dispatcher on the radio: a crackle, two short beeps, more crackle (10.07)
+      radio: () => { noise(0, 0.22, 0.05, 2400, 0.7); tone(1240, 0.2, 0.07, 'square', 0.025); tone(1240, 0.32, 0.07, 'square', 0.025); noise(0.42, 0.35, 0.04, 2000, 0.8); noise(0.8, 0.18, 0.03, 2600, 0.9); },
       // "Let's goooo!": a bright little fanfare with drums (10.06)
       fanfare: () => {
         const b = 0.13; // a sixteenth at about 115 bpm
@@ -2255,7 +2257,8 @@
   /* ---------- Town staff and the problems they solve ---------- */
   const staffBuildings = (k) => state.buildings.filter((b) => b.type === STAFF[k].home && live(b) && !b.fire);
   const staffCapacity = (k) => staffBuildings(k).reduce((a, b) => a + (TYPES[b.type].slots[b.level] || 0), 0);
-  const staffWorking = (k) => Math.min(state.staff[k] || 0, staffCapacity(k));
+  const offSick = (k) => state.buildings.filter((b) => b.sick && b.type === STAFF[k].home).length;
+  const staffWorking = (k) => Math.max(0, Math.min(state.staff[k] || 0, staffCapacity(k)) - offSick(k));
   // Every service building has a reach. Staff only look after places within reach of a staffed building
   // (staff fill their buildings one each first, so a second building only helps once someone works there).
   const SERVES = {
@@ -2372,6 +2375,9 @@
   const burningNow = () => state.buildings.find((b) => b.fire);
   const burningAll = () => state.buildings.filter((b) => b.fire);
   function placeName(b) { return b.resident ? `${b.resident}'s ${T(b).name.toLowerCase()}` : `the ${T(b).name.toLowerCase()}`; }
+  // Someone who lives or works there: "Jonas" at a home, "Ryan at the police station" at a service building (10.07).
+  const staffName = (b) => NAMES[(b.id * 7 + 3) % NAMES.length];
+  const whoAt = (b) => (b.resident ? b.resident : `${staffName(b)} at the ${T(b).name.toLowerCase()}`);
   // Lingering trouble: points off the town's mood that fade over town minutes.
   function addScar(label, pts, minutes) { state.scars = (state.scars || []).concat([{ label, pts, left: minutes, total: minutes }]).slice(-8); cityCache = null; }
   const troubleNow = () => -Math.min(20, (state.scars || []).reduce((a, s) => a + s.pts * clamp(s.left / s.total, 0, 1), 0));
@@ -2500,8 +2506,10 @@
   // treats it. Out of a clinic's reach it takes ages to get better, and it can pass it on to the neighbours.
   const sickOn = () => hallLevel() >= TYPES.clinic.unlock;
   function sickRisk(b) {
-    if (!live(b) || T(b).cat !== 'home' || b.sick || b.fire || revealFor(b.id)) return 0;
-    let r = 1 + 0.5 * (b.trash || 0) + 0.15 * crowd(b);
+    // 10.07: staff at service buildings can fall sick too (one fewer on duty until a nurse comes)
+    const staffed = T(b) && T(b).staff && (staffIn(T(b).staff).count.get(b.id) || 0) > 0;
+    if (!live(b) || !(T(b).cat === 'home' || staffed) || b.sick || b.fire || revealFor(b.id)) return 0;
+    let r = (staffed ? 0.6 : 1) + 0.5 * (b.trash || 0) + 0.15 * crowd(b);
     if (nearType(b, ['depot', 'workshop'], 1)) r *= 1.3;
     if (!coversB('nurse', b)) r *= 1.5;
     if (nearType(b, ['park', 'fountain'], 2)) r *= 0.7;
@@ -2514,7 +2522,8 @@
     b.sick = { at: Date.now(), left: 240, spreadIn: 50 + Math.random() * 30 };
     touch(); save(); sfx.grumble && sfx.grumble();
     const st = responderFor('nurse', b);
-    toast(`${spread ? 'It spread: ' : ''}${b.resident || 'Someone'} at ${placeName(b)} is sick and can't work.${st ? (st.vehicle ? ' The ambulance is on its way.' : ' A nurse is walking over (an ambulance would be faster).') : staffWorking('nurse') ? ' No nurse can reach this home: it may spread to the neighbours.' : ' Hire a nurse at the clinic to treat it, or it may spread.'}`);
+    const sw = T(b).staff ? ` One ${STAFF[T(b).staff].name.toLowerCase()} fewer on duty until a nurse comes.` : '';
+    toast(`${spread ? 'It spread: ' : ''}${whoAt(b)} is sick and can't work.${sw}${st ? (st.vehicle ? ' The ambulance is on its way.' : ' A nurse is walking over (an ambulance would be faster).') : staffWorking('nurse') ? ' No nurse can reach it: it may spread to the neighbours.' : ' Hire a nurse at the clinic to treat it, or it may spread.'}`);
     ui.bubbles.push({ bid: b.id, text: pick(LINES.health), kind: 'bad', t0: performance.now(), dur: 3600, role: 'nurse' });
     renderAll();
   }
@@ -2596,25 +2605,45 @@
   let vehSeq = 0;
   const VEH_SPEED = { fire: 3.2, police: 3.8, crew: 2.6, nurse: 3.6, builders: 2.6 };
   const ON_FOOT = 1.15;
-  const PREP = { fire: [7, 4], police: [5, 3], nurse: [5, 3] }; // seconds on foot, with a vehicle
+  // Seconds from the call to setting off, on foot or with a vehicle (10.07: the radio call takes 2 s of it). Firefighters
+  // and nurses wait indoors at their station, so they are quick; an officer out on patrol sets off from where he is.
+  const PREP = { fire: [4, 3], police: [3, 2.5], nurse: [3, 2.5] };
+  const RADIO_SEC = 2;
+  // A staff member of this role who is outside right now (on patrol, or out on a meal break).
+  const outsideOf = (role) => walkers.find((w) => w.role === role && !w.asleep && !w.indoors && !w.out);
   function vehicleFor(kind, targetId) { return VEH.find((v) => v.kind === kind && v.target === targetId); }
-  function dispatch(kind, station, target, prepSec, foot) {
+  function dispatch(kind, station, target, prepSec, foot, from) {
     const d0 = station ? doorTile(station, target.c, target.r) : null;
-    const start = d0 || doorTile(townHall(), target.c, target.r) || { c: target.c, r: target.r + 1 };
-    const v = { id: vehSeq++, kind, foot: !!foot, c: start.c + 0.5, r: start.r + 0.5, path: [], state: 'prep', until: performance.now() + prepSec * 1000, target: target.id, station: station ? station.id : null, dir: { dc: 0, dr: 1 }, home: { c: start.c, r: start.r }, walk: 0 };
+    const start = from || d0 || doorTile(townHall(), target.c, target.r) || { c: target.c, r: target.r + 1 };
+    const home = d0 || start;
+    const v = { id: vehSeq++, kind, foot: !!foot, c: start.c + 0.5, r: start.r + 0.5, path: [], state: 'prep', until: performance.now() + prepSec * 1000, target: target.id, station: station ? station.id : null, dir: { dc: 0, dr: 1 }, home: { c: home.c, r: home.r }, walk: 0 };
     VEH.push(v);
     return v;
+  }
+  // The radio call: a crackle and a beep, and a little radio over whoever answers (10.07).
+  function radioCall(kind, at) {
+    if (state.sound && sfx.radio) sfx.radio();
+    const p = at ? tileCenter(at.c, at.r) : null;
+    if (p) floats.push({ x: p.x, y: p.y - 30, t0: performance.now(), text: kind === 'police' ? '📻 On my way!' : kind === 'fire' ? '📻 Fire call!' : '📻 Call for a nurse', soft: true });
   }
   // A firefighter sets off: in the fire engine if the station has one that is free, otherwise on foot.
   function respondFire(st, b) {
     const engineFree = st.vehicle && !VEH.some((v) => v.kind === 'fire' && v.station === st.id && !v.foot && v.state !== 'back');
-    const v = dispatch('fire', st, b, PREP.fire[engineFree ? 1 : 0] * prepK(st), !engineFree);
+    const w = !engineFree ? outsideOf('fire') : null, from = w ? { c: Math.floor(w.c), r: Math.floor(w.r) } : null;
+    if (w) w.out = true;
+    radioCall('fire', from || doorTile(st, b.c, b.r));
+    const v = dispatch('fire', st, b, from ? RADIO_SEC : PREP.fire[engineFree ? 1 : 0] * prepK(st), !engineFree, from);
+    if (w) v.walker = w.id;
     if (engineFree) floats.push({ x: centerOf(st).x, y: centerOf(st).y - 40, t0: performance.now(), text: 'Fire engine out!', soft: true });
     return v;
   }
   // Sends the station's people (on foot, or in its vehicle) to this building.
   function respond(kind, role, st, b) {
-    const foot = !st.vehicle, v = dispatch(kind, st, b, PREP[kind][foot ? 0 : 1] * prepK(st), foot);
+    const foot = !st.vehicle, w = foot ? outsideOf(kind) : null, from = w ? { c: Math.floor(w.c), r: Math.floor(w.r) } : null;
+    if (w) w.out = true;
+    radioCall(kind, from || doorTile(st, b.c, b.r));
+    const v = dispatch(kind, st, b, from ? RADIO_SEC : PREP[kind][foot ? 0 : 1] * prepK(st), foot, from);
+    if (w) v.walker = w.id;
     if (!foot) floats.push({ x: centerOf(st).x, y: centerOf(st).y - 40, t0: performance.now(), text: kind === 'fire' ? 'Fire engine out!' : kind === 'police' ? 'Patrol car out!' : 'Ambulance out!', soft: true });
     return v;
   }
@@ -2635,7 +2664,7 @@
       if (v.state !== 'drive' && v.state !== 'back') continue;
       const tg = v.path[0];
       if (!tg) {
-        if (v.state === 'back') { VEH.splice(VEH.indexOf(v), 1); continue; }
+        if (v.state === 'back') { VEH.splice(VEH.indexOf(v), 1); const w = v.walker != null && walkers.find((x) => x.id === v.walker); if (w) { w.out = false; w.c = v.c; w.r = v.r; w.path = []; w.state = 'idle'; } continue; }
         v.state = 'work'; v.workT = 0;
         continue;
       }
@@ -4913,6 +4942,18 @@
     if (b.burnt && !reduced && Math.random() < 0.06) fx.push({ x: p.x + (Math.random() - 0.5) * hw * 0.5, y: p.y - 18 * u * s0, vx: (Math.random() - 0.5) * 8, vy: -14, life: 0, max: 1.8, puff: true, color: 'rgba(90,85,80,.45)', r: 3.5 });
   }
   function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+  // A small gold coin with a plus: this building earns gold (10.07).
+  function goldCoin(c, x, y, r, t) {
+    const bob = reduced ? 0 : Math.sin(t / 700) * r * 0.12;
+    y += bob;
+    c.fillStyle = 'rgba(60,40,0,.25)'; c.beginPath(); c.ellipse(x + r * 0.15, y + r * 1.05, r * 0.8, r * 0.28, 0, 0, Math.PI * 2); c.fill();
+    const g = c.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r);
+    g.addColorStop(0, '#FFF1A8'); g.addColorStop(0.55, '#F6C33B'); g.addColorStop(1, '#C98A12');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#9A6A0C'; c.lineWidth = r * 0.16; c.stroke();
+    c.strokeStyle = '#FFFBEA'; c.lineWidth = r * 0.26; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(x - r * 0.42, y); c.lineTo(x + r * 0.42, y); c.moveTo(x, y - r * 0.42); c.lineTo(x, y + r * 0.42); c.stroke();
+  }
   function badge(c, x, y, r, color, text) {
     c.fillStyle = '#fff'; c.beginPath(); c.arc(x, y, r + 1.5, 0, Math.PI * 2); c.fill();
     c.fillStyle = color; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
@@ -5144,6 +5185,9 @@
     // sweepers and gardeners go home for the night; police, firefighters and nurses stay on call
     const late = nightK() > 0.6;
     for (const w of walkers) w.asleep = late && (w.role === 'sweeper' || w.role === 'gardener');
+    // 10.07: firefighters, nurses and teachers wait indoors and only come out for lunch and dinner; the police patrol
+    const h = gameHour(), meal = (h >= 12 && h < 13) || (h >= 18.5 && h < 19.5);
+    for (const w of walkers) w.indoors = (w.role === 'fire' || w.role === 'nurse' || w.role === 'teacher') && !meal;
   }
   const claimed = (w, bid) => walkers.some((o) => o !== w && o.act && o.act.bid === bid);
   function planWalker(w, now) {
@@ -5160,7 +5204,8 @@
       const jobs = state.buildings.filter((b) => !claimed(w, b.id) && coversB('gardener', b, st) && (b.type === 'fallen' || (messy(b) && (b.leaves || 0) > 0.35) || (b.type === 'park' && live(b) && (b.overgrown || 0) > 0.2)))
         .map((b) => ({ b, k: b.type === 'fallen' ? 3 : b.leaves ? 1 + b.leaves : b.overgrown })).sort((a, b) => b.k - a.k);
       for (const { b } of jobs) { const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: b.type === 'fallen' ? 'chop' : b.type === 'park' ? 'trim' : 'rake', bid: b.id, dur: b.type === 'fallen' ? 4200 : 2800 }; break; } }
-    } else if (w.role === 'nurse' || !w.role) {
+    } else if (w.role === 'nurse' || w.role === 'teacher') { wait = 2500 + Math.random() * 3000; if (home) target = randomFree(home.c, home.r + 1, 2);
+    } else if (!w.role) {
       const spots = state.buildings.filter((b) => live(b) && !b.fire && (w.role ? T(b).cat === 'home' && coversB('nurse', b) : ['shop', 'joy', 'home'].includes(T(b).cat)));
       if (spots.length && Math.random() < (w.role ? 0.8 : 0.55)) { const b = pick(spots); const d = doorTile(b, w.c, w.r); if (d) { target = d; act = { kind: 'visit', bid: b.id, dur: 1200 + Math.random() * 2200 }; } }
     } else if (w.role === 'police') wait = 1400 + Math.random() * 1500;
@@ -5462,19 +5507,6 @@
     }
   }
   let SZN = SEASONS.spring;
-  // 10.06: smooth, gently varied ground (soft value noise over the island) instead of a checkerboard with gaps;
-  // a faint grid, clearer while you place something.
-  const groundCache = new Map();
-  function groundCol(cc, r, wildLand) {
-    const key = SEA.k + (wildLand ? 'w' : 'g') + cc + ',' + r; let v = groundCache.get(key); if (v) return v;
-    const hv = (x, y) => ((tileHash(x + 40, y + 40) >> 3) % 1000) / 1000, sm = (t) => t * t * (3 - 2 * t);
-    const x0 = Math.floor(cc / 3), y0 = Math.floor(r / 3), fx = sm(cc / 3 - x0), fy = sm(r / 3 - y0);
-    const a = hv(x0, y0), b = hv(x0 + 1, y0), c2 = hv(x0, y0 + 1), d2 = hv(x0 + 1, y0 + 1);
-    const n = a + (b - a) * fx + (c2 - a) * fy + (a - b - c2 + d2) * fx * fy, j = (tileHash(cc, r) % 7) * 0.004;
-    const base = (wildLand ? SZN.wild : SZN.grass)[0];
-    v = shade(base, 0.93 + 0.11 * n + j); groundCache.set(key, v); if (groundCache.size > 3000) groundCache.clear();
-    return v;
-  }
   function draw(now) {
     SEA.k = curSeason(); SZN = SEASONS[SEA.k];
     stepCam(now);
@@ -5496,13 +5528,13 @@
       if (!isOpen(cc, r)) {
         // Wild land you have not cleared yet: darker grass, bushes, rocks and trees.
         const h = tileHash(cc, r);
-        diamond(c, p.x, p.y, HW + 0.4, HH + 0.2, groundCol(cc, r, true));
+        diamond(c, p.x, p.y, HW - 0.7, HH - 0.35, SZN.wild[(cc + r) % 2 ? 0 : 1]);
         if (h % 3 === 0) wild.push({ depth: cc + r, draw: () => treeAt(c, p.x + ((h >> 5) % 14 - 7), p.y + ((h >> 8) % 6 - 3), 17 + (h % 7), (h >> 4) % 3 ? '#2F7A47' : '#3A8A4E') });
         else if (h % 5 === 1) { c.fillStyle = '#4F7D3C'; c.beginPath(); c.ellipse(p.x + 4, p.y, 9, 5, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#5E8F47'; c.beginPath(); c.ellipse(p.x + 1, p.y - 2, 6, 3.6, 0, 0, Math.PI * 2); c.fill(); }
         else if (h % 7 === 2) { c.fillStyle = '#9B958B'; c.beginPath(); c.ellipse(p.x - 3, p.y + 1, 6, 3.4, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#B5AFA4'; c.beginPath(); c.ellipse(p.x - 4, p.y - 0.5, 3.6, 2, 0, 0, Math.PI * 2); c.fill(); }
         continue;
       }
-      diamond(c, p.x, p.y, HW + 0.4, HH + 0.2, groundCol(cc, r, false));
+      diamond(c, p.x, p.y, HW - 0.7, HH - 0.35, SZN.grass[(cc + r) % 2 ? 0 : 1]); // 10.07: back to the crisp tiles Navid liked
       if (occ.has(cc + ',' + r) || SEA.k === 'winter') continue;
       // a little life on empty grass: tufts, tiny flowers, pebbles
       const h = tileHash(cc, r), ox = (h >> 4) % 22 - 11, oy = (h >> 9) % 10 - 5;
@@ -5511,11 +5543,6 @@
       if (h % 9 === 2) { c.fillStyle = '#B9B2A4'; c.beginPath(); c.ellipse(p.x + oy, p.y + ox * 0.3, 2.2, 1.3, 0, 0, Math.PI * 2); c.fill(); }
     }
     const item = playing ? heldItem() : null;
-    { // the grid: faint, clearer while placing
-      c.save(); c.strokeStyle = item ? 'rgba(255,255,255,.34)' : (SEA.k === 'winter' ? 'rgba(120,140,155,.16)' : 'rgba(255,255,255,.13)'); c.lineWidth = item ? 1 : 0.8; c.beginPath();
-      for (let r = 0; r < N; r++) for (let cc = 0; cc < N; cc++) { if (!isOpen(cc, r)) continue; const p = tileCenter(cc, r); c.moveTo(p.x - HW, p.y); c.lineTo(p.x, p.y - HH); c.lineTo(p.x + HW, p.y); }
-      c.stroke(); c.restore();
-    }
     if (item) {
       const showNums = HW * z >= 20;
       const hs = hints();
@@ -5631,7 +5658,7 @@
     if (!ui.reveals.length && stage.classList.contains('peek') && !scheduleReveals.timer && !peekAt.timer) stage.classList.remove('peek');
     stepVehicles(dt, now);
     const truckOut = VEH.some((v) => v.kind === 'fire'), copOut = VEH.some((v) => v.kind === 'police');
-    if (!reduced) for (const w of walkers) { if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep) continue; stepWalker(w, dt, now); }
+    if (!reduced) for (const w of walkers) { if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep || w.indoors || w.out) continue; stepWalker(w, dt, now); }
     for (const v of VEH) objs.push({ depth: v.c + v.r - 1 + 0.05, draw: () => drawVehicle(c, v, now, after) });
     // vehicles you bought, parked by their station when they are not out on a job
     for (const b of state.buildings) {
@@ -5642,7 +5669,7 @@
       objs.push({ depth: d.c + d.r + 0.05, draw: () => drawVehicle(c, pv, now, after) });
     }
     for (const w of walkers) {
-      if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep) continue;
+      if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep || w.indoors || w.out) continue;
       objs.push({ depth: w.c + w.r - 1 + 0.02, draw: () => {
         const p = tileCenter(w.c - 0.5, w.r - 0.5), pose = { facing: w.facing, t: now / 1000 };
         if (w.state === 'walk') pose.walk = w.phase;
@@ -5685,7 +5712,7 @@
     // 10.06: warm sunlight from the top left and a soft vignette, so the town has depth (only by day)
     { const dk = skyNow().dark || 0; if (dk < 0.6) { c.save(); c.setTransform(d, 0, 0, d, 0, 0);
       const g = c.createRadialGradient(geo.w * 0.15, geo.h * 0.05, 0, geo.w * 0.15, geo.h * 0.05, Math.max(geo.w, geo.h) * 1.1);
-      g.addColorStop(0, `rgba(255,236,190,${(0.14 * (1 - dk / 0.6)).toFixed(3)})`); g.addColorStop(0.55, 'rgba(255,236,190,0)'); g.addColorStop(1, `rgba(20,30,60,${(0.12 * (1 - dk / 0.6)).toFixed(3)})`);
+      g.addColorStop(0, `rgba(255,236,190,${(0.1 * (1 - dk / 0.6)).toFixed(3)})`); g.addColorStop(0.55, 'rgba(255,236,190,0)'); g.addColorStop(1, `rgba(20,30,60,${(0.05 * (1 - dk / 0.6)).toFixed(3)})`);
       c.fillStyle = g; c.fillRect(0, 0, geo.w, geo.h); c.restore(); } }
     // a soft evening or night light over the town (labels stay bright)
     const tint = skyNow().tint;
@@ -5741,8 +5768,10 @@
       for (const b of state.buildings) {
         if (revealFor(b.id) || busy.has(b.id)) continue;
         const inf = ci.info.get(b.id); if (!inf || inf.income < 0.5) continue;
-        const p = centerOf(b);
-        tag(c, p.x, labelY(b) - 9 * px, `+${Math.round(inf.income * mult)}/h`, px, 'rgba(255,248,224,.95)', '#7A5206');
+        // 10.07 (Navid): no more "+12/h" tags all over the town, just a small gold coin on buildings that earn; the
+        // numbers are in each building's Details tab
+        const p = centerOf(b), s0 = dimsB(b)[0];
+        goldCoin(c, p.x + HW * 0.32 * (1 + 0.4 * (s0 - 1)), labelY(b) + 7, 4.6 * Math.max(px, 0.75), now + b.id * 300);
       }
     }
     const hit = (b, x, y, size, q, bub) => { const sp = toScreen(x, y), w = size.w * z, h = size.h * z; ui.hits.push({ x0: sp.x - w / 2 - 6, x1: sp.x + w / 2 + 6, y0: sp.y - h - 6, y1: sp.y + 6, bid: b.id, q: q || null, bubble: bub || null }); };
@@ -6380,7 +6409,7 @@
     const chips = [];
     if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast(fireStatus(b) + '.'); else openPanel({ kind: 'alert', bid: b.id }); }));
     if (b.robbed) chips.push(fixPill('Break-in!', () => { if (staffWorking('police') >= 1) toast(robberyStatus(b) + '.'); else staffAction('police', b); }));
-    if (b.sick) chips.push(fixPill('Sick: pays nothing', () => { if (responderFor('nurse', b)) toast(sickStatus(b) + '.'); else staffAction('nurse', b); }));
+    if (b.sick) chips.push(fixPill(T(b).staff ? 'Staff off sick' : 'Sick: pays nothing', () => { if (responderFor('nurse', b)) toast(sickStatus(b) + '.'); else staffAction('nurse', b); }));
     if (b.site) chips.push(pill('Construction site', 'gold'));
     else if (b.burnt) chips.push(pill(b.burnt.health ? `Burned · ${b.burnt.health}% left` : 'Burned down', 'bad'));
     else if (b.ruin) chips.push(pill('Broken', 'bad'));
@@ -6401,7 +6430,7 @@
     const hasStaffTab = !!t.staff, hall = b.type === 'townhall';
     const tab = p.tab === 'info' || p.tab === 'report' ? 'report' : p.tab === 'staff' && hasStaffTab ? 'staff' : p.tab === 'services' && hall ? 'services' : 'actions';
     const tabs = el('div', 'ctabs'); tabs.setAttribute('role', 'tablist');
-    for (const [key, label] of [['actions', 'Actions'], ['report', 'Report']].concat(hasStaffTab ? [['staff', 'Staff']] : [], hall ? [['services', 'Services']] : [])) {
+    for (const [key, label] of [['actions', 'Actions'], ['report', 'Details']].concat(hasStaffTab ? [['staff', 'Staff']] : [], hall ? [['services', 'Services']] : [])) {
       const tb = el('button', '', label); tb.type = 'button'; tb.setAttribute('role', 'tab'); tb.setAttribute('aria-selected', String(tab === key)); tb.dataset.tab = key;
       if (key === 'report' && reqs.length) tb.append(el('span', 'dot-n', String(reqs.length)));
       tb.addEventListener('click', () => { p.tab = key; renderPanel(); });
@@ -6467,7 +6496,7 @@
     if (b.type === 'townhall') { const staffBtn = el('button', 'btn fresh', `Hire town staff · mood ${mood.value}%`); staffBtn.addEventListener('click', openMood); box.append(staffBtn); }
     if (myJob && !isMine) { const w = actionBtn('Make this my job', jobLine(myJob), 'fresh', () => { state.job = b.id; save(); toast(`When ${state.builder} is done, you ${myJob.verb.toLowerCase()} ${myJob.at}.`); renderAll(); }); box.append(w); }
     else if (isMine) box.append(el('p', 'tiny muted', `Your job: ${myJob.verb.toLowerCase()} · ${jobLine(myJob)}.`));
-    if (reqs.length) { const nudge = el('button', 'link', `${reqs[0].from === 'Town council' ? 'The town council' : reqs[0].from} asks something here · see Report`); nudge.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); box.append(nudge); }
+    if (reqs.length) { const nudge = el('button', 'link', `${reqs[0].from === 'Town council' ? 'The town council' : reqs[0].from} asks something here · see Details`); nudge.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); box.append(nudge); }
   }
   // Numbers in a sentence get their colour: gold in gold, more in green, less in red, tiles in blue, focus in purple.
   function colorize(text) {
@@ -6561,7 +6590,7 @@
     if (b.fire) bad('On fire', `${Math.round(healthOf(b))}% left`);
     if (b.health != null && b.health < 100 && !b.fire && !b.burnt) bad('Scorched by a fire', `${Math.round(b.health)}%, fixing itself`);
     if (b.robbed) bad('Break-in', `${b.robbed.stolen} gold taken`);
-    if (b.sick) bad('Sick', 'pays nothing until a nurse comes');
+    if (b.sick) bad('Sick', T(b).staff ? `${staffName(b)} is off sick: one ${STAFF[T(b).staff].name.toLowerCase()} fewer until a nurse comes` : 'pays nothing until a nurse comes');
     if (messy(b) && (b.trash || 0) >= 0.5) bad('Trash outside', 'the neighbours mind');
     if (b.type === 'park' && (b.overgrown || 0) > 0.3) bad('Overgrown', `helps ${Math.round(b.overgrown * 60)}% less`);
     if (live(b) && T(b).cat === 'home' && roleInfo('police', city()).needed && !coversB('police', b)) bad('Out of police reach', 'break-ins cost more');
@@ -6691,7 +6720,11 @@
         const t = TYPES[type];
         const big = isBigJob('build', type, chk.work || 0);
         const meta = [goldLine(chk.cost), big ? el('span', 'bc-big', `${fmtMin(chk.work)} focus`) : el('span', '', `${fmtSecs(chk.secs || buildSecs(chk.work))}`)];
-        if (t.size > 1) meta.push(el('span', '', `${t.size}×${t.size}`));
+        if (t.size > 1) meta.push(el('span', '', FOOT[type] ? `${FOOT[type].join('×')}` : `${t.size}×${t.size}`));
+        // 10.07: what it earns here, or what it costs to run
+        { const run = RUNNING[type] || 0, wage = t.staff ? wageOf(t.staff, state.staff[t.staff] || 0) : 0;
+          if (run || wage) meta.push(el('span', 'neg', `−${run + wage}/h${wage ? ` with a ${STAFF[t.staff].name.toLowerCase()}` : ' to run'}`));
+          else if (!chk.locked && t.cat !== 'landmark') { const d = deltaAt(type, p.c, p.r); const est = d != null ? d : t.cat === 'home' ? t.residents[1] * HOME_TAX : t.base ? t.base[1] : 0; if (est >= 0.5) meta.push(el('span', 'gc', `+${Math.round(est)}/h${d != null ? ' here' : ''}`)); } }
         let note = '', nc = '';
         if (chk.locked) { const miss = needsFor(type).filter((n) => !n.ok); note = miss.length ? `Needs ${miss.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(', ')}` : 'Locked'; nc = 'lock'; }
         else if (chk.capped) { note = capWhy(type).replace('Limit reached: ', 'Limit '); nc = 'lock'; }
@@ -7910,13 +7943,15 @@
     const clear = el('button', 'link', 'Clear'); clear.addEventListener('click', () => { c.clearRect(0, 0, W, H); ink = 0; sign.disabled = true; });
     sigBox.append(cv, clear);
     wrap.append(sigBox);
-    const sign = el('button', 'btn primary full', `Sign and borrow ${amount} gold`); sign.disabled = true;
-    sign.addEventListener('click', () => {
-      let sig = null; try { const sm = document.createElement('canvas'); sm.width = 180; sm.height = 66; sm.getContext('2d').drawImage(cv, 0, 0, 180, 66); sig = sm.toDataURL('image/png'); } catch (e) { /* no image */ }
-      ui.nextLender = null; closeSheet(); takeLoan(amount, p.h, sig, lender);
-    });
+    // 10.07 (Navid): in debt, the way out is focus: sign, then go straight to a focus session (no interest that way)
+    const debt = state.gold < 0;
+    const sigImg = () => { try { const sm = document.createElement('canvas'); sm.width = 180; sm.height = 66; sm.getContext('2d').drawImage(cv, 0, 0, 180, 66); return sm.toDataURL('image/png'); } catch (e) { return null; } };
+    const sign = el('button', 'btn primary full', debt ? 'Sign, then focus (no interest)' : `Sign and borrow ${amount} gold`); sign.disabled = true;
+    sign.addEventListener('click', () => { const sig = sigImg(); ui.nextLender = null; closeSheet(); takeLoan(amount, p.h, sig, lender); if (debt) setTimeout(() => openStart(), 250); });
     const back = el('button', 'btn full ct-back', 'Not now'); back.addEventListener('click', () => openTown('loans'));
-    wrap.append(sign, back);
+    wrap.append(sign);
+    if (debt) { const only = el('button', 'btn full ct-back', `Sign and borrow ${amount} gold, no focus yet`); only.disabled = true; only.addEventListener('click', () => { const sig = sigImg(); ui.nextLender = null; closeSheet(); takeLoan(amount, p.h, sig, lender); }); wrap.append(only); const en = sign; cv.addEventListener('pointerup', () => { only.disabled = en.disabled; }); clear.addEventListener('click', () => { only.disabled = true; }); }
+    wrap.append(back);
     openSheet('Contract', wrap);
   }
 
@@ -8251,8 +8286,9 @@
     ptile('xp', 'xp', `+${pv.xp}`, 'XP');
     box.append(tl);
     const extras = [];
-    if (pv.playCap === 'daily') extras.push(`Daily play limit: ${fmtMin(playLeftToday() / 60)} of play left to earn today. Focus still pays gold and XP.`);
+    if (pv.playCap === 'daily') extras.push(`Daily play limit: you have earned ${fmtMin(Math.round(playDayNow().sec / 60))} of play today (${fmtMin(DAILY_PLAY / 60)} a day), so ${fmtMin(Math.round(playLeftToday() / 60))} is left to earn. Focus still pays gold and XP.${state.speed > 1 ? ' Test speed counts every test session as real minutes, so the limit comes quickly.' : ''}`);
     else if (pv.playCap === 'bank') extras.push(`Play time is nearly full (${fmtMin(PLAY_CAP / 60)} max). Play a bit first so you don't lose any.`);
+    else extras.push(`Play earned today: ${fmtMin(Math.round(playDayNow().sec / 60))} of ${fmtMin(DAILY_PLAY / 60)}. You can hold up to ${fmtMin(PLAY_CAP / 60)}.`);
     if (pv.onPlan) extras.push(`On your plan: ${pv.block.label || 'focus block'} · +50% XP and a silver chest or better`);
     if (pv.goalGold) extras.push(`Finish it to earn the ${TIER_NAMES[pv.goal.badge.tier].toLowerCase()} ${fmtMin(pv.goal.goal)} badge`);
     if (pv.comboN) extras.push(`Combo ×${pv.combo.toFixed(1)}: session ${pv.comboN + 1} in a row`);
@@ -9483,7 +9519,7 @@
     lookAt: (c, r) => { camAnim = null; const p = tileCenter(c, r); cam.x = p.x; cam.y = p.y - (geo.h * 0.28 - geo.h / 2) / cam.z; clampCam(); },
     hits: () => ui.hits.map((h) => ({ ...h })),
     bubbles: () => ui.bubbles.length,
-    walkers: () => walkers.map((w) => ({ role: w.role, state: w.state, act: w.act && w.act.kind, c: w.c, r: w.r })),
+    walkers: () => walkers.map((w) => ({ id: w.id, role: w.role, state: w.state, act: w.act && w.act.kind, c: w.c, r: w.r, indoors: !!w.indoors, out: !!w.out, asleep: !!w.asleep })),
     mood: () => moodNow(Date.now()).value,
     fire: (id) => { const b = id ? byId(id) : (resident('Omar') || state.buildings.find(messy)); startFire(b); return b && b.id; },
     playVisit: (sec) => { ui.playVisit = sec; },
@@ -9526,6 +9562,10 @@
     townStep: (m) => { townStep(m); },
     vehShowcase: () => { const kinds = ['fire', 'police', 'nurse', 'garbage', 'van', 'builders', 'crew', 'bus'], dirs = [{ dc: 1, dr: 0 }, { dc: -1, dr: 0 }, { dc: 0, dr: 1 }, { dc: 0, dr: -1 }]; const cv = document.createElement('canvas'), Z = 3; cv.width = 4 * 90 * Z; cv.height = kinds.length * 70 * Z; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, cv.width, cv.height); const p0 = tileCenter(0, 0); kinds.forEach((k, i) => dirs.forEach((d, j) => { c.setTransform(Z, 0, 0, Z, 0, 0); c.translate(j * 90 + 45 - p0.x, i * 70 + 40 - p0.y); drawVehicle(c, { kind: k, c: 0.5, r: 0.5, dir: d, state: 'drive', foot: false }, 0, []); })); return cv.toDataURL('image/png'); },
     payLoan: (h, inSession) => payLoan(h, inSession),
+    playLimits: () => ({ cap: PLAY_CAP, day: DAILY_PLAY }),
+    buildAt: (c, r, tab) => { openPanel({ kind: 'build', c, r, tab: tab || 'buildings' }); renderAll(); return true; },
+    staffWorking: (k) => staffWorking(k),
+    hour: () => gameHour(),
     fallen: () => { const b = startFallen(); return b ? { id: b.id, c: b.c, r: b.r, covered: coversB('gardener', b) } : null; },
     leaves: (bid, k) => { const b = byId(bid); if (k != null) { b.leaves = k; touch(); } return { leaves: b.leaves || 0, risk: fireRisk(b) }; },
     turn: () => { turnHeld(); return { rot: ui.rot || 0, preview: ui.preview }; },
@@ -9559,7 +9599,7 @@
     setStaff: (k, n) => { state.staff[k] = n; touch(); syncWalkers(); },
     rob: (bid) => { const b = bid ? byId(bid) : state.buildings.find((x) => messy(x) && !policeCovers(x)); startRobbery(b); return b && b.id; },
     works: () => { startWorks(); const w = state.buildings.find((b) => b.type === 'works'); return w ? { id: w.id, c: w.c, r: w.r, left: w.works.left } : null; },
-    vehicles: () => VEH.map((v) => ({ kind: v.kind, state: v.state, target: v.target, c: v.c, r: v.r, foot: !!v.foot })),
+    vehicles: () => VEH.map((v) => ({ kind: v.kind, state: v.state, target: v.target, c: v.c, r: v.r, foot: !!v.foot, walker: v.walker == null ? null : v.walker, prep: Math.max(0, (v.until - performance.now()) / 1000) })),
     vehStep: (sec) => { for (let i = 0; i < sec * 10; i++) stepVehicles(0.1, performance.now()); },
     vehRush: () => { for (const v of VEH) v.until = 0; },
     incident: (sec) => { for (let i = 0; i < sec * 4; i++) incidentTick(0.25); },
