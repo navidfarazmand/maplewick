@@ -986,7 +986,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.02'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.03'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
@@ -1350,7 +1350,7 @@
   // One audio context for effects, music and the alarm. Browsers only allow it to start after a tap.
   const AUD = { ac: null, unlocked: false };
   function audioCtx() {
-    try { if (!AUD.ac) AUD.ac = new (window.AudioContext || window.webkitAudioContext)(); if (AUD.ac.state === 'suspended') AUD.ac.resume(); } catch (e) { return null; }
+    try { if (!AUD.ac) AUD.ac = new (window.AudioContext || window.webkitAudioContext)(); if (AUD.ac.state !== 'running' && AUD.ac.state !== 'closed') { const p = AUD.ac.resume(); if (p && p.catch) p.catch(() => {}); } } catch (e) { return null; }
     return AUD.ac;
   }
   const sfx = (() => {
@@ -1910,9 +1910,10 @@
     const cap = treasuryCap();
     if (state.gold >= cap || amount <= 0) return 0;
     let add = Math.min(amount, cap - state.gold);
-    if (state.loan && state.loan.owed > 0) { const pay = Math.min(state.loan.owed, add * 0.3); state.loan.owed -= pay; add -= pay; if (state.loan.owed <= 0.01) { state.loan = null; setTimeout(() => toast('Loan paid off. Well done, Mayor!'), 50); } }
+    if (state.loan && state.loan.owed > 0) { const pay = Math.min(state.loan.owed, add * loanShare()); state.loan.owed -= pay; add -= pay; if (state.loan.owed <= 0.01) { state.loan = null; setTimeout(() => toast('Loan paid off. Well done, Mayor!'), 50); } }
     state.gold += add; return add;
   }
+  const loanShare = () => (state.loan && state.loan.share) || 0.3;
   // Full taxes while you focus (paid at the end) or play; a tenth the rest of the time, so leaving the app open never pays.
   const taxRate = () => (ui.screen === 'play' ? 1 : AWAY_RATE);
   function accrue(now) {
@@ -2399,9 +2400,14 @@
   function econ(now) {
     const ci = city(), mood = moodNow(now || Date.now());
     const wages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0) + fleetUpkeep();
-    const taxes = ci.total * mood.mult;
-    return { ci, mood, taxes, wages, net: taxes - wages };
+    const taxes = ci.total * mood.mult, net = taxes - wages;
+    // An open loan takes its share of what's left after wages (shown as its own red line).
+    const loanPay = state.loan && state.loan.owed > 0 && net > 0 ? net * loanShare() : 0;
+    return { ci, mood, taxes, wages, net, loanPay, keep: net - loanPay };
   }
+  // 10.03: focusing pays twice the gold: your job pays double, and the town's shops are twice as busy while you focus.
+  const FOCUS_PAY = 2;
+  const focusNet = (e) => { e = e || econ(); return e.taxes * FOCUS_PAY - e.wages; };
   function faceMarkup(v) {
     const hue = Math.round(clamp(v, 0, 100) * 1.15), my = (15 + (v - 50) / 50 * 3.8).toFixed(1);
     const brows = v < 30 ? '<path d="M6.6 7.4 9.7 8.5M17.4 7.4 14.3 8.5" stroke="#1E2A28" stroke-width="1.4" stroke-linecap="round"/>' : '';
@@ -2411,7 +2417,7 @@
 
   function jobAt(b) {
     const t = T(b); if (!live(b) || !t.job) return null;
-    const gold = t.job.gold * (1 + 0.25 * (b.level - 1));
+    const gold = t.job.gold * FOCUS_PAY * (1 + 0.25 * (b.level - 1));
     return { bid: b.id, type: b.type, gold, play: t.job.play, verb: t.job.verb, at: t.job.at, title: `${t.job.verb} ${t.job.at}` };
   }
   function jobs() {
@@ -2579,8 +2585,10 @@
     return { items, leftover: Math.max(0, left) };
   }
   // The jobs Sam took on when this session started.
-  const sessionQueue = (s) => (s && s.plan ? state.queue.filter((q) => s.plan.includes(q.id)) : state.queue);
-  const planWork = () => state.queue.reduce((a, q) => a + q.work - q.done, 0);
+  // Only big projects are focus work. Small jobs are built by the crew while you play (and keep going while you focus).
+  const focusJobs = () => state.queue.filter(bigQ);
+  const sessionQueue = (s) => (s && s.plan ? state.queue.filter((q) => s.plan.includes(q.id)) : focusJobs());
+  const planWork = () => focusJobs().reduce((a, q) => a + q.work - q.done, 0);
   function completeJob(q, result) {
     if (q.kind === 'clear') {
       if (!state.land.includes(q.plot)) state.land.push(q.plot);
@@ -2733,12 +2741,12 @@
     return p;
   }
   function sessionPreview(d) {
-    const work = workFor(d), sim = simulate(state.queue, work), job = currentJob();
+    const work = workFor(d), sim = simulate(focusJobs(), work), job = currentJob();
     const unfinished = sim.items.filter((x) => !x.finished).length;
     const cn = comboNow(), combo = comboMultFor(cn);
     const shiftGold = sim.leftover * job.gold;
-    const net = econ().net;
-    const taxes = net >= 0 ? Math.min(Math.max(0, treasuryCap() - state.gold), net * d / 60) : net * d / 60;
+    const net = focusNet();
+    const taxes = net >= 0 ? Math.min(Math.max(0, treasuryCap() - state.gold), net * d / 60) * (state.loan ? 1 - loanShare() : 1) : net * d / 60;
     const nb = nextBadge(), goal = nb ? { goal: nb.min, badge: nb } : null; const goalGold = nb && d >= nb.min ? nb.reward : 0;
     const blk = blockNow(), onPlan = !!blk && d + 1e-9 >= blk.dur * 0.8;
     const want = playFor(d, sim.leftover, job, true), dayLeft = playLeftToday(), room = Math.max(0, PLAY_CAP - state.playSec), play = Math.min(want, dayLeft, room);
@@ -2864,11 +2872,11 @@
     const now = Date.now();
     accrue(now);
     const blk = blockNow();
-    const plan = simulate(state.queue, workFor(duration)).items.filter((x) => !x.waiting).map((x) => x.q.id);
+    const plan = simulate(focusJobs(), workFor(duration)).items.filter((x) => !x.waiting).map((x) => x.q.id);
     const startDone = {}; for (const q of state.queue) if (plan.includes(q.id)) startDone[q.id] = q.done;
     // The timer starts after a short get-ready countdown; until then, cancelling is free.
     const ready = ui.tourSpeed ? 3 : READY_SEC;
-    state.session = { duration, jobBid: currentJob().bid, start: now + ready * 1000, ready, speed: ui.tourSpeed || state.speed, income: econ(now).net, combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone };
+    state.session = { duration, jobBid: currentJob().bid, start: now + ready * 1000, ready, speed: ui.tourSpeed || state.speed, income: focusNet(econ(now)), combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone };
     state.lastTaxAt = now;
     sfx.pop();
     save(); closeSheet(); renderAll(); showFocus();
@@ -3272,13 +3280,14 @@
 
   /* ---------- Building while you play: Sam works on the first small job in the plan ---------- */
   const activeBuild = () => state.queue.find((x) => !bigQ(x)) || null;
-  function playBuild(dt) {
+  function playBuild(dt, quiet) {
     const q = activeBuild(); if (!q || !(dt > 0)) return;
     const brew = state.coffee > 0 ? 2 : 1; // a coffee from a chest: twice as fast
-    q.done = Math.min(q.work, q.done + dt * brew * q.work / buildSecs(q.work));
-    ui.hammer = (ui.hammer || 0) + dt;
-    if (ui.hammer > 0.42) { ui.hammer = 0; sfx.hammer(); }
+    const perSec = brew * q.work / buildSecs(q.work), need = (q.work - q.done) / perSec;
+    q.done = Math.min(q.work, q.done + dt * perSec);
+    if (!quiet) { ui.hammer = (ui.hammer || 0) + dt; if (ui.hammer > 0.42) { ui.hammer = 0; sfx.hammer(); } }
     if (q.done < q.work - 1e-6) return;
+    if (dt - need > 0.5) setTimeout(() => playBuild(dt - need, quiet), 0);
     const res = { built: [] };
     completeJob(q, res);
     state.queue = state.queue.filter((x) => x !== q);
@@ -3299,6 +3308,8 @@
     if (state.session) {
       const s = state.session;
       if (sessionMinutes(s, now) >= s.duration - 1e-9) { finishSession('complete'); return; }
+      // The crew keeps building small jobs while you focus (screen off too: the time catches up when the phone wakes).
+      if (now > s.start && dt > 0) playBuild(Math.min(dt, (now - s.start) / 1000), true);
       renderFocus(now); lockUpdate();
     } else {
       accrue(now);
@@ -4943,7 +4954,7 @@
     if (state.gold < 0 && !ui.debtWarned) { ui.debtWarned = true; setTimeout(() => toast('The town is in debt! Tap your gold to sell a building or take a loan.'), 400); }
     if (state.gold >= 0) ui.debtWarned = false;
     const playing = ui.screen === 'play';
-    const net = Math.round(ec.net), rate = `${net >= 0 ? '+' : '−'}${Math.abs(net)}`;
+    const net = Math.round(ec.keep), rate = `${net >= 0 ? '+' : '−'}${Math.abs(net)}`;
     const gr = $('gold-rate');
     if (state.gold >= cap && net >= 0) gr.textContent = 'full';
     else { gr.textContent = `${rate}/h`; if (!playing) gr.append(el('span', 'wide', ' focus')); }
@@ -5007,7 +5018,7 @@
     stage.classList.toggle('home', !playing);
     $('homebar').hidden = playing; $('playbar').hidden = !playing; $('homebody').hidden = playing;
     if (!playing) ui.barOpen = false;
-    $('home-cta').hidden = playing; $('zoom').hidden = !playing || !!ui.panel;
+    $('home-cta').hidden = playing; $('zoom').hidden = true;
     $('map').setAttribute('aria-label', playing ? 'Your town. Drag to look around, pinch or use the buttons to zoom. Tap a building or an empty spot.' : 'Your town. Tap it to start playing.');
     const qn = state.queue.length;
     $('plan-label').textContent = `${state.builder}'s plan`;
@@ -5583,9 +5594,23 @@
   };
   const fbPeople = { can: async () => true, isOwner: async () => false,
     profiles: async (ids) => Object.fromEntries([].concat(ids).map((i) => { const d = board.docs.find((x) => x.id === i); const name = d && d.name ? String(d.name).slice(0, 24) : ''; return [i, { id: i, name, avatarUrl: initialAvatar(name, i) }]; })) };
+  // Spots this phone used before (a name-only spot before Google sign-in, say) are mine too: hidden from my board,
+  // and they never block my own username.
+  const oldIds = () => { try { return JSON.parse(localStorage.getItem('mw-uids') || '[]'); } catch (e) { return []; } };
+  const rememberId = (id) => { const l = oldIds(); if (id && !l.includes(id)) { l.push(id); try { localStorage.setItem('mw-uids', JSON.stringify(l.slice(-10))); } catch (e) { /* ignore */ } } };
+  function oldMine(d) {
+    if (!d || board.kind !== 'firebase' || d.id === board.me) return false;
+    if (oldIds().includes(d.id)) return true;
+    // From before 10.03: same username, town and builder, and no more focus minutes than I have.
+    const mine = String(state.board.name || '').toLowerCase(), tot = Math.round(state.stats.focusMin);
+    if (mine && String(d.name || '').toLowerCase() === mine && d.town === state.town && d.builder === state.builder && (d.total | 0) <= tot && (d.total | 0) >= tot - 600) { rememberId(d.id); return true; }
+    return false;
+  }
+  const nameTaken = (v) => board.docs.some((d) => d.id !== board.me && !oldMine(d) && String(d.name || '').toLowerCase() === String(v || '').toLowerCase());
   function fbUser(u) {
     FB.user = u;
     if (u) {
+      rememberId(u.uid);
       if (!state.board.name && u.name) state.board.name = u.name.split(' ')[0].slice(0, 20);
       state.board.fb = true; state.board.joined = true; save();
       if (board.unsub) { board.unsub(); board.unsub = null; }
@@ -5593,7 +5618,7 @@
       connectBoard(fbDb(FB.api), fbPeople, u.uid).then(() => {
         // usernames are unique: if someone else already has this one, ask for another
         const nm = (state.board.name || '').toLowerCase();
-        if (nm && board.docs.some((d) => d.id !== u.uid && String(d.name || '').toLowerCase() === nm)) { ui.fbEdit = true; toast(`Someone already uses "${state.board.name}". Choose another username.`); }
+        if (nm && nameTaken(nm)) { ui.fbEdit = true; toast(`Someone already uses "${state.board.name}". Choose another username.`); }
         else boardSoon();
         refreshFriends();
       });
@@ -5831,7 +5856,7 @@
   function boardRows() {
     const now = Date.now(), wk = weekKey(now), dk = dayKey(now), tab = board.tab;
     const score = (d) => (tab === 'week' ? (d.week === wk ? d.weekMin | 0 : 0) : tab === 'day' ? (d.day === dk ? d.dayMin | 0 : 0) : d.total | 0);
-    const live2 = board.docs.filter((d) => d && d.town).map((d) => ({ id: d.id, d, live: true, score: score(d) }));
+    const live2 = board.docs.filter((d) => d && d.town && !oldMine(d)).map((d) => ({ id: d.id, d, live: true, score: score(d) }));
     const codes = realState().friends.filter((f) => !live2.some((x) => x.d.town === f.snap.town && x.d.total === f.snap.total)).map((f) => ({ id: 'code:' + f.key, d: f.snap, live: false, score: score(f.snap), key: f.key, at: f.at }));
     const bots = showBots() ? botTowns().map((x) => ({ id: x.id, d: x.d, live: false, bot: true, mayor: x.mayor, score: score(x.d) })) : [];
     return live2.concat(codes, bots).sort((a, b) => b.score - a.score || (b.d.level | 0) - (a.d.level | 0));
@@ -5883,11 +5908,13 @@
       const ed = el('button', 'link', 'Change name'); ed.addEventListener('click', () => { ui.fbEdit = true; refreshFriends(); }); me.append(ed);
       const lv = el('button', 'link', 'Leave'); lv.addEventListener('click', () => { ui.fbLeaveAsk = true; refreshFriends(); }); me.append(lv);
       wrap.append(me);
+      const olds = board.docs.filter(oldMine);
+      if (olds.length) wrap.append(el('div', 'tiny muted', `An older copy of your spot (from before you signed in with Google) is hidden here. Others may still see it until it is deleted in the Firebase console: Firestore › board › ${olds.map((d) => d.id).join(', ')}.`));
       if (ui.fbEdit) {
         const box = el('div', 'confirm'); const ni = el('input'); ni.maxLength = 20; ni.value = state.board.name || ''; ni.setAttribute('aria-label', 'Your name on the board');
         const ok = el('button', 'btn sm primary', 'Save'); ok.addEventListener('click', () => {
           const v = ni.value.trim().slice(0, 20); if (!v) return;
-          if (board.docs.some((d) => d.id !== board.me && String(d.name || '').toLowerCase() === v.toLowerCase())) { toast(`Someone already uses "${v}". Try another.`); return; }
+          if (nameTaken(v)) { toast(`Someone already uses "${v}". Try another.`); return; }
           state.board.name = v; save(); board.last = ''; boardPush(); ui.fbEdit = false; refreshFriends();
         });
         const no = el('button', 'btn sm', 'Cancel'); no.addEventListener('click', () => { ui.fbEdit = false; refreshFriends(); });
@@ -6290,7 +6317,7 @@
       state.queue.forEach((q, i) => {
         const it = el('div', 'item');
         it.append(icon(q.type, q.kind === 'upgrade' ? q.toLevel : 1, 60, 52, { ruin: q.kind === 'repair' }));
-        const main = el('div'); main.append(el('h3', '', `${i + 1}. ${jobLabel(q)}`), el('div', 'meta', bigQ(q) ? `Big project · ${fmtMin(Math.max(1, q.work - q.done))} of focus left` : `Built while you play · ${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work))}`));
+        const main = el('div'); main.append(el('h3', '', `${i + 1}. ${jobLabel(q)}`), el('div', 'meta', bigQ(q) ? `Big project · ${fmtMin(Math.max(1, q.work - q.done))} of focus left` : `The crew builds it while you play or focus · ${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work))} left`));
         if (q.done > 0) { const bar = el('div', 'bar'); const s = el('span'); s.style.width = (q.done / q.work * 100) + '%'; bar.append(s); main.append(bar); }
         it.append(main);
         const act = el('div', 'actions');
@@ -6298,7 +6325,7 @@
         rm.addEventListener('click', () => { removeFromPlan(q.id); renderAll(); openPlan(); });
         act.append(rm); it.append(act); wrap.append(it);
       });
-      const go = el('button', 'btn primary full', `Start focus · ${fmtMin(exactMinutes(planWork()))} finishes everything`); go.addEventListener('click', () => openStart()); wrap.append(go);
+      const go = el('button', 'btn primary full', focusJobs().length ? `Start focus · ${fmtMin(exactMinutes(planWork()))} finishes the big projects` : 'Start focus'); go.addEventListener('click', () => openStart()); wrap.append(go);
     }
     openSheet(`${state.builder}'s plan`, wrap);
   }
@@ -6394,7 +6421,7 @@
     const wrap = el('div', 'list');
     if (state.gold < 0 || ec.net < 0 || state.loan) wrap.append(moneyBox());
     const st = el('div', 'stats');
-    const s1 = el('div', 'stat'); s1.append(el('b', 'num', `${ec.net < 0 ? '−' : ''}${Math.abs(Math.round(ec.net))}`), el('span', '', 'gold an hour while you focus or play'));
+    const s1 = el('div', 'stat'); s1.append(el('b', 'num', `${ec.keep < 0 ? '−' : ''}${Math.abs(Math.round(ec.keep))}`), el('span', '', 'gold an hour while you play'));
     const s2 = el('div', 'stat'); s2.append(el('b', 'num', String(ci.residents)), el('span', '', 'residents'));
     st.append(s1, s2); wrap.append(st);
     const fl = el('ul', 'factors');
@@ -6402,9 +6429,11 @@
     frow('Taxes from homes and shops', `${Math.round(ci.total)}/h`);
     frow(`Town mood ${ec.mood.value}%`, `×${ec.mood.mult.toFixed(2)}`, ec.mood.mult >= 1 ? 'pos' : 'neg');
     if (ec.wages) frow('Staff wages', `−${Math.round(ec.wages)}/h`, 'neg');
-    frow('You get', `${ec.net < 0 ? '−' : ''}${Math.abs(Math.round(ec.net))}/h`, ec.net >= 0 ? 'pos' : 'neg');
+    if (state.loan) frow(`Loan repayment (${Math.round(loanShare() * 100)}% of what's left)`, ec.loanPay >= 0.5 ? `−${Math.round(ec.loanPay)}/h` : '0/h', 'neg');
+    frow('You get', `${ec.keep < 0 ? '−' : ''}${Math.abs(Math.round(ec.keep))}/h`, ec.keep >= 0 ? 'pos' : 'neg');
     wrap.append(fl);
-    wrap.append(el('p', 'small muted', `The rest of the time (app closed, or resting on Home) everything runs at a tenth of that speed. Your town grows fastest while you focus.`));
+    if (state.loan) { const hrs = ec.loanPay > 0.1 ? state.loan.owed / ec.loanPay : 0; wrap.append(el('p', 'small', hrs ? `At this pace the loan (${Math.ceil(state.loan.owed)} gold left) is paid off after about ${fmtMin(Math.ceil(hrs * 60))} of play, or sooner while you focus. You can also pay it back early.` : `The loan (${Math.ceil(state.loan.owed)} gold left) is paid from taxes once they are more than the wages.`)); }
+    wrap.append(el('p', 'small muted', `While you focus, the town earns twice the taxes (wages stay the same). The rest of the time (app closed, or resting on Home) everything runs at a tenth of the speed.`));
     const tb = el('div');
     const tl = el('div', 'tiny muted'); tl.style.display = 'flex'; tl.style.justifyContent = 'space-between';
     tl.append(el('span', '', 'Treasury'), el('span', 'num', `${fmtGold(state.gold)} / ${fmtGold(cap)}`));
@@ -6650,12 +6679,12 @@
   const startPick = { duration: 25 };
   function openStart(prefDuration) {
     if (state.session) return;
-    startPick.duration = prefDuration ? Math.max(MIN_SESSION, prefDuration) : (state.queue.length ? exactMinutes(planWork()) : 25);
+    startPick.duration = prefDuration ? Math.max(MIN_SESSION, prefDuration) : (focusJobs().length ? exactMinutes(planWork()) : 25);
     renderStart();
   }
   function renderStart() {
     const wrap = el('div');
-    const planned = state.queue.length > 0;
+    const planned = focusJobs().length > 0;
     const exact = planned ? exactMinutes(planWork()) : null;
     // Eight choices, two rows of four.
     let opts = planned ? STD.filter((d) => d < exact).slice(-2).concat([exact], STD.filter((d) => d > exact)).slice(0, 8) : [5, 10, 15, 25, 45, 60, 90, 120];
@@ -7052,7 +7081,7 @@
       const left = Math.ceil((s.start - now) / 1000);
       $('focus-eyebrow').textContent = 'Get ready';
       $('focus-clock').textContent = String(left);
-      $('focus-of').textContent = `${fmtMin(s.duration)} of focus starts in ${left} s · cancel for free until then`;
+      $('focus-of').textContent = `${fmtMin(s.duration)} of focus is about to start · cancelling is free until then`;
       $('focus-meter').style.width = '0%';
       $('focus-task').textContent = 'Put your phone face down and take a breath.';
       $('focus-combo').hidden = true; $('focus-list').replaceChildren();
@@ -7627,7 +7656,11 @@
   /* ---------- Input: drag to pan, pinch or wheel to zoom, tap to act ---------- */
   const ptrs = new Map(); let gesture = null;
   const localPt = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-  document.addEventListener('pointerdown', () => { AUD.unlocked = true; if (state.sound || state.music) audioCtx(); musicUpdate(); }, { passive: true });
+  // iPhone only lets sound start from a finished tap (touchend / pointerup), not from the moment a finger lands, and it
+  // pauses the sound engine when the app goes to the background. So every tap wakes it up again (10.03).
+  const wakeAudio = () => { AUD.unlocked = true; if (state.sound || state.music || (state.noise && state.noise !== 'off') || AUD.ac) audioCtx(); musicUpdate(); };
+  for (const ev of ['pointerdown', 'pointerup', 'touchend', 'keydown']) document.addEventListener(ev, wakeAudio, { passive: true, capture: true });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && AUD.ac && AUD.ac.state !== 'running') audioCtx(); });
   canvas.addEventListener('pointerdown', (e) => {
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     ptrs.set(e.pointerId, localPt(e));
@@ -7909,9 +7942,12 @@
     townStep: (m) => { townStep(m); },
     loot: (rar, n) => { const c = {}; for (let i = 0; i < (n || 200); i++) for (const l of chestLoot(rar)) c[l.kind] = (c[l.kind] || 0) + 1; return c; },
     moveCost: (bid) => moveCost(byId(bid)),
-    simulate: (min) => simulate(state.queue, workFor(min)).items.map((x) => ({ type: x.q.type, finished: x.finished, waiting: !!x.waiting, done: x.done })),
+    simulate: (min) => simulate(focusJobs(), workFor(min)).items.map((x) => ({ type: x.q.type, finished: x.finished, waiting: !!x.waiting, done: x.done })),
     skipReady: () => { if (state.session && Date.now() < state.session.start) { state.session.start = Date.now(); save(); } },
-    econ: () => { const e = econ(); return { taxes: e.taxes, wages: e.wages, net: e.net, cap: treasuryCap(), fee: { sweeper: hireFee('sweeper'), fire: hireFee('fire'), police: hireFee('police') } }; },
+    jobs: () => jobs().map((j) => ({ type: j.type, gold: j.gold })),
+    audio: () => (AUD.ac ? AUD.ac.state : null),
+    plan: () => ({ focus: focusJobs().length, all: state.queue.length, work: planWork() }),
+    econ: () => { const e = econ(); return { taxes: e.taxes, wages: e.wages, net: e.net, keep: e.keep, loanPay: e.loanPay, focusNet: focusNet(e), cap: treasuryCap(), fee: { sweeper: hireFee('sweeper'), fire: hireFee('fire'), police: hireFee('police') } }; },
     setStaff: (k, n) => { state.staff[k] = n; touch(); syncWalkers(); },
     rob: (bid) => { const b = bid ? byId(bid) : state.buildings.find((x) => messy(x) && !policeCovers(x)); startRobbery(b); return b && b.id; },
     works: () => { startWorks(); const w = state.buildings.find((b) => b.type === 'works'); return w ? { id: w.id, c: w.c, r: w.r, left: w.works.left } : null; },
