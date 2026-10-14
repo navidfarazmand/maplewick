@@ -216,7 +216,17 @@
   .sp-head { display: flex; justify-content: space-between; align-items: center; }
   .sp-kind { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--focus); }
   .spark.k-word .sp-kind { color: var(--play-deep); } .spark.k-fact .sp-kind { color: var(--gold); }
-  .sp-again { border: 0; background: var(--surface-2); border-radius: 99px; width: 30px; height: 30px; font-size: 16px; font-weight: 800; }
+  .sp-tools { display: flex; gap: 6px; }
+  .sp-btn { border: 0; background: var(--surface-2); color: var(--ink); border-radius: 99px; width: 30px; height: 30px; font-size: 16px; font-weight: 800; display: grid; place-items: center; padding: 0; }
+  .sp-btn svg { width: 15px; height: 15px; } .sp-btn.on { background: var(--focus); color: #fff; }
+  .sp-sent { font-family: var(--display); font-size: 21px; font-weight: 800; line-height: 1.3; }
+  .sp-toks { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sp-tok { background: var(--surface-2); border-radius: 10px; padding: 5px 8px; display: grid; gap: 1px; min-width: 0; }
+  .sp-tok b { font-size: 15px; } .sp-tok i { font-style: normal; font-size: 11.5px; color: var(--focus); font-weight: 700; } .sp-tok small { font-size: 11px; color: var(--muted); }
+  .sp-tr { font-size: 13.5px; color: var(--muted); font-weight: 700; }
+  .sp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sp-chips .chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 99px; padding: 7px 12px; font: inherit; font-weight: 700; font-size: 14px; }
+  .sp-chips .chip.on { background: var(--focus); border-color: var(--focus); color: #fff; }
   .sp-quote { font-family: var(--display); font-size: 17px; line-height: 1.3; font-weight: 700; }
   .sp-by { font-size: 12.5px; color: var(--muted); }
   .sp-fact { font-size: 15px; line-height: 1.35; font-weight: 700; }
@@ -389,7 +399,9 @@
   .bigfocus::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); transform: translateX(-120%); animation: shine 4.5s ease-in-out infinite; pointer-events: none; }
   @keyframes shine { 0%, 62% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
   .homerow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .homebar .bigfocus { min-height: 82px; border-radius: 20px; }
+  .homebar .bigfocus { min-height: 104px; border-radius: 22px; }
+  .homebar .bigfocus #focus-main { font-size: 30px; } .homebar .bigfocus small { font-size: 15px; }
+  .homebar .homerow { display: none; } /* 10.08: Sam's plan and Play are reached from the town and the menu */
   .homebar .bigfocus span { font-size: 27px; }
   .homebar .bigfocus small { font-size: 13.5px; }
   .pb-row { display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 8px; align-items: stretch; }
@@ -480,6 +492,8 @@
   .durations button b { font-family: var(--display); font-size: 19px; line-height: 1; }
   .durations .gold { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; color: var(--gold); font-size: calc(12px + var(--gs, 0px)); white-space: nowrap; }
   .durations .gold .coin { width: 12px; height: 12px; vertical-align: 0; }
+  .durations .gold s.was { color: var(--muted); font-weight: 700; font-size: .82em; text-decoration-color: var(--combo); text-decoration-thickness: 2px; }
+  .durations .gold .cmb { color: var(--combo); }
   .durations .note { font-size: 11px; font-weight: 800; white-space: nowrap; }
   .durations .note.minus { color: var(--bad); }
   .durations .note.all, .durations .note.bonus { color: var(--good); }
@@ -591,6 +605,7 @@
   .contract { background: #FFFDF6; color: #2B2418; border-radius: 14px; padding: 16px; border: 1px solid #E8DCC0; box-shadow: inset 0 0 0 4px #FBF3DE; display: grid; gap: 8px; }
   .ct-title { font-family: Georgia, 'Times New Roman', serif; font-size: 22px; text-align: center; letter-spacing: .04em; border-bottom: 1px solid #E0D3B5; padding-bottom: 6px; }
   .ct-terms { margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.4; } .ct-terms li { margin: 4px 0; }
+  button.pill.money { border: 0; font: inherit; font-weight: 800; cursor: pointer; }
   .ct-lead { margin: 0; font-size: 14.5px; line-height: 1.45; text-align: center; }
   .ct-deal { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .ct-opt { display: grid; gap: 2px; border-radius: 12px; padding: 10px; background: #F6EEDC; border: 1px solid #E3D3AE; text-align: center; }
@@ -1144,7 +1159,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.07'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.08'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', music: 'Your music', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
@@ -1167,8 +1182,8 @@
       blurb: 'Holds your gold. Its level is the highest level any other building can reach, and each level lets the town grow bigger.' },
     cottage: { name: 'Cottage', cat: 'home', size: 1, unlock: 1, cost: 15, work: 5, max: 3, repair: 5, color: '#F2E1BE', roof: '#BF5A3E', limit: [0, 4, 7, 10, 14],
       up: [null, null, [18, 8], [42, 18]], residents: [0, 4, 6, 9], blurb: 'A small home. Every resident pays a little over 1 gold an hour, more when they are happy.' },
-    townhouse: { name: 'Townhouse', cat: 'home', size: 1, unlock: 2, cost: 70, work: 15, max: 3, color: '#D9C6E6', roof: '#6A4A86', limit: [0, 0, 3, 5, 8],
-      up: [null, null, [77, 25], [154, 50]], residents: [0, 10, 14, 18], blurb: 'A tall home for a whole family.',
+    townhouse: { name: 'House', cat: 'home', size: 2, unlock: 2, cost: 70, work: 15, max: 3, color: '#D9C6E6', roof: '#6A4A86', limit: [0, 0, 3, 5, 8],
+      up: [null, null, [77, 25], [154, 50]], residents: [0, 10, 14, 18], blurb: 'A family house with two storeys, two tiles long.',
       needs: [['3 homes in town', () => homesCount() >= 3]] },
     market: { name: 'Market stall', cat: 'shop', size: 1, unlock: 1, cost: 20, work: 6, max: 3, repair: 6, color: '#E9D7B4', roof: '#D2503E', radius: 2, limit: [0, 2, 3, 4, 5],
       up: [null, null, [35, 10], [80, 22]], base: [0, 5, 8, 12], per: [0, 2, 3, 4],
@@ -1203,22 +1218,30 @@
       job: { verb: 'Count coins', at: 'at the bank', gold: 2.3, play: 0.7, lines: ['You counted 10,000 coins. Twice. Same answer.', 'A customer opened an account for their cat.', 'You stamped "APPROVED" with great joy.'] },
       blurb: 'Keeps the town\'s money safe (the treasury holds more) and arranges loans from neighbour towns. Working here pays the most gold, but you earn little play time.',
       needs: [['40 residents', () => city().residents >= 40]] },
-    park: { name: 'Park', cat: 'joy', size: 2, unlock: 1, cost: 20, work: 6, max: 3, repair: 4, color: '#7DB65A', roof: '#3F8A4A', radius: 1, limit: [0, 2, 3, 4, 5],
+    park: { name: 'Park', cat: 'joy', size: 1, unlock: 1, cost: 20, work: 6, max: 3, repair: 4, color: '#7DB65A', roof: '#3F8A4A', radius: 1, limit: [0, 2, 3, 4, 5],
       up: [null, null, [40, 12], [90, 25]], boost: [0, 0.15, 0.25, 0.35], blurb: 'Homes touching the park pay 15% more.' },
     fountain: { name: 'Fountain', cat: 'joy', size: 1, unlock: 2, cost: 45, work: 8, max: 3, color: '#C9CED3', roof: '#5AA9D6', radius: 2, limit: [0, 0, 2, 3, 4],
       up: [null, null, [70, 15], [150, 35]], boost: [0, 0.1, 0.15, 0.2], blurb: 'Homes within 2 tiles pay 10% more.',
       needs: [['A park (the water pipe runs through it)', () => countLive('park') >= 1]] },
-    clinic: { name: 'Clinic', cat: 'joy', size: 2, unlock: 3, cost: 160, work: 30, max: 3, color: '#F4F6F7', roof: '#C8473D', radius: 3, limit: [0, 0, 0, 1, 2], reach: 6,
+    clinic: { name: 'Clinic', cat: 'joy', size: 1, unlock: 3, cost: 160, work: 30, max: 3, color: '#F4F6F7', roof: '#C8473D', radius: 3, limit: [0, 0, 0, 1, 2], reach: 6,
       up: [null, null, [240, 60], [480, 120]], boost: [0, 0.15, 0.2, 0.3], staff: 'nurse', slots: [0, 2, 3, 4], blurb: 'Homes within 3 tiles pay 15% more. Nurses work here and look after every home within 6 tiles.',
       needs: [['40 residents', () => city().residents >= 40]] },
+    hospital: { name: 'Hospital', cat: 'joy', size: 2, unlock: 4, cost: 450, work: 60, max: 2, color: '#F4F6F7', roof: '#C8473D', radius: 4, limit: [0, 0, 0, 0, 1], reach: 12,
+      up: [null, null, [700, 90]], boost: [0, 0.2, 0.3], staff: 'nurse', slots: [0, 4, 6], blurb: 'The big, modern version of the clinic: twice the reach, twice as fast, and it can treat serious cases. Costs more to run.',
+      needs: [['A clinic at level 2', () => state.buildings.some((b) => b.type === 'clinic' && live(b) && b.level >= 2)], ['80 residents', () => city().residents >= 80]] },
+    amusement: { name: 'Amusement park', cat: 'joy', size: 2, unlock: 3, cost: 260, work: 40, max: 3, color: '#9FCB6B', roof: '#E8503A', radius: 3, limit: [0, 0, 0, 1, 2],
+      up: [null, null, [380, 60], [700, 90]], boost: [0, 0.22, 0.3, 0.38], blurb: 'The big version of a park: a Ferris wheel and a carousel. Homes within 3 tiles pay 22% more.',
+      needs: [['2 parks', () => countLive('park') >= 2]] },
+    cemetery: { name: 'Cemetery', cat: 'service', size: 1, unlock: 3, cost: 60, work: 12, max: 1, color: '#8FAF6A', roof: '#B9B2A4', limit: [0, 0, 0, 1, 1], near: { r: 1, v: -0.05, label: 'a cemetery next door' },
+      blurb: 'A quiet place to say goodbye. Without one, a loss weighs on the town for much longer.', needs: [['A clinic', () => countLive('clinic') >= 1]] },
     // Service buildings: home base for town staff. Each level gives room for more staff.
     depot: { name: 'Cleaning depot', cat: 'service', size: 2, unlock: 1, cost: 30, work: 6, max: 2, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3], reach: 6,
       up: [null, null, [60, 15]], staff: 'sweeper', slots: [0, 2, 4], blurb: 'Home of the street sweepers, who clean within 6 tiles. There is a landfill out back: homes right next to it pay 15% less.' },
     shed: { name: 'Garden shed', cat: 'service', size: 1, unlock: 1, cost: 20, work: 5, max: 2, color: '#E4D2AE', roof: '#5E9A4B', limit: [0, 1, 1, 2, 2], reach: 6,
       up: [null, null, [40, 10]], staff: 'gardener', slots: [0, 2, 4], blurb: 'Home of the gardeners. Within 6 tiles they tidy parks, rake leaves, clear fallen trees and keep fires from spreading.' },
-    firestation: { name: 'Fire station', cat: 'service', size: 2, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
+    firestation: { name: 'Fire station', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
       up: [null, null, [90, 20]], staff: 'fire', slots: [0, 2, 4], blurb: 'Home of the firefighters. They rush out when a building catches fire, fastest within 6 tiles.' },
-    police: { name: 'Police station', cat: 'service', size: 2, unlock: 2, cost: 70, work: 12, max: 2, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
+    police: { name: 'Police station', cat: 'service', size: 1, unlock: 2, cost: 70, work: 12, max: 2, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
       up: [null, null, [110, 25]], staff: 'police', slots: [0, 2, 4], blurb: 'Home of the police officers. Homes within 5 tiles of a staffed station feel safe: one station covers most of a town.' },
     school: { name: 'School', cat: 'service', size: 2, unlock: 2, cost: 90, work: 14, max: 2, color: '#F1E2C8', roof: '#B0563A', reach: 6, limit: [0, 0, 1, 2, 2],
       up: [null, null, [150, 30]], staff: 'teacher', slots: [0, 2, 4], blurb: 'Where the town\'s kids learn. With a teacher, homes within 6 tiles earn 12% more (and bored kids cause less trouble).',
@@ -1283,7 +1306,7 @@
       needed: (ci) => ci.residents >= 16, neededText: 'Needed from 16 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
     police: { name: 'Police officer', plural: 'police officers', home: 'police', fee: 240, wage: 10, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
       needed: (ci) => ci.residents >= 24, neededText: 'Needed from 24 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 25)), needText: '1 for every 25 residents, and every home within 5 tiles of a station' },
-    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
+    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', alt: ['hospital'], fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
       needed: () => countLive('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
     teacher: { name: 'Teacher', plural: 'teachers', home: 'school', fee: 150, wage: 8, look: { shirt: '#7B5EA7', hat: '#4A3B6B', hair: '#6B4226', skin: '#E7B98F' }, what: 'Teaches the town\'s kids: homes near a school earn more.',
       needed: (ci) => countLive('school') >= 1 || (hallLevel() >= 2 && ci.residents >= 20), neededText: 'Needed from town hall level 2 and 20 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' }
@@ -1296,10 +1319,10 @@
   const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
   const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th');
   const noStaff = () => ({ sweeper: 0, police: 0, fire: 0, gardener: 0, nurse: 0, teacher: 0 });
-  const BUILD_ORDER = ['cottage', 'market', 'cafe', 'park', 'townhouse', 'bakery', 'fountain', 'arcade', 'workshop', 'bookshop', 'stadium'];
+  const BUILD_ORDER = ['cottage', 'market', 'cafe', 'park', 'townhouse', 'bakery', 'fountain', 'arcade', 'workshop', 'bookshop', 'amusement', 'stadium'];
   const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle'];
   const hasLandmark = (type) => state.buildings.some((b) => b.type === type && live(b));
-  const SERVICE_ORDER = ['depot', 'shed', 'firestation', 'police', 'clinic', 'school', 'bank'];
+  const SERVICE_ORDER = ['depot', 'shed', 'firestation', 'police', 'clinic', 'hospital', 'school', 'bank', 'cemetery'];
   // Focus badges: earned in order, at most one per session, only by the session you just finished.
   const BADGES = [
     { min: 10, reward: 12, tier: 0 }, { min: 15, reward: 18, tier: 0 }, { min: 25, reward: 28, tier: 1 }, { min: 45, reward: 42, tier: 1 },
@@ -1370,7 +1393,9 @@
   const sizeOf = (type) => TYPES[type].size || 1;
   // 10.06 (Navid): the fire station, police station and clinic are two tiles long and one wide, turned either way
   // (b.rot: 0 = long along c, 1 = long along r). Everything else is square.
-  const FOOT = { firestation: [2, 1], police: [2, 1], clinic: [2, 1] };
+  // 10.08: basic buildings are one tile again; the House is two tiles long (and turns); bigger, better versions are
+  // separate buildings (Hospital, Amusement park).
+  const FOOT = { townhouse: [2, 1] };
   const dimsOf = (type, rot) => { const f = FOOT[type]; if (f) return rot ? [f[1], f[0]] : f; const s = sizeOf(type); return [s, s]; };
   const dimsB = (b) => (b.fp1 ? [1, 1] : dimsOf(b.type, b.rot));
   const rotFor = (type) => (FOOT[type] ? (ui.rot || 0) : 0);
@@ -2105,12 +2130,14 @@
           joy += bst; from.push([o.type === 'park' && (o.overgrown || 0) > 0.3 ? 'overgrown park' : t.name, bst]);
         }
         else if (t.cat === 'decor' && d <= 1) decor += t.dec != null ? t.dec : 0.05;
+        if (o.addons && o.addons.lamp && d <= 1) decor += 0.04; // a lamp post beside a building next door
         // Some buildings bother (or delight) the homes right next to them.
         if (t.near && d <= t.near.r) {
           if (t.near.v < 0) { noise += -t.near.v; from.push([t.near.label, t.near.v, o.id]); }
           else { joy += t.near.v; from.push([t.near.label, t.near.v, o.id]); }
         }
       }
+      if (h.addons && h.addons.lamp) decor += 0.04;
       decor = Math.min(decor, 0.15);
       if (decor) from.push(['decorations', decor]);
       if (schoolOn) { if (schools.some((sc) => distFull(sc, h) <= stationReach(sc))) { joy += 0.12; from.push(['school nearby', 0.12]); } else { noise += 0.05; from.push(['no school nearby', -0.05]); } }
@@ -2118,8 +2145,9 @@
       if (h.robbed) { noise += 0.3; from.push(['break-in', -0.3]); }
       else if (h.shaken && h.shaken.total) { const v = 0.3 * clamp(h.shaken.left / h.shaken.total, 0, 1); if (v > 0.01) { noise += v; from.push([h.shaken.label || 'after a scare', -v]); } }
       if (!h.fire && act.some((o) => o.fire && o !== h && dist(o, h) <= 1)) { noise += 0.1; from.push(['smoke from next door', -0.1]); }
+      if (h.loss && h.loss.total) { const v = 0.1 + 0.2 * clamp(h.loss.left / h.loss.total, 0, 1); noise += v; from.push(['in mourning', -v]); } // 10.08
       const mult = clamp(1 + joy + decor - noise, 0.3, 2.5);
-      const res = T(h).residents[h.level];
+      const res = Math.max(0, T(h).residents[h.level] - (h.loss ? 1 : 0));
       if (h.sick) from.push(['sick: can\'t work', -1]);
       const income = h.fire || h.sick ? 0 : res * HOME_TAX * mult * (castle ? 1.1 : 1);
       residents += res; total += income;
@@ -2255,9 +2283,10 @@
   }
 
   /* ---------- Town staff and the problems they solve ---------- */
-  const staffBuildings = (k) => state.buildings.filter((b) => b.type === STAFF[k].home && live(b) && !b.fire);
+  const homeOf = (k, type) => type === STAFF[k].home || !!(STAFF[k].alt && STAFF[k].alt.includes(type));
+  const staffBuildings = (k) => state.buildings.filter((b) => homeOf(k, b.type) && live(b) && !b.fire).sort((a, b) => (b.type === 'hospital') - (a.type === 'hospital'));
   const staffCapacity = (k) => staffBuildings(k).reduce((a, b) => a + (TYPES[b.type].slots[b.level] || 0), 0);
-  const offSick = (k) => state.buildings.filter((b) => b.sick && b.type === STAFF[k].home).length;
+  const offSick = (k) => state.buildings.filter((b) => b.sick && homeOf(k, b.type)).length;
   const staffWorking = (k) => Math.max(0, Math.min(state.staff[k] || 0, staffCapacity(k)) - offSick(k));
   // Every service building has a reach. Staff only look after places within reach of a staffed building
   // (staff fill their buildings one each first, so a second building only helps once someone works there).
@@ -2276,7 +2305,7 @@
   // ready 20% sooner and work 20% better (10.06).
   const stLevel = (st) => (st ? clamp(st.level || 1, 1, 4) : 1);
   const stationK = (st) => 1 + 0.2 * (stLevel(st) - 1);
-  const prepK = (st) => Math.max(0.4, 1 - 0.2 * (stLevel(st) - 1));
+  const prepK = (st) => Math.max(0.4, 1 - 0.2 * (stLevel(st) - 1)) * (st && st.type === 'hospital' ? 0.6 : 1); // 10.08: a hospital is quicker off the mark
   const baseReach = (type, level) => (TYPES[type].reach || 0) + Math.max(0, (level || 1) - 1);
   const stationReach = (x) => Math.round(baseReach(x.type, x.level) * (x.vehicle ? 1.5 : 1));
   // The best of the staffed stations that reach this building (0 when none does).
@@ -2289,12 +2318,14 @@
     shed: { kind: 'van', name: 'Garden van', cost: 150, upkeep: 3, what: 'Gardeners reach half again as far.' },
     firestation: { kind: 'fire', name: 'Fire engine', cost: 350, upkeep: 8, what: 'Reach half again as far, and the crew gets ready faster.' },
     police: { kind: 'police', name: 'Patrol car', cost: 300, upkeep: 7, what: 'Reach half again as far, and officers respond faster.' },
-    clinic: { kind: 'ambulance', name: 'Ambulance', cost: 400, upkeep: 8, what: 'Nurses reach half again as far.' },
+    clinic: { kind: 'ambulance', name: 'Ambulance', cost: 400, upkeep: 8, what: 'Nurses reach half again as far, and very sick patients can be brought in to the clinic.' },
+    hospital: { kind: 'ambulance', name: 'Ambulance', cost: 400, upkeep: 8, what: 'Reach half again as far, and serious cases are brought in fast.' },
     school: { kind: 'bus', name: 'School bus', cost: 220, upkeep: 4, what: 'Kids from half again as far come to school.' }
   };
+  const vehLevel = (type) => (type === 'hospital' ? 1 : 2); // 10.08: a hospital has an ambulance bay from the start
   const fleetUpkeep = () => state.buildings.reduce((a, b) => a + (b.vehicle && FLEET[b.type] && live(b) ? FLEET[b.type].upkeep : 0), 0);
   // Every service building costs a little to run (heating, water, paperwork), more at higher levels (10.04).
-  const RUNNING = { depot: 2, shed: 1, firestation: 3, police: 3, clinic: 4, school: 3, bank: 4 };
+  const RUNNING = { depot: 2, shed: 1, firestation: 3, police: 3, clinic: 4, school: 3, bank: 4, hospital: 9, cemetery: 1 };
   const runningOf = (b) => (RUNNING[b.type] && live(b) ? RUNNING[b.type] * b.level : 0);
   const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0);
   // Thieves who are caught sit in the police station's cells for a while: each one costs a little to keep (10.04).
@@ -2303,7 +2334,7 @@
   const jailUpkeep = () => (state.jail || []).length * JAIL_COST;
   function buyVehicle(id) {
     const b = byId(id), f = b && FLEET[b.type]; if (!f || b.vehicle) return;
-    if (b.level < 2) { toast(`A ${f.name.toLowerCase()} needs the ${T(b).name.toLowerCase()} at level 2 (a garage).`); return; }
+    if (b.level < vehLevel(b.type)) { toast(`A ${f.name.toLowerCase()} needs the ${T(b).name.toLowerCase()} at level 2 (a garage).`); return; }
     if (state.gold + 1e-6 < f.cost) { toast(`A ${f.name.toLowerCase()} costs ${f.cost} gold.`); return; }
     accrue(Date.now()); goldChange(-f.cost, `Bought a ${f.name.toLowerCase()}`, 'buy'); b.vehicle = true; touch(); save(); sfx.coin(); renderAll();
     toast(`New ${f.name.toLowerCase()}! It is on duty right away: reach ${baseReach(b.type, b.level)} → ${stationReach(b)} tiles. Upkeep ${f.upkeep} gold an hour.`);
@@ -2346,7 +2377,7 @@
     const swR = roleInfo('sweeper', ci).ratio, gdR = roleInfo('gardener', ci).ratio, swSt = stationsOf('sweeper'), gdSt = stationsOf('gardener');
     for (const b of state.buildings) {
       // out of reach of a staffed depot or shed, nobody comes to clean
-      if (messy(b)) { const kk = coverK('sweeper', b, swSt), sw = kk ? swR : 0, bins = nearType(b, ['bin'], 2) ? 0.6 : 1; b.trash = clamp((b.trash || 0) + min * (0.05 * bins * (1 - sw) - 0.16 * sw * (kk || 1)), 0, 3); }
+      if (messy(b)) { const kk = coverK('sweeper', b, swSt), sw = kk ? swR : 0, bins = nearAddon(b, 'bin', 2) ? 0.6 : 1; b.trash = clamp((b.trash || 0) + min * (0.05 * bins * (1 - sw) - 0.16 * sw * (kk || 1)), 0, 3); }
       if (b.type === 'park' && live(b)) { const kk = coverK('gardener', b, gdSt), gd = kk ? gdR : 0; b.overgrown = clamp((b.overgrown || 0) + min * (0.03 * (1 - gd) - 0.08 * gd * (kk || 1)), 0, 1); }
       // 10.06: in autumn dry leaves pile up around homes and shops (more next to trees and parks); gardeners rake them
       if (messy(b)) {
@@ -2358,6 +2389,8 @@
     // Trouble fades slowly: recent incidents, and homes shaken by one.
     if (state.scars && state.scars.length) { for (const sc of state.scars) sc.left -= min; state.scars = state.scars.filter((sc) => sc.left > 0); }
     for (const b of state.buildings) if (b.shaken) { b.shaken.left -= min; if (b.shaken.left <= 0) delete b.shaken; }
+    // 10.08: a family in mourning slowly heals; then a relative moves in and the home is full again
+    for (const b of state.buildings) if (b.loss) { b.loss.left -= min; if (b.loss.left <= 0) { delete b.loss; if (ui.screen === 'play') toast(`A cousin moved in at ${placeName(b)}. The family is smiling again.`); } }
     const ease = 1 - Math.exp(-min / 20); // safety and health change bit by bit, both ways
     const nu = roleInfo('nurse', ci);
     state.civic.safety += (safetyTarget(ci) - state.civic.safety) * ease;
@@ -2395,7 +2428,7 @@
     if (!canBurn(b) || b.fire || revealFor(b.id) || (b.noFireUntil || 0) > Date.now()) return 0;
     let r = (FIRE_RISK[b.type] || 1) * (LEVEL_FIRE[b.level] || 1) * (1 + 0.25 * crowd(b));
     if (!coversB('fire', b)) r *= 1.4; // nobody checks the wiring out there
-    if (nearType(b, ['hydrant'], 2)) r *= 0.5;
+    if (nearAddon(b, 'hydrant', 2)) r *= 0.5;
     if (b.leaves) r *= 1 + 1.2 * b.leaves; // dry autumn leaves catch fire easily (10.06)
     return r;
   }
@@ -2517,23 +2550,71 @@
     if (SEA.k === 'winter') r *= 1.4;
     return r;
   }
-  function startSick(b, spread) {
+  // 10.08 (Navid): getting better takes a while after the nurse's visit, and some cases are serious: they need an
+  // ambulance to a hospital (or a level-2 clinic). Without one, someone may not pull through, and without a cemetery
+  // the town grieves for longer. How long recovery takes will depend on age once residents have one (later).
+  const ageK = () => 1;
+  const canCare = (s) => !!s && live(s) && (s.type === 'hospital' || (s.type === 'clinic' && s.level >= 2));
+  const careK = (s) => (s && s.type === 'hospital' ? 2 : 1); // a hospital treats twice as fast
+  // A staffed hospital (first) or level-2 clinic with an ambulance that reaches this home.
+  function carerFor(b) { return stationsOf('nurse').filter((s) => canCare(s) && s.vehicle && distFull(s, b) <= stationReach(s)).sort((a, c) => (c.type === 'hospital') - (a.type === 'hospital') || dist(a, b) - dist(c, b))[0] || null; }
+  const SERIOUS_SEC = 150; // play seconds a serious case can wait for hospital care
+  function startSick(b, spread, opt) {
     if (!b || b.sick || !live(b)) return;
-    b.sick = { at: Date.now(), left: 240, spreadIn: 50 + Math.random() * 30 };
+    const home = T(b).cat === 'home';
+    const serious = home && (opt && opt.serious != null ? !!opt.serious : !spread && Math.random() < 0.16 * (SEA.k === 'winter' ? 1.5 : 1));
+    b.sick = { at: Date.now(), left: 240, spreadIn: 50 + Math.random() * 30, need: Math.round((25 + Math.random() * 65) * ageK(b)) };
+    if (serious) { b.sick.serious = true; b.sick.crit = SERIOUS_SEC; }
     touch(); save(); sfx.grumble && sfx.grumble();
     const st = responderFor('nurse', b);
-    const sw = T(b).staff ? ` One ${STAFF[T(b).staff].name.toLowerCase()} fewer on duty until a nurse comes.` : '';
-    toast(`${spread ? 'It spread: ' : ''}${whoAt(b)} is sick and can't work.${sw}${st ? (st.vehicle ? ' The ambulance is on its way.' : ' A nurse is walking over (an ambulance would be faster).') : staffWorking('nurse') ? ' No nurse can reach it: it may spread to the neighbours.' : ' Hire a nurse at the clinic to treat it, or it may spread.'}`);
+    const sw = T(b).staff ? ` The ${T(b).name.toLowerCase()} has one ${STAFF[T(b).staff].name.toLowerCase()} fewer on duty until ${staffName(b)} gets better.` : '';
+    if (serious) {
+      const cr = carerFor(b), noAmb = stationsOf('nurse').find((s) => canCare(s) && !s.vehicle);
+      toast(`${whoAt(b)} is very sick and needs hospital care.${cr ? ` The ${T(cr).name.toLowerCase()}'s ambulance is on its way.` : noAmb ? ` The ${T(noAmb).name.toLowerCase()} has no ambulance to bring them in: buy one there.` : ' Your town has no hospital (or level-2 clinic) for serious cases. A nurse can keep them comfortable, but they may not pull through.'}`);
+    } else toast(`${spread ? 'It spread: ' : ''}${whoAt(b)} is sick and can't work.${sw}${st ? (st.vehicle ? ' The ambulance is on its way.' : ' A nurse is walking over (an ambulance would be faster).') : staffWorking('nurse') ? ' No nurse can reach it: it may spread to the neighbours.' : ' Hire a nurse at the clinic to treat it, or it may spread.'}`);
     ui.bubbles.push({ bid: b.id, text: pick(LINES.health), kind: 'bad', t0: performance.now(), dur: 3600, role: 'nurse' });
     renderAll();
   }
-  function endSick(b, treated) {
+  function endSick(b, treated, how) {
     if (!b || !b.sick) return;
     delete b.sick; touch();
     const p = centerOf(b);
-    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: performance.now(), text: treated ? 'Feeling better!' : 'Better at last', soft: !treated });
+    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: performance.now(), text: how === 'hosp' ? 'Home from hospital!' : treated ? 'All better!' : 'Better at last', soft: !treated });
     if (treated) sfx.chime();
+    if (how === 'hosp') toast(`${whoAt(b)} is home from the hospital and back on their feet.`);
     save(); renderAll();
+  }
+  // The nurse's visit is done (or the ambulance is at the door).
+  function nurseDone(v, b) {
+    const s = b.sick, st = byId(v.station);
+    if (v.amb) { s.phase = 'hosp'; s.at = v.station; s.hosp = Math.round((40 + Math.random() * 50) * ageK(b)); s.ride = true; v.carry = b.id; floats.push({ x: centerOf(b).x, y: centerOf(b).y - 40, t0: performance.now(), text: 'Off to hospital', soft: true }); return; }
+    if (s.serious) { s.comfort = true; floats.push({ x: centerOf(b).x, y: centerOf(b).y - 40, t0: performance.now(), text: 'Kept comfortable', soft: true }); return; }
+    s.phase = 'rest'; s.rest = Math.round((s.need || 40) / careK(st));
+    floats.push({ x: centerOf(b).x, y: centerOf(b).y - 40, t0: performance.now(), text: 'Treated · resting now', soft: true });
+  }
+  // What would save a serious case here, in words.
+  function seriousHelp(b) {
+    const noAmb = stationsOf('nurse').find((s) => canCare(s) && !s.vehicle), far = stationsOf('nurse').find((s) => canCare(s) && s.vehicle);
+    return noAmb ? `Very sick: the ${T(noAmb).name.toLowerCase()} needs an ambulance to bring them in (buy one there).` : far ? `Very sick: this home is out of the ambulance's reach.` : 'Very sick: only a hospital, or a clinic at level 2 with an ambulance, can treat serious cases.';
+  }
+  // A serious case that waited too long without hospital care.
+  function seriousEnd(b) {
+    const s = b.sick;
+    if (Math.random() < (s.comfort ? 0.35 : 0.6)) { passAway(b); return; }
+    s.serious = false; s.crit = 0; s.phase = 'rest'; s.rest = (s.need || 40) * 2;
+    toast(`${whoAt(b)} pulled through, but needs a long rest. A hospital (or a level-2 clinic with an ambulance) treats serious cases.`);
+    touch(); save(); renderAll();
+  }
+  function passAway(b) {
+    delete b.sick;
+    const cem = countLive('cemetery') > 0, mins = cem ? 30 : 90;
+    b.loss = { left: mins, total: mins };
+    addScar(`a loss at ${placeName(b)}`, cem ? 3 : 6, mins);
+    state.stats.losses = (state.stats.losses || 0) + 1;
+    const p = centerOf(b);
+    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: performance.now(), text: '🕊', soft: true });
+    toast(`Sad news: an elderly relative at ${placeName(b)} passed away. ${cem ? 'The family said goodbye at the cemetery, and the street mourns for a while.' : 'With no cemetery in town, the grief lingers much longer (build one in Services).'} A hospital, or a level-2 clinic with an ambulance, can save serious cases.`);
+    touch(); save(); renderAll();
   }
 
   // Roadworks: a crew digs up the street next to some homes for a few minutes. Noisy, but you can pay to hurry them.
@@ -2664,7 +2745,7 @@
       if (v.state !== 'drive' && v.state !== 'back') continue;
       const tg = v.path[0];
       if (!tg) {
-        if (v.state === 'back') { VEH.splice(VEH.indexOf(v), 1); const w = v.walker != null && walkers.find((x) => x.id === v.walker); if (w) { w.out = false; w.c = v.c; w.r = v.r; w.path = []; w.state = 'idle'; } continue; }
+        if (v.state === 'back') { VEH.splice(VEH.indexOf(v), 1); if (v.carry != null) { const pb = byId(v.carry); if (pb && pb.sick) { pb.sick.ride = false; const hp = byId(v.station); if (hp) floats.push({ x: centerOf(hp).x, y: centerOf(hp).y - 40, t0: performance.now(), text: 'Patient admitted', soft: true }); } } const w = v.walker != null && walkers.find((x) => x.id === v.walker); if (w) { w.out = false; w.c = v.c; w.r = v.r; w.path = []; w.state = 'idle'; } continue; }
         v.state = 'work'; v.workT = 0;
         continue;
       }
@@ -2692,7 +2773,15 @@
     return 'Police looking for clues';
   }
   function sickStatus(b) {
+    const s = b.sick;
+    if (s.phase === 'hosp') return s.ride ? 'In the ambulance' : `In hospital · ${clamp(Math.round(100 - s.hosp / 90 * 100), 5, 99)}%`;
+    if (s.phase === 'rest') return `Resting · ${Math.max(1, Math.ceil(s.rest))}s to go`;
     const v = VEH.find((x) => x.kind === 'nurse' && x.target === b.id);
+    if (s.serious) {
+      if (v && v.amb) return v.state === 'work' ? 'Very sick · onto the stretcher' : 'Very sick · ambulance on the way';
+      if (v) return v.state === 'work' ? 'Very sick · nurse with them' : 'Very sick · nurse coming';
+      return `Very sick · needs hospital · ${Math.max(1, Math.ceil(s.crit))}s`;
+    }
     if (!v) return responderFor('nurse', b) ? 'Sick · nurse coming' : 'Sick · no nurse can reach';
     if (v.state === 'prep' || v.state === 'drive') return v.foot ? 'Sick · nurse walking over' : 'Sick · ambulance on the way';
     return 'Nurse treating the sick';
@@ -2709,7 +2798,7 @@
     for (const b of burningAll()) {
       const f = b.fire; if (!f.max) { f.max = fireHp(b); f.hp = f.hp == null ? f.max : f.hp; f.spreadIn = f.spreadIn || 20; }
       const crews = VEH.filter((v) => v.kind === 'fire' && v.state === 'work' && v.target === b.id), crew = crews[0] || null;
-      if (crews.length) f.hp -= dt * crews.reduce((a, v) => a + (v.foot ? 0.65 : 0.9) * stationK(byId(v.station)), 0) * (nearType(b, ['hydrant'], 2) ? 1.3 : 1);
+      if (crews.length) f.hp -= dt * crews.reduce((a, v) => a + (v.foot ? 0.65 : 0.9) * stationK(byId(v.station)), 0) * (nearAddon(b, 'hydrant', 2) ? 1.3 : 1);
       else if (f.first) f.hp -= dt * 0.12; // the lesson fire: neighbours with buckets get it out after a couple of minutes
       if (!crew && !f.first) {
         f.spreadIn -= dt;
@@ -2758,11 +2847,27 @@
     // ---- the sick: a nurse treats them; out of reach they get better slowly and can pass it on
     for (const b of state.buildings) {
       if (!b.sick) continue;
+      const s = b.sick;
+      // 10.08: in hospital (after the ambulance ride), or resting at home after the nurse's visit
+      if (s.phase === 'hosp') { if (!s.ride) { s.hosp -= dt * careK(byId(s.at)); if (s.hosp <= 0) endSick(b, true, 'hosp'); } continue; }
+      if (s.phase === 'rest') { s.rest -= dt; if (s.rest <= 0) endSick(b, true); continue; }
+      if (s.serious) { s.crit -= dt; if (s.crit <= 0) { const v0 = VEH.find((x) => x.kind === 'nurse' && x.target === b.id); if (v0) sendHome(v0); seriousEnd(b); continue; } }
       const v = VEH.find((x) => x.kind === 'nurse' && x.target === b.id);
-      if (v && v.state === 'work') { v.workT += dt; if (v.workT >= 12 / stationK(byId(v.station))) { endSick(b, true); sendHome(v); } continue; }
+      if (v && v.state === 'work') { v.workT += dt; if (v.workT >= (v.amb ? 3 : 8 / stationK(byId(v.station)) / careK(byId(v.station)))) { nurseDone(v, b); sendHome(v); } continue; }
       if (!v) {
+        if (s.serious) {
+          const cr = carerFor(b);
+          if (cr && !VEH.some((x) => x.amb && x.station === cr.id && x.state !== 'back')) {
+            radioCall('nurse', doorTile(cr, b.c, b.r));
+            const a = dispatch('nurse', cr, b, PREP.nurse[1] * prepK(cr), false); a.amb = true;
+            floats.push({ x: centerOf(cr).x, y: centerOf(cr).y - 40, t0: performance.now(), text: 'Ambulance out!', soft: true });
+            continue;
+          }
+          if (s.comfort) continue; // a nurse already came; only the hospital can do more
+        }
         const st = responderFor('nurse', b);
         if (st && VEH.filter((x) => x.kind === 'nurse' && x.state !== 'back').length < Math.max(1, stationsOf('nurse').length)) { respond('nurse', 'nurse', st, b); continue; }
+        if (s.serious) continue;
         b.sick.left -= dt;
         b.sick.spreadIn -= dt;
         if (b.sick.spreadIn <= 0) {
@@ -2808,7 +2913,7 @@
         ui.robIn = null;
         const st = stationsOf('police');
         // the farther from a police station, the likelier
-        const w = (b) => { if (coversB('police', b, st)) return 0.4; const d = st.length ? Math.min(...st.map((x) => dist(x, b) - stationReach(x))) : 4; return (2 + 0.6 * Math.max(0, d)) * (T(b).cat === 'shop' ? 1.3 : 1); };
+        const w = (b) => { if (coversB('police', b, st)) return 0.4; const d = st.length ? Math.min(...st.map((x) => dist(x, b) - stationReach(x))) : 4; return (2 + 0.6 * Math.max(0, d)) * (T(b).cat === 'shop' ? 1.3 : 1) * (nearAddon(b, 'lamp', 1) ? 0.7 : 1); };
         startRobbery(weighted(state.buildings.filter((b) => messy(b) && !b.fire && !revealFor(b.id)), w));
       }
     }
@@ -2895,10 +3000,19 @@
   // Fewer bubbles: urgent problems at most every 30 seconds, other complaints and happy chatter at most once a
   // minute each, never two at once, and at least 15 seconds of quiet in between. Happy lines make no sound.
   const BUBBLE_GAP = { urgent: 30000, bad: 60000, good: 60000, quiet: 15000 };
+  // 10.08 (Navid): requests and chatter are not urgent, so they only speak up as you arrive in town: one bubble at a
+  // time, each building once, then quiet (a small "!" stays on buildings with a request). Fires, break-ins and the
+  // sick always show.
+  const ARRIVE_MS = 70000, ARRIVE_MAX = 6;
   function bubbleTick(now) {
     if (ui.screen !== 'play' || ui.holding || ui.overlay || ui.visit) return;
     ui.bubbles = ui.bubbles.filter((x) => now < x.t0 + x.dur);
     if (ui.bubbles.some((x) => !x.reply) || now < ui.nextBubble) return;
+    if (!ui.arriveAt || now - ui.arriveAt > ARRIVE_MS || (ui.bubbleCount | 0) >= ARRIVE_MAX) return;
+    const seen = ui.bubbleSeen || (ui.bubbleSeen = new Set());
+    // first the town's requests, one by one
+    const rq = activeQuests().filter((q) => !q.alert && q.id !== 'firenow').map((q) => ({ q, b: questPlace(q) })).find((x) => x.b && !seen.has(x.b.id));
+    if (rq) { seen.add(rq.b.id); ui.bubbleCount = (ui.bubbleCount | 0) + 1; ui.nextBubble = now + 4600 + 900; ui.bubbles.push({ bid: rq.b.id, text: rq.q.from === 'Town council' ? 'Town council' : rq.q.from, kind: 'req', t0: now, dur: 4600, q: rq.q }); return; }
     const nb = ui.nextBy || (ui.nextBy = { urgent: 0, bad: now + 20000, good: now + 30000 });
     const c = complaintFor();
     let o = null, kind = null;
@@ -2906,8 +3020,9 @@
     else if (c.bad && now >= nb.bad) { o = c.bad; kind = 'bad'; }
     else if (c.good && now >= nb.good && !c.urgent) { o = c.good; kind = 'good'; }
     ui.nextBubble = now + 2000;
-    if (!o || ui.bubbles.some((x) => x.bid === o.b.id)) return;
-    nb[kind] = now + BUBBLE_GAP[kind]; ui.nextBubble = now + BUBBLE_GAP.quiet;
+    if (!o || ui.bubbles.some((x) => x.bid === o.b.id) || seen.has(o.b.id)) return;
+    seen.add(o.b.id); ui.bubbleCount = (ui.bubbleCount | 0) + 1;
+    nb[kind] = now + 6000; ui.nextBubble = now + 4200 + 1200;
     ui.bubbles.push({ bid: o.b.id, text: o.text, kind: o.kind, t0: now, dur: 4200, role: o.role || null, src: o.src || null });
     if (o.kind === 'bad') sfx.grumble();
   }
@@ -3017,7 +3132,44 @@
     const secs = newSecs(type, cost);
     return { cost, mode, secs, work: Math.max(1, Math.round(t.work * (1 + 0.5 * n))) };
   }
-  const countType = (type) => state.buildings.filter((b) => b.type === type).length + state.tray.filter((x) => x.type === type).length;
+  const countType = (type) => state.buildings.filter((b) => b.type === type).length + state.tray.filter((x) => x.type === type).length + (ADDON[type] ? state.buildings.filter((b) => b.addons && b.addons[type]).length : 0);
+  /* ---------- Add-ons (10.08, Navid): fire hydrants, lamp posts and trash bins don't take a tile; they go beside a building. ---------- */
+  const ADDON = { hydrant: true, lamp: true, bin: true };
+  const canHost = (b) => !!(b && live(b) && TYPES[b.type] && !['decor', 'works'].includes(T(b).cat) && !special(T(b)) && !b.site);
+  const nearAddon = (b, k, d) => state.buildings.some((o) => o.addons && o.addons[k] && live(o) && dist(o, b) <= d);
+  function startAttach(type) {
+    const t = TYPES[type];
+    if (countType(type) >= capFor(type)) { toast(capWhy(type)); return; }
+    if (state.gold + 1e-6 < t.cost) { toast(`A ${t.name.toLowerCase()} costs ${t.cost} gold.`); return; }
+    closePanel(true); ui.attach = { type }; ui.panel = { kind: 'attach' }; renderAll(); sfx.pop();
+  }
+  function attachTo(b) {
+    const k = ui.attach && ui.attach.type, t = k && TYPES[k]; if (!t) return;
+    if (!canHost(b)) { toast(`A ${t.name.toLowerCase()} goes beside a building. Tap a home, a shop or a service building.`); return; }
+    if (b.addons && b.addons[k]) { toast(`The ${T(b).name.toLowerCase()} already has a ${t.name.toLowerCase()}.`); return; }
+    if (state.gold + 1e-6 < t.cost) { toast(`A ${t.name.toLowerCase()} costs ${t.cost} gold.`); return; }
+    goldChange(-t.cost, `${t.name} beside ${placeName(b)}`, 'buy');
+    b.addons = Object.assign({}, b.addons || {}, { [k]: true });
+    ui.attach = null; ui.panel = null; touch(); accrue(Date.now()); sfx.place(); bump(b.id); save();
+    toast(`${t.name} put up beside ${placeName(b)}.`); checkQuests(false); afterAction(); renderAll();
+  }
+  function removeAddon(b, k) {
+    if (!b.addons || !b.addons[k]) return;
+    const back = Math.floor((TYPES[k].cost || 0) / 2);
+    delete b.addons[k]; if (!Object.keys(b.addons).length) delete b.addons;
+    if (back) goldChange(back, `Took down the ${TYPES[k].name.toLowerCase()}`, 'sell');
+    touch(); save(); renderAll(); toast(`${TYPES[k].name} taken down${back ? ` (+${back} gold)` : ''}.`);
+  }
+  // Older towns had hydrants, lamps and bins on their own tiles: move each beside the nearest building.
+  function attachOldAddons() {
+    let n = 0;
+    for (const o of state.buildings.filter((x) => ADDON[x.type])) {
+      const host = state.buildings.filter((b) => canHost(b) && !(b.addons && b.addons[o.type])).sort((a, b) => dist(a, o) - dist(b, o))[0];
+      if (host) host.addons = Object.assign({}, host.addons || {}, { [o.type]: true }); else state.gold += Math.floor((TYPES[o.type].cost || 0) / 2);
+      state.buildings = state.buildings.filter((x) => x !== o); n++;
+    }
+    if (n) { touch(); save(); setTimeout(() => toast(`Hydrants, lamps and bins now stand beside buildings, so ${n} tile${n > 1 ? 's are' : ' is'} free again.`), 2200); }
+  }
   const capFor = (type, L) => { const l = TYPES[type].limit; return l ? l[L == null ? hallLevel() : L] : Infinity; };
   function needsFor(type) {
     const t = TYPES[type], out = [];
@@ -3106,7 +3258,7 @@
     const a = anchored ? { c, r } : anchorFor(type, c, r);
     goldChange(-chk.cost, `New ${TYPES[type].name.toLowerCase()}`, 'buy');
     const b = { id: state.nextId++, type, c: a.c, r: a.r, level: 1, site: true, origin: 'built' };
-    if (FOOT[type]) { b.rot = rotFor(type); b.fp6 = true; }
+    if (FOOT[type]) { b.rot = rotFor(type); b.fp8 = true; }
     if (TYPES[type].cat === 'home') b.resident = nextName();
     state.buildings.push(b);
     const q = { id: state.nextId++, kind: 'build', type, bid: b.id, fromLevel: 0, toLevel: 1, work: chk.work, done: 0, paid: chk.cost, mode: chk.mode };
@@ -3342,7 +3494,7 @@
     const blk = blockNow(), onPlan = !!blk && d + 1e-9 >= blk.dur * 0.8;
     const want = playFor(d, sim.leftover, job, true), dayLeft = playLeftToday(), room = Math.max(0, PLAY_CAP - state.playSec), play = Math.min(want, dayLeft, room);
     const playCap = play < want - 30 ? (dayLeft <= room ? 'daily' : 'bank') : null;
-    return { sim, unfinished, shiftGold, taxes, goalGold, goal, gold: (shiftGold + Math.max(0, taxes) + goalGold) * combo + Math.min(0, taxes), play, playWant: want, playCap, bonusPct: Math.round((work / d - 1) * 100), job, combo, comboN: cn,
+    return { sim, unfinished, shiftGold, taxes, goalGold, goal, gold: (shiftGold + Math.max(0, taxes) + goalGold) * combo + Math.min(0, taxes), goldBase: shiftGold + Math.max(0, taxes) + goalGold + Math.min(0, taxes), play, playWant: want, playCap, bonusPct: Math.round((work / d - 1) * 100), job, combo, comboN: cn,
       xp: Math.round((d * 10 * (hasLandmark('observatory') ? 1.1 : 1) + (goalGold ? 50 : 0) + (onPlan ? d * 5 : 0)) * combo), chest: d >= MIN_SESSION ? chestOdds(d) : null, block: blk, onPlan };
   }
   /* ---------- Lock-screen timer. A web app can't put a real countdown on the iPhone lock screen (that needs the native
@@ -3755,6 +3907,7 @@
     let target;
     const firstReveal = ui.reveals.length && byId(ui.reveals[0].bid);
     ui.playVisit = 0; ui.nextBubble = performance.now() + 3500; ui.fireSince = performance.now(); ui.hintKey = '';
+    ui.arriveAt = performance.now(); ui.bubbleSeen = new Set(); ui.bubbleCount = 0; // 10.08: chatter only as you arrive, one at a time
     if (focusB) { const p = centerOf(focusB); target = { x: p.x, y: p.y - (geo.h * 0.3 - geo.h / 2) / playZoom() }; }
     else if (ui.landReveal) { const pl = PLOTS[ui.landReveal.plot], p = tileCenter((pl.c0 + pl.c1) / 2, (pl.r0 + pl.r1) / 2); target = { x: p.x, y: p.y }; }
     else if (firstReveal) { const p = centerOf(firstReveal); target = { x: p.x, y: p.y - 20 }; }
@@ -3796,7 +3949,7 @@
     if (ui.screen !== 'play') return;
     accrue(Date.now());
     // Crews already at work finish the job; everyone else heads back and comes again next time you play.
-    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, Math.random() < catchChance(v), v.foot); if (v.kind === 'nurse' && b.sick) endSick(b, true); } }
+    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, Math.random() < catchChance(v), v.foot); if (v.kind === 'nurse' && b.sick && !b.sick.phase) nurseDone(v, b); } if (v.carry != null) { const pb = byId(v.carry); if (pb && pb.sick) pb.sick.ride = false; } }
     VEH.length = 0;
     ui.screen = 'home'; ui.holding = null; ui.preview = null; ui.playExpired = false; ui.spark = null; ledgerFlush();
     closePanel(true);
@@ -3973,7 +4126,8 @@
         }
       }
       if (ui.recharge && ui.recharge.step === 'timer') renderRecharge();
-      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock(); if (ui.screen === 'play' || ui.screen === 'home') syncWalkers(); }
+      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock();
+        if (state.sparkSet && state.sparkSet.auto && ui.screen === 'home' && !ui.overlay && !state.session && $('scrim').hidden && Date.now() - (ui.sparkAt || 0) > 12000) { nextSpark(); renderBanner(); } if (ui.screen === 'play' || ui.screen === 'home') syncWalkers(); }
     }
     if (ui.panel) liveJobButtons();
     renderHud();
@@ -4115,6 +4269,20 @@
       c.beginPath(); c.moveTo(B[0], B[1]); c.lineTo(B[0], B[1] - h); c.lineTo(L[0], L[1] - h); c.moveTo(B[0], B[1] - h); c.lineTo(R[0], R[1] - h); c.stroke();
     }
     return { L, R, B, T: Tp };
+  }
+  // A gable roof on a w×d footprint, its ridge along the long side (10.08).
+  function gableF(c, x, y, F, s, h, rh, color) {
+    const { L, R, B, T: Tp } = rectPts(x, y - h, F, s * 1.08);
+    if (F.w >= F.d) {
+      const m1 = [(Tp[0] + L[0]) / 2, (Tp[1] + L[1]) / 2 - rh], m2 = [(B[0] + R[0]) / 2, (B[1] + R[1]) / 2 - rh];
+      poly(c, [Tp, R, m2, m1], shade(color, 1.05)); poly(c, [B, R, m2], shade(color, 0.7)); poly(c, [L, B, m2, m1], shade(color, 0.88));
+      if (ART.w) { c.strokeStyle = 'rgba(38,28,18,.3)'; c.lineWidth = ART.w; outline(c, [L, B, m2, m1]); outline(c, [B, R, m2]); outline(c, [Tp, R, m2, m1]); line(c, m1, m2, 'rgba(255,255,255,.35)', ART.w); }
+      return { m1, m2 };
+    }
+    const m1 = [(Tp[0] + R[0]) / 2, (Tp[1] + R[1]) / 2 - rh], m2 = [(L[0] + B[0]) / 2, (L[1] + B[1]) / 2 - rh];
+    poly(c, [L, Tp, m1, m2], shade(color, 1.05)); poly(c, [B, L, m2], shade(color, 0.7)); poly(c, [R, B, m2, m1], shade(color, 0.95));
+    if (ART.w) { c.strokeStyle = 'rgba(38,28,18,.3)'; c.lineWidth = ART.w; outline(c, [R, B, m2, m1]); outline(c, [B, L, m2]); outline(c, [L, Tp, m1, m2]); line(c, m1, m2, 'rgba(255,255,255,.35)', ART.w); }
+    return { m1, m2 };
   }
   const wallPt = (P, Q, u, v) => [P[0] + (Q[0] - P[0]) * u, P[1] + (Q[1] - P[1]) * u - v];
   function wallQuad(c, P, Q, u0, u1, v0, v1, fill) { poly(c, [wallPt(P, Q, u0, v0), wallPt(P, Q, u1, v0), wallPt(P, Q, u1, v1), wallPt(P, Q, u0, v1)], fill); }
@@ -4298,8 +4466,8 @@
         line(c, [x, y - h - 5 * u], [x, y - h - 7.5 * u], '#4A3B2B', 1 * u); line(c, [x, y - h - 5 * u], [x + 2 * u, y - h - 5 * u], '#4A3B2B', 1 * u);
         break;
       }
-      case 'cottage': case 'townhouse': {
-        const tall = type === 'townhouse';
+      case 'cottage': {
+        const tall = false;
         const h = (tall ? 22 + level * 4 : 11 + level * 2.5) * u;
         const s = tall ? 0.62 : 0.56 + level * 0.03;
         const f = box(c, x, y, hw, hh, s, h, col);
@@ -4327,6 +4495,27 @@
           weeds(c, [[f.L[0] + 2 * u, f.L[1]], [f.B[0], f.B[1] + 1 * u], [f.R[0] - 3 * u, f.R[1]]], u);
           rubble(c, x + hw * 0.25, y + hh * 0.45, u);
         }
+        break;
+      }
+      case 'townhouse': {
+        // 10.08: the House, two tiles long: two storeys, a gable along its length, a porch from level 2
+        const F = fpv, long = F.w >= F.d, h = (17 + level * 4) * u, f = boxF(c, x, y, F, 0.84, h, col);
+        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
+        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
+        W(lf, 0, 1, h * 0.47, h * 0.52, shade(col, 0.82)); W(sf, 0, 1, h * 0.47, h * 0.52, shade(col, 0.78));
+        if (ruin) { W(lf, 0.44, 0.56, 0, h * 0.4, '#4A3A2C'); for (const a1 of [0.12, 0.68, 0.2, 0.62]) W(lf, a1, a1 + 0.14, h * 0.6, h * 0.82, '#3A322B'); boards(c, lf[0], lf[1], 0.12, 0.26, h * 0.6, h * 0.82, u); }
+        else {
+          doorQ(c, lf[0], lf[1], 0.44, 0.56, h * 0.4, '#4E3A6A', u);
+          for (const a1 of [0.1, 0.7]) windowQ(c, lf[0], lf[1], a1, a1 + 0.16, h * 0.16, h * 0.4, glass, u, level >= 2 && a1 === 0.1);
+          for (const a1 of [0.12, 0.42, 0.72]) windowQ(c, lf[0], lf[1], a1, a1 + 0.14, h * 0.6, h * 0.84, glass, u);
+          windowQ(c, sf[0], sf[1], 0.3, 0.7, h * 0.6, h * 0.84, glass, u); windowQ(c, sf[0], sf[1], 0.3, 0.7, h * 0.16, h * 0.4, glass, u, true);
+          if (level >= 2) { const p1 = wallPt(lf[0], lf[1], 0.4, h * 0.45), p2 = wallPt(lf[0], lf[1], 0.6, h * 0.45); poly(c, [p1, p2, [p2[0], p2[1] + 3 * u], [p1[0], p1[1] + 3 * u]], shade(roofc, 0.8)); }
+          if (level >= 3) for (const a1 of [0.12, 0.42, 0.72]) { const fp = wallPt(lf[0], lf[1], a1 + 0.07, h * 0.6 - 1.4 * u); c.fillStyle = '#E46B8A'; c.beginPath(); c.arc(fp[0], fp[1], 1.1 * u, 0, Math.PI * 2); c.fill(); }
+        }
+        const g = gableF(c, x, y, F, 0.84, h, (9 + level) * u, roofc);
+        const ch = [g.m1[0] + (g.m2[0] - g.m1[0]) * 0.2, g.m1[1] + (g.m2[1] - g.m1[1]) * 0.2];
+        c.fillStyle = shade(roofc, 0.55); c.fillRect(ch[0] - 1.5 * u, ch[1] - 5 * u, 3 * u, 7 * u); c.fillStyle = shade(roofc, 0.42); c.fillRect(ch[0] - 1.9 * u, ch[1] - 5.6 * u, 3.8 * u, 1.3 * u);
+        if (!ruin) smoke(c, ch[0], ch[1] - 6.5 * u, u);
         break;
       }
       case 'cafe': {
@@ -4432,20 +4621,56 @@
         break;
       }
       case 'clinic': {
-        // 10.06: a long white clinic: glass doors under a canopy, a row of windows, red crosses
-        const F = fpv, h = (16 + level * 3) * u, f = boxF(c, x, y, F, 0.88, h, col), long = F.w >= F.d;
-        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
-        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
-        W(lf, 0, 1, 0, h * 0.1, '#8FC7B8'); W(sf, 0, 1, 0, h * 0.1, '#7DB5A6');
-        W(lf, 0.42, 0.58, 0, h * 0.46, '#9ED0E0'); line(c, wallPt(lf[0], lf[1], 0.5, 0), wallPt(lf[0], lf[1], 0.5, h * 0.46), '#F4F6F7', 0.8 * u);
-        W(lf, 0.38, 0.62, h * 0.46, h * 0.54, roofc);
-        for (const a1 of [0.06, 0.2, 0.68, 0.82]) windowQ(c, lf[0], lf[1], a1, a1 + 0.1, h * 0.22, h * 0.42, glass, u);
-        for (const a1 of [0.06, 0.2, 0.34, 0.56, 0.7, 0.84]) windowQ(c, lf[0], lf[1], a1, a1 + 0.09, h * 0.6, h * 0.82, glass, u, level >= 2 && a1 === 0.2);
-        W(sf, 0.42, 0.58, h * 0.3, h * 0.86, roofc); W(sf, 0.26, 0.74, h * 0.5, h * 0.66, roofc);
-        boxF(c, x, y - h, F, 0.9, 2.2 * u, '#DCE2E6');
-        const rt = rectPts(x, y - h - 2.2 * u, F, 0.5);
-        if (level >= 3) { poly(c, [rt.T, rt.R, rt.B, rt.L], '#9AA4AB'); c.fillStyle = '#F4F6F7'; c.font = `800 ${7 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('H', x, y - h - 2.2 * u); }
-        else { const cx = x, cy = y - h - 2.2 * u - 5 * u; c.fillStyle = '#FFFFFF'; roundRect(c, cx - 4.5 * u, cy - 4.5 * u, 9 * u, 9 * u, 1.5 * u); c.fill(); c.fillStyle = roofc; c.fillRect(cx - 1.2 * u, cy - 3.4 * u, 2.4 * u, 6.8 * u); c.fillRect(cx - 3.4 * u, cy - 1.2 * u, 6.8 * u, 2.4 * u); line(c, [cx, cy + 4.5 * u], [cx, y - h - 2.2 * u], '#8A9096', 0.8 * u); }
+        // 10.08: back to one tile. White, with a big red cross, glass doors under a canopy
+        const h = (16 + level * 3) * u, f = box(c, x, y, hw, hh, 0.66, h, col);
+        wallQuad(c, f.L, f.B, 0, 1, 0, h * 0.1, '#8FC7B8'); wallQuad(c, f.B, f.R, 0, 1, 0, h * 0.1, '#7DB5A6');
+        wallQuad(c, f.B, f.R, 0.36, 0.64, 0, h * 0.46, ruin ? '#3A322B' : '#9ED0E0'); line(c, wallPt(f.B, f.R, 0.5, 0), wallPt(f.B, f.R, 0.5, h * 0.46), '#F4F6F7', 0.7 * u);
+        wallQuad(c, f.B, f.R, 0.3, 0.7, h * 0.46, h * 0.54, roofc);
+        for (const a1 of [0.08, 0.76]) windowQ(c, f.B, f.R, a1, a1 + 0.16, h * 0.62, h * 0.84, glass, u);
+        wallQuad(c, f.L, f.B, 0.42, 0.58, h * 0.32, h * 0.86, roofc); wallQuad(c, f.L, f.B, 0.28, 0.72, h * 0.51, h * 0.67, roofc);
+        box(c, x, y - h, hw, hh, 0.7, 2.4 * u, '#DCE2E6');
+        if (level >= 3) { const cx0 = x, cy0 = y - h - 2.4 * u - 4.5 * u; c.fillStyle = '#FFFFFF'; roundRect(c, cx0 - 3.6 * u, cy0 - 3.6 * u, 7.2 * u, 7.2 * u, 1.2 * u); c.fill(); c.fillStyle = roofc; c.fillRect(cx0 - 1 * u, cy0 - 2.7 * u, 2 * u, 5.4 * u); c.fillRect(cx0 - 2.7 * u, cy0 - 1 * u, 5.4 * u, 2 * u); }
+        break;
+      }
+      case 'hospital': {
+        // 10.08: a big modern hospital: rows of windows, a red band, an entrance canopy, an ambulance bay, a helipad
+        const h = (26 + level * 5) * u, f = box(c, x, y, hw, hh, 0.78, h, col);
+        const rows = 3 + level, glassC = ruin ? '#3A322B' : '#A9CDE0';
+        for (let r0 = 0; r0 < rows; r0++) { const v0 = h * (0.16 + r0 * 0.74 / rows), v1 = v0 + h * 0.46 / rows; for (let i = 0; i < 6; i++) { const a1 = 0.06 + i * 0.15; wallQuad(c, f.B, f.R, a1, a1 + 0.1, v0, v1, glassC); wallQuad(c, f.L, f.B, a1, a1 + 0.1, v0, v1, shade(glassC, 0.85)); } }
+        wallQuad(c, f.L, f.B, 0, 1, h * 0.9, h, roofc); wallQuad(c, f.B, f.R, 0, 1, h * 0.9, h, shade(roofc, 0.9));
+        wallQuad(c, f.B, f.R, 0.4, 0.6, 0, h * 0.14, '#9ED0E0'); wallQuad(c, f.B, f.R, 0.36, 0.64, h * 0.14, h * 0.17, roofc);
+        wallQuad(c, f.L, f.B, 0.08, 0.3, 0, h * 0.13, '#E9E4DA'); wallQuad(c, f.L, f.B, 0.1, 0.28, 0, h * 0.11, '#5E6B7A');
+        const cp = wallPt(f.L, f.B, 0.62, h * 0.55); c.fillStyle = '#FFFFFF'; roundRect(c, cp[0] - 6 * u, cp[1] - 6 * u, 12 * u, 12 * u, 2 * u); c.fill(); c.fillStyle = roofc; c.fillRect(cp[0] - 1.7 * u, cp[1] - 4.6 * u, 3.4 * u, 9.2 * u); c.fillRect(cp[0] - 4.6 * u, cp[1] - 1.7 * u, 9.2 * u, 3.4 * u);
+        box(c, x, y - h, hw, hh, 0.8, 3 * u, '#DCE2E6');
+        diamond(c, x, y - h - 3 * u, hw * 0.34, hh * 0.34, '#8C969E'); c.strokeStyle = '#F3C64B'; c.lineWidth = 0.9 * u; c.beginPath(); c.ellipse(x, y - h - 3 * u, hw * 0.24, hh * 0.24, 0, 0, Math.PI * 2); c.stroke();
+        c.fillStyle = '#FFFFFF'; c.font = `800 ${6.5 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('H', x, y - h - 3 * u);
+        break;
+      }
+      case 'amusement': {
+        // 10.08: the Amusement park (2×2): a turning Ferris wheel, a carousel and bunting
+        diamond(c, x, y, hw * 0.94, hh * 0.94, ruin ? '#B2A774' : '#9FCB6B');
+        diamond(c, x, y + hh * 0.08, hw * 0.6, hh * 0.6, ruin ? '#A89C78' : '#E6D3A6');
+        const wx = x - hw * 0.25, wy = y - hh * 0.12, R0 = 15 * u, ang = reduced || ruin ? 0 : now / 3000;
+        line(c, [wx - 6 * u, wy], [wx, wy - R0 - 4 * u], '#7A8590', 1.6 * u); line(c, [wx + 6 * u, wy], [wx, wy - R0 - 4 * u], '#7A8590', 1.6 * u);
+        const cy0 = wy - R0 - 4 * u;
+        c.strokeStyle = '#E8503A'; c.lineWidth = 1.4 * u; c.beginPath(); c.arc(wx, cy0, R0, 0, Math.PI * 2); c.stroke();
+        for (let i = 0; i < 8; i++) { const a = ang + i * Math.PI / 4, px1 = wx + Math.cos(a) * R0, py1 = cy0 + Math.sin(a) * R0; line(c, [wx, cy0], [px1, py1], 'rgba(120,130,140,.8)', 0.6 * u); c.fillStyle = ['#F3C64B', '#3E9ADB', '#E46B8A', '#6CC04A'][i % 4]; roundRect(c, px1 - 2.2 * u, py1 - 0.5 * u, 4.4 * u, 3.4 * u, 1 * u); c.fill(); }
+        c.fillStyle = '#59606A'; c.beginPath(); c.arc(wx, cy0, 1.6 * u, 0, Math.PI * 2); c.fill();
+        const kx = x + hw * 0.32, ky = y + hh * 0.18;
+        box(c, kx, ky, 8 * u, 4 * u, 1, 5 * u, '#F6E7C8');
+        pyramid(c, kx, ky, 8 * u, 4 * u, 1, 5 * u, 8 * u, '#E8503A', '#F7F3EA');
+        for (let i = 0; i < 4; i++) { const a = (reduced ? 0 : now / 900) + i * Math.PI / 2, hx = kx + Math.cos(a) * 5 * u, hy = ky + Math.sin(a) * 2.5 * u - 2 * u; c.fillStyle = ['#FFFFFF', '#F3C64B'][i % 2]; c.beginPath(); c.arc(hx, hy, 1.3 * u, 0, Math.PI * 2); c.fill(); }
+        for (let i = 0; i <= 6; i++) { const t2 = i / 6, bx0 = x - hw * 0.85 + hw * 0.85 * t2, by0 = y + hh * 0.08 + hh * 0.8 * t2; c.fillStyle = ['#E8503A', '#F3C64B', '#3E9ADB'][i % 3]; poly(c, [[bx0, by0 - 6 * u], [bx0 + 2.2 * u, by0 - 6 * u + 1.1 * u], [bx0 + 1.1 * u, by0 - 3 * u]], c.fillStyle); }
+        treeAt(c, x + hw * 0.55, y - hh * 0.25, 16 * u);
+        break;
+      }
+      case 'cemetery': {
+        // 10.08: a quiet cemetery: a low stone wall, rows of headstones, a willow
+        diamond(c, x, y, hw * 0.92, hh * 0.92, '#8FAF6A');
+        const k = 0.9, Lp = [x - hw * k, y], Bp = [x, y + hh * k], Rp = [x + hw * k, y], Tp = [x, y - hh * k];
+        for (const [A, B2] of [[Lp, Bp], [Bp, Rp]]) { poly(c, [A, B2, [B2[0], B2[1] - 3 * u], [A[0], A[1] - 3 * u]], '#B9B2A4'); }
+        for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { const gx = x + (i - j) * hw * 0.22, gy = y + (i + j - 2) * hh * 0.22; c.fillStyle = '#D6D2CA'; roundRect(c, gx - 2 * u, gy - 5 * u, 4 * u, 5 * u, 1.6 * u); c.fill(); c.fillStyle = '#A9A49A'; c.fillRect(gx - 2 * u, gy - 1 * u, 4 * u, 1 * u); }
+        treeAt(c, x - hw * 0.5, y - hh * 0.2, 18 * u, '#5E8F5A');
         break;
       }
       case 'stadium': {
@@ -4503,48 +4728,39 @@
         break;
       }
       case 'firestation': {
-        // 10.06: two big red garage doors on the long side, a hose tower with a bell at the back
-        const F = fpv, h = (15 + level * 2) * u, f = boxF(c, x, y, F, 0.9, h, col), long = F.w >= F.d;
-        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
-        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
-        W(lf, 0, 1, h * 0.8, h * 0.93, roofc); W(sf, 0, 1, h * 0.8, h * 0.93, shade(roofc, 0.9));
-        for (const [a1, b1] of [[0.07, 0.44], [0.53, 0.9]]) {
-          W(lf, a1 - 0.015, b1 + 0.015, 0, h * 0.68, '#F4EEE0'); W(lf, a1, b1, 0, h * 0.64, '#C8473D');
-          for (let i = 1; i < 5; i++) W(lf, a1, b1, h * 0.64 * i / 5 - 0.22 * u, h * 0.64 * i / 5 + 0.22 * u, '#A23A30');
-          for (let i = 0; i < 3; i++) W(lf, a1 + (b1 - a1) * (0.1 + i * 0.29), a1 + (b1 - a1) * (0.32 + i * 0.29), h * 0.4, h * 0.5, 'rgba(205,228,240,.92)');
+        // 10.08: back to one tile. A red garage door (two from level 2), a hose tower with a bell
+        const h = (15 + level * 2) * u, f = box(c, x, y, hw, hh, 0.7, h, col);
+        wallQuad(c, f.L, f.B, 0, 1, h * 0.8, h * 0.92, roofc); wallQuad(c, f.B, f.R, 0, 1, h * 0.8, h * 0.92, shade(roofc, 0.9));
+        for (const [a1, b1] of level >= 2 ? [[0.08, 0.46], [0.54, 0.92]] : [[0.14, 0.86]]) {
+          wallQuad(c, f.B, f.R, a1 - 0.02, b1 + 0.02, 0, h * 0.66, '#F4EEE0'); wallQuad(c, f.B, f.R, a1, b1, 0, h * 0.62, ruin ? '#6E3A33' : '#C8473D');
+          for (let i = 1; i < 5; i++) wallQuad(c, f.B, f.R, a1, b1, h * 0.62 * i / 5 - 0.25 * u, h * 0.62 * i / 5 + 0.25 * u, '#A23A30');
+          wallQuad(c, f.B, f.R, a1 + (b1 - a1) * 0.12, b1 - (b1 - a1) * 0.12, h * 0.38, h * 0.48, ruin ? '#3A322B' : 'rgba(205,228,240,.92)');
         }
-        doorQ(c, sf[0], sf[1], 0.18, 0.44, h * 0.52, '#7A5230', u);
-        windowQ(c, sf[0], sf[1], 0.58, 0.84, h * 0.38, h * 0.66, glass, u);
-        boxF(c, x, y - h, F, 0.94, 2.4 * u, shade(col, 0.9));
-        const Lv = long ? F.ac : F.ar, tx = x - Lv[0] * 0.52, ty = y - h - 2.4 * u - Lv[1] * 0.52;
-        const tf = box(c, tx, ty, 5.6 * u, 2.8 * u, 1, 13 * u, col);
-        wallQuad(c, tf.L, tf.B, 0, 1, 10 * u, 12 * u, roofc); wallQuad(c, tf.B, tf.R, 0, 1, 10 * u, 12 * u, roofc);
-        windowQ(c, tf.B, tf.R, 0.3, 0.7, 4 * u, 8 * u, glass, u);
-        pyramid(c, tx, ty, 5.6 * u, 2.8 * u, 1, 13 * u, 6 * u, roofc);
-        c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(tx, ty - 14.5 * u, 1.8 * u, 0, Math.PI * 2); c.fill();
-        if (level >= 2) { const fp = wallPt(lf[0], lf[1], 0.48, h + 2.4 * u); const on = reduced || Math.floor(now / 400) % 2; c.fillStyle = on ? '#FF5A4A' : '#9A2A22'; c.beginPath(); c.arc(fp[0], fp[1] - 1.5 * u, 1.5 * u, 0, Math.PI * 2); c.fill(); }
+        doorQ(c, f.L, f.B, 0.58, 0.8, h * 0.5, '#7A5230', u); windowQ(c, f.L, f.B, 0.14, 0.42, h * 0.38, h * 0.66, glass, u);
+        box(c, x, y - h, hw, hh, 0.72, 2.4 * u, shade(col, 0.9));
+        const tx = x - hw * 0.34, ty = y - h - 2.4 * u;
+        const tf = box(c, tx, ty, 5 * u, 2.5 * u, 1, 11 * u, col);
+        wallQuad(c, tf.L, tf.B, 0, 1, 8.5 * u, 10 * u, roofc); wallQuad(c, tf.B, tf.R, 0, 1, 8.5 * u, 10 * u, roofc);
+        windowQ(c, tf.B, tf.R, 0.3, 0.7, 3.5 * u, 7 * u, glass, u * 0.8);
+        pyramid(c, tx, ty, 5 * u, 2.5 * u, 1, 11 * u, 5.5 * u, roofc);
+        c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(tx, ty - 13.3 * u, 1.5 * u, 0, Math.PI * 2); c.fill();
         break;
       }
       case 'police': {
-        // 10.06: a long blue-and-grey station: a blue door with a star, windows (with bars on the cells from level 2),
-        // a blue lamp over the door and a flag at the back
-        const F = fpv, h = (14 + level * 2) * u, f = boxF(c, x, y, F, 0.88, h, col), long = F.w >= F.d;
-        const lf = long ? [f.L, f.B] : [f.B, f.R], sf = long ? [f.B, f.R] : [f.L, f.B];
-        const W = (fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
-        W(lf, 0, 1, h * 0.84, h, roofc); W(sf, 0, 1, h * 0.84, h, shade(roofc, 0.85));
-        W(lf, 0, 1, 0, h * 0.08, shade(col, 0.7)); W(sf, 0, 1, 0, h * 0.08, shade(col, 0.66));
-        doorQ(c, lf[0], lf[1], 0.43, 0.57, h * 0.58, '#2F4E8C', u);
-        for (const a1 of [0.07, 0.24]) windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.38, h * 0.7, glass, u);
-        for (const a1 of [0.64, 0.81]) { windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.38, h * 0.7, glass, u); if (level >= 2) for (let i = 1; i < 4; i++) line(c, wallPt(lf[0], lf[1], a1 + 0.03 * i, h * 0.38), wallPt(lf[0], lf[1], a1 + 0.03 * i, h * 0.7), '#4A5360', 0.7 * u); }
-        windowQ(c, sf[0], sf[1], 0.3, 0.7, h * 0.38, h * 0.7, glass, u);
-        const sp = wallPt(lf[0], lf[1], 0.5, h * 0.72); starShape(c, sp[0], sp[1], 2.4 * u, '#F3C64B');
-        boxF(c, x, y - h, F, 0.9, 2.4 * u, shade(col, 0.88));
-        const lp = wallPt(lf[0], lf[1], 0.5, h + 2.4 * u), blink = reduced ? 0.5 : (Math.sin(now / 260) + 1) / 2;
-        c.fillStyle = `rgba(80,150,255,${0.2 + 0.5 * blink})`; c.beginPath(); c.arc(lp[0], lp[1] - 3 * u, 5 * u, 0, Math.PI * 2); c.fill();
-        c.fillStyle = '#4C8DFF'; c.fillRect(lp[0] - 1.7 * u, lp[1] - 4.5 * u, 3.4 * u, 3 * u);
-        const Lv = long ? F.ac : F.ar, fx0 = x - Lv[0] * 0.7, fy0 = y - h - 2.4 * u - Lv[1] * 0.7, wave = reduced ? 0 : Math.sin(now / 280) * 1.2 * u;
-        line(c, [fx0, fy0], [fx0, fy0 - 16 * u], '#59606A', 0.9 * u);
-        poly(c, [[fx0, fy0 - 16 * u], [fx0 + 7 * u, fy0 - 14.5 * u + wave], [fx0, fy0 - 12 * u]], '#2F4E8C');
+        // 10.08: back to one tile. A blue door with a star, a blue lamp, barred cell windows from level 2, a flag
+        const h = (15 + level * 2) * u, f = box(c, x, y, hw, hh, 0.66, h, col);
+        wallQuad(c, f.B, f.R, 0, 1, h * 0.85, h, roofc); wallQuad(c, f.L, f.B, 0, 1, h * 0.85, h, shade(roofc, 0.85));
+        wallQuad(c, f.B, f.R, 0, 1, 0, h * 0.08, shade(col, 0.7)); wallQuad(c, f.L, f.B, 0, 1, 0, h * 0.08, shade(col, 0.66));
+        doorQ(c, f.B, f.R, 0.4, 0.6, h * 0.56, '#2F4E8C', u);
+        for (const a1 of [0.08, 0.72]) windowQ(c, f.B, f.R, a1, a1 + 0.2, h * 0.42, h * 0.72, glass, u);
+        for (const a1 of [0.14, 0.58]) { windowQ(c, f.L, f.B, a1, a1 + 0.26, h * 0.42, h * 0.72, glass, u); if (level >= 2) for (let i = 1; i < 4; i++) line(c, wallPt(f.L, f.B, a1 + 0.065 * i, h * 0.42), wallPt(f.L, f.B, a1 + 0.065 * i, h * 0.72), '#4A5360', 0.7 * u); }
+        const sp = wallPt(f.B, f.R, 0.5, h * 0.7); starShape(c, sp[0], sp[1], 2.4 * u, '#F3C64B');
+        box(c, x, y - h, hw, hh, 0.68, 2.4 * u, shade(col, 0.88));
+        const blink = reduced ? 0.5 : (Math.sin(now / 260) + 1) / 2;
+        c.fillStyle = `rgba(80,150,255,${0.2 + 0.5 * blink})`; c.beginPath(); c.arc(x, y - h - 6 * u, 5 * u, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#4C8DFF'; c.fillRect(x - 1.7 * u, y - h - 7.5 * u, 3.4 * u, 3 * u);
+        const fx0 = x - hw * 0.45, fy0 = y - h - 2.4 * u - hh * 0.05, wave = reduced ? 0 : Math.sin(now / 280) * 1.1 * u;
+        line(c, [fx0, fy0], [fx0, fy0 - 14 * u], '#59606A', 0.9 * u); poly(c, [[fx0, fy0 - 14 * u], [fx0 + 6.5 * u, fy0 - 12.5 * u + wave], [fx0, fy0 - 10.5 * u]], '#2F4E8C');
         break;
       }
       case 'gnome': {
@@ -4779,22 +4995,25 @@
         break;
       }
       case 'school': {
-        // a brick schoolhouse with a bell tower, a clock and a flag in the yard
-        const h = (20 + level * 4) * u, rh = (10 + level * 2) * u;
-        const f = box(c, x, y, hw, hh, 0.76, h, col);
-        doorQ(c, f.B, f.R, 0.44, 0.56, h * 0.48, '#6B4A2E', u);
-        for (const uu of [0.08, 0.22, 0.66, 0.8]) windowQ(c, f.B, f.R, uu, uu + 0.1, h * 0.42, h * 0.76, glass, u);
-        for (const uu of [0.1, 0.3, 0.56, 0.76]) windowQ(c, f.L, f.B, uu, uu + 0.12, h * 0.42, h * 0.76, glass, u);
-        wallQuad(c, f.B, f.R, 0, 1, h * 0.06, h * 0.14, shade(col, 0.82)); wallQuad(c, f.L, f.B, 0, 1, h * 0.06, h * 0.14, shade(col, 0.75));
-        gable(c, x, y, hw, hh, 0.76, h, rh, roofc);
-        const ty = y - h - rh * 0.55;
-        box(c, x, ty, 4.2 * u, 2.1 * u, 1, 8 * u, '#F4EADB');
-        pyramid(c, x, ty, 4.2 * u, 2.1 * u, 1, 8 * u, 6 * u, roofc);
-        c.fillStyle = '#FFFFFF'; c.beginPath(); c.arc(x - 1.4 * u, ty - 4 * u, 1.9 * u, 0, Math.PI * 2); c.fill();
-        line(c, [x - 1.4 * u, ty - 4 * u], [x - 1.4 * u, ty - 5.4 * u], '#3B2A1A', 0.5 * u); line(c, [x - 1.4 * u, ty - 4 * u], [x - 0.4 * u, ty - 4 * u], '#3B2A1A', 0.5 * u);
-        const fxp = x + hw * 0.62, fyp = y + hh * 0.1, wave = reduced ? 0 : Math.sin(now / 280) * 1.2 * u;
-        line(c, [fxp, fyp], [fxp, fyp - 26 * u], '#5A4A3A', 1.1 * u);
-        poly(c, [[fxp, fyp - 26 * u], [fxp + 8 * u, fyp - 24 * u + wave], [fxp, fyp - 21 * u]], '#3E7CC8');
+        // 10.08: a sunny yellow school with a flat roof, a big clock and a playground (so it can't be mistaken for a home)
+        const h = (17 + level * 4) * u, k = 0.6;
+        const bx = x - hw * 0.14, by = y - hh * 0.14;
+        const f = box(c, bx, by, hw, hh, k, h, '#F2C14E');
+        for (const a1 of [0.08, 0.3, 0.56, 0.78]) windowQ(c, f.L, f.B, a1, a1 + 0.14, h * 0.5, h * 0.8, glass, u);
+        for (const a1 of [0.08, 0.3, 0.56, 0.78]) windowQ(c, f.L, f.B, a1, a1 + 0.14, h * 0.14, h * 0.38, glass, u);
+        doorQ(c, f.B, f.R, 0.4, 0.6, h * 0.42, '#3E6FB0', u);
+        for (const a1 of [0.08, 0.74]) windowQ(c, f.B, f.R, a1, a1 + 0.18, h * 0.5, h * 0.8, glass, u);
+        wallQuad(c, f.B, f.R, 0, 1, h * 0.88, h, '#3E6FB0'); wallQuad(c, f.L, f.B, 0, 1, h * 0.88, h, shade('#3E6FB0', 0.85));
+        box(c, bx, by - h, hw, hh, k + 0.02, 2.4 * u, '#E4D2A4');
+        const cl = wallPt(f.B, f.R, 0.5, h * 0.66); c.fillStyle = '#FFFFFF'; c.beginPath(); c.arc(cl[0], cl[1], 3.2 * u, 0, Math.PI * 2); c.fill(); c.strokeStyle = '#3E6FB0'; c.lineWidth = 0.7 * u; c.stroke();
+        line(c, cl, [cl[0], cl[1] - 2.2 * u], '#22252B', 0.6 * u); line(c, cl, [cl[0] + 1.6 * u, cl[1]], '#22252B', 0.6 * u);
+        // the playground in front: a red slide and a swing set
+        const px1 = x + hw * 0.48, py1 = y + hh * 0.38;
+        poly(c, [[px1 - 5 * u, py1], [px1 + 3 * u, py1 - 4 * u], [px1 + 4 * u, py1 - 2.8 * u], [px1 - 4 * u, py1 + 1.2 * u]], '#E8503A');
+        line(c, [px1 + 3.5 * u, py1 - 3.4 * u], [px1 + 3.5 * u, py1 + 3 * u], '#7A8590', 0.8 * u);
+        const sx = x - hw * 0.05, sy = y + hh * 0.62;
+        line(c, [sx - 6 * u, sy], [sx - 5 * u, sy - 9 * u], '#7A8590', 0.8 * u); line(c, [sx + 6 * u, sy], [sx + 5 * u, sy - 9 * u], '#7A8590', 0.8 * u); line(c, [sx - 5 * u, sy - 9 * u], [sx + 5 * u, sy - 9 * u], '#7A8590', 0.8 * u);
+        const sw = reduced ? 0 : Math.sin(now / 500) * 1.5 * u; line(c, [sx - 1.5 * u, sy - 9 * u], [sx - 1.5 * u + sw, sy - 3 * u], '#59606A', 0.5 * u); line(c, [sx + 1.5 * u, sy - 9 * u], [sx + 1.5 * u + sw, sy - 3 * u], '#59606A', 0.5 * u); c.fillStyle = '#F3C64B'; c.fillRect(sx - 2 * u + sw, sy - 3.4 * u, 4 * u, 1 * u);
         break;
       }
       case 'hydrant': {
@@ -4824,6 +5043,7 @@
       }
     }
     const hwO = fpv ? hw * 0.75 : hw, hhO = fpv ? hh * 0.75 : hh;
+    if (!ruin && (t.cat === 'home' || t.cat === 'shop') && level >= 2 && !opt.noDress) levelDress(c, type, level, x, y, hw, hh, u, fpv);
     if (!ruin && type === 'park' && (opt.overgrown || 0) > 0.15) tallGrass(c, x, y, hw, hh, u, opt.overgrown);
     if (!ruin && (opt.trash || 0) > 0.25) trashPile(c, x, y, hwO, hhO, u, opt.trash);
     if (!ruin && (opt.leaves || 0) > 0.15) leafPiles(c, x, y, hwO, hhO, u, opt.leaves);
@@ -4896,6 +5116,7 @@
     else if (mode === 'sweep') { const k = Math.sin(t * 9) * 0.35; arm(-1, f * (0.75 + k), 3.9); hand = arm(1, f * (0.55 + k), 4.3); }
     else if (mode === 'trim') { const k = Math.sin(t * 13) * 0.18; arm(-1, f * (1.2 + k), 4); hand = arm(1, f * (1.3 - k), 4.2); }
     else if (mode === 'spray') { arm(-1, f * 1.35, 3.8); hand = arm(1, f * 1.5, 4.4); }
+    else if (mode === 'umbrella') { arm(-1, -0.12 - sw * 0.4, 4.2); hand = arm(1, f * 2.5, 3.6); }
     else if (mode === 'hammer') { arm(-1, -0.15, 4.2); hand = arm(1, f * (Math.PI * 0.9 - (pose.swing || 0) * 2.1), 4.4); }
     else { arm(-1, -0.12, 4.2); hand = arm(1, 0.12, 4.2); }
     if (pose.tool === 'broom') { const tip = [hand[0] + f * 3.2 * u, y + 0.2 * u]; line(c, [hand[0] - f * 2.2 * u, hand[1] - 3.2 * u], tip, '#9A6B43', 0.9 * u); poly(c, [[tip[0] - 1.8 * u, tip[1] - 1.6 * u], [tip[0] + 1.8 * u, tip[1] - 1.6 * u], [tip[0] + 2.4 * u, tip[1] + 0.4 * u], [tip[0] - 2.4 * u, tip[1] + 0.4 * u]], '#E8C66A'); }
@@ -4917,6 +5138,24 @@
     }
     drawHat(c, look, hx, hy, u, f);
     return hand;
+  }
+  // 10.08: an umbrella over someone's head (in the rain), tilting a little as they walk.
+  const UMBRELLAS = ['#E5482F', '#3B7DD8', '#F3C64B', '#8E5BB5', '#2E8F7A', '#E46B8A', '#1E2A28'];
+  function umbrella(c, x, y, u, f, col, tilt) {
+    const hx = x + f * 2.1 * u, cy = y - 20.5 * u;
+    c.save(); c.translate(hx, cy); c.rotate(f * 0.14 + tilt);
+    c.strokeStyle = '#3A3530'; c.lineWidth = 0.8 * u; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(0, 11.2 * u); c.stroke();
+    c.beginPath(); c.arc(-0.9 * u, 11.2 * u, 0.9 * u, 0, Math.PI); c.stroke();
+    const R = 7.2 * u, H = 4.6 * u;
+    c.fillStyle = col; c.beginPath(); c.moveTo(-R, 0.6 * u);
+    c.bezierCurveTo(-R, -H, R, -H, R, 0.6 * u);
+    for (let i = 3; i >= 0; i--) { const x0 = -R + i * R / 2; c.quadraticCurveTo(x0 + R / 4, -0.6 * u, x0, 0.6 * u); }
+    c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.28)'; c.beginPath(); c.moveTo(-R * 0.15, -H * 0.72); c.bezierCurveTo(-R * 0.75, -H * 0.55, -R * 0.95, -0.4 * u, -R * 0.9, 0.2 * u); c.lineTo(-R * 0.55, 0); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = 0.6 * u; c.beginPath(); c.moveTo(0, -H * 0.75); c.lineTo(-R / 2, 0.2 * u); c.moveTo(0, -H * 0.75); c.lineTo(R / 2, 0.2 * u); c.stroke();
+    c.fillStyle = '#3A3530'; c.beginPath(); c.arc(0, -H * 0.76, 0.7 * u, 0, Math.PI * 2); c.fill();
+    c.restore();
   }
   function drawHat(c, look, hx, hy, u, f) {
     const h = look.hat, col = look.hatColor || '#F3C64B';
@@ -4942,6 +5181,33 @@
     if (b.burnt && !reduced && Math.random() < 0.06) fx.push({ x: p.x + (Math.random() - 0.5) * hw * 0.5, y: p.y - 18 * u * s0, vx: (Math.random() - 0.5) * 8, vy: -14, life: 0, max: 1.8, puff: true, color: 'rgba(90,85,80,.45)', r: 3.5 });
   }
   function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+  // Upgrades look better (10.08, Navid): a hedge (homes) or flower tubs (shops) from level 2; a garden lamp and a
+  // letterbox from level 3.
+  function levelDress(c, type, level, x, y, hw, hh, u, fpv) {
+    const q = fpv ? rectPts(x, y, fpv, 0.97) : { L: [x - hw * 0.97, y], B: [x, y + hh * 0.97], R: [x + hw * 0.97, y] };
+    const lerp2 = (P, Q, t) => [P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t];
+    if (TYPES[type].cat === 'home') {
+      for (const [P, Q] of [[q.L, q.B], [q.B, q.R]]) for (const [t0, t1] of [[0.06, 0.4], [0.6, 0.94]]) {
+        const a = lerp2(P, Q, t0), b = lerp2(P, Q, t1);
+        poly(c, [a, b, [b[0], b[1] - 2.4 * u], [a[0], a[1] - 2.4 * u]], '#4E8A3A'); poly(c, [[a[0], a[1] - 2.4 * u], [b[0], b[1] - 2.4 * u], [b[0], b[1] - 3.2 * u], [a[0], a[1] - 3.2 * u]], '#76B455');
+      }
+    } else {
+      for (const P of [lerp2(q.L, q.B, 0.1), lerp2(q.B, q.R, 0.9)]) { c.fillStyle = '#B5653A'; c.fillRect(P[0] - 2 * u, P[1] - 3 * u, 4 * u, 3 * u); c.fillStyle = '#4E8A3A'; c.beginPath(); c.arc(P[0], P[1] - 4 * u, 2.4 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = level >= 3 ? '#F3C64B' : '#E46B8A'; c.beginPath(); c.arc(P[0] + 0.8 * u, P[1] - 5 * u, 1 * u, 0, Math.PI * 2); c.fill(); }
+    }
+    if (level >= 3) {
+      const lp = lerp2(q.B, q.R, 0.5), mb = lerp2(q.L, q.B, 0.5);
+      line(c, [lp[0], lp[1]], [lp[0], lp[1] - 9 * u], '#3B4A57', 0.8 * u); c.fillStyle = nightK() > 0.3 ? '#FFE9A8' : '#FFD978'; c.beginPath(); c.arc(lp[0], lp[1] - 9.6 * u, 1.4 * u, 0, Math.PI * 2); c.fill();
+      line(c, [mb[0], mb[1]], [mb[0], mb[1] - 4.5 * u], '#6B4A33', 0.7 * u); c.fillStyle = '#3E6FB0'; c.fillRect(mb[0] - 1.6 * u, mb[1] - 6.6 * u, 3.2 * u, 2.2 * u);
+    }
+  }
+  // Hydrants, lamp posts and bins stand at the corners of the building they belong to (10.08).
+  function drawAddons(c, b, now) {
+    const [w, d] = dimsB(b), pts = footPts(b.c, b.r, w, d), L = pts[3], B = pts[2], R = pts[1];
+    const lerp2 = (P, Q, t, dy) => [P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t + (dy || 0)];
+    const spots = { hydrant: lerp2(L, B, 0.22, 1), bin: lerp2(L, B, 0.78, 1), lamp: lerp2(B, R, 0.8, 1) };
+    for (const k of ['hydrant', 'bin', 'lamp']) if (b.addons[k]) { const [ax, ay] = spots[k]; drawBuilding(c, k, 1, ax, ay, HW * 0.5, HH * 0.5, { time: now }); }
+    if (b.addons.lamp && nightK() > 0.3) { const [ax, ay] = spots.lamp; c.fillStyle = `rgba(255,217,120,${0.18 * nightK()})`; c.beginPath(); c.arc(ax, ay - 12, 16, 0, Math.PI * 2); c.fill(); }
+  }
   // A small gold coin with a plus: this building earns gold (10.07).
   function goldCoin(c, x, y, r, t) {
     const bob = reduced ? 0 : Math.sin(t / 700) * r * 0.12;
@@ -4965,7 +5231,7 @@
     c.fillStyle = bg; roundRect(c, x - w / 2, y - 8 * px, w, 16 * px, 8 * px); c.fill();
     c.fillStyle = fg; c.fillText(txt, x, y + 0.5 * px);
   }
-  function pips(c, x, y, u, n) { for (let i = 0; i < n; i++) { c.fillStyle = '#fff'; c.beginPath(); c.arc(x + i * 5 * u, y, 2.6 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(x + i * 5 * u, y, 1.8 * u, 0, Math.PI * 2); c.fill(); } }
+  function pips(c, x, y, u, n) { for (let i = 0; i < n; i++) { c.fillStyle = '#fff'; c.beginPath(); c.arc(x + i * 5 * u, y, 2.6 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#23262D'; c.beginPath(); c.arc(x + i * 5 * u, y, 1.8 * u, 0, Math.PI * 2); c.fill(); } } // 10.08: dark dots, so levels don't look like coins or flowers
 
   /* ---------- Vehicles: a small box on wheels, turned along the street it drives on ---------- */
   const VEH_LOOK = {
@@ -5169,7 +5435,9 @@
   }
   function syncWalkers() {
     // At night most residents are asleep: only a few night owls stay out.
-    const want = Math.round(Math.min(16, Math.floor(city().residents / 3)) * (1 - 0.85 * nightK()));
+    // 10.08: in the rain fewer people go out (and those who do carry an umbrella); in a storm fewer still
+    const wx = skyNow().w, wet = wx.k > 0.3 ? (wx.kind === 'storm' ? 0.35 : wx.kind === 'rain' ? 0.55 : 1) : 1;
+    const want = Math.round(Math.min(16, Math.floor(city().residents / 3)) * (1 - 0.85 * nightK()) * wet);
     const res = walkers.filter((w) => !w.role), staff = walkers.filter((w) => w.role);
     while (res.length < want) res.push(makeWalker(null));
     res.length = want;
@@ -5303,9 +5571,9 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 33 + 4 * L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
-    workshop: (L) => 36 + 3 * L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 23 + 2.5 * L, stadium: (L) => 44 + 4 * L, depot: (L) => 30 + 2 * L,
-    shed: (L) => 19 + 2 * L, firestation: (L) => 31 + 1.7 * L, police: (L) => 23 + 1.7 * L, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
+  const ROOF = { townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 23 + 4 * L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+    workshop: (L) => 36 + 3 * L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 22 + 3 * L, stadium: (L) => 44 + 4 * L, depot: (L) => 30 + 2 * L,
+    shed: (L) => 19 + 2 * L, firestation: (L) => 33 + 2 * L, police: (L) => 25 + 2 * L, hospital: (L) => 32 + 5 * L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
     cherry: () => 26, statue: () => 25, goldstatue: () => 25, rainbow: () => 21, arcade: (L) => 33 + 3 * L, bank: (L) => 30 + 3 * L, lighthouse: () => 66, observatory: () => 40, castle: () => 50,
     pumpkins: () => 10, snowman: () => 27, tulips: () => 11, parasol: () => 26 };
   function labelY(b) { const p = centerOf(b), s = sizeOf(b.type), u = (HW / 30) * (1 + 0.35 * (s - 1)); return p.y - (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u - 4; }
@@ -5543,6 +5811,7 @@
       if (h % 9 === 2) { c.fillStyle = '#B9B2A4'; c.beginPath(); c.ellipse(p.x + oy, p.y + ox * 0.3, 2.2, 1.3, 0, 0, Math.PI * 2); c.fill(); }
     }
     const item = playing ? heldItem() : null;
+    if (playing && ui.attach) { for (const b of state.buildings) { if (!canHost(b) || (b.addons && b.addons[ui.attach.type])) continue; const [w, d] = dimsB(b); poly(c, footPts(b.c, b.r, w, d), 'rgba(96,205,80,.42)'); } }
     if (item) {
       const showNums = HW * z >= 20;
       const hs = hints();
@@ -5637,6 +5906,7 @@
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
         drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
+        if (b.addons) drawAddons(c, b, now);
         if (sc !== 1) c.restore();
         if (q && q.done === 0 && bigQ(q)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#5B2DB8', String(focusJobs().indexOf(q) + 1));
         else if (q && !bigQ(q) && !crewOnSite(q.bid)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
@@ -5668,6 +5938,7 @@
       const pv = { kind, c: d.c + 0.5, r: d.r + 0.5, dir: { dc: 1, dr: 0 }, state: 'back' };
       objs.push({ depth: d.c + d.r + 0.05, draw: () => drawVehicle(c, pv, now, after) });
     }
+    const wxNow = skyNow().w, wetNow = (wxNow.kind === 'rain' || wxNow.kind === 'storm') && wxNow.k > 0.3; // 10.08: umbrellas in the rain
     for (const w of walkers) {
       if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep || w.indoors || w.out) continue;
       objs.push({ depth: w.c + w.r - 1 + 0.02, draw: () => {
@@ -5682,7 +5953,9 @@
           else if (kind === 'chop') { pose.arms = 'hammer'; pose.tool = 'hammer'; pose.swing = reduced ? 0.5 : (Math.sin(now / 160) + 1) / 2; }
           else if (kind === 'spray') { pose.arms = 'spray'; pose.tool = 'hose'; }
         }
+        if (wetNow && !w.role) pose.arms = 'umbrella';
         const hand = person(c, p.x, p.y, w.role ? 1 : 0.92, w.look, pose);
+        if (wetNow && (!w.role || (w.state === 'walk' && !w.act))) umbrella(c, p.x, p.y, w.role ? 1 : 0.92, w.facing, UMBRELLAS[w.id % UMBRELLAS.length], w.state === 'walk' ? Math.sin(w.phase) * 0.06 : 0);
         if (w.state === 'act' && w.act && w.act.kind === 'sweep' && !reduced && Math.random() < 0.12) fx.push({ x: p.x + w.facing * 6, y: p.y, vx: w.facing * 12, vy: -12, life: 0, max: 0.7, puff: true, color: 'rgba(205,190,160,.7)', r: 1.6 });
         if (w.state === 'act' && w.act && w.act.kind === 'spray') {
           const b = byId(w.act.bid);
@@ -5791,7 +6064,7 @@
       const k = (now - bb.t0) / 220, left = bb.t0 + bb.dur - now, p = centerOf(b);
       c.save(); if (left < 300) c.globalAlpha = clamp(left / 300, 0, 1);
       const y = labelY(b);
-      hit(b, p.x, y, speech(c, p.x, y, bb.text, px, bb.kind, k), null, bb); c.restore(); labelled.add(b.id);
+      hit(b, p.x, y, speech(c, p.x, y, bb.text, px, bb.kind, k), bb.q || null, bb); c.restore(); labelled.add(b.id);
     }
     if (!item) for (const q of activeQuests()) {
       const b = questPlace(q); if (!b || labelled.has(b.id) || q.id === 'firenow') continue;
@@ -5800,7 +6073,7 @@
       const ph = ((now / 1000 + (b.id * 7) % 30) % 30);
       // between showings the "!" rests on the building itself (10.06: it used to float above the roof, over the tile behind)
       const yRest = p.y - (p.y - labelY(b)) * 0.45;
-      if (q.alert || ph < 6) {
+      if (q.alert) {
         const fade = q.alert ? 1 : clamp((6 - ph) / 0.45, 0, 1), k = q.alert ? 1 : ph < 0.35 ? clamp(ph / 0.35, 0, 1) : 0.15 + 0.85 * fade;
         const y0 = labelY(b) - (reduced ? 0 : Math.abs(Math.sin(now / 380)) * 4), y = yRest + (y0 - yRest) * (fade < 1 ? fade * fade : 1);
         c.save(); c.globalAlpha = Math.min(1, fade * 1.4); const sz = speech(c, p.x, y, q.from === 'Town council' ? 'Town council' : q.from, px, 'req', k); if (fade > 0.6) hit(b, p.x, y, sz, q); c.restore();
@@ -5852,7 +6125,7 @@
     const c = cv.getContext('2d'); c.scale(d, d);
     const hw = w * 0.38, hh = hw / 2;
     diamond(c, w / 2, h * 0.74, hw, hh, '#93C46C');
-    drawBuilding(c, type, level, w / 2, h * 0.74, hw, hh, Object.assign({ time: 0 }, opt || {}));
+    drawBuilding(c, type, level, w / 2, h * 0.74, hw, hh, Object.assign({ time: 0, noDress: true }, opt || {}));
     return cv;
   }
 
@@ -6041,16 +6314,6 @@
       ['Whether you think you can, or you think you can\'t, you\'re right.', 'Attributed to Henry Ford'],
       ['If you are working on something exciting that you really care about, you don\'t have to be pushed. The vision pulls you.', 'Steve Jobs']
     ],
-    word: [
-      ['Love', [['Persian', 'عشق', 'eshgh'], ['Spanish', 'amor', 'ah-MOR'], ['French', 'amour', 'ah-MOOR'], ['German', 'Liebe', 'LEE-buh'], ['Japanese', '愛', 'ah-ee'], ['Korean', '사랑', 'sah-rahng'], ['Swahili', 'upendo', 'oo-PEN-doh'], ['Greek', 'αγάπη', 'ah-GAH-pee']]],
-      ['Friend', [['Persian', 'دوست', 'doost'], ['Spanish', 'amigo', 'ah-MEE-goh'], ['French', 'ami', 'ah-MEE'], ['German', 'Freund', 'froynt'], ['Japanese', '友達', 'toh-moh-dah-chee'], ['Korean', '친구', 'chin-goo'], ['Swahili', 'rafiki', 'rah-FEE-kee'], ['Hindi', 'दोस्त', 'dost']]],
-      ['Hope', [['Persian', 'امید', 'o-MEED'], ['Spanish', 'esperanza', 'es-peh-RAHN-sah'], ['French', 'espoir', 'es-PWAHR'], ['German', 'Hoffnung', 'HOFF-noong'], ['Italian', 'speranza', 'speh-RAHN-tsah'], ['Arabic', 'أمل', 'AH-mal'], ['Japanese', '希望', 'kee-boh'], ['Turkish', 'umut', 'oo-MOOT']]],
-      ['Thank you', [['Persian', 'ممنون', 'mam-NOON'], ['Spanish', 'gracias', 'GRAH-syahs'], ['French', 'merci', 'mehr-SEE'], ['German', 'danke', 'DAHN-kuh'], ['Japanese', 'ありがとう', 'ah-ree-gah-toh'], ['Chinese', '谢谢', 'shyeh-shyeh'], ['Swahili', 'asante', 'ah-SAHN-teh'], ['Russian', 'спасибо', 'spah-SEE-buh']]],
-      ['Courage', [['Persian', 'شجاعت', 'sho-jā-AT'], ['Spanish', 'valentía', 'bah-len-TEE-ah'], ['French', 'courage', 'koo-RAHZH'], ['German', 'Mut', 'moot'], ['Italian', 'coraggio', 'koh-RAH-joh'], ['Japanese', '勇気', 'yoo-kee'], ['Korean', '용기', 'yong-gee'], ['Turkish', 'cesaret', 'jeh-sah-RET']]],
-      ['Peace', [['Persian', 'صلح', 'solh'], ['Spanish', 'paz', 'pahs'], ['French', 'paix', 'peh'], ['German', 'Frieden', 'FREE-den'], ['Hebrew', 'שלום', 'shah-LOHM'], ['Hindi', 'शांति', 'SHAHN-tee'], ['Japanese', '平和', 'hay-wah'], ['Swahili', 'amani', 'ah-MAH-nee']]],
-      ['Hello', [['Persian', 'سلام', 'sa-LAAM'], ['Spanish', 'hola', 'OH-lah'], ['French', 'bonjour', 'bohn-ZHOOR'], ['Italian', 'ciao', 'chow'], ['Japanese', 'こんにちは', 'kohn-nee-chee-wah'], ['Chinese', '你好', 'nee how'], ['Hindi', 'नमस्ते', 'nuh-muh-STAY'], ['Swahili', 'jambo', 'JAHM-boh']]],
-      ['Focus', [['Persian', 'تمرکز', 'ta-MAR-koz'], ['Spanish', 'enfoque', 'en-FOH-keh'], ['French', 'concentration', 'kohn-sahn-trah-SYOHN'], ['German', 'Fokus', 'FOH-koos'], ['Japanese', '集中', 'shoo-choo'], ['Chinese', '专注', 'jwahn-joo'], ['Korean', '집중', 'jip-joong'], ['Italian', 'concentrazione', 'kohn-chen-trah-TSYOH-neh']]]
-    ],
     fact: [
       'Octopuses have three hearts, and their blood is blue.',
       'A day on Venus is longer than its whole year: it spins very slowly.',
@@ -6073,30 +6336,316 @@
       'The Moon drifts about 3.8 cm farther from Earth every year.',
       'A bolt of lightning is about five times hotter than the surface of the Sun.',
       'Honeybees can learn to recognise human faces.',
-      'Water can boil and freeze at the same time, at its "triple point".'
+      'Water can boil and freeze at the same time, at its "triple point".',
+      'Your heart beats about 100,000 times a day.',
+      'Honey never goes off: pots of edible honey have been found in ancient Egyptian tombs.',
+      'Venus is the hottest planet, even though Mercury is closer to the Sun.',
+      'Some turtles can breathe through their bottoms.',
+      'There are more possible games of chess than atoms in the observable universe.',
+      'Trees share food and warnings with each other through fungi in the soil.',
+      'Elephants can recognise themselves in a mirror.',
+      'Crows remember human faces for years, and tell their friends about you.',
+      'Every time you learn something, your brain builds new connections. Practice literally changes its shape.',
+      'A short walk can lift your mood and help you focus better afterwards.',
+      'An ordinary fluffy cloud weighs hundreds of tonnes.',
+      'Some bamboo can grow almost a metre in a single day.',
+      'Gentoo penguins give pebbles as gifts to the penguin they like.',
+      'A teaspoon of a neutron star would weigh about a billion tonnes on Earth.',
+      'Earth is the only planet in our solar system not named after a god.'
     ]
   };
+  // 10.08: words in 14 languages, and short everyday sentences with every word explained (spark settings)
+  const LANGS = [['fa', 'Persian'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['it', 'Italian'], ['pt', 'Portuguese'], ['ja', 'Japanese'], ['ko', 'Korean'], ['zh', 'Chinese'], ['ar', 'Arabic'], ['tr', 'Turkish'], ['hi', 'Hindi'], ['ru', 'Russian'], ['sw', 'Swahili']];
+  const LANG_NAME = Object.fromEntries(LANGS), RTL_LANG = { fa: true, ar: true };
+  const WORDS = `Love|عشق/eshgh|amor/ah-MOR|amour/ah-MOOR|Liebe/LEE-buh|amore/ah-MOH-reh|amor/ah-MOR|愛/ah-ee|사랑/sah-rahng|爱/ài|حب/hubb|aşk/ahshk|प्यार/pyaar|любовь/lyoo-BOF|upendo/oo-PEN-doh
+Friend|دوست/doost|amigo/ah-MEE-goh|ami/ah-MEE|Freund/froynt|amico/ah-MEE-koh|amigo/ah-MEE-goo|友達/toh-moh-dah-chee|친구/chin-goo|朋友/péng-you|صديق/sa-DEEQ|arkadaş/ar-kah-DAHSH|दोस्त/dost|друг/drook|rafiki/rah-FEE-kee
+Hope|امید/o-MEED|esperanza/es-peh-RAHN-sah|espoir/es-PWAHR|Hoffnung/HOFF-noong|speranza/speh-RAHN-tsah|esperança/es-peh-RAHN-sah|希望/kee-boh|희망/hee-mahng|希望/xī-wàng|أمل/AH-mal|umut/oo-MOOT|आशा/AA-shaa|надежда/nah-DYEZH-dah|tumaini/too-mah-EE-nee
+Thank you|ممنون/mam-NOON|gracias/GRAH-syahs|merci/mehr-SEE|danke/DAHN-kuh|grazie/GRAH-tsyeh|obrigado/oh-bree-GAH-doo|ありがとう/ah-ree-gah-toh|감사합니다/gahm-sah-hahm-nee-dah|谢谢/xiè-xie|شكرا/SHUK-ran|teşekkürler/teh-shek-kyur-LER|धन्यवाद/dhun-ya-VAAD|спасибо/spah-SEE-buh|asante/ah-SAHN-teh
+Courage|شجاعت/sho-jaa-AT|valentía/bah-len-TEE-ah|courage/koo-RAHZH|Mut/moot|coraggio/koh-RAH-joh|coragem/koh-RAH-zhayn|勇気/yoo-kee|용기/yong-gee|勇气/yǒng-qì|شجاعة/sha-JAA-a|cesaret/jeh-sah-RET|साहस/SAA-has|смелость/SMYE-lost|ujasiri/oo-jah-SEE-ree
+Peace|صلح/solh|paz/pahs|paix/peh|Frieden/FREE-den|pace/PAH-cheh|paz/pahs|平和/hay-wah|평화/pyung-hwah|和平/hé-píng|سلام/sa-LAAM|barış/bah-RUSH|शांति/SHAAN-tee|мир/meer|amani/ah-MAH-nee
+Hello|سلام/sa-LAAM|hola/OH-lah|bonjour/bohn-ZHOOR|hallo/HAH-loh|ciao/chow|olá/oh-LAH|こんにちは/kohn-nee-chee-wah|안녕하세요/ahn-nyung-hah-seh-yoh|你好/nǐ-hǎo|مرحبا/MAR-ha-ban|merhaba/MEHR-hah-bah|नमस्ते/nuh-muh-STAY|привет/pree-VYET|jambo/JAHM-boh
+Focus|تمرکز/ta-mar-KOZ|enfoque/en-FOH-keh|concentration/kohn-sahn-trah-SYOHN|Konzentration/kon-tsen-trah-TSYOHN|concentrazione/kon-chen-trah-TSYOH-neh|foco/FOH-koo|集中/shoo-choo|집중/jip-joong|专注/zhuān-zhù|تركيز/tar-KEEZ|odak/oh-DAHK|ध्यान/dhyaan|фокус/FOH-koos|umakini/oo-mah-KEE-nee
+Sun|خورشید/khor-SHEED|sol/sohl|soleil/soh-LAY|Sonne/ZON-nuh|sole/SOH-leh|sol/sohw|太陽/tai-yoh|태양/tae-yahng|太阳/tài-yáng|شمس/shams|güneş/gyu-NESH|सूरज/SOO-raj|солнце/SOHN-tseh|jua/JOO-ah
+Moon|ماه/maah|luna/LOO-nah|lune/lewn|Mond/mohnt|luna/LOO-nah|lua/LOO-ah|月/tsoo-kee|달/dahl|月亮/yuè-liang|قمر/QA-mar|ay/ai|चाँद/chaand|луна/loo-NAH|mwezi/MWEH-zee
+Star|ستاره/se-taa-REH|estrella/es-TREH-yah|étoile/ay-TWAHL|Stern/shtern|stella/STEL-lah|estrela/es-TREH-lah|星/hoh-shee|별/byul|星星/xīng-xing|نجمة/NAJ-ma|yıldız/yuhl-DUHZ|तारा/TAA-raa|звезда/zvyez-DAH|nyota/NYOH-tah
+Water|آب/aab|agua/AH-gwah|eau/oh|Wasser/VAH-ser|acqua/AHK-kwah|água/AH-gwah|水/mee-zoo|물/mool|水/shuǐ|ماء/maa|su/soo|पानी/PAA-nee|вода/vah-DAH|maji/MAH-jee
+Tree|درخت/de-RAKHT|árbol/AR-bohl|arbre/AR-bruh|Baum/bowm|albero/AHL-beh-roh|árvore/AR-voh-reh|木/kee|나무/nah-moo|树/shù|شجرة/SHA-ja-ra|ağaç/ah-AHCH|पेड़/payd|дерево/DYEH-reh-vuh|mti/m-TEE
+Flower|گل/gol|flor/flor|fleur/flur|Blume/BLOO-muh|fiore/FYOH-reh|flor/flor|花/hah-nah|꽃/kkot|花/huā|زهرة/ZAH-ra|çiçek/chee-CHEK|फूल/phool|цветок/tsvye-TOK|ua/OO-ah
+Home|خانه/khaa-NEH|hogar/oh-GAR|maison/meh-ZOHN|Zuhause/tsoo-HOW-zuh|casa/KAH-zah|casa/KAH-zah|家/ee-eh|집/jip|家/jiā|بيت/bayt|ev/ev|घर/ghar|дом/dohm|nyumbani/nyoom-BAH-nee
+Family|خانواده/khaa-ne-vaa-DEH|familia/fah-MEE-lyah|famille/fah-MEE|Familie/fah-MEE-lee-uh|famiglia/fah-MEE-lyah|família/fah-MEE-lyah|家族/kah-zoh-koo|가족/gah-jok|家人/jiā-rén|عائلة/AA-i-la|aile/ah-ee-LEH|परिवार/pa-ri-VAAR|семья/syem-YAH|familia/fah-MEE-lee-ah
+Heart|دل/del|corazón/koh-rah-SOHN|cœur/kur|Herz/herts|cuore/KWOH-reh|coração/koh-rah-SOWN|心/koh-koh-roh|마음/mah-eum|心/xīn|قلب/qalb|kalp/kahlp|दिल/dil|сердце/SYER-tseh|moyo/MOH-yoh
+Dream|رؤیا/ro-YAA|sueño/SWEH-nyoh|rêve/rev|Traum/trowm|sogno/SOH-nyoh|sonho/SOH-nyoo|夢/yoo-meh|꿈/kkoom|梦想/mèng-xiǎng|حلم/hulm|rüya/ryu-YAH|सपना/SAP-naa|мечта/myech-TAH|ndoto/n-DOH-toh
+Smile|لبخند/lab-KHAND|sonrisa/sohn-REE-sah|sourire/soo-REER|Lächeln/LEH-heln|sorriso/sor-REE-zoh|sorriso/soh-HEE-zoo|笑顔/eh-gah-oh|미소/mee-soh|微笑/wēi-xiào|ابتسامة/ib-ti-SAA-ma|gülümseme/gyu-lyum-seh-MEH|मुस्कान/mus-KAAN|улыбка/oo-LIP-kah|tabasamu/tah-bah-SAH-moo
+Light|نور/noor|luz/loos|lumière/lew-MYEHR|Licht/liht|luce/LOO-cheh|luz/loos|光/hee-kah-ree|빛/bit|光/guāng|نور/noor|ışık/uh-SHUHK|रोशनी/ROSH-nee|свет/svyet|mwanga/MWAHN-gah
+Sky|آسمان/aa-se-MAAN|cielo/SYEH-loh|ciel/syel|Himmel/HIM-mel|cielo/CHEH-loh|céu/SEH-oo|空/soh-rah|하늘/hah-neul|天空/tiān-kōng|سماء/sa-MAA|gökyüzü/gyok-yu-ZYU|आसमान/aas-MAAN|небо/NYEH-buh|anga/AHN-gah
+Sea|دریا/dar-YAA|mar/mar|mer/mehr|Meer/mayr|mare/MAH-reh|mar/mar|海/oo-mee|바다/bah-dah|海/hǎi|بحر/bahr|deniz/deh-NEEZ|समुद्र/sa-MUD-ra|море/MOH-ryeh|bahari/bah-HAH-ree
+Rain|باران/baa-RAAN|lluvia/YOO-vyah|pluie/plwee|Regen/RAY-gen|pioggia/PYOH-jah|chuva/SHOO-vah|雨/ah-meh|비/bee|雨/yǔ|مطر/MA-tar|yağmur/yah-MOOR|बारिश/BAA-rish|дождь/dohsht|mvua/m-VOO-ah
+Book|کتاب/ke-TAAB|libro/LEE-broh|livre/LEE-vruh|Buch/booh|libro/LEE-broh|livro/LEE-vroo|本/hohn|책/chaek|书/shū|كتاب/ki-TAAB|kitap/kee-TAHP|किताब/ki-TAAB|книга/KNEE-gah|kitabu/kee-TAH-boo
+Music|موسیقی/moo-see-GHEE|música/MOO-see-kah|musique/mew-ZEEK|Musik/moo-ZEEK|musica/MOO-zee-kah|música/MOO-zee-kah|音楽/ohn-gah-koo|음악/eum-ahk|音乐/yīn-yuè|موسيقى/moo-SEE-qaa|müzik/myu-ZEEK|संगीत/san-GEET|музыка/MOO-zih-kah|muziki/moo-ZEE-kee
+Time|زمان/za-MAAN|tiempo/TYEM-poh|temps/tahn|Zeit/tsite|tempo/TEM-poh|tempo/TEHM-poo|時間/jee-kahn|시간/shee-gahn|时间/shí-jiān|وقت/waqt|zaman/zah-MAHN|समय/SA-may|время/VRYEH-myah|wakati/wah-KAH-tee
+Today|امروز/em-ROOZ|hoy/oy|aujourd'hui/oh-zhoor-DWEE|heute/HOY-tuh|oggi/OH-jee|hoje/OH-zhee|今日/kyoh|오늘/oh-neul|今天/jīn-tiān|اليوم/al-YAWM|bugün/boo-GYUN|आज/aaj|сегодня/syeh-VOD-nyah|leo/LEH-oh
+Tomorrow|فردا/far-DAA|mañana/mah-NYAH-nah|demain/duh-MAN|morgen/MOR-gen|domani/doh-MAH-nee|amanhã/ah-mah-NYAN|明日/ah-shee-tah|내일/nae-il|明天/míng-tiān|غدا/GHA-dan|yarın/YAH-ruhn|कल/kal|завтра/ZAHF-trah|kesho/KEH-shoh
+Happiness|شادی/shaa-DEE|felicidad/feh-lee-see-DAHD|bonheur/boh-NUR|Glück/glewk|felicità/feh-lee-chee-TAH|felicidade/feh-lee-see-DAH-jee|幸せ/shee-ah-wah-seh|행복/haeng-bok|幸福/xìng-fú|سعادة/sa-AA-da|mutluluk/moot-loo-LOOK|खुशी/KHU-shee|счастье/SHCHAS-tyeh|furaha/foo-RAH-hah
+Strength|قدرت/ghod-RAT|fuerza/FWEHR-sah|force/fors|Stärke/SHTEHR-kuh|forza/FOR-tsah|força/FOR-sah|力/chee-kah-rah|힘/him|力量/lì-liàng|قوة/QUW-wa|güç/gyuch|ताकत/TAA-kat|сила/SEE-lah|nguvu/n-GOO-voo
+Calm|آرامش/aa-raa-MESH|calma/KAHL-mah|calme/kalm|Ruhe/ROO-uh|calma/KAHL-mah|calma/KOW-mah|落ち着き/oh-chee-tsoo-kee|평온/pyung-on|平静/píng-jìng|هدوء/hu-DOO|sakinlik/sah-keen-LEEK|सुकून/su-KOON|спокойствие/spah-KOY-stvee-yeh|utulivu/oo-too-LEE-voo
+Beautiful|زیبا/zee-BAA|hermoso/ehr-MOH-soh|beau/boh|schön/shurn|bello/BEL-loh|bonito/boo-NEE-too|美しい/oo-tsoo-koo-shee|아름다운/ah-reum-dah-oon|美丽/měi-lì|جميل/ja-MEEL|güzel/gyu-ZEL|सुंदर/SUN-dar|красивый/krah-SEE-vihy|nzuri/n-ZOO-ree
+Gift|هدیه/had-YEH|regalo/reh-GAH-loh|cadeau/kah-DOH|Geschenk/geh-SHENK|regalo/reh-GAH-loh|presente/preh-ZEN-chee|贈り物/oh-koo-ree-moh-noh|선물/sun-mool|礼物/lǐ-wù|هدية/ha-DEE-ya|hediye/heh-dee-YEH|उपहार/up-HAAR|подарок/pah-DAH-rok|zawadi/zah-WAH-dee
+Patience|صبر/sabr|paciencia/pah-SYEN-syah|patience/pah-SYAHNS|Geduld/geh-DOOLT|pazienza/pah-TSYEN-tsah|paciência/pah-SYEN-syah|忍耐/neen-tai|인내/in-nae|耐心/nài-xīn|صبر/sabr|sabır/sah-BUHR|धैर्य/DHAIR-ya|терпение/tyer-PYEH-nee-yeh|subira/soo-BEE-rah
+Journey|سفر/sa-FAR|viaje/BYAH-heh|voyage/vwah-YAZH|Reise/RYE-zuh|viaggio/VYAH-joh|viagem/vee-AH-zhayn|旅/tah-bee|여행/yuh-haeng|旅程/lǚ-chéng|رحلة/RIH-la|yolculuk/yol-joo-LOOK|यात्रा/YAA-traa|путешествие/poo-tyeh-SHEST-vee-yeh|safari/sah-FAH-ree
+Bread|نان/naan|pan/pahn|pain/pan|Brot/broht|pane/PAH-neh|pão/pown|パン/pahn|빵/ppahng|面包/miàn-bāo|خبز/khubz|ekmek/ek-MEK|रोटी/RO-tee|хлеб/hlyep|mkate/m-KAH-teh
+Tea|چای/chaay|té/teh|thé/tay|Tee/tay|tè/teh|chá/shah|お茶/oh-chah|차/chah|茶/chá|شاي/shaay|çay/chai|चाय/chaay|чай/chai|chai/chai
+Coffee|قهوه/ghah-VEH|café/kah-FEH|café/kah-FAY|Kaffee/KAH-fay|caffè/kahf-FEH|café/kah-FEH|コーヒー/koh-hee|커피/kuh-pee|咖啡/kā-fēi|قهوة/QAH-wa|kahve/kah-VEH|कॉफ़ी/KOF-fee|кофе/KOH-feh|kahawa/kah-HAH-wah
+Apple|سیب/seeb|manzana/mahn-SAH-nah|pomme/pom|Apfel/AHP-fel|mela/MEH-lah|maçã/mah-SAN|りんご/reen-goh|사과/sah-gwah|苹果/píng-guǒ|تفاحة/tuf-FAA-ha|elma/el-MAH|सेब/seb|яблоко/YAH-bloh-kuh|tufaha/too-FAH-hah
+Cat|گربه/gor-BEH|gato/GAH-toh|chat/shah|Katze/KAHT-suh|gatto/GAHT-toh|gato/GAH-too|猫/neh-koh|고양이/goh-yahng-ee|猫/māo|قطة/QIT-ta|kedi/keh-DEE|बिल्ली/BIL-lee|кошка/KOSH-kah|paka/PAH-kah
+Dog|سگ/sag|perro/PEH-rroh|chien/shyan|Hund/hoont|cane/KAH-neh|cachorro/kah-SHOH-hoo|犬/ee-noo|개/gae|狗/gǒu|كلب/kalb|köpek/kyo-PEK|कुत्ता/KUT-taa|собака/sah-BAH-kah|mbwa/m-BWAH
+Bird|پرنده/pa-ran-DEH|pájaro/PAH-hah-roh|oiseau/wah-ZOH|Vogel/FOH-gel|uccello/oot-CHEL-loh|pássaro/PAH-sah-roo|鳥/toh-ree|새/sae|鸟/niǎo|طائر/TAA-ir|kuş/koosh|पक्षी/PAK-shee|птица/PTEE-tsah|ndege/n-DEH-geh
+Mountain|کوه/kooh|montaña/mohn-TAH-nyah|montagne/mohn-TAH-nyuh|Berg/berk|montagna/mohn-TAH-nyah|montanha/mohn-TAH-nyah|山/yah-mah|산/sahn|山/shān|جبل/JA-bal|dağ/daa|पहाड़/pa-HAAD|гора/gah-RAH|mlima/m-LEE-mah
+River|رود/rood|río/REE-oh|rivière/ree-VYEHR|Fluss/floos|fiume/FYOO-meh|rio/HEE-oo|川/kah-wah|강/gahng|河/hé|نهر/nahr|nehir/neh-HEER|नदी/na-DEE|река/ryeh-KAH|mto/m-TOH
+City|شهر/shahr|ciudad/syoo-DAHD|ville/veel|Stadt/shtaht|città/cheet-TAH|cidade/see-DAH-jee|町/mah-chee|도시/doh-shee|城市/chéng-shì|مدينة/ma-DEE-na|şehir/sheh-HEER|शहर/sha-HAR|город/GOH-rut|mji/m-JEE
+Goodbye|خداحافظ/kho-daa-haa-FEZ|adiós/ah-DYOHS|au revoir/oh ruh-VWAHR|tschüss/chewss|arrivederci/ar-ree-veh-DEHR-chee|tchau/chow|さようなら/sah-yoh-nah-rah|안녕히 가세요/ahn-nyung-hee gah-seh-yoh|再见/zài-jiàn|مع السلامة/ma-a as-sa-LAA-ma|hoşça kal/hosh-CHAH kahl|अलविदा/al-VI-daa|до свидания/dah svee-DAH-nee-yah|kwaheri/kwah-HEH-ree
+Please|لطفاً/lot-FAN|por favor/por fah-BOR|s'il vous plaît/seel voo PLEH|bitte/BIT-tuh|per favore/pehr fah-VOH-reh|por favor/poor fah-VOR|お願いします/oh-neh-gai-shee-mahs|부탁합니다/boo-tahk-hahm-nee-dah|请/qǐng|من فضلك/min FAD-lak|lütfen/LYUT-fen|कृपया/KRIP-yaa|пожалуйста/pah-ZHAH-loo-stah|tafadhali/tah-fah-THAH-lee
+Freedom|آزادی/aa-zaa-DEE|libertad/lee-behr-TAHD|liberté/lee-behr-TAY|Freiheit/FRY-hite|libertà/lee-behr-TAH|liberdade/lee-behr-DAH-jee|自由/jee-yoo|자유/jah-yoo|自由/zì-yóu|حرية/hur-REE-ya|özgürlük/oz-gyur-LYUK|आज़ादी/aa-ZAA-dee|свобода/svah-BOH-dah|uhuru/oo-HOO-roo
+Wisdom|خرد/kha-RAD|sabiduría/sah-bee-doo-REE-ah|sagesse/sah-ZHESS|Weisheit/VICE-hite|saggezza/sahd-JET-tsah|sabedoria/sah-beh-doh-REE-ah|知恵/chee-eh|지혜/jee-hyeh|智慧/zhì-huì|حكمة/HIK-ma|bilgelik/beel-geh-LEEK|ज्ञान/gyaan|мудрость/MOO-drust|hekima/heh-KEE-mah
+Morning|صبح/sobh|mañana/mah-NYAH-nah|matin/mah-TAN|Morgen/MOR-gen|mattina/maht-TEE-nah|manhã/mah-NYAN|朝/ah-sah|아침/ah-chim|早上/zǎo-shang|صباح/sa-BAAH|sabah/sah-BAH|सुबह/SU-bah|утро/OO-truh|asubuhi/ah-soo-BOO-hee
+Night|شب/shab|noche/NOH-cheh|nuit/nwee|Nacht/nahht|notte/NOT-teh|noite/NOY-chee|夜/yoh-roo|밤/bahm|夜晚/yè-wǎn|ليل/layl|gece/geh-JEH|रात/raat|ночь/noch|usiku/oo-SEE-koo
+Snow|برف/barf|nieve/NYEH-beh|neige/nezh|Schnee/shnay|neve/NEH-veh|neve/NEH-vee|雪/yoo-kee|눈/noon|雪/xuě|ثلج/thalj|kar/kahr|बर्फ़/barf|снег/snyek|theluji/theh-LOO-jee
+Fire|آتش/aa-TASH|fuego/FWEH-goh|feu/fuh|Feuer/FOY-er|fuoco/FWOH-koh|fogo/FOH-goo|火/hee|불/bool|火/huǒ|نار/naar|ateş/ah-TESH|आग/aag|огонь/ah-GON|moto/MOH-toh
+World|جهان/ja-HAAN|mundo/MOON-doh|monde/mohnd|Welt/velt|mondo/MOHN-doh|mundo/MOON-doo|世界/seh-kai|세계/seh-gyeh|世界/shì-jiè|عالم/AA-lam|dünya/dyun-YAH|दुनिया/DUN-i-yaa|мир/meer|dunia/doo-NEE-ah
+Life|زندگی/zen-de-GEE|vida/BEE-dah|vie/vee|Leben/LAY-ben|vita/VEE-tah|vida/VEE-dah|人生/jeen-seh|인생/in-saeng|生活/shēng-huó|حياة/ha-YAAH|hayat/hah-YAHT|ज़िंदगी/ZIN-da-gee|жизнь/zhizn|maisha/mah-EE-shah
+Kindness|مهربانی/meh-ra-baa-NEE|amabilidad/ah-mah-bee-lee-DAHD|gentillesse/zhahn-tee-YESS|Freundlichkeit/FROYNT-lish-kite|gentilezza/jen-tee-LET-tsah|gentileza/zhen-chee-LEH-zah|優しさ/yah-sah-shee-sah|친절/chin-jul|善良/shàn-liáng|لطف/lutf|nezaket/neh-zah-KET|दया/DA-yaa|доброта/dah-brah-TAH|wema/WEH-mah
+Child|کودک/koo-DAK|niño/NEE-nyoh|enfant/ahn-FAHN|Kind/kint|bambino/bahm-BEE-noh|criança/kree-AN-sah|子ども/koh-doh-moh|아이/ah-ee|孩子/hái-zi|طفل/tifl|çocuk/choh-JOOK|बच्चा/BUCH-chaa|ребёнок/ryeh-BYOH-nok|mtoto/m-TOH-toh
+Mother|مادر/maa-DAR|madre/MAH-dreh|mère/mehr|Mutter/MOO-ter|madre/MAH-dreh|mãe/mine|母/hah-hah|어머니/uh-muh-nee|妈妈/mā-ma|أم/umm|anne/ahn-NEH|माँ/maa|мама/MAH-mah|mama/MAH-mah
+Garden|باغ/baagh|jardín/har-DEEN|jardin/zhar-DAN|Garten/GAR-ten|giardino/jar-DEE-noh|jardim/zhar-JEEN|庭/nee-wah|정원/jung-won|花园/huā-yuán|حديقة/ha-DEE-qa|bahçe/bah-CHEH|बगीचा/ba-GEE-chaa|сад/saht|bustani/boo-STAH-nee
+Success|موفقیت/mo-vaf-fa-ghi-YAT|éxito/EK-see-toh|succès/sewk-SEH|Erfolg/er-FOLK|successo/soot-CHES-soh|sucesso/soo-SEH-soo|成功/seh-koh|성공/sung-gong|成功/chéng-gōng|نجاح/na-JAAH|başarı/bah-shah-RUH|सफलता/sa-PHAL-taa|успех/oos-PYEH|mafanikio/mah-fah-nee-KEE-oh`.split('\n').map((line) => { const p = line.split('|'); return { en: p[0], t: Object.fromEntries(LANGS.map(([k], i) => [k, p[i + 1].split('/')])) }; });
+  const SENTS = {};
+  `fa|صبح بخیر!|Good morning!|صبح/sobh/morning;بخیر/be-kheyr/good
+fa|ممنون، دوست من.|Thank you, my friend.|ممنون/mam-noon/thank you;دوستِ/doo-ste/friend (of);من/man/me
+fa|من خانواده‌ام را دوست دارم.|I love my family.|من/man/I;خانواده‌ام/khaa-ne-vaa-de-am/my family;را/raa/(the object);دوست دارم/doost daa-ram/love
+fa|امروز روز قشنگی است.|Today is a beautiful day.|امروز/em-rooz/today;روز/rooz/day;قشنگی/ghe-shan-gee/a beautiful;است/ast/is
+fa|من چای می‌نوشم.|I drink tea.|من/man/I;چای/chaay/tea;می‌نوشم/mee-noo-sham/drink
+fa|خورشید می‌درخشد.|The sun is shining.|خورشید/khor-sheed/sun;می‌درخشد/mee-de-rakh-shad/shines
+fa|باران می‌بارد.|It is raining.|باران/baa-raan/rain;می‌بارد/mee-baa-rad/falls
+fa|من کتاب می‌خوانم.|I am reading a book.|من/man/I;کتاب/ke-taab/book;می‌خوانم/mee-khaa-nam/read
+fa|ما خوشحالیم.|We are happy.|ما/maa/we;خوشحالیم/khosh-haa-leem/are happy
+fa|فردا می‌بینمت.|See you tomorrow.|فردا/far-daa/tomorrow;می‌بینمت/mee-bee-na-mat/I see you
+fa|من موسیقی دوست دارم.|I like music.|من/man/I;موسیقی/moo-see-ghee/music;دوست دارم/doost daa-ram/like
+fa|گربه خوابیده است.|The cat is asleep.|گربه/gor-be/cat;خوابیده/khaa-bee-de/asleep;است/ast/is
+es|¡Buenos días!|Good morning!|Buenos/BWEH-nos/good;días/DEE-ahs/days
+es|Gracias, amigo mío.|Thank you, my friend.|Gracias/GRAH-syahs/thank you;amigo/ah-MEE-goh/friend;mío/MEE-oh/my
+es|Quiero a mi familia.|I love my family.|Quiero/KYEH-roh/I love;a/ah/(to);mi/mee/my;familia/fah-MEE-lyah/family
+es|Hoy es un día bonito.|Today is a beautiful day.|Hoy/oy/today;es/es/is;un/oon/a;día/DEE-ah/day;bonito/boh-NEE-toh/beautiful
+es|Estoy bebiendo té.|I am drinking tea.|Estoy/es-TOY/I am;bebiendo/beh-BYEN-doh/drinking;té/teh/tea
+es|Brilla el sol.|The sun is shining.|Brilla/BREE-yah/shines;el/el/the;sol/sohl/sun
+es|Está lloviendo.|It is raining.|Está/es-TAH/it is;lloviendo/yoh-VYEN-doh/raining
+es|Leo un libro.|I am reading a book.|Leo/LEH-oh/I read;un/oon/a;libro/LEE-broh/book
+es|Somos felices.|We are happy.|Somos/SOH-mos/we are;felices/feh-LEE-ses/happy
+es|Hasta mañana.|See you tomorrow.|Hasta/AHS-tah/until;mañana/mah-NYAH-nah/tomorrow
+es|Me gusta la música.|I like music.|Me/meh/to me;gusta/GOOS-tah/is pleasing;la/lah/the;música/MOO-see-kah/music
+es|El gato está durmiendo.|The cat is sleeping.|El/el/the;gato/GAH-toh/cat;está/es-TAH/is;durmiendo/door-MYEN-doh/sleeping
+fr|Bonjour !|Good morning!|Bonjour/bohn-ZHOOR/good day
+fr|Merci, mon ami.|Thank you, my friend.|Merci/mehr-SEE/thank you;mon/mohn/my;ami/ah-MEE/friend
+fr|J'aime ma famille.|I love my family.|J'aime/zhem/I love;ma/mah/my;famille/fah-MEE/family
+fr|Aujourd'hui, c'est une belle journée.|Today is a beautiful day.|Aujourd'hui/oh-zhoor-DWEE/today;c'est/seh/it is;une/ewn/a;belle/bel/beautiful;journée/zhoor-NAY/day
+fr|Je bois du thé.|I am drinking tea.|Je/zhuh/I;bois/bwah/drink;du/dew/some;thé/tay/tea
+fr|Le soleil brille.|The sun is shining.|Le/luh/the;soleil/soh-LAY/sun;brille/bree/shines
+fr|Il pleut.|It is raining.|Il/eel/it;pleut/pluh/rains
+fr|Je lis un livre.|I am reading a book.|Je/zhuh/I;lis/lee/read;un/uhn/a;livre/LEE-vruh/book
+fr|Nous sommes heureux.|We are happy.|Nous/noo/we;sommes/som/are;heureux/uh-RUH/happy
+fr|À demain !|See you tomorrow.|À/ah/until;demain/duh-MAN/tomorrow
+fr|J'aime la musique.|I like music.|J'aime/zhem/I like;la/lah/the;musique/mew-ZEEK/music
+fr|Le chat dort.|The cat is sleeping.|Le/luh/the;chat/shah/cat;dort/dor/sleeps
+de|Guten Morgen!|Good morning!|Guten/GOO-ten/good;Morgen/MOR-gen/morning
+de|Danke, mein Freund.|Thank you, my friend.|Danke/DAHN-kuh/thanks;mein/mine/my;Freund/froynt/friend
+de|Ich liebe meine Familie.|I love my family.|Ich/ish/I;liebe/LEE-buh/love;meine/MY-nuh/my;Familie/fah-MEE-lee-uh/family
+de|Heute ist ein schöner Tag.|Today is a beautiful day.|Heute/HOY-tuh/today;ist/ist/is;ein/ine/a;schöner/SHUR-ner/beautiful;Tag/tahk/day
+de|Ich trinke Tee.|I am drinking tea.|Ich/ish/I;trinke/TRIN-kuh/drink;Tee/tay/tea
+de|Die Sonne scheint.|The sun is shining.|Die/dee/the;Sonne/ZON-nuh/sun;scheint/shynt/shines
+de|Es regnet.|It is raining.|Es/es/it;regnet/RAYG-net/rains
+de|Ich lese ein Buch.|I am reading a book.|Ich/ish/I;lese/LAY-zuh/read;ein/ine/a;Buch/booh/book
+de|Wir sind glücklich.|We are happy.|Wir/veer/we;sind/zint/are;glücklich/GLEWK-lish/happy
+de|Bis morgen!|See you tomorrow.|Bis/bis/until;morgen/MOR-gen/tomorrow
+de|Ich mag Musik.|I like music.|Ich/ish/I;mag/mahk/like;Musik/moo-ZEEK/music
+de|Die Katze schläft.|The cat is sleeping.|Die/dee/the;Katze/KAHT-suh/cat;schläft/shlehft/sleeps
+it|Buongiorno!|Good morning!|Buongiorno/bwon-JOR-noh/good morning
+it|Grazie, amico mio.|Thank you, my friend.|Grazie/GRAH-tsyeh/thank you;amico/ah-MEE-koh/friend;mio/MEE-oh/my
+it|Amo la mia famiglia.|I love my family.|Amo/AH-moh/I love;la/lah/the;mia/MEE-ah/my;famiglia/fah-MEE-lyah/family
+it|Oggi è una bella giornata.|Today is a beautiful day.|Oggi/OH-jee/today;è/eh/is;una/OO-nah/a;bella/BEL-lah/beautiful;giornata/jor-NAH-tah/day
+it|Bevo il tè.|I am drinking tea.|Bevo/BEH-voh/I drink;il/eel/the;tè/teh/tea
+it|Il sole splende.|The sun is shining.|Il/eel/the;sole/SOH-leh/sun;splende/SPLEN-deh/shines
+it|Piove.|It is raining.|Piove/PYOH-veh/it rains
+it|Leggo un libro.|I am reading a book.|Leggo/LEG-goh/I read;un/oon/a;libro/LEE-broh/book
+it|Siamo felici.|We are happy.|Siamo/SYAH-moh/we are;felici/feh-LEE-chee/happy
+it|A domani!|See you tomorrow.|A/ah/until;domani/doh-MAH-nee/tomorrow
+it|Mi piace la musica.|I like music.|Mi/mee/to me;piace/PYAH-cheh/is pleasing;la/lah/the;musica/MOO-zee-kah/music
+it|Il gatto dorme.|The cat is sleeping.|Il/eel/the;gatto/GAHT-toh/cat;dorme/DOR-meh/sleeps
+pt|Bom dia!|Good morning!|Bom/bohn/good;dia/JEE-ah/day
+pt|Obrigado, meu amigo.|Thank you, my friend.|Obrigado/oh-bree-GAH-doo/thank you;meu/MEH-oo/my;amigo/ah-MEE-goo/friend
+pt|Eu amo a minha família.|I love my family.|Eu/EH-oo/I;amo/AH-moo/love;a/ah/the;minha/MEE-nyah/my;família/fah-MEE-lyah/family
+pt|Hoje é um dia lindo.|Today is a beautiful day.|Hoje/OH-zhee/today;é/eh/is;um/oong/a;dia/JEE-ah/day;lindo/LEEN-doo/beautiful
+pt|Estou bebendo chá.|I am drinking tea.|Estou/es-TOH/I am;bebendo/beh-BEN-doo/drinking;chá/shah/tea
+pt|O sol está brilhando.|The sun is shining.|O/oo/the;sol/sohw/sun;está/es-TAH/is;brilhando/bree-LYAN-doo/shining
+pt|Está chovendo.|It is raining.|Está/es-TAH/it is;chovendo/shoh-VEN-doo/raining
+pt|Estou lendo um livro.|I am reading a book.|Estou/es-TOH/I am;lendo/LEN-doo/reading;um/oong/a;livro/LEE-vroo/book
+pt|Nós estamos felizes.|We are happy.|Nós/nohs/we;estamos/es-TAH-moos/are;felizes/feh-LEE-zees/happy
+pt|Até amanhã!|See you tomorrow.|Até/ah-TEH/until;amanhã/ah-mah-NYAN/tomorrow
+pt|Eu gosto de música.|I like music.|Eu/EH-oo/I;gosto/GOS-too/like;de/jee/(of);música/MOO-zee-kah/music
+pt|O gato está dormindo.|The cat is sleeping.|O/oo/the;gato/GAH-too/cat;está/es-TAH/is;dormindo/dor-MEEN-doo/sleeping
+ja|おはようございます！|Good morning!|おはよう/oh-hah-yoh/good morning;ございます/goh-zai-mahs/(polite)
+ja|ありがとう、友達。|Thank you, my friend.|ありがとう/ah-ree-gah-toh/thank you;友達/toh-moh-dah-chee/friend
+ja|私は家族が大好きです。|I love my family.|私/wah-tah-shee/I;は/wah/(topic);家族/kah-zoh-koo/family;が/gah/(subject);大好き/dai-soo-kee/love;です/dess/is
+ja|今日はいい日です。|Today is a good day.|今日/kyoh/today;は/wah/(topic);いい/ee/good;日/hee/day;です/dess/is
+ja|お茶を飲んでいます。|I am drinking tea.|お茶/oh-chah/tea;を/oh/(object);飲んでいます/nohn-deh ee-mahs/am drinking
+ja|太陽が輝いています。|The sun is shining.|太陽/tai-yoh/sun;が/gah/(subject);輝いています/kah-gah-yai-teh ee-mahs/is shining
+ja|雨が降っています。|It is raining.|雨/ah-meh/rain;が/gah/(subject);降っています/foot-teh ee-mahs/is falling
+ja|本を読んでいます。|I am reading a book.|本/hohn/book;を/oh/(object);読んでいます/yohn-deh ee-mahs/am reading
+ja|私たちは幸せです。|We are happy.|私たち/wah-tah-shee-tah-chee/we;は/wah/(topic);幸せ/shee-ah-wah-seh/happy;です/dess/are
+ja|また明日！|See you tomorrow.|また/mah-tah/again;明日/ah-shee-tah/tomorrow
+ja|音楽が好きです。|I like music.|音楽/ohn-gah-koo/music;が/gah/(subject);好き/soo-kee/liked;です/dess/is
+ja|猫が寝ています。|The cat is sleeping.|猫/neh-koh/cat;が/gah/(subject);寝ています/neh-teh ee-mahs/is sleeping
+ko|좋은 아침이에요!|Good morning!|좋은/joh-eun/good;아침이에요/ah-chim-ee-eh-yoh/it's morning
+ko|고마워, 친구야.|Thank you, my friend.|고마워/goh-mah-woh/thanks;친구야/chin-goo-yah/friend!
+ko|저는 가족을 사랑해요.|I love my family.|저는/juh-neun/I;가족을/gah-jok-eul/family;사랑해요/sah-rahng-hae-yoh/love
+ko|오늘은 아름다운 날이에요.|Today is a beautiful day.|오늘은/oh-neul-eun/today;아름다운/ah-reum-dah-oon/beautiful;날이에요/nahl-ee-eh-yoh/is a day
+ko|저는 차를 마셔요.|I drink tea.|저는/juh-neun/I;차를/chah-reul/tea;마셔요/mah-shuh-yoh/drink
+ko|해가 빛나요.|The sun is shining.|해가/hae-gah/the sun;빛나요/bin-nah-yoh/shines
+ko|비가 와요.|It is raining.|비가/bee-gah/rain;와요/wah-yoh/comes
+ko|저는 책을 읽어요.|I am reading a book.|저는/juh-neun/I;책을/chaek-eul/book;읽어요/il-guh-yoh/read
+ko|우리는 행복해요.|We are happy.|우리는/oo-ree-neun/we;행복해요/haeng-bok-hae-yoh/are happy
+ko|내일 봐요!|See you tomorrow.|내일/nae-il/tomorrow;봐요/bwah-yoh/see you
+ko|저는 음악을 좋아해요.|I like music.|저는/juh-neun/I;음악을/eum-ahk-eul/music;좋아해요/joh-ah-hae-yoh/like
+ko|고양이가 자고 있어요.|The cat is sleeping.|고양이가/goh-yahng-ee-gah/the cat;자고 있어요/jah-goh ee-ssuh-yoh/is sleeping
+zh|早上好！|Good morning!|早上/zǎo-shang/morning;好/hǎo/good
+zh|谢谢你，朋友。|Thank you, my friend.|谢谢/xiè-xie/thank;你/nǐ/you;朋友/péng-you/friend
+zh|我爱我的家人。|I love my family.|我/wǒ/I;爱/ài/love;我的/wǒ-de/my;家人/jiā-rén/family
+zh|今天是美好的一天。|Today is a beautiful day.|今天/jīn-tiān/today;是/shì/is;美好的/měi-hǎo-de/beautiful;一天/yì-tiān/a day
+zh|我在喝茶。|I am drinking tea.|我/wǒ/I;在/zài/(am doing);喝/hē/drink;茶/chá/tea
+zh|阳光灿烂。|The sun is shining.|阳光/yáng-guāng/sunshine;灿烂/càn-làn/bright
+zh|下雨了。|It is raining.|下雨/xià-yǔ/rain falls;了/le/(now)
+zh|我在看书。|I am reading a book.|我/wǒ/I;在/zài/(am doing);看/kàn/read;书/shū/book
+zh|我们很开心。|We are happy.|我们/wǒ-men/we;很/hěn/very;开心/kāi-xīn/happy
+zh|明天见！|See you tomorrow.|明天/míng-tiān/tomorrow;见/jiàn/see
+zh|我喜欢音乐。|I like music.|我/wǒ/I;喜欢/xǐ-huan/like;音乐/yīn-yuè/music
+zh|猫在睡觉。|The cat is sleeping.|猫/māo/cat;在/zài/(is doing);睡觉/shuì-jiào/sleep
+ar|صباح الخير!|Good morning!|صباح/sa-BAAH/morning;الخير/al-KHAYR/(of) goodness
+ar|شكرا يا صديقي.|Thank you, my friend.|شكرا/SHUK-ran/thank you;يا/yaa/O;صديقي/sa-DEE-qee/my friend
+ar|أحب عائلتي.|I love my family.|أحب/u-HIB-bu/I love;عائلتي/AA-i-la-tee/my family
+ar|اليوم يوم جميل.|Today is a beautiful day.|اليوم/al-YAWM/today;يوم/yawm/a day;جميل/ja-MEEL/beautiful
+ar|أشرب الشاي.|I drink tea.|أشرب/ASH-rab/I drink;الشاي/ash-SHAAY/the tea
+ar|الشمس مشرقة.|The sun is shining.|الشمس/ash-SHAMS/the sun;مشرقة/mush-RI-qa/shining
+ar|إنها تمطر.|It is raining.|إنها/IN-na-haa/it;تمطر/TUM-tir/rains
+ar|أقرأ كتابا.|I am reading a book.|أقرأ/AQ-ra-u/I read;كتابا/ki-TAA-ban/a book
+ar|نحن سعداء.|We are happy.|نحن/NAH-nu/we;سعداء/su-a-DAA/happy
+ar|أراك غدا.|See you tomorrow.|أراك/a-RAA-ka/I see you;غدا/GHA-dan/tomorrow
+ar|أحب الموسيقى.|I love music.|أحب/u-HIB-bu/I love;الموسيقى/al-moo-SEE-qaa/the music
+ar|القطة نائمة.|The cat is sleeping.|القطة/al-QIT-ta/the cat;نائمة/NAA-i-ma/asleep
+tr|Günaydın!|Good morning!|Günaydın/gyu-NAI-duhn/good morning
+tr|Teşekkürler, dostum.|Thank you, my friend.|Teşekkürler/teh-shek-kyur-LER/thank you;dostum/dos-TOOM/my friend
+tr|Ailemi seviyorum.|I love my family.|Ailemi/ah-ee-leh-MEE/my family;seviyorum/seh-VEE-yo-room/I love
+tr|Bugün güzel bir gün.|Today is a beautiful day.|Bugün/boo-GYUN/today;güzel/gyu-ZEL/beautiful;bir/beer/a;gün/gyun/day
+tr|Çay içiyorum.|I am drinking tea.|Çay/chai/tea;içiyorum/ee-CHEE-yo-room/I am drinking
+tr|Güneş parlıyor.|The sun is shining.|Güneş/gyu-NESH/sun;parlıyor/par-LUH-yor/is shining
+tr|Yağmur yağıyor.|It is raining.|Yağmur/yah-MOOR/rain;yağıyor/yah-UH-yor/is falling
+tr|Kitap okuyorum.|I am reading a book.|Kitap/kee-TAHP/book;okuyorum/oh-KOO-yo-room/I am reading
+tr|Mutluyuz.|We are happy.|Mutluyuz/moot-LOO-yooz/we are happy
+tr|Yarın görüşürüz!|See you tomorrow.|Yarın/YAH-ruhn/tomorrow;görüşürüz/gyo-ryu-shyu-RYUZ/we'll see each other
+tr|Müziği severim.|I like music.|Müziği/myu-zee-YEE/music;severim/seh-veh-REEM/I like
+tr|Kedi uyuyor.|The cat is sleeping.|Kedi/keh-DEE/cat;uyuyor/oo-YOO-yor/is sleeping
+hi|सुप्रभात!|Good morning!|सुप्रभात/su-pra-BHAAT/good morning
+hi|धन्यवाद, मेरे दोस्त।|Thank you, my friend.|धन्यवाद/dhun-ya-VAAD/thank you;मेरे/MAY-ray/my;दोस्त/dost/friend
+hi|मैं अपने परिवार से प्यार करता हूँ।|I love my family.|मैं/main/I;अपने/AP-nay/my own;परिवार/pa-ri-VAAR/family;से/say/(with);प्यार करता हूँ/pyaar kar-taa hoon/love
+hi|आज एक सुंदर दिन है।|Today is a beautiful day.|आज/aaj/today;एक/ek/a;सुंदर/SUN-dar/beautiful;दिन/din/day;है/hai/is
+hi|मैं चाय पी रहा हूँ।|I am drinking tea.|मैं/main/I;चाय/chaay/tea;पी रहा हूँ/pee ra-haa hoon/am drinking
+hi|सूरज चमक रहा है।|The sun is shining.|सूरज/SOO-raj/sun;चमक रहा है/cha-mak ra-haa hai/is shining
+hi|बारिश हो रही है।|It is raining.|बारिश/BAA-rish/rain;हो रही है/ho ra-hee hai/is happening
+hi|मैं किताब पढ़ रहा हूँ।|I am reading a book.|मैं/main/I;किताब/ki-TAAB/book;पढ़ रहा हूँ/parh ra-haa hoon/am reading
+hi|हम खुश हैं।|We are happy.|हम/hum/we;खुश/khush/happy;हैं/hain/are
+hi|कल मिलते हैं!|See you tomorrow.|कल/kal/tomorrow;मिलते हैं/mil-tay hain/we meet
+hi|मुझे संगीत पसंद है।|I like music.|मुझे/MUJ-hay/to me;संगीत/san-GEET/music;पसंद है/pa-SAND hai/is liked
+hi|बिल्ली सो रही है।|The cat is sleeping.|बिल्ली/BIL-lee/cat;सो रही है/so ra-hee hai/is sleeping
+ru|Доброе утро!|Good morning!|Доброе/DOH-bruh-yeh/good;утро/OO-truh/morning
+ru|Спасибо, мой друг.|Thank you, my friend.|Спасибо/spah-SEE-buh/thank you;мой/moy/my;друг/drook/friend
+ru|Я люблю свою семью.|I love my family.|Я/yah/I;люблю/lyoo-BLYOO/love;свою/svah-YOO/my own;семью/syem-YOO/family
+ru|Сегодня прекрасный день.|Today is a beautiful day.|Сегодня/syeh-VOD-nyah/today;прекрасный/preh-KRAHS-nihy/beautiful;день/dyen/day
+ru|Я пью чай.|I am drinking tea.|Я/yah/I;пью/pyoo/drink;чай/chai/tea
+ru|Светит солнце.|The sun is shining.|Светит/SVYEH-teet/shines;солнце/SOHN-tseh/sun
+ru|Идёт дождь.|It is raining.|Идёт/ee-DYOT/is going;дождь/dohsht/rain
+ru|Я читаю книгу.|I am reading a book.|Я/yah/I;читаю/chee-TAH-yoo/read;книгу/KNEE-goo/book
+ru|Мы счастливы.|We are happy.|Мы/mih/we;счастливы/SHCHAS-lee-vih/happy
+ru|До завтра!|See you tomorrow.|До/dah/until;завтра/ZAHF-trah/tomorrow
+ru|Я люблю музыку.|I love music.|Я/yah/I;люблю/lyoo-BLYOO/love;музыку/MOO-zih-koo/music
+ru|Кошка спит.|The cat is sleeping.|Кошка/KOSH-kah/cat;спит/speet/sleeps
+sw|Habari ya asubuhi!|Good morning!|Habari/hah-BAH-ree/news;ya/yah/of;asubuhi/ah-soo-BOO-hee/morning
+sw|Asante, rafiki yangu.|Thank you, my friend.|Asante/ah-SAHN-teh/thank you;rafiki/rah-FEE-kee/friend;yangu/YAHN-goo/my
+sw|Ninaipenda familia yangu.|I love my family.|Ninaipenda/nee-nah-ee-PEN-dah/I love it;familia/fah-MEE-lee-ah/family;yangu/YAHN-goo/my
+sw|Leo ni siku nzuri.|Today is a beautiful day.|Leo/LEH-oh/today;ni/nee/is;siku/SEE-koo/day;nzuri/n-ZOO-ree/beautiful
+sw|Ninakunywa chai.|I am drinking tea.|Ninakunywa/nee-nah-KOON-ywah/I am drinking;chai/chai/tea
+sw|Jua linawaka.|The sun is shining.|Jua/JOO-ah/sun;linawaka/lee-nah-WAH-kah/is shining
+sw|Mvua inanyesha.|It is raining.|Mvua/m-VOO-ah/rain;inanyesha/ee-nah-NYEH-shah/is falling
+sw|Ninasoma kitabu.|I am reading a book.|Ninasoma/nee-nah-SOH-mah/I am reading;kitabu/kee-TAH-boo/book
+sw|Tuna furaha.|We are happy.|Tuna/TOO-nah/we have;furaha/foo-RAH-hah/happiness
+sw|Tutaonana kesho!|See you tomorrow.|Tutaonana/too-tah-oh-NAH-nah/we will see each other;kesho/KEH-shoh/tomorrow
+sw|Ninapenda muziki.|I like music.|Ninapenda/nee-nah-PEN-dah/I like;muziki/moo-ZEE-kee/music
+sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has fallen asleep`.split('\n').forEach((line) => { const [k, nat, en, toks] = line.split('|'); (SENTS[k] || (SENTS[k] = [])).push({ nat, en, toks: toks.split(';').map((t) => t.split('/')) }); });
+  function sparkSet() { const S = state.sparkSet || (state.sparkSet = {}); if (!Array.isArray(S.langs)) S.langs = []; if (!S.show) S.show = { quote: true, word: true, fact: true }; return S; }
+  function deckNext(key, n) {
+    const D = state.sparkDeck || (state.sparkDeck = {}); let d = D[key];
+    if (!Array.isArray(d) || !d.length || d.some((x) => x >= n)) { d = [...Array(n).keys()]; for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; } D[key] = d; }
+    return d.pop();
+  }
   function nextSpark() {
-    const kinds = ['quote', 'word', 'fact'], n = (state.sparkN = (state.sparkN | 0) + 1), kind = kinds[n % 3];
-    const list = SPARKS[kind], i = Math.floor(n / 3 * 7 + (kind === 'word' ? 3 : kind === 'fact' ? 5 : 0)) % list.length;
-    ui.spark = { kind, i };
+    const S = sparkSet(), kinds = ['quote', 'word', 'fact'].filter((k) => S.show[k]); if (!kinds.length) kinds.push('word');
+    const n = (state.sparkN = (state.sparkN | 0) + 1), kind = kinds[n % kinds.length];
+    ui.sparkAt = Date.now();
+    if (kind === 'word' && S.langs.length === 1 && SENTS[S.langs[0]]) { const L = S.langs[0]; ui.spark = { kind: 'sent', lang: L, i: deckNext('s_' + L, SENTS[L].length) }; return; }
+    ui.spark = { kind, i: deckNext(kind, (kind === 'word' ? WORDS : SPARKS[kind]).length) };
   }
   function sparkCard() {
-    if (!ui.spark) nextSpark();
-    const { kind, i } = ui.spark, card = el('div', 'spark k-' + kind);
-    const head = el('div', 'sp-head'); head.append(el('span', 'sp-kind', kind === 'quote' ? 'A thought for today' : kind === 'word' ? 'A word, around the world' : 'Did you know?'));
-    const again = el('button', 'sp-again', '↻'); again.type = 'button'; again.setAttribute('aria-label', 'Show another'); again.addEventListener('click', () => { nextSpark(); save(); renderBanner(); }); head.append(again);
-    card.append(head);
+    if (!ui.spark || (ui.spark.kind === 'word' && !WORDS[ui.spark.i])) nextSpark();
+    const S = sparkSet(), { kind, i } = ui.spark, card = el('div', 'spark k-' + kind);
+    const head = el('div', 'sp-head');
+    head.append(el('span', 'sp-kind', kind === 'quote' ? 'A thought for today' : kind === 'word' ? 'A word, around the world' : kind === 'sent' ? `A sentence in ${LANG_NAME[ui.spark.lang]}` : 'Did you know?'));
+    const tools = el('div', 'sp-tools');
+    const set = el('button', 'sp-btn', ''); set.type = 'button'; set.setAttribute('aria-label', 'Settings'); set.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>'; set.addEventListener('click', openSparkSettings);
+    const auto = el('button', 'sp-btn' + (S.auto ? ' on' : ''), ''); auto.type = 'button'; auto.setAttribute('aria-label', S.auto ? 'Stop auto-play' : 'Auto-play'); auto.innerHTML = S.auto ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
+    auto.addEventListener('click', () => { S.auto = !S.auto; ui.sparkAt = Date.now(); save(); renderBanner(true); toast(S.auto ? 'Auto-play on: a new card every 12 seconds.' : 'Auto-play off.'); });
+    const again = el('button', 'sp-btn sp-again', '↻'); again.type = 'button'; again.setAttribute('aria-label', 'Show another'); again.addEventListener('click', () => { nextSpark(); save(); renderBanner(); });
+    tools.append(set, auto, again); head.append(tools); card.append(head);
     if (kind === 'quote') { const q = SPARKS.quote[i]; card.append(el('div', 'sp-quote', `“${q[0]}”`), el('div', 'sp-by', `— ${q[1]}`)); }
     else if (kind === 'word') {
-      const [w, tr0] = SPARKS.word[i]; card.append(el('div', 'sp-word', w));
-      const g = el('div', 'sp-langs'), off = (state.sparkN | 0) % (tr0.length - 1), tr = [tr0[0]].concat([0, 1, 2].map((k) => tr0[1 + (off + k * 2) % (tr0.length - 1)]));
-      for (const [lang, word, say] of tr) { const it = el('div', 'sp-lang'); it.append(el('b', '', word), el('i', '', say || ''), el('small', '', lang)); g.append(it); }
+      const w = WORDS[i]; card.append(el('div', 'sp-word', w.en));
+      let langs = S.langs.length >= 2 ? S.langs.slice(0, 4) : null;
+      if (!langs) { const rest = LANGS.map(([k]) => k).filter((k) => k !== 'fa'), off = ((state.sparkN | 0) * 3) % rest.length; langs = ['fa'].concat([0, 1, 2].map((k) => rest[(off + k * 4) % rest.length])); }
+      const g = el('div', 'sp-langs');
+      for (const L of langs) { const [word, say] = w.t[L] || ['', '']; const it = el('div', 'sp-lang'); const wb = el('b', '', word); if (RTL_LANG[L]) wb.dir = 'rtl'; it.append(wb, el('i', '', say || ''), el('small', '', LANG_NAME[L])); g.append(it); }
       card.append(g);
+    } else if (kind === 'sent') {
+      const L = ui.spark.lang, x = SENTS[L][i];
+      const nat = el('div', 'sp-sent', x.nat); if (RTL_LANG[L]) nat.dir = 'rtl'; card.append(nat);
+      const tk = el('div', 'sp-toks'); if (RTL_LANG[L]) tk.dir = 'rtl';
+      for (const [w, say, gl] of x.toks) { const t = el('div', 'sp-tok'); t.append(el('b', '', w), el('i', '', say), el('small', '', gl)); tk.append(t); }
+      card.append(tk, el('div', 'sp-tr', x.en));
     } else card.append(el('div', 'sp-fact', SPARKS.fact[i]));
-    const qs = activeQuests();
-    if (qs.length) { const rq = el('button', 'link sp-req', `Town requests (${qs.length})`); rq.addEventListener('click', openRequests); card.append(rq); }
     return card;
+  }
+  // The spark settings (10.08): what to show, which languages, auto-play.
+  function openSparkSettings() {
+    const S = sparkSet(), wrap = el('div', 'stack');
+    const render = () => {
+      wrap.replaceChildren();
+      wrap.append(el('h3', 'plan-h', 'Show on Home'));
+      const kr = el('div', 'sp-chips');
+      for (const [k, label] of [['quote', 'Thoughts'], ['word', 'Words'], ['fact', 'Did you know?']]) { const b = el('button', 'chip' + (S.show[k] ? ' on' : ''), label); b.type = 'button'; b.addEventListener('click', () => { S.show[k] = !S.show[k]; if (!S.show.quote && !S.show.word && !S.show.fact) S.show[k] = true; save(); render(); }); kr.append(b); }
+      wrap.append(kr);
+      wrap.append(el('h3', 'plan-h', 'Languages'));
+      wrap.append(el('p', 'small muted', S.langs.length === 1 ? `Learning ${LANG_NAME[S.langs[0]]}: you get short sentences with every word explained.` : S.langs.length ? `Each word in ${S.langs.map((k) => LANG_NAME[k]).join(', ')}.` : 'Pick one language to learn it with short sentences (every word explained), or up to four to see each word in all of them. With none picked you get a mix, Persian first.'));
+      const lr = el('div', 'sp-chips');
+      for (const [k, name] of LANGS) { const on = S.langs.includes(k), b = el('button', 'chip' + (on ? ' on' : ''), name); b.type = 'button'; b.addEventListener('click', () => { if (on) S.langs = S.langs.filter((x) => x !== k); else if (S.langs.length >= 4) { toast('Up to four languages: there is room for four words.'); return; } else S.langs = S.langs.concat([k]); save(); render(); }); lr.append(b); }
+      wrap.append(lr);
+      wrap.append(switchRow('Auto-play', 'A new card every 12 seconds while you are on Home.', 'set-sp-auto', !!S.auto, (v) => { S.auto = v; ui.sparkAt = Date.now(); save(); }));
+      const done = el('button', 'btn primary full', 'Done'); done.addEventListener('click', () => { closeSheet(); if (S.show.word && ui.spark && (ui.spark.kind === 'word' || ui.spark.kind === 'sent')) nextSpark(); renderBanner(true); }); wrap.append(done);
+    };
+    render();
+    openSheet('Home card', wrap);
   }
 
   /* ---------- A cheerful welcome when you open the app (10.04): your town, your name, a line for the time of day,
@@ -6144,8 +6693,10 @@
       setTimeout(() => { ov.hidden = true; ov.classList.remove('on', 'go', 'out'); burst.replaceChildren(); }, reduced ? 650 : 2000);
     };
   }
-  function renderBanner() {
+  const sparkKey = () => (ui.spark ? `${ui.spark.kind}${ui.spark.lang || ''}${ui.spark.i}` : '');
+  function renderBanner(force) {
     const ban = $('banner'), pillEl = $('reqpill');
+    if (force) ban.dataset.spark = '';
     const qs = activeQuests();
     let showBanner = false, showPill = false;
     if (!state.session && qs.length) {
@@ -6159,7 +6710,7 @@
           showPill = true;
         }
       } else if (!q.alert) {
-        if (!ban.querySelector('.spark') || ban.dataset.spark !== `${ui.spark && ui.spark.kind}${ui.spark && ui.spark.i}:${qs.length}`) { ban.replaceChildren(sparkCard()); ban.dataset.spark = `${ui.spark.kind}${ui.spark.i}:${qs.length}`; }
+        if (!ban.querySelector('.spark') || ban.dataset.spark !== sparkKey()) { ban.replaceChildren(sparkCard()); ban.dataset.spark = sparkKey(); }
         ban.classList.remove('alert'); ban.classList.add('sparky');
         showBanner = true;
       } else {
@@ -6177,7 +6728,7 @@
       }
     }
     if (!showBanner && !state.session && ui.screen !== 'play') {
-      if (!ban.querySelector('.spark')) { ban.replaceChildren(sparkCard()); ban.dataset.spark = `${ui.spark.kind}${ui.spark.i}:0`; }
+      if (!ban.querySelector('.spark') || ban.dataset.spark !== sparkKey()) { ban.replaceChildren(sparkCard()); ban.dataset.spark = sparkKey(); }
       ban.classList.remove('alert'); ban.classList.add('sparky'); showBanner = true;
     }
     if (ban.hidden === showBanner) ban.hidden = !showBanner;
@@ -6283,6 +6834,7 @@
       if (p.kind === 'info') renderInfoPanel(box, byId(p.bid));
       else if (p.kind === 'build') renderBuildPanel(box, p);
       else if (p.kind === 'place') renderPlacePanel(box);
+      else if (p.kind === 'attach') renderAttachPanel(box);
       else if (p.kind === 'alert') renderAlertPanel(box, byId(p.bid));
       else if (p.kind === 'land') renderLandPanel(box, p.plot);
     }
@@ -6331,14 +6883,14 @@
     const row = el('div', 'staff vehrow' + (b.vehicle ? '' : ' off'));
     row.append(vehIcon(f.kind === 'fire' ? 'fire' : f.kind === 'police' ? 'police' : f.kind));
     const tx = el('div'); tx.append(el('b', '', f.name));
-    const faster = ['firestation', 'police', 'clinic'].includes(b.type) ? ' They get there much faster than on foot.' : '';
+    const faster = ['firestation', 'police', 'clinic', 'hospital'].includes(b.type) ? ' They get there much faster than on foot.' : '';
     const br = baseReach(b.type, b.level);
     tx.append(el('small', '', b.vehicle ? `On duty. Reach ${stationReach(b)} tiles instead of ${br}.${faster}` : `Without it your ${STAFF[t.staff].plural} go on foot: slow, and only ${br} tiles. With it: ${Math.round(br * 1.5)} tiles.${faster}`));
     tx.append(el('span', 'fee', b.vehicle ? `Upkeep ${f.upkeep} gold an hour` : `${f.cost} gold, then ${f.upkeep} gold an hour`));
     row.append(tx);
     const stp = el('div', 'stepper');
     if (b.vehicle) { const sv = el('button', 'btn sm', `Sell · +${Math.round(f.cost / 2)}`); sv.disabled = !playing; sv.addEventListener('click', () => { sellVehicle(b.id); renderPanel(); }); stp.append(sv); }
-    else { const bv = el('button', 'btn sm ' + (b.level >= 2 && state.gold + 1e-6 >= f.cost ? 'playc' : ''), 'Buy'); bv.disabled = b.level < 2 || state.gold + 1e-6 < f.cost || !playing; bv.addEventListener('click', () => { buyVehicle(b.id); renderPanel(); }); stp.append(bv); }
+    else { const bv = el('button', 'btn sm ' + (b.level >= vehLevel(b.type) && state.gold + 1e-6 >= f.cost ? 'playc' : ''), 'Buy'); bv.disabled = b.level < vehLevel(b.type) || state.gold + 1e-6 < f.cost || !playing; bv.addEventListener('click', () => { buyVehicle(b.id); renderPanel(); }); stp.append(bv); }
     row.append(stp);
     const why = b.vehicle ? null : b.level < 2 ? `Needs the ${t.name.toLowerCase()} at level 2 (a garage).` : !playing ? 'Buy it during play time.' : state.gold + 1e-6 < f.cost ? `You need ${fmtGold(f.cost - state.gold + 0.999)} more gold.` : null;
     if (why) { const n = el('div', 'staffnotes'); n.style.gridColumn = '1 / -1'; n.append(el('div', 'snote', why)); row.append(n); }
@@ -6385,7 +6937,7 @@
       if (q) up.append(el('span', 'tiny', bigQ(q) ? `Upgrade in ${state.builder}'s plan · ${fmtMin(exactMinutes(q.work - q.done))} of focus left` : 'Being worked on'));
       else if (chk.max) up.append(el('span', 'tiny muted', 'Fully upgraded.'));
       else {
-        up.append(el('span', 'tiny', `Level ${b.level + 1}: ${chk.cost} gold and ${fmtMin(chk.work)} of focus${t.slots ? ` · room for ${t.slots[b.level + 1]}` : ''}${FLEET[b.type] && b.level + 1 === 2 ? ', and a vehicle' : ''}`));
+        up.append(el('span', 'tiny', `Level ${b.level + 1}: ${chk.cost} gold and ${fmtMin(chk.work)} of focus${t.slots ? ` · room for ${t.slots[b.level + 1]}` : ''}${FLEET[b.type] && b.level + 1 === vehLevel(b.type) ? ', and a vehicle' : ''}`));
         const asked = ui.svcAsk === b.id;
         const ub = el('button', 'btn sm ' + (asked ? 'primary' : ''), asked ? `Confirm · ${chk.cost} gold` : 'Upgrade'); ub.disabled = !chk.ok && !asked;
         ub.addEventListener('click', () => { if (!asked) { ui.svcAsk = b.id; refreshStaffViews(true); return; } ui.svcAsk = null; if (planJob('upgrade', b.id)) { refreshStaffViews(true); renderAll(); } });
@@ -6409,12 +6961,14 @@
     const chips = [];
     if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast(fireStatus(b) + '.'); else openPanel({ kind: 'alert', bid: b.id }); }));
     if (b.robbed) chips.push(fixPill('Break-in!', () => { if (staffWorking('police') >= 1) toast(robberyStatus(b) + '.'); else staffAction('police', b); }));
-    if (b.sick) chips.push(fixPill(T(b).staff ? 'Staff off sick' : 'Sick: pays nothing', () => { if (responderFor('nurse', b)) toast(sickStatus(b) + '.'); else staffAction('nurse', b); }));
+    if (b.sick) chips.push(fixPill(T(b).staff ? 'Staff off sick' : b.sick.serious ? 'Very sick' : b.sick.phase ? 'Getting better' : 'Sick: pays nothing', () => { if (b.sick.serious && !carerFor(b)) { toast(seriousHelp(b)); return; } if (responderFor('nurse', b) || b.sick.phase) toast(sickStatus(b) + '.'); else staffAction('nurse', b); }));
+    if (b.loss) chips.push(countLive('cemetery') ? pill('In mourning', 'bad') : fixPill('In mourning', () => { if (!startPlacing('cemetery')) toast('A cemetery would help the family say goodbye. ' + (checkNew('cemetery').why || '')); }));
     if (b.site) chips.push(pill('Construction site', 'gold'));
     else if (b.burnt) chips.push(pill(b.burnt.health ? `Burned · ${b.burnt.health}% left` : 'Burned down', 'bad'));
     else if (b.ruin) chips.push(pill('Broken', 'bad'));
     else if (t.cat === 'landmark') chips.push(pill('Landmark', 'gold'));
     else if (t.cat !== 'decor' && !special(t)) chips.push(pill(`Level ${b.level}`));
+    { const bn = bNet(b, inf, mood); if (live(b) && Math.abs(bn.net) >= 0.5) { const mc = el('button', 'pill money ' + (bn.net >= 0 ? 'gold' : 'bad'), `${bn.net >= 0 ? '+' : '−'}${Math.abs(Math.round(bn.net))} gold/h`); mc.type = 'button'; mc.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); chips.push(mc); } }
     const myJob = jobAt(b), isMine = !!(myJob && currentJob() && currentJob().bid === b.id);
     if (isMine) chips.push(pill('Your job', 'play'));
     const ru = live(b) && t.cat === 'shop' ? rushFor(b.type) : null;
@@ -6525,10 +7079,17 @@
     if (type === 'bin') out.push('Trash piles up 40% slower within 2 tiles');
     if (type === 'school') out.push('With a teacher, homes within reach earn 12% more');
     if (type === 'police') out.push(`Cells for ${[0, 2, 4][L] || 4} thieves (each costs ${JAIL_COST} gold an hour)`);
-    if (FLEET[type]) out.push(`From level 2: a ${FLEET[type].name.toLowerCase()} for half again the reach${['firestation', 'police', 'clinic'].includes(type) ? ' and much faster help' : ''}`);
+    if (FLEET[type]) out.push(`${vehLevel(type) > 1 ? 'From level 2: a' : 'Can have a'} ${FLEET[type].name.toLowerCase()} for half again the reach${['firestation', 'police', 'clinic', 'hospital'].includes(type) ? ' and much faster help' : ''}`);
     if (FIRE_RISK[type]) out.push('Catches fire more easily than most (ovens, machines)');
     if (t.cat === 'landmark' && t.perk) out.push(`Town bonus: ${t.perk}`);
     return out;
+  }
+  // What a building earns or costs an hour, all in (10.08: also shown next to its level on the card).
+  function bNet(b, inf, mood) {
+    const t = T(b); inf = inf || city().info.get(b.id) || {}; mood = mood || econ().mood;
+    const sc = isServiceType(b.type) ? serviceCost(b) : null, cost = sc ? sc.running + sc.wages + sc.fleet : 0;
+    const inc = live(b) ? (inf.income || 0) * (t.cat === 'home' || t.cat === 'shop' ? mood.mult : 1) : 0;
+    return { sc, inc, cost, net: inc - cost };
   }
   // The Report tab (10.05): what it is (one sentence), its money in and out, its state right now, and what's special.
   function renderReportTab(box, b, reqs, inf, mood, myJob) {
@@ -6538,13 +7099,12 @@
     if (b.site) { box.append(el('p', 'small', `${q && bigQ(q) ? `A focus project: ${state.builder} builds it while you focus.` : 'The crew builds it while you play (and while you focus).'} ${q && q.done > 0 ? `${Math.round(q.done / q.work * 100)}% done.` : 'Not started yet.'}`)); return; }
     if (b.burnt) { const p0 = el('p', 'small'); p0.append(colorize(`${b.burnt.health ? `Badly burned (${b.burnt.health}% left), so it is closed.` : 'Burned down to the ground.'}${b.resident ? ` ${b.resident} is staying with friends until it is fixed.` : ''} The repair costs ${burnRepairCost(b)} gold (more the worse the damage).`)); box.append(p0); return; }
     if (b.ruin) { box.append(el('p', 'small', `Broken and empty.${b.resident ? ` ${b.resident} is waiting to move back in.` : ''}`)); return; }
-    const sc = isServiceType(b.type) ? serviceCost(b) : null, cost = sc ? sc.running + sc.wages + sc.fleet : 0;
-    const inc = live(b) ? (inf.income || 0) * (t.cat === 'home' || t.cat === 'shop' ? mood.mult : 1) : 0, net = inc - cost;
+    const { sc, inc, cost, net } = bNet(b, inf, mood);
     // the facts at a glance
     const grid = el('div', 'rp-grid');
     const cell = (k, v, cls) => { const d = el('div', 'rp-cell'); d.append(el('small', '', k), el('b', cls || '', v)); grid.append(d); };
     if (t.cat !== 'decor' && !special(t) && t.cat !== 'landmark') cell('Level', `${b.level} of ${t.max}`);
-    cell('Size', `${t.size || 1}×${t.size || 1}`);
+    cell('Size', dimsB(b).join('×'));
     if (t.cat === 'home') cell('Residents', String(inf.residents || 0));
     if (t.cat === 'shop') cell('Customers', `${inf.near || 0} home${inf.near === 1 ? '' : 's'}`);
     if (t.staff) cell('Staff', `${sc.staff} of ${t.slots[b.level] || 0}`);
@@ -6590,7 +7150,7 @@
     if (b.fire) bad('On fire', `${Math.round(healthOf(b))}% left`);
     if (b.health != null && b.health < 100 && !b.fire && !b.burnt) bad('Scorched by a fire', `${Math.round(b.health)}%, fixing itself`);
     if (b.robbed) bad('Break-in', `${b.robbed.stolen} gold taken`);
-    if (b.sick) bad('Sick', T(b).staff ? `${staffName(b)} is off sick: one ${STAFF[T(b).staff].name.toLowerCase()} fewer until a nurse comes` : 'pays nothing until a nurse comes');
+    if (b.sick) bad('Sick', T(b).staff ? `${staffName(b)} is off sick, so one ${STAFF[T(b).staff].name.toLowerCase()} fewer is on duty until they get better` : 'pays nothing until they get better');
     if (messy(b) && (b.trash || 0) >= 0.5) bad('Trash outside', 'the neighbours mind');
     if (b.type === 'park' && (b.overgrown || 0) > 0.3) bad('Overgrown', `helps ${Math.round(b.overgrown * 60)}% less`);
     if (live(b) && T(b).cat === 'home' && roleInfo('police', city()).needed && !coversB('police', b)) bad('Out of police reach', 'break-ins cost more');
@@ -6599,6 +7159,11 @@
     // what is special about it
     const sp = specialFacts(b.type, b.level);
     if (sp.length) { const ul = el('ul', 'does'); for (const x of sp) { const li = el('li'); li.append(colorize(x)); ul.append(li); } box.append(el('h4', 'rp-h', 'Special'), ul); }
+    if (b.addons) {
+      const ul = el('ul', 'does');
+      for (const k of Object.keys(b.addons)) { const li = el('li'); li.append(colorize(`${TYPES[k].name}: ${k === 'hydrant' ? 'fires start half as often within 2 tiles' : k === 'bin' ? 'trash piles up 40% slower within 2 tiles' : 'homes next to it pay 4% more, and fewer break-ins at night'} `)); const rm = el('button', 'link', 'Take down'); rm.addEventListener('click', () => removeAddon(b, k)); li.append(rm); ul.append(li); }
+      box.append(el('h4', 'rp-h', 'Beside it'), ul);
+    }
     // the next level
     if (t.cat !== 'decor' && t.cat !== 'civic' && t.cat !== 'landmark' && !special(t) && b.level < t.max && !q) {
       const g = levelGain(b), chk = checkJob('upgrade', b), mode = jobMode('upgrade', b.type);
@@ -6709,6 +7274,7 @@
         const ok = !locked && !capped && fitsHere && money;
         const d = deltaAt(type, p.c, p.r);
         const why = locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : !fitsHere ? 'This spot is taken.' : !money ? `Needs ${fmtGold(t.cost - state.gold + 0.999)} more gold.` : '';
+        if (ADDON[type]) { const okA = !locked && !capped && money; card(type, okA ? '' : 'off', () => { if (okA) startAttach(type); else toast(locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : `Needs ${fmtGold(t.cost - state.gold + 0.999)} more gold.`); }, [goldLine(t.cost), el('span', '', 'beside a building')], locked ? `Town hall ${t.unlock}` : type === 'hydrant' ? 'Fewer fires nearby' : type === 'bin' ? 'Less trash nearby' : '+4% next door, safer at night', locked ? 'lock' : 'pos', locked ? '' : capLabel(type)); continue; }
         card(type, ok ? '' : 'off', () => { if (ok) placeDecor(type, p.c, p.r); else toast(why); }, [goldLine(t.cost), el('span', '', 'instant')], locked ? `Town hall ${t.unlock}` : d != null && d >= 0.5 ? `+${Math.round(d)} gold/h here` : '+5% next door', locked ? 'lock' : 'pos', locked ? '' : capLabel(type));
       }
     } else {
@@ -6828,7 +7394,7 @@
     if (type === 'hydrant') out.push('Fires start half as often within 2 tiles, and firefighters put them out faster there');
     if (type === 'bin') out.push('Trash piles up 40% slower within 2 tiles');
     if (type === 'school') out.push('With a teacher, homes within reach earn 12% more');
-    if (FLEET[type]) out.push(`From level 2 it can have a ${FLEET[type].name.toLowerCase()}: half again the reach${['firestation', 'police', 'clinic'].includes(type) ? ', and help arrives much faster' : ''}`);
+    if (FLEET[type]) out.push(`${vehLevel(type) > 1 ? 'From level 2 it can have' : 'It can have'} a ${FLEET[type].name.toLowerCase()}: half again the reach${['firestation', 'police', 'clinic', 'hospital'].includes(type) ? ', and help arrives much faster' : ''}${type === 'hospital' || type === 'clinic' ? '. Very sick patients need one to get to hospital care' : ''}`);
     if (FIRE_RISK[type]) out.push('Catches fire more easily than most (ovens, machines)');
     return out;
   }
@@ -6840,6 +7406,13 @@
     else if (t.cat === 'home') f.unshift(`${t.residents[level || 1]} residents, each paying ${g1(HOME_TAX)} gold an hour`);
     if (f.length) { const ul = el('ul', 'does'); for (const x of f.slice(0, max || 8)) { const li = el('li'); li.append(colorize(x)); ul.append(li); } box.append(ul); }
     return box;
+  }
+  function renderAttachPanel(box) {
+    const k = ui.attach && ui.attach.type; if (!k) { ui.panel = null; return; }
+    const t = TYPES[k];
+    box.append(panelHead(k, 1, {}, `Put up a ${t.name.toLowerCase()}`, [pill(`${t.cost} gold`, 'gold')]));
+    box.append(el('p', 'small', `Tap a building to put it beside. It doesn't take a tile. ${k === 'hydrant' ? 'Fires start half as often within 2 tiles of it.' : k === 'bin' ? 'Trash piles up 40% slower within 2 tiles of it.' : 'Homes next to it pay 4% more, and the street feels safer at night.'}`));
+    const grid = el('div', 'actions-grid'); grid.append(actionBtn('Cancel', null, '', () => { ui.attach = null; ui.panel = null; renderAll(); })); box.append(grid);
   }
   function renderPlacePanel(box) {
     const item = heldItem(); if (!item || !ui.preview) { ui.panel = null; return; }
@@ -7101,7 +7674,7 @@
       staff: Object.assign(noStaff(), snap.staff || {}), flags: { tourDone: true, fireSeen: true } });
     vs.streak.count = snap.streak | 0;
     let nid = 1;
-    vs.buildings = snap.b.filter((x) => Array.isArray(x) && TYPES[x[0]]).map((x) => ({ id: nid++, type: x[0], c: clamp(x[1] | 0, 0, N - 1), r: clamp(x[2] | 0, 0, N - 1), level: clamp(x[3] | 0, 1, TYPES[x[0]].max || 1), ruin: !!(x[4] & 1), site: !!(x[4] & 2), origin: 'built', rot: x[5] ? 1 : 0, fp6: true, fp1: FOOT[x[0]] && x[5] == null ? true : undefined }));
+    vs.buildings = snap.b.filter((x) => Array.isArray(x) && TYPES[x[0]]).map((x) => ({ id: nid++, type: x[0], c: clamp(x[1] | 0, 0, N - 1), r: clamp(x[2] | 0, 0, N - 1), level: clamp(x[3] | 0, 1, TYPES[x[0]].max || 1), ruin: !!(x[4] & 1), site: !!(x[4] & 2), origin: 'built', rot: x[5] ? 1 : 0, fp8: true, fp1: FOOT[x[0]] && x[5] == null ? true : undefined }));
     if (!vs.buildings.some((b) => b.type === 'townhall')) vs.buildings.unshift({ id: nid++, type: 'townhall', c: 5, r: 5, level: 1 });
     for (const b of vs.buildings) if (TYPES[b.type].cat === 'home') b.resident = NAMES[b.id % NAMES.length];
     closeSheet(); closePanel(true); setHolding(null);
@@ -8241,7 +8814,10 @@
       b.style.setProperty('--g', Math.round(g * 100) + '%'); b.style.setProperty('--gs', (g * 5).toFixed(1) + 'px');
       b.setAttribute('aria-pressed', String(startPick.duration === d));
       b.append(el('b', '', shortMin(d)));
-      const gl = el('span', 'gold'); gl.append(coinEl(), `+${fmtGold(pv.gold)}`); b.append(gl);
+      const gl = el('span', 'gold'); gl.append(coinEl());
+      // 10.08: with a combo, the normal amount is crossed out and the combo amount shown next to it
+      if (pv.combo > 1.001 && pv.gold - pv.goldBase >= 1) { gl.append(el('s', 'was', `+${fmtGold(pv.goldBase)}`), el('span', 'cmb', `+${fmtGold(pv.gold)}`)); } else gl.append(`+${fmtGold(pv.gold)}`);
+      b.append(gl);
       let note = '', nc = '';
       if (pv.unfinished) { note = `−${pv.unfinished}`; nc = 'minus'; }
       else if (d === exact) { note = '✓ all'; nc = 'all'; }
@@ -8331,7 +8907,7 @@
       { k: 'help', title: 'Help', sub: 'Why this app, play-time limits, the quick tour', page: helpPage },
       { k: 'about', title: 'About', sub: `Version ${APP_VERSION} · music credits · rate us`, page: aboutPage },
       { k: 'testing', title: 'Testing', sub: 'Test speed, extra play time and gold, restart', page: testPage }
-    ];
+    ].filter((m) => m.k !== 'testing' || devOn());
   }
   function openMenu() {
     const wrap = el('div', 'mtiles');
@@ -8344,9 +8920,24 @@
       b.addEventListener('click', () => openMenuPage(m.k));
       wrap.append(b);
     }
-    wrap.append(el('p', 'tiny muted mver', `Maplewick ${APP_VERSION}`));
+    const ver = el('p', 'tiny muted mver', `Maplewick ${APP_VERSION}`); wrap.append(ver);
+    // 10.08: Testing is only for Navid. Tap the version 7 times and enter the code to unlock it on this phone.
+    let taps = 0, tapT = 0; ver.addEventListener('click', () => { const t = Date.now(); taps = t - tapT < 900 ? taps + 1 : 1; tapT = t; if (taps >= 7 && !devOn()) { taps = 0; openDevUnlock(); } });
     openSheet('Menu', wrap, { full: false });
     $('sheet').dataset.kind = 'menu';
+  }
+  // Testing tools are hidden unless this phone was unlocked with Navid's code (or it's the private copy inside Claude).
+  const DEV_HASH = 'd04c591fd7cdfc600297101e43c0d412d358de4647049d6125e5ee2d90823b59';
+  function devOn() { return !!(state.flags && state.flags.dev) || inFrame || !!navigator.webdriver; }
+  async function sha256hex(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
+  function openDevUnlock() {
+    const wrap = el('div', 'stack');
+    wrap.append(el('p', 'small', 'For the developer only. Enter the code to show the Testing tools on this phone.'));
+    const inp = el('input'); inp.type = 'password'; inp.autocomplete = 'off'; inp.className = 'codebox'; inp.style.width = '100%'; inp.placeholder = 'Code';
+    const go = el('button', 'btn primary full', 'Unlock');
+    go.addEventListener('click', async () => { let h = ''; try { h = await sha256hex(inp.value.trim()); } catch (e) { toast('This browser can\'t check the code here.'); return; } if (h === DEV_HASH) { state.flags.dev = true; save(); closeSheet(); toast('Testing unlocked on this phone.'); openMenu(); } else { toast('That is not the code.'); inp.value = ''; } });
+    wrap.append(inp, go);
+    openSheet('Developer', wrap);
   }
   function openMenuPage(k) {
     const m = menuSections().find((x) => x.k === k); if (!m) return;
@@ -8642,7 +9233,7 @@
 
   /* ---------- Focus screen: the building rises while you work ---------- */
   const scene = $('focus-scene'), sctx = scene.getContext('2d');
-  const sceneFx = []; let sceneLast = 0, lastHit = 0;
+  const sceneFx = []; let sceneLast = 0, lastHit = 0, sceneJ = 0;
   function showFocus() {
     $('toast').hidden = true; $('focus').hidden = false; ui.overlay = 'focus';
     const test = state.speed > 1;
@@ -8734,17 +9325,21 @@
         }
       } else if (now - lastHit > 1300) {
         lastHit = now;
-        sceneFx.push({ x: x + (Math.random() - 0.5) * hw * 0.6, y: y - hw * 0.9, vx: 0, vy: -22, life: 0, max: 1.4, coin: true });
+        // 10.08: your job earns gold and play time, so both float up (play more often at play-heavy jobs)
+        sceneJ = (sceneJ | 0) + 1;
+        const playOdds = clamp(0.3 * (f.job && f.job.play ? f.job.play : 1), 0.2, 0.6), isPlay = playLeftToday() > 0 && Math.random() < playOdds;
+        sceneFx.push({ x: x + (Math.random() - 0.5) * hw * 0.6, y: y - hw * 0.9, vx: 0, vy: -22, life: 0, max: 1.4, coin: !isPlay, play: isPlay });
       }
     }
     for (let i = sceneFx.length - 1; i >= 0; i--) {
       const p = sceneFx[i]; p.life += dt;
       if (p.life > p.max) { sceneFx.splice(i, 1); continue; }
       const k = p.life / p.max;
-      if (!p.puff && !p.coin) p.vy += 220 * dt;
+      if (!p.puff && !p.coin && !p.play) p.vy += 220 * dt;
       p.x += p.vx * dt; p.y += p.vy * dt;
       c.globalAlpha = 1 - k;
-      if (p.coin) { c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(p.x, p.y, 5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFE7A3'; c.beginPath(); c.arc(p.x - 1.4, p.y - 1.4, 1.8, 0, Math.PI * 2); c.fill(); c.font = '700 10px Figtree, system-ui, sans-serif'; c.textAlign = 'left'; c.fillStyle = '#FFE7A3'; c.fillText('+1', p.x + 8, p.y + 3); }
+      if (p.play) { c.fillStyle = '#A3E635'; c.beginPath(); c.arc(p.x, p.y, 5.5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#1A2E04'; c.beginPath(); c.moveTo(p.x - 1.6, p.y - 2.6); c.lineTo(p.x + 2.8, p.y); c.lineTo(p.x - 1.6, p.y + 2.6); c.closePath(); c.fill(); c.font = '800 10px Figtree, system-ui, sans-serif'; c.fillStyle = '#C7F37A'; c.textAlign = 'left'; c.fillText('+', p.x + 6.5, p.y + 3.5); }
+      else if (p.coin) { c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(p.x, p.y, 5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFE7A3'; c.beginPath(); c.arc(p.x - 1.4, p.y - 1.4, 1.8, 0, Math.PI * 2); c.fill(); c.font = '700 10px Figtree, system-ui, sans-serif'; c.textAlign = 'left'; c.fillStyle = '#FFE7A3'; c.fillText('+1', p.x + 8, p.y + 3); }
       else { c.fillStyle = p.color; c.beginPath(); c.arc(p.x, p.y, p.r * (p.puff ? 1 + k * 1.5 : 1), 0, Math.PI * 2); c.fill(); }
       c.globalAlpha = 1;
     }
@@ -9312,9 +9907,9 @@
     }
     // With a card or the bottom bar open, the first tap on the map just closes it.
     if (ui.screen === 'play' && ui.barOpen) { closeBar(); return; }
-    if (ui.screen === 'play' && ui.panel && ui.panel.kind !== 'place' && !ui.holding) { closePanel(); return; }
+    if (ui.screen === 'play' && ui.panel && ui.panel.kind !== 'place' && ui.panel.kind !== 'attach' && !ui.holding) { closePanel(); return; }
     // Speech bubbles, request markers and land signs lead to what needs doing.
-    if (!ui.holding) for (let i = ui.hits.length - 1; i >= 0; i--) {
+    if (!ui.holding && !ui.attach) for (let i = ui.hits.length - 1; i >= 0; i--) {
       const h = ui.hits[i]; if (sx < h.x0 || sx > h.x1 || sy < h.y0 || sy > h.y1) continue;
       if (h.plot) { const go = () => openPanel({ kind: 'land', plot: h.plot }); if (ui.screen === 'home') { if (enterPlay()) setTimeout(go, 420); } else go(); return; }
       const b = byId(h.bid); if (!b) break;
@@ -9332,6 +9927,7 @@
     }
     if (ui.screen === 'home') { enterPlay(sx, sy); return; }
     const w = toWorld(sx, sy), tl = tileAtWorld(w.x, w.y);
+    if (ui.attach) { if (!tl) return; const hb = at(tl.c, tl.r); if (hb) attachTo(hb); else toast('Tap a building to put it beside.'); return; }
     if (ui.holding) {
       if (!tl) return;
       const item = heldItem(); if (!item) return;
@@ -9469,10 +10065,11 @@
   function fitFootprints() {
     const moved = [];
     for (const b of state.buildings) {
-      if (!FOOT[b.type] || b.fp6) continue;
-      b.fp6 = true; delete b.fp1; touch();
+      if (!FOOT[b.type]) { if (b.rot != null || b.fp6) { delete b.rot; delete b.fp6; delete b.fp1; touch(); } continue; } // 10.08: one tile again
+      if (b.fp8) continue;
+      b.fp8 = true; delete b.fp1; touch();
       const tryAt = (c, r, rot) => (fits(b.type, c, r, b.id, rot) ? (b.c = c, b.r = r, b.rot = rot, true) : false);
-      const near = b.type === 'clinic' ? [[b.c, b.r, 0], [b.c, b.r, 1], [b.c, b.r + 1, 0], [b.c + 1, b.r, 1]] : [[b.c, b.r, 0], [b.c, b.r, 1], [b.c - 1, b.r, 0], [b.c, b.r - 1, 1]];
+      const near = [[b.c, b.r, 0], [b.c, b.r, 1], [b.c - 1, b.r, 0], [b.c, b.r - 1, 1]];
       if (near.some(([c, r, rot]) => tryAt(c, r, rot))) { touch(); continue; }
       let best = null, bd = 1e9;
       for (const rot of [0, 1]) for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const d = Math.abs(c - b.c) + Math.abs(r - b.r); if (d < bd && fits(b.type, c, r, b.id, rot)) { bd = d; best = { c, r, rot }; } }
@@ -9480,9 +10077,11 @@
       touch();
     }
     if (state.buildings.some((b) => FOOT[b.type])) save();
-    if (moved.length) setTimeout(() => toast(`Your ${moved.join(' and ')} ${moved.length > 1 ? 'are' : 'is'} now two tiles long, so ${moved.length > 1 ? 'they' : 'it'} moved to the nearest free spot.`), 1500);
+    if (moved.length) setTimeout(() => toast(`Townhouses are now Houses, two tiles long: ${moved.length === 1 ? 'one' : moved.length} moved to the nearest free spot.`), 1500);
   }
   function boot() {
+    if (!devOn() && state.speed > 1) { state.speed = 1; save(); } // test speed is for the developer only
+    attachOldAddons();
     fitFootprints();
     hideResult(); closeSheet(); hideFocus(); hideCelebration();
     CH.active = false; $('chest').hidden = true;
@@ -9507,7 +10106,7 @@
   googleReturn();
   try { radio.warm(); } catch (e) { /* no saved songs */ }
   if (FB.cfg && !inFrame && (state.board.fb || state.board.fbPending)) fbLoad(); // back on the online leaderboard
-  window.MaplewickDebug = Object.freeze({
+  if (devOn()) window.MaplewickDebug = Object.freeze({ // 10.08: only on Navid's unlocked phone (and in tests)
     state: () => JSON.parse(JSON.stringify(state)),
     screen: () => ui.screen,
     overlay: () => ui.overlay,
@@ -9535,6 +10134,9 @@
     tally: () => ({ done: !!TALLY.done, gold: $('tally').querySelector('.k-gold .ti-val') && $('tally').querySelector('.k-gold .ti-val').textContent, xp: $('tally').querySelector('.k-xp .ti-val') && $('tally').querySelector('.k-xp .ti-val').textContent }),
     tour: () => (tour.steps ? tour.i : -1),
     openCard: (bid) => { closePanel(true); openPanel({ kind: 'info', bid }); },
+    attach: (type, bid) => { startAttach(type); if (bid != null && ui.attach) attachTo(byId(bid)); const b = byId(bid); return b ? b.addons || null : ui.attach; },
+    wantWalkers: () => walkers.filter((w) => !w.role).length,
+    buyVehicle: (bid) => { buyVehicle(bid); return !!(byId(bid) && byId(bid).vehicle); },
     season: (k) => { seasonOverride = k || null; renderAll(); },
     sky: (k) => { skyOverride = k == null ? null : typeof k === 'number' ? k : SKY_OVR[k]; SKYC.at = -1; },
     weather: (k) => { weatherOverride = k || null; SKYC.at = -1; },
@@ -9562,6 +10164,7 @@
     townStep: (m) => { townStep(m); },
     vehShowcase: () => { const kinds = ['fire', 'police', 'nurse', 'garbage', 'van', 'builders', 'crew', 'bus'], dirs = [{ dc: 1, dr: 0 }, { dc: -1, dr: 0 }, { dc: 0, dr: 1 }, { dc: 0, dr: -1 }]; const cv = document.createElement('canvas'), Z = 3; cv.width = 4 * 90 * Z; cv.height = kinds.length * 70 * Z; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, cv.width, cv.height); const p0 = tileCenter(0, 0); kinds.forEach((k, i) => dirs.forEach((d, j) => { c.setTransform(Z, 0, 0, Z, 0, 0); c.translate(j * 90 + 45 - p0.x, i * 70 + 40 - p0.y); drawVehicle(c, { kind: k, c: 0.5, r: 0.5, dir: d, state: 'drive', foot: false }, 0, []); })); return cv.toDataURL('image/png'); },
     payLoan: (h, inSession) => payLoan(h, inSession),
+    play: () => { enterPlay(); return ui.screen; },
     playLimits: () => ({ cap: PLAY_CAP, day: DAILY_PLAY }),
     buildAt: (c, r, tab) => { openPanel({ kind: 'build', c, r, tab: tab || 'buildings' }); renderAll(); return true; },
     staffWorking: (k) => staffWorking(k),
@@ -9582,8 +10185,12 @@
     intro: () => showIntro(true),
     order: (type) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r)) { const q = orderNew(type, c, r, true, true); return q ? { kind: q.kind, mode: q.mode, secs: q.secs || 0, work: q.work } : null; } return null; },
     spark: () => (ui.spark ? { ...ui.spark } : null),
+    sparkSet: (o) => { state.sparkSet = Object.assign(sparkSet(), o); nextSpark(); renderBanner(true); return { ...ui.spark }; },
     addBuilding: (type, level) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r)) { const b = { id: state.nextId++, type, c, r, level: level || 1, origin: 'built' }; if (TYPES[type].cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); save(); renderAll(); return b.id; } return null; },
-    sick: (bid) => { const b = bid ? byId(bid) : state.buildings.find((x) => live(x) && T(x).cat === 'home'); startSick(b); return b && b.id; },
+    sick: (bid, serious) => { const b = bid ? byId(bid) : state.buildings.find((x) => live(x) && T(x).cat === 'home'); startSick(b, false, serious == null ? { serious: false } : { serious }); return b && b.id; },
+    sickOf: (bid) => { const b = byId(bid); return b ? { sick: b.sick ? JSON.parse(JSON.stringify(b.sick)) : null, loss: b.loss || null } : null; },
+    setSick: (bid, patch) => { const b = byId(bid); if (b && b.sick) Object.assign(b.sick, patch); return b && b.sick; },
+    passAway: (bid) => { const b = byId(bid); if (b) { if (!b.sick) startSick(b, false, { serious: true }); passAway(b); } return b && b.loss; },
     crime: () => ({ level: crimeLevel(), target: crimeTarget(city()), jail: (state.jail || []).length, cells: jailCells() }),
     health: (bid) => { const b = byId(bid); return b ? { health: b.health == null ? 100 : b.health, level: b.level, ruin: !!b.ruin, burnt: b.burnt || null, fire: !!b.fire, sick: !!b.sick, robbed: b.robbed || null } : null; },
     reach: (k, bid) => { const st = responderFor(k, byId(bid)); return st ? st.id : null; },
