@@ -249,6 +249,10 @@
   .pill.rush { background: var(--combo-soft); color: var(--combo); }
   .mp-close { width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; align-self: start; }
   .chiprow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; }
+  .mp-head .chiprow { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; padding-bottom: 2px; margin-right: -4px; }
+  .mp-head .chiprow::-webkit-scrollbar { display: none; }
+  .mp-head .chiprow > * { flex: none; }
+  .mp-head > div { min-width: 0; }
   .pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 700; background: var(--surface-2); }
   .pill.gold { background: var(--gold-soft); color: var(--gold); }
   .pill.good { background: var(--good-soft); color: var(--good); }
@@ -335,7 +339,44 @@
   .scrim { position: fixed; inset: 0; z-index: 40; background: rgba(10, 18, 20, .45); display: grid; align-items: end; justify-items: center; }
   .sheet { width: min(520px, 100%); max-height: min(88dvh, 780px); overflow: auto; background: var(--surface); border-radius: 22px 22px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); box-shadow: var(--shadow); animation: slideUp .3s cubic-bezier(.2, 1.1, .3, 1) both; }
   .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .sheet-head h2 { font-size: 24px; }
+  .sheet-head h2 { font-size: 24px; flex: 1; min-width: 0; }
+  .sheet.full { max-height: 100dvh; height: 100dvh; border-radius: 0; padding-top: calc(14px + env(safe-area-inset-top, 0px)); animation: slideIn .25s cubic-bezier(.2, 1, .3, 1) both; }
+  @keyframes slideIn { from { transform: translateX(24px); opacity: .4; } to { transform: none; opacity: 1; } }
+  .mtiles { display: grid; gap: 8px; }
+  .mtile { display: grid; grid-template-columns: 42px minmax(0, 1fr) 18px; gap: 12px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 10px 12px; min-height: 60px; }
+  .mtile:active { transform: scale(.98); }
+  .mt-ic { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); color: var(--ink); }
+  .mt-ic svg { width: 22px; height: 22px; }
+  .mtile.k-music .mt-ic { background: #FBEBC9; color: #9A6512; } .mtile.k-progress .mt-ic { background: #DCE8FB; color: #2B5FB0; } .mtile.k-friends .mt-ic { background: #FDE7C8; color: #A86E08; }
+  .mtile.k-staff .mt-ic { background: #D8EFE3; color: #2E7D52; } .mtile.k-money .mt-ic { background: #FBEBC9; color: #B07A10; } .mtile.k-festival .mt-ic { background: #F9DDE5; color: #B5385E; }
+  .mtile.k-settings .mt-ic, .mtile.k-help .mt-ic, .mtile.k-about .mt-ic { background: #E6E9EE; color: #3E4A57; } .mtile.k-testing .mt-ic { background: #ECE4FB; color: #5B2DB8; }
+  .mt-tx b { display: block; font-size: 16px; } .mt-tx small { display: block; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mt-ch { color: var(--muted); } .mt-ch svg { width: 18px; height: 18px; }
+  .mver { text-align: center; margin-top: 6px; }
+  .mnow { border-radius: 18px; padding: 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; align-items: center; background: linear-gradient(135deg, #FFF3D6, #F8E2B0); color: #3B2A10; }
+  .mnow.gen { background: linear-gradient(135deg, #EEE6FF, #D9CCFA); color: #2A1B55; }
+  .mn-kind { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .75; }
+  .mn-tx b { display: block; font-size: 20px; line-height: 1.15; margin-top: 2px; } .mn-tx small { display: block; opacity: .8; }
+  .mn-ctl { display: flex; gap: 8px; }
+  .mn-play, .mn-skip { width: 52px; height: 52px; border-radius: 50%; border: 0; display: grid; place-items: center; background: #3B2A10; color: #FFF3D6; }
+  .mnow.gen .mn-play, .mnow.gen .mn-skip { background: #2A1B55; color: #EEE6FF; }
+  .mn-skip { width: 44px; height: 44px; align-self: center; opacity: .85; }
+  .mn-play svg, .mn-skip svg { width: 24px; height: 24px; }
+  .mslider { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; font-size: 13px; font-weight: 700; }
+  .mslider input { width: 100%; accent-color: currentColor; }
+  .songs .st-head { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 4px; }
+  .song { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; text-align: left; border: 0; border-radius: 10px; padding: 9px 10px; background: transparent; }
+  .song .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .song.rec .dot { background: #E8A93A; } .song.gen .dot { background: #8B5CF6; }
+  .song .by { font-size: 12px; color: var(--muted); }
+  .song.on { font-weight: 800; } .song.rec.on { background: #FBEBC9; color: #3B2A10; } .song.gen.on { background: #ECE4FB; color: #2A1B55; }
+  .song.on .by { color: inherit; opacity: .75; }
+  .songs.rec h3 { color: #A86E08; } .songs.gen h3 { color: #6D3FD6; }
+  .paytbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .paytbl th, .paytbl td { padding: 5px 3px; text-align: center; border-bottom: 1px solid var(--line); }
+  .paytbl th:first-child { text-align: left; font-weight: 700; }
+  .paytbl td b { display: block; } .paytbl td small { color: var(--muted); }
+  .paytbl td.have { background: var(--good-soft, #DDF2E4); border-radius: 6px; }
   .list { display: grid; gap: 10px; }
   .item { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 14px; }
   .item canvas { width: 60px; height: 52px; }
@@ -437,6 +478,14 @@
   .fbme { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 2px 2px 4px; }
   .fbme .small { flex: 1 1 100%; font-weight: 600; }
   .fbjoin .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .req.warn { background: var(--bad-soft); }
+  .staffnotes { display: grid; gap: 6px; margin-top: 4px; }
+  .snote { font-size: 12.5px; background: var(--surface-2); border-radius: 10px; padding: 7px 9px; display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: center; }
+  .snote > span { flex: 1 1 100%; }
+  .snote.bad { background: var(--bad-soft); color: var(--ink); }
+  .staff small.wages { display: block; color: var(--muted); font-size: 11.5px; }
+  .sellrow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .sellrow small { display: block; color: var(--muted); }
   .night-btn { border: 1px solid rgba(255,255,255,.22); background: transparent; color: var(--night-ink); border-radius: 12px; min-height: 44px; padding: 8px 14px; font-weight: 600; }
   .night-btn.warn { border-color: transparent; background: rgba(255,255,255,.1); }
   .focus-confirm { background: rgba(255,255,255,.08); border-radius: 14px; padding: 12px; display: grid; gap: 10px; font-size: 14px; }
@@ -672,6 +721,8 @@
   .lbacts { grid-column: 3 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
   .codebox { width: 100%; min-height: 70px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface); font: 12px/1.35 ui-monospace, Menlo, monospace; resize: vertical; word-break: break-all; }
   .app.visiting #chip-gold, .app.visiting #chip-play { visibility: hidden; }
+  .chip.gold.debt { background: var(--bad-soft); box-shadow: inset 0 0 0 2px var(--bad); }
+  .chip.gold.debt .val b { color: var(--bad); }
   .app.visiting .skychip { display: none; }
   .skychip { position: absolute; right: 12px; top: 10px; z-index: 2; border: 0; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; background: color-mix(in oklab, var(--surface) 88%, transparent); box-shadow: var(--shadow); font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .reqpill:not([hidden]) ~ .skychip { top: 58px; }
@@ -788,7 +839,7 @@
 
 <div class="scrim" id="scrim" hidden>
   <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-    <div class="sheet-head"><h2 id="sheet-title">Sheet</h2><button class="icon-btn" id="sheet-close" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg></button></div>
+    <div class="sheet-head"><button class="icon-btn" id="sheet-back" aria-label="Back to the menu" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="m15 5.5-6.5 6.5 6.5 6.5 1.5-1.5-5-5 5-5z"/></svg></button><h2 id="sheet-title">Sheet</h2><button class="icon-btn" id="sheet-close" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg></button></div>
     <div id="sheet-body"></div>
   </div>
 </div>
@@ -931,13 +982,15 @@
   const QUEUE_MAX = 5;
   // Small jobs get built while you play (a couple of seconds per minute of work). Big projects need focus:
   // the town hall, new land, landmarks, the stadium, and anything over half an hour of work.
-  // Building gets slower as the town grows: 3 seconds of play per minute of work at town hall 1, then 4.5, 6 and 7.5.
-  const BIG_WORK = 30, PLAY_BUILD_SEC = [0, 3, 4.5, 6, 7.5], BUILD_MAX_SEC = 150;
+  // 10.02: building in play takes a real chunk of play time (8 s per minute of work at town hall 1, up to 20 s at level 4,
+  // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
+  const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.01'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.02'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
+  const BG_SOUNDS = { off: 'Off', rain: 'Soft rain', waves: 'Ocean waves', fire: 'Crackling fire', brown: 'Brown noise' };
   const NAMES = ['Mira', 'Theo', 'Priya', 'Jonas', 'Kofi', 'Ines', 'Hugo', 'Yara', 'Sven', 'Noor', 'Ezra', 'Tilly', 'Ravi', 'Ada', 'Felix', 'June', 'Malik', 'Elsie', 'Tomas', 'Wren', 'Idris', 'Pia', 'Otto', 'Leila'];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1270,6 +1323,12 @@
     if (!s.flags.music10) { s.track = 0; s.flags.music10 = true; } // version 10: real music stations
     if (s.alarms === undefined) s.alarms = true;
     s.cheers = Object.assign({ day: null, seen: 0 }, s.cheers || {});
+    if (s.loan === undefined) s.loan = null;
+    if (!(s.vol >= 0 && s.vol <= 1)) s.vol = 0.7;
+    if (!(s.noiseVol >= 0 && s.noiseVol <= 1)) s.noiseVol = 0.4;
+    if (!BG_SOUNDS[s.noise]) s.noise = 'off';
+    if (s.src !== 'gen') s.src = 'rec';
+    if (!(s.gen >= 0)) s.gen = 0;
     if (!LOCK_SOUNDS[s.lockSound]) s.lockSound = 'off';
     if (!LOCK_SOUNDS[s.lockKind] || s.lockKind === 'off') s.lockKind = 'rain';
     return s;
@@ -1342,7 +1401,7 @@
 
   /* ---------- Music: a few tunes made on the fly. They play on Home and in your town, never while you focus. ---------- */
   const music = (() => {
-    let master = null, wet = null, lp = null, timer = 0, step = 0, nextT = 0, on = false, mode = 'home', cycle = 0, noiseBuf = null, cur = null, switching = false;
+    let master = null, wet = null, lp = null, timer = 0, step = 0, nextT = 0, on = false, mode = 'home', cycle = 0, noiseBuf = null, cur = null, switching = false, volK = 1;
     const NOTE = (n) => { const m = /^([A-G])([b#]?)(\d)$/.exec(n); const idx = { C: -9, D: -7, E: -5, F: -4, G: -2, A: 0, B: 2 }[m[1]] + (m[2] === 'b' ? -1 : m[2] === '#' ? 1 : 0) + (Number(m[3]) - 4) * 12; return 440 * Math.pow(2, idx / 12); };
     const seq = (str) => str.trim().split(/\s+/);
     const rnd = (n) => Math.floor(Math.random() * n);
@@ -1517,13 +1576,14 @@
         if (want && switching) return;
         if (want && ac && (!on || cur !== tr)) {
           graph(ac);
-          const start = () => { switching = false; cur = tr; on = true; step = 0; cycle = 0; nextT = ac.currentTime + 0.08; fade(ac, 0.55, 1.6); clearInterval(timer); timer = setInterval(pump, 50); pump(); };
+          const start = () => { switching = false; cur = tr; on = true; step = 0; cycle = 0; nextT = ac.currentTime + 0.08; fade(ac, 0.55 * volK, 1.6); clearInterval(timer); timer = setInterval(pump, 50); pump(); };
           if (on && cur !== tr) { fade(ac, 0.0001, 0.35); on = false; switching = true; clearInterval(timer); setTimeout(start, 380); } else start();
         } else if (!want && on) {
           on = false; clearInterval(timer); timer = 0;
           if (ac && master) fade(ac, 0.0001, 0.5);
         }
       },
+      volume(v) { if (Math.abs(v - volK) < 0.01) return; volK = v; if (on && master && AUD.ac) fade(AUD.ac, 0.55 * volK, 0.3); },
       playing: () => on,
       mode: () => mode,
       track: () => (cur ? cur.name : TRACKS[0].name)
@@ -1540,27 +1600,43 @@
     { name: 'Calm piano', synth: 2, tracks: [[CA + '12 - Meditation Impromptu 01.mp3', 'Meditation Impromptu 01'], [CA + '13 - Meditation Impromptu 02.mp3', 'Meditation Impromptu 02'], [CA + '14 - Meditation Impromptu 03.mp3', 'Meditation Impromptu 03'], [CA + '05 - Clean Soul.mp3', 'Clean Soul'], [CA + '23 - Winter Reflections.mp3', 'Winter Reflections']] },
     { name: 'Soft ambient', synth: 1, tracks: [[CA + '18 - Silver Blue Light.mp3', 'Silver Blue Light'], [CA + '07 - Dream Culture.mp3', 'Dream Culture'], [CA + '02 - Bathed in the Light.mp3', 'Bathed in the Light'], [CA + '22 - Windswept.mp3', 'Windswept']] }
   ];
+  // The player: recorded songs (one element, routed through Web Audio when the server allows it, so the volume works on
+  // iPhone too) or the tunes made in the app. state.src: 'rec' (recorded) or 'gen' (made in the app).
+  const GEN_TUNES = music.tracks; // made in Maplewick
   const radio = (() => {
-    let a = null, st = -1, idx = 0, order = [], on = false, mode = 'home', fails = 0, fallback = false, fadeTimer = 0, cur = '', target = 0;
-    const vol = () => (mode === 'play' ? 0.55 : 0.32);
+    let a = null, cors = true, node = null, gain = null, st = -1, idx = 0, order = [], on = false, mode = 'home', fails = 0, fallback = false, fadeTimer = 0, cur = '', target = -1, played = false, genOn = false;
+    const vol = () => (mode === 'play' ? 1 : 0.65) * clamp(state.vol == null ? 0.7 : state.vol, 0, 1);
+    function route() {
+      if (!cors || node) return;
+      const ac = audioCtx(); if (!ac) return;
+      try { node = ac.createMediaElementSource(a); gain = ac.createGain(); gain.gain.value = 0; node.connect(gain); gain.connect(ac.destination); } catch (e) { node = null; gain = null; }
+    }
     function el() {
       if (a) return a;
-      a = new Audio(); a.preload = 'auto';
+      a = new Audio(); a.preload = 'auto'; if (cors) a.crossOrigin = 'anonymous';
       a.addEventListener('ended', () => { if (on) next(); });
-      a.addEventListener('error', () => { if (!on) return; fails += 1; if (fails >= 2) useFallback(); else next(); });
-      a.addEventListener('playing', () => { fails = 0; meta(); });
+      a.addEventListener('error', () => {
+        if (!on) return;
+        // The server would not share the song with Web Audio: play it plainly instead (the phone's own volume then).
+        if (cors && !played) { cors = false; try { a.pause(); } catch (e) { /* ignore */ } a = null; node = null; gain = null; load(); return; }
+        fails += 1; if (fails >= 2) useFallback(); else next();
+      });
+      a.addEventListener('playing', () => { fails = 0; played = true; meta(); });
+      route();
       return a;
     }
+    const setV = (v) => { if (gain) gain.gain.value = v; else { try { a.volume = v; } catch (e) { /* iPhone: fixed */ } } };
+    const getV = () => (gain ? gain.gain.value : a.volume);
     function shuffle(n) { const o = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return o; }
     function fade(to, ms, then) {
-      clearInterval(fadeTimer); target = to; const from = a.volume, t0 = performance.now();
-      fadeTimer = setInterval(() => { const k = clamp((performance.now() - t0) / ms, 0, 1); try { a.volume = from + (to - from) * k; } catch (e) { /* iPhone: fixed volume */ } if (k >= 1) { clearInterval(fadeTimer); fadeTimer = 0; if (then) then(); } }, 50);
+      clearInterval(fadeTimer); target = to; const from = getV(), t0 = performance.now();
+      fadeTimer = setInterval(() => { const k = clamp((performance.now() - t0) / ms, 0, 1); setV(from + (to - from) * k); if (k >= 1) { clearInterval(fadeTimer); fadeTimer = 0; if (then) then(); } }, 50);
     }
     function load() {
       const t = STATIONS[st].tracks[order[idx % order.length]];
       cur = t[1];
       el().src = IA + encodeURI(t[0]);
-      try { a.volume = 0; } catch (e) { /* fixed volume */ }
+      setV(0);
       const pr = a.play(); if (pr && pr.catch) pr.catch(() => { /* not allowed yet: the next tap starts it */ });
       fade(vol(), 1500);
     }
@@ -1569,50 +1645,93 @@
       if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || LOCK.on) return;
       try {
         navigator.mediaSession.metadata = new MediaMetadata({ title: cur, artist: 'Kevin MacLeod', album: `Maplewick · ${STATIONS[st].name}`, artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] });
-        navigator.mediaSession.setActionHandler('nexttrack', () => radio.skip());
+        navigator.mediaSession.setActionHandler('nexttrack', () => musicSkip());
         navigator.mediaSession.setActionHandler('pause', () => { state.music = false; save(); musicUpdate(); });
         navigator.mediaSession.setActionHandler('play', () => { state.music = true; save(); musicUpdate(); });
       } catch (e) { /* not supported */ }
     }
     function useFallback() {
       fallback = true; on = false; if (a) a.pause();
-      toast('Could not reach the music online, so the built-in tunes play instead.');
+      toast('Could not reach the recorded music, so the tunes made in Maplewick play instead.');
       musicUpdate();
     }
+    function stopRec() { if (on && a && !a.paused) fade(0, 500, () => a.pause()); }
     return {
       stations: STATIONS.map((x) => x.name),
       get fallback() { return fallback; },
-      set(want, m, station) {
+      set(want, m) {
         mode = m || mode;
-        const s2 = ((station | 0) % STATIONS.length + STATIONS.length) % STATIONS.length;
-        if (fallback) { music.set(want, mode, STATIONS[s2].synth); return; }
+        const s2 = ((state.track | 0) % STATIONS.length + STATIONS.length) % STATIONS.length;
+        const gen = state.src === 'gen' || fallback;
+        if (gen) {
+          stopRec();
+          const gi = state.src === 'gen' ? (state.gen | 0) : STATIONS[s2].synth;
+          music.set(want, mode, gi); music.volume(clamp(state.vol == null ? 0.7 : state.vol, 0, 1) / 0.7); genOn = want;
+          return;
+        }
+        if (genOn) { music.set(false); genOn = false; }
         if (want) {
-          if (!on || st !== s2) { st = s2; order = shuffle(STATIONS[st].tracks.length); idx = 0; on = true; load(); }
+          if (!on || st !== s2) {
+            st = s2; order = shuffle(STATIONS[st].tracks.length);
+            if (ui.songPick != null) { const k = order.indexOf(ui.songPick); if (k > 0) [order[0], order[k]] = [order[k], order[0]]; ui.songPick = null; }
+            idx = 0; on = true; load();
+          } else if (ui.songPick != null) { const k = order.indexOf(ui.songPick); idx = Math.max(0, k); ui.songPick = null; load(); }
           else if (a && a.paused) { const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); fade(vol(), 800); }
-          else if (a && target !== vol() && !fadeTimer) fade(vol(), 800);
-        } else if (on && a && !a.paused) { fade(0, 500, () => a.pause()); }
-        if (!want) { /* stays loaded, so it picks up where it was */ }
+          else if (a && target !== vol() && !fadeTimer) fade(vol(), 400);
+        } else stopRec();
       },
-      skip() { if (fallback) return false; if (!on) return false; next(); return true; },
-      playing: () => (fallback ? music.playing() : on && !!a && !a.paused),
-      track: () => (fallback ? music.track() : cur || STATIONS[Math.max(0, st)].tracks[0][1])
+      skip() { if (state.src === 'gen' || fallback) { state.gen = ((state.gen | 0) + 1) % GEN_TUNES.length; if (state.src !== 'gen') state.src = 'gen'; return 'gen'; } if (!on) return false; next(); return true; },
+      playing: () => ((state.src === 'gen' || fallback) ? music.playing() : on && !!a && !a.paused),
+      track: () => ((state.src === 'gen' || fallback) ? music.track() : cur || STATIONS[Math.max(0, st)].tracks[0][1]),
+      info() {
+        const gen = state.src === 'gen' || fallback;
+        return gen ? { title: music.track(), artist: 'Made in Maplewick', station: fallback && state.src !== 'gen' ? `${STATIONS[(state.track | 0) % STATIONS.length].name} (offline)` : 'Made in Maplewick', gen: true, playing: music.playing(), volumeWorks: true }
+          : { title: cur || '…', artist: 'Kevin MacLeod', station: STATIONS[(state.track | 0) % STATIONS.length].name, gen: false, playing: on && !!a && !a.paused, volumeWorks: !!gain || !/iPhone|iPad/.test(navigator.userAgent) };
+      }
+    };
+  })();
+  // Background sounds that play under the music (or alone), each with its own volume. Made in the app, so they work offline.
+  const noiseBed = (() => {
+    let src = null, g = null, kind = null; const bufs = {};
+    function buffer(ac, k) {
+      if (bufs[k]) return bufs[k];
+      const d = genSound(k, ac.sampleRate > 30000 ? 22050 : ac.sampleRate);
+      const b = ac.createBuffer(1, d.data.length, d.sr); b.getChannelData(0).set(d.data);
+      return (bufs[k] = b);
+    }
+    function stop() { if (src && g && AUD.ac) { const s0 = src; g.gain.setTargetAtTime(0, AUD.ac.currentTime, 0.25); setTimeout(() => { try { s0.stop(); } catch (e) { /* stopped */ } }, 900); } src = null; g = null; kind = null; }
+    return {
+      set(want, k, v) {
+        const ac = AUD.ac;
+        if (!want || !BG_SOUNDS[k] || k === 'off' || !ac) { if (src) stop(); return; }
+        if (kind !== k) {
+          if (src) stop();
+          try { g = ac.createGain(); g.gain.value = 0; g.connect(ac.destination); src = ac.createBufferSource(); src.buffer = buffer(ac, k); src.loop = true; src.connect(g); src.start(); kind = k; } catch (e) { src = null; g = null; return; }
+        }
+        g.gain.setTargetAtTime(clamp(v == null ? 0.4 : v, 0, 1) * 1.6, ac.currentTime, 0.3);
+      },
+      playing: () => !!src
     };
   })();
   function musicUpdate() {
     const want = !!state.music && AUD.unlocked && !document.hidden && !state.session && !ui.visitLoading && !['focus', 'celebrate', 'chest', 'alarm'].includes(ui.overlay) && !!state.named;
-    radio.set(want, ui.screen === 'play' ? 'play' : 'home', state.track | 0);
+    radio.set(want, ui.screen === 'play' ? 'play' : 'home');
+    const wantBg = AUD.unlocked && !document.hidden && !state.session && !ui.visitLoading && !['focus', 'celebrate', 'chest', 'alarm'].includes(ui.overlay) && !!state.named;
+    noiseBed.set(wantBg, state.noise, state.noiseVol);
     const tg = $('mus-toggle');
     if (tg && tg.dataset.on !== String(!!state.music)) { tg.dataset.on = String(!!state.music); tg.innerHTML = state.music ? MUS_PAUSE : MUS_PLAY; tg.setAttribute('aria-label', state.music ? 'Pause music' : 'Play music'); tg.classList.toggle('on', !!state.music); }
   }
   const MUS_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l10.5-6.5z"/></svg>';
   const MUS_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 5h3.6v14H7zm6.4 0H17v14h-3.6z"/></svg>';
-  const stationName = () => radio.stations[(state.track | 0) % radio.stations.length];
+  const stationName = () => (state.src === 'gen' ? 'Made in Maplewick' : radio.stations[(state.track | 0) % radio.stations.length]);
   function musicToggle() { state.music = !state.music; AUD.unlocked = true; save(); musicUpdate(); toast(state.music ? `♪ ${stationName()}` : 'Music off'); }
   // ⏭ plays the next song; a long press (or the menu) changes the station.
   function musicSkip() {
     state.music = true; AUD.unlocked = true; save();
-    if (!radio.skip()) { state.track = ((state.track | 0) + 1) % radio.stations.length; save(); musicUpdate(); toast(`♪ ${stationName()}`); return; }
-    musicUpdate(); setTimeout(() => toast(`♪ ${radio.track()} · Kevin MacLeod`), 300);
+    const r = radio.skip();
+    if (r === 'gen') { save(); musicUpdate(); toast(`♪ ${GEN_TUNES[state.gen | 0]} · made in Maplewick`); refreshMusicPage(); return; }
+    if (!r) { state.track = ((state.track | 0) + 1) % radio.stations.length; save(); musicUpdate(); toast(`♪ ${stationName()}`); refreshMusicPage(); return; }
+    musicUpdate(); setTimeout(() => { toast(`♪ ${radio.track()} · Kevin MacLeod`); refreshMusicPage(); }, 300);
   }
   // The plan alarm: a bell that rings until you answer it (it ignores the sound-effects switch, but has its own).
   function ringBell() {
@@ -1784,12 +1903,14 @@
   const fmtSecs = (sec) => { sec = Math.max(1, Math.ceil(sec)); return sec < 60 ? `${sec} s` : `${Math.floor(sec / 60)} min${sec % 60 ? ` ${sec % 60} s` : ''}`; };
   function nextName() { const n = NAMES[state.nameIdx % NAMES.length]; state.nameIdx++; return n; }
 
-  // Positive amounts fill the treasury up to its limit; negative amounts (wages above taxes) take gold away, never below zero.
+  // Positive amounts fill the treasury up to its limit; negative amounts (wages above taxes) take gold away, even into debt.
+  // 10.02: wages above taxes can push the treasury below zero (debt). While a loan is open, 30% of incoming taxes repay it.
   function addTaxes(amount) {
-    if (amount < 0) { const sub = Math.min(state.gold, -amount); state.gold -= sub; return -sub; }
+    if (amount < 0) { state.gold += amount; return amount; }
     const cap = treasuryCap();
     if (state.gold >= cap || amount <= 0) return 0;
-    const add = Math.min(amount, cap - state.gold);
+    let add = Math.min(amount, cap - state.gold);
+    if (state.loan && state.loan.owed > 0) { const pay = Math.min(state.loan.owed, add * 0.3); state.loan.owed -= pay; add -= pay; if (state.loan.owed <= 0.01) { state.loan = null; setTimeout(() => toast('Loan paid off. Well done, Mayor!'), 50); } }
     state.gold += add; return add;
   }
   // Full taxes while you focus (paid at the end) or play; a tenth the rest of the time, so leaving the app open never pays.
@@ -1797,7 +1918,17 @@
   function accrue(now) {
     if (state.session || !state.named) { if (!state.session) state.lastTaxAt = now; return; }
     const dt = (now - state.lastTaxAt) / 60000;
-    if (dt > 0) { const rate = taxRate(); addTaxes(econ(now).net * rate * dt / 60); townStep(dt * rate); state.lastTaxAt = now; }
+    if (dt > 0) { const rate = taxRate(); addTaxes(econ(now).net * rate * dt / 60); townStep(dt * rate); state.lastTaxAt = now; staffWalkout(); }
+  }
+  // Deep in debt, unpaid staff start to quit: the best-paid one first.
+  function staffWalkout() {
+    const wages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0);
+    if (!(state.gold < -Math.max(100, wages * 4))) return;
+    let worst = null, w = 0;
+    for (const k of STAFF_ORDER) { const n = state.staff[k] || 0; if (n && wageOf(k, n - 1) > w) { w = wageOf(k, n - 1); worst = k; } }
+    if (!worst) return;
+    state.staff[worst] -= 1; touch(); save();
+    setTimeout(() => toast(`Unpaid for too long, a ${STAFF[worst].name.toLowerCase()} quit. You save ${w} gold an hour.`), 300);
   }
 
   /* ---------- Town staff and the problems they solve ---------- */
@@ -1815,7 +1946,30 @@
   };
   const reachOf = (k) => TYPES[STAFF[k].home].reach;
   const stationsOf = (k) => staffBuildings(k).slice(0, staffWorking(k));
-  const coversB = (k, b, st) => (st || stationsOf(k)).some((x) => dist(x, b) <= reachOf(k));
+  // A station with its own vehicle reaches half again as far (10.02).
+  const stationReach = (x) => Math.round(TYPES[x.type].reach * (x.vehicle ? 1.5 : 1));
+  const coversB = (k, b, st) => (st || stationsOf(k)).some((x) => dist(x, b) <= stationReach(x));
+  // Vehicles you can buy for a service building (from level 2): more reach and faster help, but they cost upkeep every hour.
+  const FLEET = {
+    depot: { kind: 'garbage', name: 'Garbage truck', cost: 250, upkeep: 5, what: 'Sweepers reach half again as far.' },
+    shed: { kind: 'van', name: 'Garden van', cost: 150, upkeep: 3, what: 'Gardeners reach half again as far.' },
+    firestation: { kind: 'fire', name: 'Fire engine', cost: 350, upkeep: 8, what: 'Reach half again as far, and the crew gets ready faster.' },
+    police: { kind: 'police', name: 'Patrol car', cost: 300, upkeep: 7, what: 'Reach half again as far, and officers respond faster.' },
+    clinic: { kind: 'ambulance', name: 'Ambulance', cost: 400, upkeep: 8, what: 'Nurses reach half again as far.' }
+  };
+  const fleetUpkeep = () => state.buildings.reduce((a, b) => a + (b.vehicle && FLEET[b.type] && live(b) ? FLEET[b.type].upkeep : 0), 0);
+  function buyVehicle(id) {
+    const b = byId(id), f = b && FLEET[b.type]; if (!f || b.vehicle) return;
+    if (b.level < 2) { toast(`A ${f.name.toLowerCase()} needs the ${T(b).name.toLowerCase()} at level 2 (a garage).`); return; }
+    if (state.gold + 1e-6 < f.cost) { toast(`A ${f.name.toLowerCase()} costs ${f.cost} gold.`); return; }
+    accrue(Date.now()); state.gold -= f.cost; b.vehicle = true; touch(); save(); sfx.coin(); renderAll();
+    toast(`New ${f.name.toLowerCase()}! Reach ${TYPES[b.type].reach} → ${stationReach(b)} tiles. Upkeep ${f.upkeep} gold an hour.`);
+  }
+  function sellVehicle(id) {
+    const b = byId(id), f = b && FLEET[b.type]; if (!f || !b.vehicle) return;
+    accrue(Date.now()); b.vehicle = false; state.gold += Math.round(f.cost / 2); touch(); save(); renderAll();
+    toast(`Sold the ${f.name.toLowerCase()} for ${Math.round(f.cost / 2)} gold.`);
+  }
   const policeStations = () => stationsOf('police');
   const policeCovers = (h) => coversB('police', h);
   // Night: 0 by day, 1 in the middle of the night (town time).
@@ -1912,7 +2066,7 @@
   // Break-ins: most often at homes and shops far from a staffed police station, and at night.
   function startRobbery(b) {
     if (!b || b.robbed || b.fire) return;
-    const stolen = Math.min(Math.floor(state.gold), Math.round(4 + econ().taxes * 0.12));
+    const stolen = Math.max(0, Math.min(Math.floor(state.gold), Math.round(4 + econ().taxes * 0.12)));
     state.gold -= stolen;
     b.robbed = { at: Date.now(), stolen, open: 120 };
     touch(); save(); sfx.alarm();
@@ -2049,7 +2203,7 @@
       if (VEH.some((v) => v.kind === 'fire' && v.target === b.id)) continue;
       if (VEH.filter((v) => v.kind === 'fire' && v.state !== 'back').length >= Math.max(1, stationsOf('fire').length)) break;
       const st = stationsOf('fire').slice().sort((a, c) => dist(a, b) - dist(c, b))[0];
-      dispatch('fire', st, b, coversB('fire', b) ? 8 : 15);
+      dispatch('fire', st, b, (coversB('fire', b) ? 8 : 15) * (st && st.vehicle ? 0.6 : 1));
       floats.push({ x: centerOf(st || b).x, y: centerOf(st || b).y - 40, t0: now, text: 'Firefighters gearing up', soft: true });
     }
     // ---- break-ins
@@ -2058,7 +2212,7 @@
       const v = VEH.find((x) => x.kind === 'police' && x.target === b.id);
       if (v && v.state === 'work') { v.workT += dt; if (v.workT >= 10) { endRobbery(b, true); sendHome(v); } continue; }
       if (!v) { b.robbed.open -= dt; if (b.robbed.open <= 0) endRobbery(b, false); }
-      if (!v && staffWorking('police') >= 1) { const st = stationsOf('police').slice().sort((a, c) => dist(a, b) - dist(c, b))[0]; dispatch('police', st, b, coversB('police', b) ? 5 : 14); }
+      if (!v && staffWorking('police') >= 1) { const st = stationsOf('police').slice().sort((a, c) => dist(a, b) - dist(c, b))[0]; dispatch('police', st, b, (coversB('police', b) ? 5 : 14) * (st && st.vehicle ? 0.6 : 1)); }
     }
     // ---- roadworks: the crew van comes, works, then leaves
     for (const b of state.buildings.slice()) {
@@ -2237,13 +2391,14 @@
     const boost = boostNow(now);
     const landmarks = LANDMARK_ORDER.reduce((a, k) => a + (hasLandmark(k) ? TYPES[k].mood : 0), 0);
     const trouble = troubleNow() - state.buildings.filter((b) => b.robbed).length * 3;
-    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble), 0, 100);
-    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, roles, mult: 0.6 + 0.8 * value / 100 };
+    const debt = state.gold < 0 ? -10 : 0; // staff aren't paid in full: everyone notices
+    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt), 0, 100);
+    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, roles, mult: 0.6 + 0.8 * value / 100 };
   }
   const moodWord = (v) => (v < 25 ? 'Miserable' : v < 45 ? 'Grumpy' : v < 60 ? 'Okay' : v < 80 ? 'Happy' : 'Delighted');
   function econ(now) {
     const ci = city(), mood = moodNow(now || Date.now());
-    const wages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0);
+    const wages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0) + fleetUpkeep();
     const taxes = ci.total * mood.mult;
     return { ci, mood, taxes, wages, net: taxes - wages };
   }
@@ -2295,6 +2450,7 @@
   function jobLabel(q) {
     if (q.kind === 'clear') return `Clear the ${PLOTS[q.plot].name.toLowerCase()}`;
     const t = TYPES[q.type];
+    if (q.kind === 'remove') return `Clear away the ${t.name.toLowerCase()}`;
     if (q.kind === 'build') return `Build a ${t.name.toLowerCase()}`;
     if (q.kind === 'repair') return `Repair the ${t.name.toLowerCase()}`;
     return `${t.name} to level ${q.toLevel}`;
@@ -2303,6 +2459,7 @@
   function jobName(q) {
     if (q.kind === 'clear') return `clearing the ${PLOTS[q.plot].name.toLowerCase()}`;
     const t = TYPES[q.type];
+    if (q.kind === 'remove') return `clearing away the ${t.name.toLowerCase()}`;
     if (q.kind === 'build') return `the new ${t.name.toLowerCase()}`;
     if (q.kind === 'repair') return `repairing the ${t.name.toLowerCase()}`;
     return `${t.name} to level ${q.toLevel}`;
@@ -2432,6 +2589,12 @@
       return;
     }
     const b = byId(q.bid); if (!b) return;
+    if (q.kind === 'remove') {
+      state.buildings = state.buildings.filter((x) => x !== b);
+      const p = centerOf(b); for (let i = 0; i < 10; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 24, y: p.y - 6, vx: (Math.random() - 0.5) * 30, vy: -20 - Math.random() * 25, life: 0, max: 1, puff: true, color: 'rgba(200,190,170,.8)', r: 3 });
+      floats.push({ x: p.x, y: p.y - 30, t0: performance.now(), text: 'Cleared away', soft: true });
+      return;
+    }
     if (q.kind === 'build') { b.site = false; result.built.push({ bid: b.id, kind: 'build', from: 0, type: b.type, level: 1, label: T(b).name, note: b.resident ? `${b.resident} moves in` : (T(b).cat === 'shop' ? 'Open for business' : 'Finished') }); }
     else if (q.kind === 'repair') { b.ruin = false; result.built.push({ bid: b.id, kind: 'repair', from: b.level, type: b.type, level: b.level, label: T(b).name, note: b.resident ? `${b.resident} is back` : 'Open again' }); }
     else { b.level = q.toLevel; result.built.push({ bid: b.id, kind: 'upgrade', from: q.fromLevel || q.toLevel - 1, type: b.type, level: b.level, label: T(b).name, note: `Level ${b.level}` }); }
@@ -2587,9 +2750,10 @@
      app), but a page that plays sound gets the "now playing" tile there. So during focus an optional soft sound plays,
      and the tile reads "18 min left · until 15:25". ---------- */
   const LOCK = { el: null, urls: {}, title: '', on: false, art: null };
-  function wavUrl(kind) {
-    if (LOCK.urls[kind]) return LOCK.urls[kind];
-    const sr = 22050, secs = kind === 'bell' ? 2.6 : 12, fadeN = Math.floor(sr * 0.6);
+  // Made-up sounds: soft rain, brown noise, ocean waves, a crackling fire, a near-silent hush, and a bell. 12-second loops.
+  function genSound(kind, sr) {
+    sr = sr || 22050;
+    const secs = kind === 'bell' ? 2.6 : 12, fadeN = Math.floor(sr * 0.6);
     let n = Math.floor(sr * secs); const d = new Float32Array(n);
     if (kind === 'bell') {
       for (let i = 0; i < n; i++) { const t = i / sr; d[i] = 0.32 * Math.exp(-t * 1.8) * (Math.sin(2 * Math.PI * 784 * t) + 0.45 * Math.exp(-t * 2.5) * Math.sin(2 * Math.PI * 1176 * t) + 0.25 * Math.exp(-t * 4) * Math.sin(2 * Math.PI * 1568 * t)) * Math.min(1, t * 200); }
@@ -2604,10 +2768,24 @@
           if (Math.random() < 0.0009) { drop = 0.14 + Math.random() * 0.12; dropF = 1400 + Math.random() * 2400; }
           drop *= 0.9965; ph += 2 * Math.PI * dropF / sr;
           d[i] = (lp * 0.9 + br * 1.2 + drop * Math.sin(ph) * 0.5) * 0.22; // soft: iPhones ignore the page's volume setting
+        } else if (kind === 'waves') {
+          // slow swells, two per loop, over deep brown noise
+          lp += (br - lp) * 0.08; const sw = 0.5 + 0.5 * Math.sin(2 * Math.PI * (i / n) * 2 - Math.PI / 2);
+          d[i] = (lp * 2.2 * (0.18 + 0.82 * sw * sw) + br * 0.25) * 0.8;
+        } else if (kind === 'fire') {
+          // a low rumble with little crackles and pops
+          lp += (br - lp) * 0.05;
+          if (Math.random() < 6 / sr) { drop = 0.25 + Math.random() * 0.35; dropF = Math.random() < 0.3 ? 0.985 : 0.9; }
+          drop *= dropF; d[i] = lp * 1.3 + drop * w * 0.6;
         } else d[i] = br * (kind === 'quiet' ? 0.04 : 0.85);
       }
     }
     if (kind !== 'bell') { for (let i = 0; i < fadeN; i++) { const k = i / fadeN; d[i] = d[i] * k + d[n - fadeN + i] * (1 - k); } n -= fadeN; } // seamless loop
+    return { data: d.subarray(0, n), sr };
+  }
+  function wavUrl(kind) {
+    if (LOCK.urls[kind]) return LOCK.urls[kind];
+    const g = genSound(kind, 22050), d = g.data, n = d.length, sr = g.sr;
     const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf), str = (o, x) => { for (let i = 0; i < x.length; i++) v.setUint8(o + i, x.charCodeAt(i)); };
     str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVE'); str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
     v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 2, true);
@@ -3076,11 +3254,19 @@
     touch(); accrue(Date.now()); sfx.place(); bump(id);
     checkQuests(false); save(); closePanel(); afterAction();
   }
+  // Clearing away a decoration or a find is a paid job for the crew (it takes a little time and gives nothing back).
+  const REMOVE_WORK = 2;
+  const removeCost = (b) => Math.max(5, Math.round((T(b).cost || 30) * 0.4));
   function removeDecor(id) {
-    const b = byId(id); if (!b || T(b).cat !== 'decor') return;
-    state.buildings = state.buildings.filter((x) => x !== b);
-    state.gold += Math.floor(T(b).cost / 2);
-    touch(); save(); closePanel(); afterAction();
+    const b = byId(id); if (!b || jobFor(b.id)) return;
+    const cost = removeCost(b);
+    if (state.queue.length >= QUEUE_MAX) { toast(`${state.builder}'s plan is full (5 jobs).`); return; }
+    if (state.gold + 1e-6 < cost) { toast(`The crew costs ${cost} gold to clear it away.`); return; }
+    accrue(Date.now());
+    state.gold -= cost;
+    state.queue.push({ id: state.nextId++, kind: 'remove', type: b.type, bid: b.id, fromLevel: b.level, toLevel: b.level, work: REMOVE_WORK, done: 0, paid: cost });
+    touch(); save(); sfx.coin(); closePanel(); renderAll(); afterAction();
+    toast(`${state.builder} clears it away in ${fmtSecs(buildSecs(REMOVE_WORK))}.`);
   }
   function bump(bid) { ui.bump = { bid, t0: performance.now() }; }
 
@@ -3987,7 +4173,10 @@
   const VEH_LOOK = {
     fire: { top: '#E2483A', a: '#B8342A', b: '#9A2A22', stripe: '#F4F1EA' },
     police: { top: '#F4F6F8', a: '#D8DDE3', b: '#C3C9D1', stripe: '#2F4E8C' },
-    crew: { top: '#F4BE3E', a: '#D99F22', b: '#BF8A18', stripe: '#3B3B3B' }
+    crew: { top: '#F4BE3E', a: '#D99F22', b: '#BF8A18', stripe: '#3B3B3B' },
+    garbage: { top: '#5FAE6E', a: '#3E8E57', b: '#2F7046', stripe: '#F3C64B' },
+    van: { top: '#9BBF5A', a: '#7A9E3E', b: '#617F31', stripe: '#F4F1EA' },
+    ambulance: { top: '#F6F7F9', a: '#DCE0E6', b: '#C6CBD3', stripe: '#D9342B' }
   };
   function drawVehicle(c, v, now, after) {
     const p = tileCenter(v.c - 0.5, v.r - 0.5), L = VEH_LOOK[v.kind];
@@ -4562,6 +4751,14 @@
     const truckOut = VEH.some((v) => v.kind === 'fire'), copOut = VEH.some((v) => v.kind === 'police');
     if (!reduced) for (const w of walkers) { if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep) continue; stepWalker(w, dt, now); }
     for (const v of VEH) objs.push({ depth: v.c + v.r - 1 + 0.05, draw: () => drawVehicle(c, v, now, after) });
+    // vehicles you bought, parked by their station when they are not out on a job
+    for (const b of state.buildings) {
+      if (!b.vehicle || !FLEET[b.type] || !live(b)) continue;
+      const kind = FLEET[b.type].kind; if (VEH.some((v) => v.kind === kind && v.station === b.id)) continue;
+      const d = doorTile(b, b.c + 2, b.r + 4); if (!d) continue;
+      const pv = { kind, c: d.c + 0.5, r: d.r + 0.5, dir: { dc: 1, dr: 0 }, state: 'back' };
+      objs.push({ depth: d.c + d.r + 0.05, draw: () => drawVehicle(c, pv, now, after) });
+    }
     for (const w of walkers) {
       if ((truckOut && w.role === 'fire') || (copOut && w.role === 'police') || w.asleep) continue;
       objs.push({ depth: w.c + w.r - 1 + 0.02, draw: () => {
@@ -4740,8 +4937,11 @@
   const FLAME_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-1.2-.5-2.2-1-3 3 1.5 5 4.2 5 7.5A7 7 0 0 1 5 15.5C5 9.5 11 7 12 2z"/></svg>';
   function renderHud() {
     const cap = treasuryCap(), ec = econ(), ci = ec.ci;
-    $('gold').textContent = fmtGold(state.gold);
-    $('gold-cap').textContent = state.gold >= cap ? '' : ` / ${fmtGold(cap)}`;
+    $('gold').textContent = state.gold < 0 ? `−${fmtGold(-state.gold + 0.999)}` : fmtGold(state.gold);
+    $('gold-cap').textContent = state.gold >= cap || state.gold < 0 ? '' : ` / ${fmtGold(cap)}`;
+    $('chip-gold').classList.toggle('debt', state.gold < 0);
+    if (state.gold < 0 && !ui.debtWarned) { ui.debtWarned = true; setTimeout(() => toast('The town is in debt! Tap your gold to sell a building or take a loan.'), 400); }
+    if (state.gold >= 0) ui.debtWarned = false;
     const playing = ui.screen === 'play';
     const net = Math.round(ec.net), rate = `${net >= 0 ? '+' : '−'}${Math.abs(net)}`;
     const gr = $('gold-rate');
@@ -5051,7 +5251,8 @@
     const ru = live(b) && t.cat === 'shop' ? rushFor(b.type) : null;
     if (ru) chips.push(pill(`Rush ×${ru.mult} · ${fmtMin(Math.max(1, ru.left))} left`, 'rush'));
     if (live(b) && t.cat === 'shop' && state.perks[b.type]) chips.push(pill(`Perk +${Math.round(state.perks[b.type] * 100)}%`, 'rush'));
-    if (t.staff && t.reach) chips.push(pill(`Reach ${t.reach} tiles`, 'xp'));
+    if (t.staff && t.reach) chips.push(pill(`Reach ${stationReach(b)} tiles`, 'xp'));
+    if (b.vehicle && FLEET[b.type]) chips.push(pill(FLEET[b.type].name, 'gold'));
     if (live(b) && messy(b) && (b.trash || 0) >= 0.5) chips.push(fixPill('Trash outside', () => staffAction('sweeper', b)));
     if (b.type === 'park' && live(b) && (b.overgrown || 0) > 0.3) chips.push(fixPill('Overgrown', () => staffAction('gardener', b)));
     if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && !policeCovers(b)) chips.push(fixPill(nightK() > 0.5 ? 'Not safe at night' : 'Not safe', () => staffAction('police', b)));
@@ -5089,7 +5290,7 @@
       row.append(actionBtn(q.done > 0 ? 'In the plan' : 'Remove from plan', q.done > 0 ? 'Already started' : `Refund ${q.paid} gold`, '', () => { removeFromPlan(q.id); closePanel(); }, q.done > 0));
     } else if (q) {
       const wait = activeBuild() !== q;
-      row.append(actionBtn(wait ? `Waiting for ${state.builder}` : `${q.kind === 'repair' ? 'Repairing' : q.kind === 'build' ? 'Building' : 'Upgrading'}… ${Math.round(q.done / q.work * 100)}%`, wait ? 'next in line' : `${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work) / (state.coffee > 0 ? 2 : 1))} left${state.coffee > 0 ? ' · coffee 2×' : ''}`, 'primary', () => {}, true));
+      row.append(actionBtn(wait ? `Waiting for ${state.builder}` : `${q.kind === 'repair' ? 'Repairing' : q.kind === 'build' ? 'Building' : q.kind === 'remove' ? 'Clearing' : 'Upgrading'}… ${Math.round(q.done / q.work * 100)}%`, wait ? 'next in line' : `${fmtSecs(buildSecs(q.work) * (1 - q.done / q.work) / (state.coffee > 0 ? 2 : 1))} left${state.coffee > 0 ? ' · coffee 2×' : ''}`, 'primary', () => {}, true));
       row.append(actionBtn('Cancel', `Refund ${q.paid} gold`, '', () => { removeFromPlan(q.id); closePanel(); }));
       if (ui.screen !== 'play') why = `${state.builder} builds it next time you play.`;
     } else if (b.ruin) {
@@ -5099,8 +5300,10 @@
     } else if (b.site) {
       // a site without a job cannot happen; nothing to do
     } else if (t.cat === 'decor') {
-      row.append(moveBtn(), actionBtn('Remove', `+${Math.floor(t.cost / 2)} gold back`, '', () => removeDecor(b.id)));
-    } else if (special(t) || t.cat === 'landmark') {
+      row.append(moveBtn(), actionBtn('Clear away', `crew · ${removeCost(b)} gold`, '', () => removeDecor(b.id)));
+    } else if (special(t)) {
+      row.append(moveBtn(), actionBtn('Clear away', `crew · ${removeCost(b)} gold`, '', () => removeDecor(b.id)));
+    } else if (t.cat === 'landmark') {
       row.append(moveBtn());
     } else {
       const chk = checkJob('upgrade', b);
@@ -5117,6 +5320,17 @@
     if (q || b.ruin || b.site) { /* no move while it is being worked on */ }
     if (row.childNodes.length) { row.classList.toggle('two', row.childNodes.length === 2); if (row.childNodes.length === 1) row.style.gridTemplateColumns = '1fr'; box.append(row); }
     if (why) box.append(el('p', 'tiny muted', why));
+    if (sellable(b) && T(b).cat !== 'decor' && !special(T(b))) {
+      const sl = el('button', 'link', `Sell for ${sellPrice(b)} gold (half of what it cost)`);
+      sl.addEventListener('click', () => { if (sl.dataset.ask) sellBuilding(b.id); else { sl.dataset.ask = '1'; sl.textContent = `Tap again to sell it for ${sellPrice(b)} gold`; } });
+      box.append(sl);
+    }
+    if (FLEET[b.type] && live(b) && !ui.visit) {
+      const f = FLEET[b.type], vr = el('div', 'snote');
+      if (b.vehicle) { vr.append(el('span', '', `${f.name}: reach ${stationReach(b)} tiles instead of ${TYPES[b.type].reach}. Upkeep ${f.upkeep} gold an hour.`)); const sv = el('button', 'link', `Sell it · +${Math.round(f.cost / 2)} gold`); sv.addEventListener('click', () => sellVehicle(b.id)); vr.append(sv); }
+      else { vr.append(el('span', '', `${f.name}: ${f.what} ${f.cost} gold, then ${f.upkeep} gold an hour.${b.level < 2 ? ` Needs the ${t.name.toLowerCase()} at level 2.` : ''}`)); const bv = el('button', 'link', `Buy a ${f.name.toLowerCase()} · ${f.cost} gold`); bv.disabled = b.level < 2 || state.gold + 1e-6 < f.cost || ui.screen !== 'play'; bv.addEventListener('click', () => buyVehicle(b.id)); vr.append(bv); }
+      box.append(vr);
+    }
     if (t.staff && live(b)) box.append(staffRow(t.staff));
     if (b.type === 'townhall') { const staffBtn = el('button', 'btn fresh', `Hire town staff · mood ${mood.value}%`); staffBtn.addEventListener('click', openMood); box.append(staffBtn); }
     if (myJob && !isMine) { const w = actionBtn('Make this my job', jobLine(myJob), 'fresh', () => { state.job = b.id; save(); toast(`When ${state.builder} is done, you ${myJob.verb.toLowerCase()} ${myJob.at}.`); renderAll(); }); box.append(w); }
@@ -5290,7 +5504,8 @@
     if (item.type === 'police') { radius = 0; kind = null; }
     const customers = t.cat === 'shop' ? others.filter((h) => live(h) && T(h).cat === 'home' && dist(h, me) <= t.radius).length : 0;
     // A service building's reach and the places its staff would look after from here.
-    const sk = t.staff, reach = sk ? t.reach : 0;
+    const vb = item.moveId != null ? byId(item.moveId) : null;
+    const sk = t.staff, reach = sk ? Math.round(t.reach * (vb && vb.vehicle ? 1.5 : 1)) : 0;
     const safeList = sk ? others.filter((h) => SERVES[sk].what(h) && dist(h, me) <= reach) : null, safe = safeList ? safeList.length : 0;
     const val = { homes, radius, kind, customers, safe, safeList, reach, staff: sk, gold: (after.total - before.total) * econ().mood.mult };
     fxCache.key = key; fxCache.val = val;
@@ -5576,12 +5791,50 @@
     if (live(b) && t.cat === 'home') chips.push(pill(`${inf.residents} residents`));
     box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site }, t.name, chips), el('p', 'small', t.blurb || ''), el('p', 'tiny muted', `You are visiting ${state.town}. Look around as much as you like: nothing here costs play time, and nothing changes.`));
   }
+  /* Robot towns: computer-run neighbours on the board (once you are signed in), so there is always someone to visit
+     and race. Their towns and minutes are made up from a fixed seed, so they look the same for everyone. */
+  const BOTS = [
+    ['Pinehaven', 'Rosa', 9, 70], ['Saltmarsh', 'Abe', 6, 45], ['Willowby', 'Juno', 12, 95], ['Copperbrook', 'Milo', 4, 30],
+    ['Thornfield', 'Greta', 8, 60], ['Amberly Bay', 'Kai', 14, 120], ['Mossgate', 'Lou', 5, 38]
+  ];
+  let botCache = null;
+  function botTowns() {
+    const now = Date.now(), dk = dayKey(now), wk = weekKey(now);
+    if (botCache && botCache.key === dk + Math.floor(now / 600000)) return botCache.list;
+    const d = new Date(now), dow = (d.getDay() + 6) % 7, frac = (d.getHours() + d.getMinutes() / 60) / 24;
+    const list = BOTS.map(([town, mayor, level, pace], i) => {
+      let seed = 1234567 + i * 7919; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+      const hall = level >= 12 ? 4 : level >= 8 ? 3 : level >= 5 ? 2 : 1;
+      const land = ['base'].concat(level >= 6 ? ['east'] : [], level >= 10 ? ['south'] : []);
+      const b = [['townhall', 5, 5, hall, 0]], occ = new Set(); const put = (type, c, r) => { const sz = sizeOf(type); for (let x = 0; x < sz; x++) for (let y = 0; y < sz; y++) occ.add((c + x) + ',' + (r + y)); };
+      put('townhall', 5, 5);
+      const open = (c, r) => (c < 12 && r < 12) || (land.includes('east') && c >= 12 && r < 12) || (land.includes('south') && c < 12 && r >= 12);
+      const fitsBot = (type, c, r) => { const sz = sizeOf(type); for (let x = 0; x < sz; x++) for (let y = 0; y < sz; y++) { const cc = c + x, rr = r + y; if (cc < 0 || rr < 0 || cc >= N || rr >= N || !open(cc, rr) || occ.has(cc + ',' + rr)) return false; } return true; };
+      const want = ['cottage', 'cottage', 'cottage', 'market', 'cafe', 'park', 'tree', 'flowers', 'cottage', 'depot', 'firestation', 'townhouse', 'bakery', 'fountain', 'police', 'cottage', 'tree', 'workshop', 'townhouse', 'arcade', 'bookshop', 'clinic', 'cottage', 'bench', 'lighthouse', 'bank', 'tree', 'flowers'];
+      const count = Math.min(want.length, 8 + level * 2);
+      for (let k = 0; k < count; k++) {
+        const type = want[k]; if (!TYPES[type]) continue;
+        for (let tries = 0; tries < 60; tries++) {
+          const c = Math.floor(rnd() * N), r = Math.floor(rnd() * N);
+          if (type === 'lighthouse' && !(c === 0 || r === 0)) continue;
+          if (fitsBot(type, c, r)) { put(type, c, r); b.push([type, c, r, clamp(1 + Math.floor(rnd() * (hall + 1)), 1, Math.min(hall, TYPES[type].max || 1)), 0]); break; }
+        }
+      }
+      const residents = b.reduce((a, x) => a + (TYPES[x[0]].residents ? TYPES[x[0]].residents[x[3]] : 0), 0);
+      const daily = pace * (0.7 + 0.6 * rnd());
+      return { id: 'bot:' + i, bot: true, mayor, d: { v: 1, town, builder: mayor, level, residents, mood: 60 + Math.round(rnd() * 30), streak: 2 + Math.floor(rnd() * 20), week: wk, weekMin: Math.round(daily * (dow + frac)), day: dk, dayMin: Math.round(daily * frac), total: Math.round(daily * (40 + level * 8)), badges: Math.min(9, 2 + Math.floor(level / 2)), hall, land, b, staff: {} } };
+    });
+    botCache = { key: dk + Math.floor(now / 600000), list };
+    return list;
+  }
+  const showBots = () => !!(board.me && (board.kind === 'firebase' || board.db));
   function boardRows() {
     const now = Date.now(), wk = weekKey(now), dk = dayKey(now), tab = board.tab;
     const score = (d) => (tab === 'week' ? (d.week === wk ? d.weekMin | 0 : 0) : tab === 'day' ? (d.day === dk ? d.dayMin | 0 : 0) : d.total | 0);
     const live2 = board.docs.filter((d) => d && d.town).map((d) => ({ id: d.id, d, live: true, score: score(d) }));
     const codes = realState().friends.filter((f) => !live2.some((x) => x.d.town === f.snap.town && x.d.total === f.snap.total)).map((f) => ({ id: 'code:' + f.key, d: f.snap, live: false, score: score(f.snap), key: f.key, at: f.at }));
-    return live2.concat(codes).sort((a, b) => b.score - a.score || (b.d.level | 0) - (a.d.level | 0));
+    const bots = showBots() ? botTowns().map((x) => ({ id: x.id, d: x.d, live: false, bot: true, mayor: x.mayor, score: score(x.d) })) : [];
+    return live2.concat(codes, bots).sort((a, b) => b.score - a.score || (b.d.level | 0) - (a.d.level | 0));
   }
   async function renderBoardList(listEl) {
     const rows = boardRows(), ids = rows.filter((r) => r.live).map((r) => r.id);
@@ -5591,15 +5844,16 @@
     if (!rows.length) { listEl.append(el('p', 'small muted', FB.cfg && !board.db && !inFrame ? 'Join to see who is on the board.' : 'Nobody here yet.')); return; }
     rows.forEach((r, i) => {
       const me = r.live && r.id === board.me, row = el('div', 'lbrow' + (me ? ' me' : '') + (i < 3 ? ` r${i + 1}` : ''));
-      const img = el('img'); img.alt = ''; img.src = r.live && ps[r.id] ? ps[r.id].avatarUrl : 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="18" fill="#93C46C"/><path d="M18 8 7 17h3v10h6v-6h4v6h6V17h3z" fill="#fff"/></svg>');
-      const nm = el('div'); const who = r.live ? ((ps[r.id] && ps[r.id].name) || (me ? 'You' : 'A mayor')) : 'Neighbour (by code)';
-      nm.append(el('b', '', `${me ? 'You' : who} · ${r.d.town}`), el('small', '', `Lv ${r.d.level | 0} · ${r.d.residents | 0} people · ${r.d.streak | 0}-day streak${r.live ? '' : ` · code from ${fmtAgo(r.at)}`}`));
+      const BOT_IMG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="18" fill="#8E9AAF"/><rect x="10" y="12" width="16" height="13" rx="3" fill="#fff"/><circle cx="15" cy="18" r="1.8" fill="#8E9AAF"/><circle cx="21" cy="18" r="1.8" fill="#8E9AAF"/><path d="M18 8v4" stroke="#fff" stroke-width="2"/><circle cx="18" cy="7.5" r="1.6" fill="#fff"/></svg>';
+      const img = el('img'); img.alt = ''; img.src = r.live && ps[r.id] ? ps[r.id].avatarUrl : 'data:image/svg+xml;utf8,' + encodeURIComponent(r.bot ? BOT_IMG : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="18" fill="#93C46C"/><path d="M18 8 7 17h3v10h6v-6h4v6h6V17h3z" fill="#fff"/></svg>');
+      const nm = el('div'); const who = r.live ? ((ps[r.id] && ps[r.id].name) || (me ? 'You' : 'A mayor')) : r.bot ? `${r.mayor} (robot)` : 'Neighbour (by code)';
+      nm.append(el('b', '', `${me ? 'You' : who} · ${r.d.town}`), el('small', '', `Lv ${r.d.level | 0} · ${r.d.residents | 0} people · ${r.d.streak | 0}-day streak${r.live || r.bot ? '' : ` · code from ${fmtAgo(r.at)}`}`));
       const sc = el('div', 'sc'); sc.append(document.createTextNode(fmtMin(r.score)), el('small', '', board.tab === 'week' ? 'this week' : board.tab === 'day' ? 'today' : 'in total'));
       row.append(el('span', 'rk', String(i + 1)), img, nm, sc);
       const acts = el('div', 'lbacts');
-      if (!me) { const vb = el('button', 'btn sm', 'Visit town'); vb.addEventListener('click', () => visitTown(r.d, r.live ? (ps[r.id] && ps[r.id].name) || '' : '', r.live ? r.id : null)); acts.append(vb); }
+      if (!me) { const vb = el('button', 'btn sm', 'Visit town'); vb.addEventListener('click', () => visitTown(r.d, r.live ? (ps[r.id] && ps[r.id].name) || '' : r.bot ? r.mayor : '', r.live ? r.id : null)); acts.append(vb); }
       if (r.live && !me && realState().board.joined) { const cb = el('button', 'btn sm goldc', cheeredToday(r.id) ? 'Cheered ✓' : 'Cheer'); cb.disabled = cheeredToday(r.id); cb.addEventListener('click', () => { cheer(r.id); renderBoardList(listEl); }); acts.append(cb); }
-      if (!r.live) { const rm = el('button', 'btn sm ghost', 'Remove'); rm.addEventListener('click', () => { state.friends = state.friends.filter((f) => f.key !== r.key); save(); renderBoardList(listEl); }); acts.append(rm); }
+      if (!r.live && !r.bot) { const rm = el('button', 'btn sm ghost', 'Remove'); rm.addEventListener('click', () => { state.friends = state.friends.filter((f) => f.key !== r.key); save(); renderBoardList(listEl); }); acts.append(rm); }
       if (acts.childNodes.length) row.append(acts);
       listEl.append(row);
     });
@@ -6005,11 +6259,17 @@
 
   /* ---------- Sheets ---------- */
   let sheetReturn = null;
-  function openSheet(title, body) {
+  function openSheet(title, body, opts) {
+    opts = opts || {};
+    const opening = $('scrim').hidden;
+    // Pages opened from the menu fill the screen and have a back arrow; re-drawing a page keeps its look.
+    const full = opts.full != null ? opts.full : ui.menuNav ? true : !opening && $('sheet').classList.contains('full');
+    const back = opts.back != null ? opts.back : ui.menuNav ? true : !opening && !$('sheet-back').hidden;
+    ui.menuNav = false;
+    $('sheet').classList.toggle('full', !!full); $('sheet-back').hidden = !back;
     $('sheet-title').textContent = title;
     $('sheet-body').replaceChildren(body);
     $('sheet').dataset.kind = '';
-    const opening = $('scrim').hidden;
     if (opening) { sheetReturn = document.activeElement; sfx.pop(); }
     $('scrim').hidden = false;
     if (opening) { $('sheet').scrollTop = 0; $('sheet-close').focus({ preventScroll: true }); }
@@ -6060,9 +6320,79 @@
     wrap.append(el('p', 'tiny muted', `${state.questsDone.length} request${state.questsDone.length === 1 ? '' : 's'} done so far.`));
     openSheet('Requests', wrap);
   }
+  /* ---------- Money trouble: sell a building for half of what it cost, or borrow from a neighbour town's bank ---------- */
+  function paidFor(b) {
+    const t = T(b); if (!t.cost) return 0;
+    let v = t.cost; if (t.up) for (let L = 2; L <= b.level; L++) if (t.up[L]) v += t.up[L][0];
+    return v;
+  }
+  const sellable = (b) => live(b) && !b.fire && !jobFor(b.id) && T(b).cost && !['townhall', 'works'].includes(b.type) && T(b).cat !== 'landmark';
+  const sellPrice = (b) => Math.round(paidFor(b) * 0.5);
+  function sellBuilding(id) {
+    const b = byId(id); if (!b || !sellable(b)) return;
+    const price = sellPrice(b);
+    accrue(Date.now());
+    state.buildings = state.buildings.filter((x) => x !== b);
+    state.gold += price;
+    const p = centerOf(b); for (let i = 0; i < 14; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 28, y: p.y - 10, vx: (Math.random() - 0.5) * 36, vy: -24 - Math.random() * 28, life: 0, max: 1.1, puff: true, color: 'rgba(210,200,180,.85)', r: 3.5 });
+    floats.push({ x: p.x, y: p.y - 34, t0: performance.now(), text: `Sold · +${price} gold` });
+    sfx.coin(); touch(); save(); closePanel(true); closeSheet(); renderAll();
+    toast(`Sold the ${T(b).name.toLowerCase()} for ${price} gold.${b.resident ? ` ${b.resident} moved away.` : ''}`);
+  }
+  // Neighbour towns' banks lend gold, at a high price: you pay back 30% more, from 30% of your taxes until it is paid.
+  const LENDERS = ['Bank of Riverton', 'Hollowbrook Savings', 'Port Amberly Bank'];
+  function loanOffers() {
+    const base = Math.max(100, Math.round(econ().taxes * 3 / 50) * 50);
+    return [base, base * 2, base * 4].map((n) => ({ amount: n, owed: Math.round(n * 1.3) }));
+  }
+  function takeLoan(amount) {
+    if (state.loan) { toast('Pay off your loan first.'); return; }
+    const o = loanOffers().find((x) => x.amount === amount); if (!o) return;
+    state.loan = { lender: pick(LENDERS), amount: o.amount, owed: o.owed, at: Date.now() };
+    state.gold += o.amount; sfx.coin(); touch(); save(); renderAll();
+    toast(`${state.loan.lender} lent you ${o.amount} gold. You pay back ${o.owed}, a bit from every tax payment.`);
+    openTown();
+  }
+  function repayLoan() {
+    const L = state.loan; if (!L) return;
+    const pay = Math.min(L.owed, Math.max(0, Math.floor(state.gold)));
+    if (pay <= 0) { toast('No gold to pay with yet.'); return; }
+    state.gold -= pay; L.owed -= pay; if (L.owed <= 0.01) state.loan = null;
+    sfx.coin(); save(); renderAll(); toast(state.loan ? `Paid ${pay} gold. ${Math.ceil(state.loan.owed)} still to go.` : 'Loan paid off!'); openTown();
+  }
+  function moneyBox() {
+    const box = el('div', 'req' + (state.gold < 0 ? ' warn' : ''));
+    box.append(el('div', 'from', state.gold < 0 ? `In debt: ${fmtGold(-state.gold + 0.999)} gold` : 'Money options'));
+    box.append(el('div', 'small', state.gold < 0 ? 'Wages are higher than taxes, and the treasury is empty. Until you are back above zero you can\'t build or hire, and the town is unhappy.' : 'Running short? Sell a building, or borrow from a neighbour town\'s bank.'));
+    if (state.loan) {
+      box.append(el('div', 'small', `Loan from ${state.loan.lender}: ${Math.ceil(state.loan.owed)} gold still to pay. 30% of your taxes go to it.`));
+      const rp = el('button', 'btn sm', `Pay back now · up to ${Math.min(Math.ceil(state.loan.owed), Math.max(0, Math.floor(state.gold)))} gold`); rp.addEventListener('click', repayLoan); box.append(rp);
+    } else {
+      const lr = el('div', 'dp-durs');
+      for (const o of loanOffers()) { const b = el('button', '', `Borrow ${o.amount} · pay back ${o.owed}`); b.type = 'button'; b.addEventListener('click', () => takeLoan(o.amount)); lr.append(b); }
+      box.append(el('div', 'tiny muted', 'A neighbour town\'s bank lends gold at a high price: you pay back 30% more, from 30% of your taxes until it is paid.'), lr);
+    }
+    const sl = el('button', 'btn sm', 'Sell a building for half of what it cost'); sl.addEventListener('click', openSell); box.append(sl);
+    return box;
+  }
+  function openSell() {
+    const wrap = el('div', 'list'), ci = city();
+    wrap.append(el('p', 'small', 'Selling gives back half of what the building and its upgrades cost. Residents move away, and its staff room is gone.'));
+    const rows = state.buildings.filter(sellable).sort((a, b) => sellPrice(b) - sellPrice(a));
+    for (const b of rows) {
+      const inf = ci.info.get(b.id), row = el('div', 'sellrow');
+      const tx = el('div'); tx.append(el('b', '', `${T(b).name}${b.resident ? ' · ' + b.resident : ''}`), el('small', '', `Level ${b.level}${inf && inf.income >= 0.5 ? ` · earns ${Math.round(inf.income)}/h` : ''}${T(b).staff ? ' · staff building' : ''}`));
+      const go = el('button', 'btn sm', `Sell · +${sellPrice(b)}`);
+      go.addEventListener('click', () => { if (go.dataset.ask) sellBuilding(b.id); else { go.dataset.ask = '1'; go.textContent = `Sure? +${sellPrice(b)} gold`; go.classList.add('primary'); } });
+      row.append(icon(b.type, b.level, 40, 34), tx, go); wrap.append(row);
+    }
+    if (!rows.length) wrap.append(el('p', 'small muted', 'Nothing to sell right now.'));
+    openSheet('Sell a building', wrap);
+  }
   function openTown() {
     const ec = econ(), ci = ec.ci, cap = treasuryCap();
     const wrap = el('div', 'list');
+    if (state.gold < 0 || ec.net < 0 || state.loan) wrap.append(moneyBox());
     const st = el('div', 'stats');
     const s1 = el('div', 'stat'); s1.append(el('b', 'num', `${ec.net < 0 ? '−' : ''}${Math.abs(Math.round(ec.net))}`), el('span', '', 'gold an hour while you focus or play'));
     const s2 = el('div', 'stat'); s2.append(el('b', 'num', String(ci.residents)), el('span', '', 'residents'));
@@ -6086,6 +6416,7 @@
     for (const b of rows) { const li = el('li'); li.append(el('span', '', b.resident ? `${T(b).name} · ${b.resident}` : T(b).name), el('span', 'num', `${Math.round(ci.info.get(b.id).income * ec.mood.mult)}/h`)); list.append(li); }
     if (rows.length) { wrap.append(el('h3', '', 'Top earners'), list); }
     else wrap.append(el('p', 'small muted', 'Nothing pays taxes yet. Place the gift cottage and repair the old town.'));
+    if (!(state.gold < 0 || ec.net < 0 || state.loan)) wrap.append(moneyBox());
     openSheet(state.town, wrap);
   }
 
@@ -6113,7 +6444,27 @@
     else info = `${ro.working} working${ro.needed ? ` · town needs ${ro.need} (${r.needText})` : r.neededText ? ` · ${r.neededText.toLowerCase()}` : ''} · room for ${ro.cap}`;
     const nf = hireFee(k, ro.hired), nw = wageOf(k, ro.hired);
     tx.append(el('small', '', info), el('span', 'fee', `${ro.hired ? `${ordinal(ro.hired + 1)} hire` : 'Hire'}: ${nf} gold, then ${nw} gold an hour${ro.hired ? ` · now paying ${wagesFor(k, ro.hired)}/h` : ''}`));
+    if (ro.hired) tx.append(el('small', 'wages', `Wages: ${[...Array(ro.hired).keys()].map((i) => `${ordinal(i + 1)} ${wageOf(k, i)}/h`).join(' · ')}`));
     row.append(tx);
+    // What is wrong, and the fix: buildings out of reach, no room for more, not enough gold.
+    const notes = el('div', 'staffnotes');
+    const home = TYPES[r.home].name.toLowerCase(), word = SERVES[k].word;
+    if (ro.hasHome && ro.working && ro.homes && ro.covered < ro.homes) {
+      const far = ro.homes - ro.covered, nb = state.buildings.find((b) => SERVES[k].what(b) && !coversB(k, b));
+      const n = el('div', 'snote bad'); n.append(el('span', '', `${far} of your ${ro.homes} ${word} ${far === 1 ? 'is' : 'are'} more than ${reachOf(k)} tiles from a staffed ${home}, so nobody comes there.`));
+      const fx2 = el('button', 'link', `Build a ${home} nearer`); fx2.addEventListener('click', () => { closeSheet(); openServiceSpot(r.home, nb); }); n.append(fx2);
+      if (nb) { const sh = el('button', 'link', 'Show me'); sh.addEventListener('click', () => { closeSheet(); showOnMap(nb, { tab: 'info' }); }); n.append(sh); }
+      notes.append(n);
+    }
+    if (ro.hasHome && ro.hired >= ro.cap) {
+      const up = staffBuildings(k).find((b) => !checkJob('upgrade', b).max), nx = up ? TYPES[r.home].slots[up.level + 1] : 0;
+      const n = el('div', 'snote' + (short ? ' bad' : '')); n.append(el('span', '', `No room for more: your ${home}${staffBuildings(k).length > 1 ? 's hold' : ' holds'} ${ro.cap}.${up ? ` Upgrade it to hold ${nx - TYPES[r.home].slots[up.level] + ro.cap}, or build another.` : ' Build another one.'}`));
+      if (up) { const ub = el('button', 'link', `Upgrade the ${home}`); ub.addEventListener('click', () => { closeSheet(); showOnMap(up); }); n.append(ub); }
+      const bb2 = el('button', 'link', `Build another ${home}`); bb2.addEventListener('click', () => { closeSheet(); openServiceSpot(r.home); }); n.append(bb2);
+      notes.append(n);
+    } else if (ro.hasHome && !playing) notes.append(el('div', 'snote', 'Hire during play time.'));
+    else if (ro.hasHome && state.gold + 1e-6 < nf) notes.append(el('div', 'snote', `The next hire costs ${nf} gold: you need ${fmtGold(nf - state.gold + 0.999)} more.`));
+    notes.style.gridColumn = '1 / -1';
     const ask = ui.staffAsk && ui.staffAsk.k === k ? ui.staffAsk.op : null;
     if (ask) {
       const box = el('div', 'confirm'); box.style.gridColumn = '1 / -1'; box.style.marginTop = '2px';
@@ -6142,6 +6493,7 @@
       bb.addEventListener('click', () => { closeSheet(); openServiceSpot(r.home); }); stp.append(bb);
     }
     row.append(stp);
+    if (notes.childNodes.length) row.append(notes);
     return row;
   }
   function refreshStaffViews(any) {
@@ -6187,7 +6539,7 @@
     const stations = staffBuildings(k).length;
     // Out of reach of every one of its buildings: build one nearer. In reach of one nobody works at yet: hire.
     const far = ro.hasHome && nearB && SERVES[k].what(nearB) && !coversB(k, nearB);
-    const inReach = far && staffBuildings(k).some((x) => dist(x, nearB) <= reachOf(k));
+    const inReach = far && staffBuildings(k).some((x) => dist(x, nearB) <= stationReach(x));
     if (far && !inReach && !sq) return { kind: 'build', label: `Build a ${home} nearer`, fn: () => { openServiceSpot(r.home, nearB); toast(`Too far: ${r.plural} only work within ${reachOf(k)} tiles of their ${home}.`); } };
     const short = ro.working < Math.max(1, ro.need) || (inReach && ro.working < stations) || (k === 'police' && ro.working < stations);
     if (ro.hasHome && short && ro.hired < ro.cap) return { kind: 'hire', label: `Hire a ${r.name.toLowerCase()} · ${hireFee(k)} gold`, fn: () => showOnMap(staffBuildings(k)[0]) };
@@ -6234,6 +6586,7 @@
     if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`} ${nk > 0.5 ? 'It is night: homes far from the police are not safe now, and most break-ins happen after dark.' : 'Crime rises at night, most of all far from the police.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
     const nu = role('nurse');
     if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} more than ${reachOf('nurse')} tiles from a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
+    if (m.debt) fac('Money trouble', m.debt, 'The town is in debt and staff wages are late. Sell a building, take a loan or let someone go: tap your gold to see the options.', null, [-10, 0]);
     if (m.trouble <= -0.5) fac('Recent trouble', m.trouble, `${(state.scars || []).slice(-3).map((x) => x.label).join(', ') || 'A break-in'}${state.buildings.some((b) => b.robbed) ? ', and a break-in nobody has solved yet' : ''}. It fades slowly.`, 'up', [-20, 0]);
     if (m.burning) fac('Fire', m.fires, staffWorking('fire') ? 'A building is on fire. Your firefighters are on their way.' : 'A building is on fire and nobody can put it out. Hire a firefighter.', null, [-20, 0]);
     const b = state.boost;
@@ -6381,61 +6734,180 @@
     openSheet('Start focus', wrap);
   }
 
+  /* ---------- The menu: a list of sections; each opens full-screen, with a back arrow to the list ---------- */
+  const MENU_ICONS = {
+    music: '<path fill="currentColor" d="M9 4.5 20 2.5v12.7a3 3 0 1 1-2-2.8V6.6l-7 1.3v9.4a3 3 0 1 1-2-2.8z"/>',
+    progress: '<path fill="currentColor" d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/>',
+    friends: '<path fill="currentColor" d="M6 3h12v3a6 6 0 0 1-4.5 5.8V15H16v3H8v-3h2.5v-3.2A6 6 0 0 1 6 6zM3 5h2v2.5A3 3 0 0 1 3 7zm16 0h2v2a3 3 0 0 1-2 .5zM7 20h10v2H7z"/>',
+    staff: '<path fill="currentColor" d="M8 11a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm8.5 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM2 20c0-3.6 2.7-6 6-6s6 2.4 6 6zm13.5 0c0-1.9-.6-3.5-1.7-4.7.8-.4 1.6-.6 2.7-.6 2.9 0 5 2.2 5 5.3z"/>',
+    money: '<circle cx="12" cy="12" r="9" fill="currentColor"/><path d="M12 7.5v9M9.6 10c0-1 1-1.6 2.4-1.6s2.4.6 2.4 1.5c0 2.2-4.8 1.3-4.8 3.6 0 1 1 1.7 2.4 1.7s2.4-.6 2.4-1.6" stroke="var(--surface)" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
+    festival: '<path fill="currentColor" d="M5 21V3h2v1h11l-2.5 4.5L18 13H7v8z"/>',
+    settings: '<path fill="currentColor" d="M10.3 2h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9L2 13.7v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8zM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/>',
+    help: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-.1 13.6a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zM12 6c-2 0-3.5 1.2-3.7 3h2.2c.2-.7.7-1 1.4-1 .8 0 1.4.5 1.4 1.2 0 .6-.3.9-1.2 1.5-1 .6-1.5 1.3-1.4 2.6h2.1c0-.7.2-1 1.1-1.6 1-.7 1.6-1.4 1.6-2.6C15.5 7.2 14 6 12 6z"/>',
+    about: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm1.2 8h-2.4v8h2.4zM12 5.6a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/>',
+    testing: '<path fill="currentColor" d="M9 2h6v2h-1v5.2l5.6 9.7A2 2 0 0 1 17.9 22H6.1a2 2 0 0 1-1.7-3.1L10 9.2V4H9zm3.3 9h-.6L8.9 16h6.2z"/>'
+  };
+  function menuSections() {
+    const ec = econ(), ri = radio.info();
+    const staffN = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0);
+    return [
+      { k: 'music', title: 'Music', sub: state.music ? `♪ ${ri.title} · ${ri.artist}` : 'Off · tap to choose music and background sounds', page: musicPage },
+      { k: 'progress', title: 'Your progress', sub: `Level ${state.level} · ${state.badges.length} badges · ${state.chestStats.opened} chests`, open: openLevels },
+      { k: 'friends', title: 'Friends & leaderboard', sub: board.me && board.kind === 'firebase' ? `On the board as ${state.board.name || 'Mayor'}` : 'Compete with friends and visit their towns', open: openFriends },
+      { k: 'staff', title: 'Town staff & wages', sub: staffN ? `${staffN} staff · ${Math.round(ec.wages)} gold an hour in wages` : 'Nobody hired yet', page: staffPage },
+      { k: 'money', title: 'Money', sub: `${state.gold < 0 ? '−' : ''}${fmtGold(Math.abs(state.gold))} gold · ${ec.net < 0 ? '−' : '+'}${Math.abs(Math.round(ec.net))} an hour${state.loan ? ' · loan open' : ''}`, open: openTown },
+      { k: 'festival', title: SEASONS[curSeason()].fest, sub: `${Math.floor(seasonProgress().min)} of ${SEASON_GOAL[0]} minutes for its prize`, open: openSeason },
+      { k: 'settings', title: 'Settings', sub: 'Names, sounds, focus alarm, days, lock-screen timer', page: settingsPage },
+      { k: 'help', title: 'Help', sub: 'Why this app, play-time limits, the quick tour', page: helpPage },
+      { k: 'about', title: 'About', sub: `Version ${APP_VERSION} · music credits · rate us`, page: aboutPage },
+      { k: 'testing', title: 'Testing', sub: 'Test speed, extra play time and gold, restart', page: testPage }
+    ];
+  }
   function openMenu() {
+    const wrap = el('div', 'mtiles');
+    for (const m of menuSections()) {
+      const b = el('button', 'mtile k-' + m.k); b.type = 'button'; b.dataset.k = m.k;
+      const ic = el('span', 'mt-ic'); ic.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${MENU_ICONS[m.k]}</svg>`;
+      const tx = el('span', 'mt-tx'); tx.append(el('b', '', m.title), el('small', '', m.sub));
+      const ch = el('span', 'mt-ch'); ch.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m9 5.5 6.5 6.5L9 18.5l-1.5-1.5 5-5-5-5z"/></svg>';
+      b.append(ic, tx, ch);
+      b.addEventListener('click', () => openMenuPage(m.k));
+      wrap.append(b);
+    }
+    wrap.append(el('p', 'tiny muted mver', `Maplewick ${APP_VERSION}`));
+    openSheet('Menu', wrap, { full: false });
+    $('sheet').dataset.kind = 'menu';
+  }
+  function openMenuPage(k) {
+    const m = menuSections().find((x) => x.k === k); if (!m) return;
+    ui.menuNav = true;
+    if (m.open) { m.open(); ui.menuNav = false; return; }
+    openSheet(m.title, m.page(), { full: true, back: true });
+    $('sheet').dataset.kind = 'menu-' + k;
+  }
+  const switchRow = (title, sub, id, checked, onChange) => {
+    const lab = el('label', 'switch'), t = el('span'); t.append(el('b', '', title), el('div', 'tiny muted', sub));
+    const c = el('input'); c.type = 'checkbox'; c.id = id; c.checked = !!checked; c.addEventListener('change', () => onChange(c.checked, c));
+    lab.append(t, c); return lab;
+  };
+  const menuSec = (wrap, title, ...nodes) => { const sct = el('div', 'menu-sec'); if (title) sct.append(el('h3', '', title)); sct.append(...nodes); wrap.append(sct); return sct; };
+
+  // Music: a player, a volume, background sounds, and every song (recorded ones in gold, ones made in Maplewick in purple).
+  function musicPage() {
+    const wrap = el('div', 'musicpage'), ri = radio.info();
+    const now = el('div', 'mnow' + (ri.gen ? ' gen' : ''));
+    const tl = el('div', 'mn-tx'); tl.append(el('span', 'mn-kind', ri.gen ? 'Made in Maplewick' : 'Recorded · free licence'), el('b', '', state.music ? ri.title : 'Music is off'), el('small', '', state.music ? `${ri.artist} · ${ri.station}` : 'Tap play, or pick a song below'));
+    const ctl = el('div', 'mn-ctl');
+    const pp = el('button', 'mn-play'); pp.type = 'button'; pp.setAttribute('aria-label', state.music ? 'Pause' : 'Play'); pp.innerHTML = state.music ? MUS_PAUSE : MUS_PLAY;
+    pp.addEventListener('click', () => { musicToggle(); setTimeout(refreshMusicPage, 250); });
+    const sk = el('button', 'mn-skip'); sk.type = 'button'; sk.setAttribute('aria-label', 'Next song'); sk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 5.5v13l9-6.5zM16 5.5h2.5v13H16z"/></svg>';
+    sk.addEventListener('click', () => { musicSkip(); });
+    ctl.append(pp, sk);
+    now.append(tl, ctl);
+    const vr = el('label', 'mslider'); vr.append(el('span', '', 'Volume'));
+    const vi = el('input'); vi.type = 'range'; vi.min = '0'; vi.max = '100'; vi.value = String(Math.round((state.vol == null ? 0.7 : state.vol) * 100)); vi.id = 'mus-vol'; vi.setAttribute('aria-label', 'Music volume');
+    vi.addEventListener('input', () => { state.vol = vi.value / 100; AUD.unlocked = true; musicUpdate(); clearTimeout(ui.volSave); ui.volSave = setTimeout(save, 400); });
+    vr.append(vi); now.append(vr);
+    if (!ri.volumeWorks && !ri.gen) now.append(el('div', 'tiny muted', 'On this phone the recorded songs follow your phone\'s volume buttons.'));
+    wrap.append(now);
+    // background sounds
+    const bg = el('div', 'menu-sec'); bg.append(el('h3', '', 'Background sound'), el('p', 'tiny muted', 'Plays under the music (or on its own) on Home and in your town. Made in the app, so it works offline.'));
+    const bgr = el('div', 'dp-durs');
+    for (const k of Object.keys(BG_SOUNDS)) { const b = el('button', '', BG_SOUNDS[k]); b.type = 'button'; b.setAttribute('aria-pressed', String((state.noise || 'off') === k)); b.addEventListener('click', () => { state.noise = k; AUD.unlocked = true; audioCtx(); save(); musicUpdate(); refreshMusicPage(); }); bgr.append(b); }
+    const nr = el('label', 'mslider'); nr.append(el('span', '', 'Volume'));
+    const ni = el('input'); ni.type = 'range'; ni.min = '0'; ni.max = '100'; ni.value = String(Math.round((state.noiseVol == null ? 0.4 : state.noiseVol) * 100)); ni.id = 'noise-vol'; ni.setAttribute('aria-label', 'Background sound volume');
+    ni.addEventListener('input', () => { state.noiseVol = ni.value / 100; musicUpdate(); clearTimeout(ui.volSave); ui.volSave = setTimeout(save, 400); });
+    nr.append(ni); bg.append(bgr, nr); wrap.append(bg);
+    // every song
+    const playing = (rec, si, ti) => state.music && (rec ? state.src !== 'gen' && (state.track | 0) === si && radio.track() === STATIONS[si].tracks[ti][1] : state.src === 'gen' && (state.gen | 0) === ti);
+    const recBox = el('div', 'menu-sec songs rec'); recBox.append(el('h3', '', 'Recorded music'), el('p', 'tiny muted', 'Real recordings by Kevin MacLeod, free to use under a Creative Commons licence (credit below). They stream from the Internet Archive.'));
+    STATIONS.forEach((stn, si) => {
+      const hd = el('div', 'st-head'); hd.append(el('b', '', stn.name));
+      const pb = el('button', 'btn sm', (state.src !== 'gen' && (state.track | 0) === si && state.music) ? 'Playing' : 'Play station'); pb.addEventListener('click', () => { state.src = 'rec'; state.track = si; state.music = true; AUD.unlocked = true; save(); musicUpdate(); setTimeout(refreshMusicPage, 300); });
+      hd.append(pb); recBox.append(hd);
+      stn.tracks.forEach((tk, ti) => {
+        const b = el('button', 'song rec' + (playing(true, si, ti) ? ' on' : '')); b.type = 'button';
+        b.append(el('span', 'dot'), el('span', 'nm', tk[1]), el('span', 'by', 'Kevin MacLeod'));
+        b.addEventListener('click', () => { state.src = 'rec'; state.track = si; ui.songPick = ti; state.music = true; AUD.unlocked = true; save(); musicUpdate(); setTimeout(refreshMusicPage, 400); });
+        recBox.append(b);
+      });
+    });
+    wrap.append(recBox);
+    const genBox = el('div', 'menu-sec songs gen'); genBox.append(el('h3', '', 'Made in Maplewick'), el('p', 'tiny muted', 'Little tunes the app makes on the fly. They work offline.'));
+    GEN_TUNES.forEach((nm, i) => {
+      const b = el('button', 'song gen' + (playing(false, 0, i) ? ' on' : '')); b.type = 'button';
+      b.append(el('span', 'dot'), el('span', 'nm', nm), el('span', 'by', 'Maplewick'));
+      b.addEventListener('click', () => { state.src = 'gen'; state.gen = i; state.music = true; AUD.unlocked = true; audioCtx(); save(); musicUpdate(); setTimeout(refreshMusicPage, 300); });
+      genBox.append(b);
+    });
+    wrap.append(genBox);
+    const credit = el('p', 'tiny muted'); credit.append(`Recorded music: ${STATIONS.flatMap((x) => x.tracks.map((t) => `"${t[1]}"`)).join(', ')} by Kevin MacLeod (incompetech.com), licensed under `);
+    const lic = el('a', '', 'Creative Commons: By Attribution 4.0'); lic.href = 'https://creativecommons.org/licenses/by/4.0/'; lic.target = '_blank'; lic.rel = 'noopener'; credit.append(lic, '.');
+    wrap.append(credit);
+    return wrap;
+  }
+  function refreshMusicPage() {
+    if ($('scrim').hidden || $('sheet').dataset.kind !== 'menu-music') return;
+    const sc = $('sheet').scrollTop; $('sheet-body').replaceChildren(musicPage()); $('sheet').scrollTop = sc;
+  }
+  // Staff: every role, who works, what each one is paid, and what the next hire would cost.
+  function staffPage() {
+    const wrap = el('div', 'list'), ec = econ();
+    wrap.append(el('p', 'small muted', `Wages: ${Math.round(ec.wages)} gold an hour in total. Each extra person of the same kind costs more to hire and asks a higher wage. ${ui.screen === 'play' ? 'Tap + to hire.' : 'You can hire during play time.'}`));
+    for (const k of STAFF_ORDER) wrap.append(staffRow(k));
+    const tb = el('div', 'menu-sec'); tb.append(el('h3', '', 'Pay scale'), el('p', 'tiny muted', 'What the 1st to 5th person of each kind costs to hire, and their wage an hour.'));
+    const tbl = el('table', 'paytbl'), hd = el('tr'); hd.append(el('th', '', ''), ...[1, 2, 3, 4, 5].map((n) => el('th', '', ordinal(n)))); tbl.append(hd);
+    for (const k of STAFF_ORDER) {
+      const tr = el('tr'); tr.append(el('th', '', STAFF[k].name));
+      for (let i = 0; i < 5; i++) { const td = el('td', i < (state.staff[k] || 0) ? 'have' : ''); td.append(el('b', '', `${wageOf(k, i)}/h`), el('small', '', `${hireFee(k, i)} g`)); tr.append(td); }
+      tbl.append(tr);
+    }
+    tb.append(tbl); wrap.append(tb);
+    return wrap;
+  }
+  function settingsPage() {
     const wrap = el('div');
-    wrap.append(el('p', 'tiny muted', `Maplewick ${APP_VERSION}`));
-    const sec = (title, ...nodes) => { const s = el('div', 'menu-sec'); s.append(el('h3', '', title), ...nodes); wrap.append(s); return s; };
-    sec('Why this app', el('p', '', 'Starting is the hardest part. Maplewick makes the first step small: put the phone away and focus, and you earn play time in a town that is yours to build. Small things get built right away while you play; the big projects need your focus.'),
-      el('p', '', 'Short sessions count from day one. Badges stretch your focus a little at a time, and play time turns your break into something you look forward to, with an end built in.'));
-    const prog = el('button', 'btn full', `Your progress · level ${state.level}, ${state.badges.length} badges, ${state.chestStats.opened} chests`); prog.addEventListener('click', openLevels);
-    const fr = el('button', 'btn full', 'Friends and leaderboard'); fr.addEventListener('click', openFriends);
-    const fest = el('button', 'btn full', `${SEASONS[curSeason()].fest} · ${Math.floor(seasonProgress().min)} min so far`); fest.addEventListener('click', openSeason);
-    sec('Progress', prog, fr, fest);
-    sec('Play time has limits', el('p', '', `Play time is the reward, so it stays special: you can hold at most ${fmtMin(PLAY_CAP / 60)} at once and earn at most ${fmtMin(DAILY_PLAY / 60)} a day. Focus beyond that still pays gold and XP. Today: ${fmtMin(playDayNow().sec / 60)} of ${fmtMin(DAILY_PLAY / 60)} earned.`));
-    const tourBtn = el('button', 'btn full', 'Replay the quick tour'); tourBtn.addEventListener('click', () => { closeSheet(); if (ui.screen === 'play') leavePlay(false, true); setTimeout(() => startTour(true), 250); });
-    sec('Quick tour', el('p', '', 'A one-minute walk through Home, your town and focusing.'), tourBtn);
-    const credit = el('p', 'tiny muted'); credit.append('Music: "Backbay Lounge", "Jazz Brunch", "Apero Hour", "Smooth Lovin’", "Airport Lounge", "Crinoline Dreams", "Bossa Antigua", "Samba Isobel", "Meditation Impromptu 01–03", "Clean Soul", "Winter Reflections", "Silver Blue Light", "Dream Culture", "Bathed in the Light" and "Windswept" by Kevin MacLeod (incompetech.com), licensed under ');
-    const lic = el('a', '', 'Creative Commons: By Attribution 4.0'); lic.href = 'https://creativecommons.org/licenses/by/4.0/'; lic.target = '_blank'; lic.rel = 'noopener'; credit.append(lic, '. Streamed from the Internet Archive.');
-    sec('About', el('p', '', 'A prototype made with Navid to test the idea before building the real Android and iPhone app. Focus here runs on trust; the real app checks your phone.'), credit);
-    const stars = el('div', 'stars'); const thanks = el('p', '', state.rating ? `You gave ${state.rating} star${state.rating > 1 ? 's' : ''}. Thank you!` : 'In the real app this opens the app store.');
-    for (let i = 1; i <= 5; i++) { const b = el('button', '', i <= state.rating ? '★' : '☆'); b.setAttribute('aria-label', `${i} star${i > 1 ? 's' : ''}`); b.addEventListener('click', () => { state.rating = i; save(); openMenu(); }); stars.append(b); }
-    sec('Rate us', stars, thanks);
     const f1 = el('label', 'field'); f1.append(el('span', 'label', 'Builder name')); const i1 = el('input'); i1.id = 'set-builder'; i1.maxLength = 18; i1.value = state.builder; f1.append(i1);
     const f2 = el('label', 'field'); f2.append(el('span', 'label', 'Town name')); const i2 = el('input'); i2.id = 'set-town'; i2.maxLength = 22; i2.value = state.town; f2.append(i2);
     const saveBtn = el('button', 'btn', 'Save names'); saveBtn.addEventListener('click', () => { state.builder = i1.value.trim().slice(0, 18) || state.builder; state.town = i2.value.trim().slice(0, 22) || state.town; save(); renderAll(); toast('Names saved.'); });
-    const snd = el('label', 'switch');
-    const sndt = el('span'); sndt.append(el('b', '', 'Sound effects'), el('div', 'tiny muted', 'Pops, chimes and applause.'));
-    const sndc = el('input'); sndc.type = 'checkbox'; sndc.id = 'set-sound'; sndc.checked = state.sound !== false;
-    sndc.addEventListener('change', () => { state.sound = sndc.checked; save(); if (state.sound) sfx.chime(); });
-    snd.append(sndt, sndc);
-    const mus = el('label', 'switch');
-    const must = el('span'); must.append(el('b', '', 'Music'), el('div', 'tiny muted', 'Relaxed recordings by Kevin MacLeod, on Home and in your town, never while you focus. Pick a station below; ⏭ in the top bar skips a song.'));
-    const musc = el('input'); musc.type = 'checkbox'; musc.id = 'set-music'; musc.checked = state.music !== false;
-    musc.addEventListener('change', () => { state.music = musc.checked; save(); musicUpdate(); });
-    mus.append(must, musc);
-    const trk = el('div', 'dp-durs');
-    radio.stations.forEach((nm, i) => { const b = el('button', '', nm); b.type = 'button'; b.setAttribute('aria-pressed', String((state.track | 0) === i)); b.addEventListener('click', () => { state.track = i; state.music = true; AUD.unlocked = true; save(); musicUpdate(); openMenu(); }); trk.append(b); });
-    const alm = el('label', 'switch');
-    const almt = el('span'); almt.append(el('b', '', 'Focus plan alarm'), el('div', 'tiny muted', 'A bell rings when a planned focus block starts (while Maplewick is open).'));
-    const almc = el('input'); almc.type = 'checkbox'; almc.id = 'set-alarm'; almc.checked = state.alarms !== false;
-    almc.addEventListener('change', () => { state.alarms = almc.checked; save(); if (state.alarms) ringBell(); });
-    alm.append(almt, almc);
-    const clk = el('label', 'switch');
-    const clkt = el('span'); clkt.append(el('b', '', 'Fast days'), el('div', 'tiny muted', 'A day in town lasts 24 minutes, with dawn, dusk, night and weather. Off: town time follows your real clock.'));
-    const clkc = el('input'); clkc.type = 'checkbox'; clkc.id = 'set-clock'; clkc.checked = !state.realClock;
-    clkc.addEventListener('change', () => { state.realClock = !clkc.checked; save(); renderHud(); });
-    clk.append(clkt, clkc);
-    const lk = el('div', 'switch'); const lkt = el('span'); lkt.append(el('b', '', 'Lock-screen timer'), el('div', 'tiny muted', 'While you focus, a soft sound plays so your iPhone lock screen shows the time left, like a song that is playing. It pauses other music apps while it plays.'));
-    lk.append(lkt);
+    menuSec(wrap, 'Names', f1, f2, saveBtn);
+    menuSec(wrap, 'Sound',
+      switchRow('Sound effects', 'Pops, chimes and applause.', 'set-sound', state.sound !== false, (v) => { state.sound = v; save(); if (v) sfx.chime(); }),
+      switchRow('Music', 'On Home and in your town, never while you focus. Choose songs in Music.', 'set-music', state.music !== false, (v) => { state.music = v; AUD.unlocked = true; save(); musicUpdate(); }));
     const lks = el('div', 'dp-durs');
-    for (const k of Object.keys(LOCK_SOUNDS)) { const b = el('button', '', LOCK_SOUNDS[k]); b.type = 'button'; b.setAttribute('aria-pressed', String(state.lockSound === k)); b.addEventListener('click', () => { state.lockSound = k; if (k !== 'off') state.lockKind = k; save(); openMenu(); }); lks.append(b); }
+    for (const k of Object.keys(LOCK_SOUNDS)) { const b = el('button', '', LOCK_SOUNDS[k]); b.type = 'button'; b.setAttribute('aria-pressed', String(state.lockSound === k)); b.addEventListener('click', () => { state.lockSound = k; if (k !== 'off') state.lockKind = k; save(); openMenuPage('settings'); }); lks.append(b); }
+    menuSec(wrap, 'Focus', switchRow('Focus plan alarm', 'A bell rings when a planned focus block starts (while Maplewick is open).', 'set-alarm', state.alarms !== false, (v) => { state.alarms = v; save(); if (v) ringBell(); }),
+      el('div', 'tiny muted', 'Lock-screen timer: while you focus, a soft sound plays so your iPhone lock screen shows the time left, like a song that is playing. It pauses other music apps while it plays.'), lks);
+    menuSec(wrap, 'Town', switchRow('Fast days', 'A day in town lasts 24 minutes, with dawn, dusk, night and weather. Off: town time follows your real clock.', 'set-clock', !state.realClock, (v) => { state.realClock = !v; save(); renderHud(); }));
     const mv = el('button', 'btn', 'Move your town to another device'); mv.addEventListener('click', openMoveTown);
-    sec('Settings', f1, f2, saveBtn, snd, mus, trk, lk, lks, clk, alm, mv);
-    const sw = el('label', 'switch');
-    const st = el('span'); st.append(el('b', '', 'Test speed'), el('div', 'tiny muted', 'One focus minute takes one second, and the focus screen gets a "finish now" button. Play time still runs in real time.'));
-    const cb = el('input'); cb.type = 'checkbox'; cb.id = 'set-speed'; cb.checked = state.speed > 1; cb.disabled = !!state.session;
-    cb.addEventListener('change', () => { state.speed = cb.checked ? 60 : 1; save(); toast(cb.checked ? 'Test speed on.' : 'Real time.'); });
-    sw.append(st, cb);
+    menuSec(wrap, 'Your town', mv, el('p', 'tiny muted', `Progress is saved on ${cloud.status}.`));
+    return wrap;
+  }
+  function helpPage() {
+    const wrap = el('div');
+    menuSec(wrap, 'Why this app', el('p', '', 'Starting is the hardest part. Maplewick makes the first step small: put the phone away and focus, and you earn play time in a town that is yours to build. Small things get built while you play; the big projects need your focus.'),
+      el('p', '', 'Short sessions count from day one. Badges stretch your focus a little at a time, and play time turns your break into something you look forward to, with an end built in.'));
+    menuSec(wrap, 'Play time has limits', el('p', '', `Play time is the reward, so it stays special: you can hold at most ${fmtMin(PLAY_CAP / 60)} at once and earn at most ${fmtMin(DAILY_PLAY / 60)} a day. Focus beyond that still pays gold and XP. Today: ${fmtMin(playDayNow().sec / 60)} of ${fmtMin(DAILY_PLAY / 60)} earned.`));
+    const tourBtn = el('button', 'btn full', 'Replay the quick tour'); tourBtn.addEventListener('click', () => { closeSheet(); if (ui.screen === 'play') leavePlay(false, true); setTimeout(() => startTour(true), 250); });
+    menuSec(wrap, 'Quick tour', el('p', '', 'A one-minute walk through Home, your town and focusing.'), tourBtn);
+    return wrap;
+  }
+  function aboutPage() {
+    const wrap = el('div');
+    menuSec(wrap, `Maplewick ${APP_VERSION}`, el('p', '', 'A prototype made with Navid to test the idea before building the real Android and iPhone app. Focus here runs on trust; the real app checks your phone.'),
+      el('p', 'tiny muted', 'Version numbers: 10.01, 10.02 and so on for updates; the first number goes up for a big one.'));
+    const stars = el('div', 'stars'); const thanks = el('p', '', state.rating ? `You gave ${state.rating} star${state.rating > 1 ? 's' : ''}. Thank you!` : 'In the real app this opens the app store.');
+    for (let i = 1; i <= 5; i++) { const b = el('button', '', i <= state.rating ? '★' : '☆'); b.setAttribute('aria-label', `${i} star${i > 1 ? 's' : ''}`); b.addEventListener('click', () => { state.rating = i; save(); openMenuPage('about'); }); stars.append(b); }
+    menuSec(wrap, 'Rate us', stars, thanks);
+    const credit = el('p', 'tiny muted'); credit.append('Recorded music by Kevin MacLeod (incompetech.com), licensed under ');
+    const lic = el('a', '', 'Creative Commons: By Attribution 4.0'); lic.href = 'https://creativecommons.org/licenses/by/4.0/'; lic.target = '_blank'; lic.rel = 'noopener'; credit.append(lic, '. The song list is in Music.');
+    menuSec(wrap, 'Credits', credit);
+    return wrap;
+  }
+  function testPage() {
+    const wrap = el('div');
+    const sw = switchRow('Test speed', 'One focus minute takes one second, and the focus screen gets a "finish now" button. Play time still runs in real time.', 'set-speed', state.speed > 1, (v) => { state.speed = v ? 60 : 1; save(); toast(v ? 'Test speed on.' : 'Real time.'); });
+    if (state.session) sw.querySelector('input').disabled = true;
     const tb = el('button', 'btn', '+10 min play time'); tb.addEventListener('click', () => { state.playSec = Math.min(PLAY_CAP, state.playSec + 600); save(); renderAll(); toast('Added 10 minutes of play time.'); });
     const tg = el('button', 'btn', '+200 gold'); tg.addEventListener('click', () => { state.gold += 200; save(); renderAll(); toast('Added 200 gold.'); });
     const tr = el('div', 'row'); tr.append(tb, tg);
@@ -6446,8 +6918,8 @@
     const no = el('button', 'btn', 'Keep my town'); no.addEventListener('click', () => { conf.hidden = true; });
     const r = el('div', 'row'); r.append(no, yes); conf.append(r);
     reset.addEventListener('click', () => { conf.hidden = false; });
-    sec('Testing', sw, tr, el('p', 'tiny muted', `Progress is saved on ${cloud.status}.`), reset, conf);
-    openSheet('Maplewick', wrap);
+    menuSec(wrap, null, sw, tr, reset, conf);
+    return wrap;
   }
 
   /* ---------- Progress: mayor level, badges, chests ---------- */
@@ -7296,6 +7768,7 @@
   $('al-snooze').addEventListener('click', () => { const b = ALARM.b; if (!b) return; b.rung = false; b.snooze = Date.now() + 5 * 60000; save(); closeAlarm(); toast('Snoozed for 5 minutes. Start within 15 minutes of the block for the bonus.'); });
   $('al-skip').addEventListener('click', () => { const b = ALARM.b; if (b) { b.status = 'missed'; save(); } closeAlarm(); toast('Skipped. You can still focus any time.'); });
   $('sheet-close').addEventListener('click', closeSheet);
+  $('sheet-back').addEventListener('click', () => { if (board.unsub) { board.unsub(); board.unsub = null; } openMenu(); });
   $('scrim').addEventListener('click', (ev) => { if (ev.target === $('scrim')) closeSheet(); });
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
