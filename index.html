@@ -725,7 +725,7 @@
   input { -webkit-user-select: text; user-select: text; }
   button { touch-action: manipulation; }
 </style>
-<script id="fb-config">window.MAPLEWICK_FIREBASE = window.MAPLEWICK_FIREBASE || {"apiKey": "AIzaSyB_iBo8PgoV37nLH-BZQxIvZ-ZU6mmxffk", "authDomain": "maplewick-eb4df.firebaseapp.com", "projectId": "maplewick-eb4df", "storageBucket": "maplewick-eb4df.firebasestorage.app", "messagingSenderId": "816864251885", "appId": "1:816864251885:web:b9d6959bccef2873d861e4"}; window.MAPLEWICK_GOOGLE_CLIENT_ID = window.MAPLEWICK_GOOGLE_CLIENT_ID || "";</script>
+<script id="fb-config">window.MAPLEWICK_FIREBASE = window.MAPLEWICK_FIREBASE || {"apiKey": "AIzaSyB_iBo8PgoV37nLH-BZQxIvZ-ZU6mmxffk", "authDomain": "maplewick-eb4df.firebaseapp.com", "projectId": "maplewick-eb4df", "storageBucket": "maplewick-eb4df.firebasestorage.app", "messagingSenderId": "816864251885", "appId": "1:816864251885:web:b9d6959bccef2873d861e4"}; window.MAPLEWICK_GOOGLE_CLIENT_ID = window.MAPLEWICK_GOOGLE_CLIENT_ID || "816864251885-qv4f643rct9ainsgbf55iuccjlic4u0u.apps.googleusercontent.com";</script>
 </head>
 <body>
 <div class="app" id="app">
@@ -934,6 +934,7 @@
   // Building gets slower as the town grows: 3 seconds of play per minute of work at town hall 1, then 4.5, 6 and 7.5.
   const BIG_WORK = 30, PLAY_BUILD_SEC = [0, 3, 4.5, 6, 7.5], BUILD_MAX_SEC = 150;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
+  const APP_VERSION = '10.01'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
@@ -6382,6 +6383,7 @@
 
   function openMenu() {
     const wrap = el('div');
+    wrap.append(el('p', 'tiny muted', `Maplewick ${APP_VERSION}`));
     const sec = (title, ...nodes) => { const s = el('div', 'menu-sec'); s.append(el('h3', '', title), ...nodes); wrap.append(s); return s; };
     sec('Why this app', el('p', '', 'Starting is the hardest part. Maplewick makes the first step small: put the phone away and focus, and you earn play time in a town that is yours to build. Small things get built right away while you play; the big projects need your focus.'),
       el('p', '', 'Short sessions count from day one. Badges stretch your focus a little at a time, and play time turns your break into something you look forward to, with an end built in.'));
