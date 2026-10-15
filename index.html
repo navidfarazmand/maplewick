@@ -172,9 +172,11 @@
   .stage.home { flex: 1 1 auto; min-height: 150px; height: auto; }
   .homebody { flex: 0 0 auto; max-height: 52vh; max-height: 52dvh; min-height: 0; overflow: auto; padding: 10px 16px 6px; display: grid; gap: 10px; align-content: start; }
   .stage.home .skychip { display: none; }
-  .stage.home .season { left: 0; right: 0; margin: 0 auto; width: max-content; top: calc(58% + 30px); grid-template-columns: 22px auto; padding: 3px 10px 3px 4px; border-radius: 99px; max-width: 88%; background: color-mix(in oklab, var(--surface) 92%, transparent); }
-  .stage.home .season canvas { width: 22px; height: 20px; grid-row: auto; }
-  .stage.home .season b { display: inline; font-size: 12px; } .stage.home .season small { display: inline; font-size: 11.5px; margin-left: 6px; }
+  .stage.home .season { left: 0; right: 0; margin: 0 auto; width: max-content; top: calc(58% + 30px); grid-template-columns: 22px auto; padding: 3px 11px 3px 4px; border-radius: 99px; max-width: 88%;
+    /* 10.09 (Navid): the festival pill wears its season's colour (a soft, warm orange in autumn) */
+    background: linear-gradient(135deg, var(--sea-a, #E9A06A), var(--sea-b, #CF7240)); color: var(--sea-ink, #FFF7EC); box-shadow: 0 4px 14px -6px var(--sea-b, #CF7240), inset 0 1px 0 rgba(255,255,255,.28); }
+  .stage.home .season canvas { width: 22px; height: 20px; grid-row: auto; background: rgba(255,255,255,.22); border-radius: 50%; }
+  .stage.home .season b { display: inline; font-size: 12px; } .stage.home .season small { display: inline; font-size: 11.5px; margin-left: 6px; color: inherit; opacity: .88; }
   .stage.home .season .bar { display: none; }
   .nextblock { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 16px; background: var(--focus-soft); border: 1px solid color-mix(in oklab, var(--focus) 25%, transparent); animation: popIn .35s both; }
   .nextblock .nb-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--focus); color: var(--focus-ink); display: grid; place-items: center; }
@@ -273,13 +275,39 @@
   .in-tap { align-self: center; margin-top: 12px; position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 99px; background: rgba(255,255,255,.92); color: #2B2257; font-weight: 800; font-size: 15px; box-shadow: 0 8px 24px rgba(0,0,0,.18); opacity: 0; }
   .intro.on .in-tap { animation: inUp .5s 1.9s ease-out forwards, inPulse 1.6s 2.4s ease-in-out infinite; }
   .in-ring { width: 14px; height: 14px; border-radius: 50%; background: #A3E635; box-shadow: 0 0 0 0 rgba(163,230,53,.7); animation: inRing 1.4s ease-out infinite; }
-  .in-go { position: fixed; left: var(--gx, 50%); top: var(--gy, 50%); transform: translate(-50%, -50%) scale(.2); font-family: var(--display); font-size: min(56px, 12.5vw); font-weight: 900; letter-spacing: .01em; line-height: 1.1; opacity: 0; pointer-events: none; white-space: nowrap; filter: drop-shadow(0 0 1px #A8410F) drop-shadow(0 3px 0 #C2551A) drop-shadow(0 8px 18px rgba(110,40,10,.35)); }
-  .in-go .gl { display: inline-block; background: linear-gradient(180deg, #FFFBD0 0%, #FFE066 38%, #FFB23F 70%, #FF7A3D 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 .02em; }
-  .intro.go .in-go .gl { animation: inGoChar .62s cubic-bezier(.2, 1.6, .4, 1) both; animation-delay: var(--d, 0s); }
-  .intro.go .in-go .gl.o { animation: inGoChar .62s cubic-bezier(.2, 1.6, .4, 1) both, inGoO .5s ease-in-out infinite alternate; animation-delay: var(--d, 0s), calc(var(--d, 0s) + .62s); }
-  @keyframes inGoChar { 0% { opacity: 0; transform: translateY(34px) scale(.3) rotate(-12deg); } 60% { opacity: 1; transform: translateY(-12px) scale(1.18) rotate(4deg); } 100% { opacity: 1; transform: none; } }
-  @keyframes inGoO { to { transform: translateY(-6px) scaleY(1.08); } }
-  .intro.go .in-go { animation: inGoPop .75s cubic-bezier(.2, 1.5, .35, 1) forwards; }
+  /* 10.09: "Let's goooo!" redone. Every letter carries its own outline and 3D edge (a ::before copy behind it), so the
+     look is the same on every letter in every browser. The word flies from your tap to the middle, the letters slam in
+     with a squash, the o's do a wave, a shine sweeps across, light rays turn behind, then it zooms past you. */
+  .in-go { position: fixed; left: var(--gx, 50%); top: var(--gy, 50%); z-index: 3; transform: translate(-50%, -50%) scale(.3); font-family: var(--display); font-size: min(62px, 13.5vw); font-weight: 900; letter-spacing: .01em; line-height: 1.1; opacity: 0; pointer-events: none; white-space: nowrap; }
+  .in-go .gw { position: relative; display: inline-block; }
+  .in-go .gl { position: relative; display: inline-block; padding: 0 .025em; color: transparent; -webkit-text-fill-color: transparent; transform-origin: 50% 90%; }
+  .in-go .gl::before, .in-go .gl::after { content: attr(data-ch); position: absolute; left: .025em; top: 0; }
+  .in-go .gl::before { color: #C2551A; -webkit-text-fill-color: #C2551A; -webkit-text-stroke: .15em #8A320E; transform: translateY(.075em); text-shadow: 0 .14em .22em rgba(80,25,5,.5); }
+  .in-go .gl::after { color: transparent; -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(105deg, rgba(255,255,255,0) 0 40%, rgba(255,255,255,.95) 50%, rgba(255,255,255,0) 60% 100%), linear-gradient(180deg, #FFFCDA 0%, #FFE36B 36%, #FFB53F 68%, #FF7A3D 100%);
+    background-size: 320% 100%, 100% 100%; background-position: 140% 0, 0 0; background-repeat: no-repeat; -webkit-background-clip: text; background-clip: text; }
+  .in-go .gl.sp { width: .28em; }
+  .in-go .rays { position: absolute; left: 50%; top: 50%; width: 170%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(0deg) scale(.4); border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255,232,150,.5) 0deg 7deg, rgba(255,232,150,0) 7deg 20deg); -webkit-mask: radial-gradient(circle, #000 18%, rgba(0,0,0,.6) 38%, transparent 66%); mask: radial-gradient(circle, #000 18%, rgba(0,0,0,.6) 38%, transparent 66%); opacity: 0; z-index: 0; }
+  .in-go .glow { position: absolute; left: 50%; top: 52%; width: 120%; height: 160%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(ellipse, rgba(255,214,110,.55), rgba(255,170,60,.18) 45%, transparent 70%); opacity: 0; z-index: 0; }
+  .in-go .spk { position: absolute; left: var(--sx); top: var(--sy); width: .34em; height: .34em; z-index: 2; opacity: 0; background: radial-gradient(circle, #fff 0 18%, transparent 20%), conic-gradient(from 45deg, transparent 0 20deg, #FFF6C8 20deg 25deg, transparent 25deg 110deg, #FFF6C8 110deg 115deg, transparent 115deg 200deg, #FFF6C8 200deg 205deg, transparent 205deg 290deg, #FFF6C8 290deg 295deg, transparent 295deg); -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); }
+  .intro.go .in-go { animation: inGoFly .62s cubic-bezier(.22, 1.25, .36, 1) forwards, inGoExit .5s 1.95s cubic-bezier(.5, 0, .9, .4) forwards; }
+  .intro.go .in-go .gl { animation: inGoChar .7s cubic-bezier(.25, 1.5, .45, 1) both; animation-delay: var(--d, 0s); }
+  .intro.go .in-go .gl.o { animation: inGoChar .7s cubic-bezier(.25, 1.5, .45, 1) both, inGoWave .42s ease-in-out 2; animation-delay: var(--d, 0s), calc(.95s + var(--o, 0) * .07s); }
+  .intro.go .in-go .gl.bang { animation: inGoBang .8s cubic-bezier(.25, 1.6, .45, 1) both; animation-delay: var(--d, 0s); }
+  .intro.go .in-go .gl::after { animation: inGoShine .7s ease-in-out forwards; animation-delay: calc(1.05s + var(--i, 0) * .035s); }
+  .intro.go .in-go .rays { animation: inGoRays 2.4s .2s ease-out forwards; }
+  .intro.go .in-go .glow { animation: inGoGlow 2.3s .1s ease-out forwards; }
+  .intro.go .in-go .spk { animation: inGoSpark .9s ease-out both; animation-delay: var(--sd, 1s); }
+  @keyframes inGoFly { 0% { opacity: 0; left: var(--gx, 50%); top: var(--gy, 50%); transform: translate(-50%, -50%) scale(.3) rotate(-6deg); } 18% { opacity: 1; } 70% { left: 50%; top: 40%; transform: translate(-50%, -50%) scale(1.08) rotate(1deg); } 100% { opacity: 1; left: 50%; top: 40%; transform: translate(-50%, -50%) scale(1) rotate(0deg); } }
+  @keyframes inGoExit { 0% { opacity: 1; left: 50%; top: 40%; transform: translate(-50%, -50%) scale(1); filter: blur(0); } 100% { opacity: 0; left: 50%; top: 40%; transform: translate(-50%, -50%) scale(2.7); filter: blur(5px); } }
+  @keyframes inGoChar { 0% { opacity: 0; transform: translateY(1.1em) scale(.25, .25) rotate(-16deg); } 45% { opacity: 1; transform: translateY(-.32em) scale(.92, 1.24) rotate(4deg); } 64% { transform: translateY(.05em) scale(1.22, .78) rotate(0deg); } 80% { transform: translateY(-.06em) scale(.96, 1.06); } 100% { opacity: 1; transform: none; } }
+  @keyframes inGoBang { 0% { opacity: 0; transform: translateY(-1.4em) scale(.4) rotate(30deg); } 55% { opacity: 1; transform: translateY(.06em) scale(1.25, .8) rotate(-8deg); } 75% { transform: translateY(-.1em) scale(.94, 1.1) rotate(10deg); } 100% { opacity: 1; transform: rotate(6deg); } }
+  @keyframes inGoWave { 50% { transform: translateY(-.2em) scale(1.06, 1.1); } }
+  @keyframes inGoShine { from { background-position: 140% 0, 0 0; } to { background-position: -40% 0, 0 0; } }
+  @keyframes inGoRays { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg) scale(.4); } 25% { opacity: 1; transform: translate(-50%, -50%) rotate(25deg) scale(1); } 80% { opacity: .85; } 100% { opacity: 0; transform: translate(-50%, -50%) rotate(80deg) scale(1.15); } }
+  @keyframes inGoGlow { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: .8; } 100% { opacity: 0; } }
+  @keyframes inGoSpark { 0% { opacity: 0; transform: scale(0) rotate(0deg); } 40% { opacity: 1; transform: scale(1.3) rotate(45deg); } 100% { opacity: 0; transform: scale(.4) rotate(120deg); } }
+  @media (prefers-reduced-motion: reduce) { .intro.go .in-go { animation: inUp .2s forwards; left: 50%; top: 40%; transform: translate(-50%, -50%); } .intro.go .in-go .gl, .intro.go .in-go .gl.o, .intro.go .in-go .gl.bang { animation: none; } .in-go .rays, .in-go .spk { display: none; } }
   .intro.go .in-card, .intro.go .in-tap { animation: inAway .35s forwards; }
   .intro.go .in-island { animation: inZoom .9s .25s ease-in forwards; }
   .in-burst { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
@@ -447,6 +475,16 @@
   .mt-ic svg { width: 22px; height: 22px; }
   .mtile.k-music .mt-ic { background: #FBEBC9; color: #9A6512; } .mtile.k-progress .mt-ic { background: #DCE8FB; color: #2B5FB0; } .mtile.k-friends .mt-ic { background: #FDE7C8; color: #A86E08; }
   .mtile.k-staff .mt-ic { background: #D8EFE3; color: #2E7D52; } .mtile.k-money .mt-ic { background: #FBEBC9; color: #B07A10; } .mtile.k-festival .mt-ic { background: #F9DDE5; color: #B5385E; }
+  .mtile.k-incidents .mt-ic { background: #E4E8F3; color: #2F4E8C; }
+  .inc-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .inc-st { background: var(--surface-2); border-radius: 12px; padding: 8px 6px; text-align: center; display: grid; gap: 1px; } .inc-st b { font-family: var(--display); font-size: 20px; line-height: 1.1; } .inc-st span { font-size: 11.5px; color: var(--muted); font-weight: 700; } .inc-st.neg b { color: var(--bad, #C8473D); }
+  .inc-lock, .inc-box { display: grid; gap: 4px; padding: 10px 12px; border-radius: 14px; background: color-mix(in oklab, #2F4E8C 10%, var(--surface)); border: 1px solid color-mix(in oklab, #2F4E8C 22%, transparent); }
+  .inc-ct { font-weight: 700; color: #2F4E8C; } @media (prefers-color-scheme: dark) { .inc-ct { color: #8FB0F0; } }
+  .inc-thief { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; } .inc-thief small { color: var(--muted); }
+  .inc-item { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 10px 2px; border-top: 1px solid var(--line, rgba(0,0,0,.08)); } .inc-item.tap { cursor: pointer; }
+  .inc-ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+  .inc-tx { display: grid; gap: 2px; min-width: 0; } .inc-tx .live { color: #C2551A; font-weight: 700; }
+  .inc-why { margin: 4px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted); } .inc-why li { margin: 1px 0; }
   .mtile.k-settings .mt-ic, .mtile.k-help .mt-ic, .mtile.k-about .mt-ic { background: #E6E9EE; color: #3E4A57; } .mtile.k-testing .mt-ic { background: #ECE4FB; color: #5B2DB8; }
   .mt-tx b { display: block; font-size: 16px; } .mt-tx small { display: block; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mt-ch { color: var(--muted); } .mt-ch svg { width: 18px; height: 18px; }
@@ -1159,7 +1197,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.08'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.09'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   const READY_SEC = 10; // a free "get ready" countdown before the focus timer starts
   const LOCK_SOUNDS = { off: 'Off', music: 'Your music', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
@@ -1198,10 +1236,10 @@
       job: { verb: 'Knead dough', at: 'at the bakery', gold: 1.3, play: 0.9, lines: ['The bread rose. So did your confidence.', 'Your croissant looked like a duck. It sold first.', 'You were covered in flour by 9 a.m. A new record.'] },
       blurb: 'A busy shop. Earns more for every home within 2 tiles.',
       needs: [['A market stall at level 2 (it sells the flour)', () => hasLevel('market', 2)]] },
-    workshop: { name: 'Workshop', cat: 'shop', size: 2, unlock: 2, cost: 80, work: 15, max: 3, color: '#B9B4AA', roof: '#5C5F66', radius: 0, near: { r: 1, v: -0.2, label: 'workshop noise' }, limit: [0, 0, 1, 1, 2],
+    workshop: { name: 'Workshop', cat: 'shop', size: 1, unlock: 2, cost: 80, work: 15, max: 3, color: '#B9B4AA', roof: '#5C5F66', radius: 0, near: { r: 1, v: -0.2, label: 'workshop noise' }, limit: [0, 0, 1, 1, 2],
       up: [null, null, [120, 30], [240, 60]], base: [0, 30, 45, 65], per: [0, 0, 0, 0],
       job: { verb: 'Sweep sawdust', at: 'at the workshop', gold: 1.6, play: 0.8, lines: ['You found a sandwich in the sawdust. It was not yours.', 'You swept one corner 14 times. It is very clean.', 'You learned what a dovetail joint is. You will not forget.'] },
-      blurb: 'Big and loud. Earns a lot, but homes right next to it pay 20% less.',
+      blurb: 'Loud, and a big employer. Earns a lot, but homes right next to it pay 20% less. It grows: Workshop (1×1), Factory (2×1), Industrial park (2×2).',
       needs: [['16 residents to work there', () => city().residents >= 16]] },
     bookshop: { name: 'Bookshop', cat: 'shop', size: 1, unlock: 3, cost: 140, work: 25, max: 3, color: '#3E5C76', roof: '#23394D', radius: 3, limit: [0, 0, 0, 1, 2],
       up: [null, null, [210, 45], [420, 90]], base: [0, 15, 22, 32], per: [0, 2, 3, 4],
@@ -1213,10 +1251,10 @@
       job: { verb: 'Run the arcade', at: 'at the game center', gold: 0.25, play: 1.7, lines: ['You beat the high score. Then a seven-year-old beat yours.', 'You fixed the claw machine. It still never grabs anything.', 'You handed out 400 tickets for one rubber duck.'] },
       blurb: 'Flashing lights and happy beeps. Working here pays very little gold but lots of play time.',
       needs: [['20 residents to play there', () => city().residents >= 20]] },
-    bank: { name: 'Bank', cat: 'service', size: 1, where: 'center', unlock: 3, cost: 180, work: 35, max: 3, color: '#E9E2D2', roof: '#5E6B7A', limit: [0, 0, 0, 1, 2],
+    bank: { name: 'Bank office', cat: 'service', size: 1, where: 'center', unlock: 3, cost: 180, work: 35, max: 3, color: '#E9E2D2', roof: '#5E6B7A', limit: [0, 0, 0, 1, 2],
       up: [null, null, [260, 60], [520, 110]],
       job: { verb: 'Count coins', at: 'at the bank', gold: 2.3, play: 0.7, lines: ['You counted 10,000 coins. Twice. Same answer.', 'A customer opened an account for their cat.', 'You stamped "APPROVED" with great joy.'] },
-      blurb: 'Keeps the town\'s money safe (the treasury holds more) and arranges loans from neighbour towns. Working here pays the most gold, but you earn little play time.',
+      blurb: 'Keeps the town\'s money safe (the treasury holds more) and arranges loans from neighbour towns. Working here pays the most gold, but you earn little play time. It grows: Bank office (1×1), Bank (2×1), Central bank (2×2).',
       needs: [['40 residents', () => city().residents >= 40]] },
     park: { name: 'Park', cat: 'joy', size: 1, unlock: 1, cost: 20, work: 6, max: 3, repair: 4, color: '#7DB65A', roof: '#3F8A4A', radius: 1, limit: [0, 2, 3, 4, 5],
       up: [null, null, [40, 12], [90, 25]], boost: [0, 0.15, 0.25, 0.35], blurb: 'Homes touching the park pay 15% more.' },
@@ -1224,9 +1262,9 @@
       up: [null, null, [70, 15], [150, 35]], boost: [0, 0.1, 0.15, 0.2], blurb: 'Homes within 2 tiles pay 10% more.',
       needs: [['A park (the water pipe runs through it)', () => countLive('park') >= 1]] },
     clinic: { name: 'Clinic', cat: 'joy', size: 1, unlock: 3, cost: 160, work: 30, max: 3, color: '#F4F6F7', roof: '#C8473D', radius: 3, limit: [0, 0, 0, 1, 2], reach: 6,
-      up: [null, null, [240, 60], [480, 120]], boost: [0, 0.15, 0.2, 0.3], staff: 'nurse', slots: [0, 2, 3, 4], blurb: 'Homes within 3 tiles pay 15% more. Nurses work here and look after every home within 6 tiles.',
+      up: [null, null, [240, 60], [480, 120]], boost: [0, 0.15, 0.2, 0.3], staff: 'nurse', slots: [0, 2, 4, 6], blurb: 'Homes within 3 tiles pay 15% more. Nurses work here and look after every home in reach. It grows: Clinic (1×1), Medical center (2×1, takes very sick patients), Hospital (2×2, twice the reach and twice as fast).',
       needs: [['40 residents', () => city().residents >= 40]] },
-    hospital: { name: 'Hospital', cat: 'joy', size: 2, unlock: 4, cost: 450, work: 60, max: 2, color: '#F4F6F7', roof: '#C8473D', radius: 4, limit: [0, 0, 0, 0, 1], reach: 12,
+    hospital: { name: 'Hospital', cat: 'joy', size: 2, unlock: 4, cost: 450, work: 60, max: 2, color: '#F4F6F7', roof: '#C8473D', radius: 4, limit: [0, 0, 0, 0, 0], reach: 12, retired: true,
       up: [null, null, [700, 90]], boost: [0, 0.2, 0.3], staff: 'nurse', slots: [0, 4, 6], blurb: 'The big, modern version of the clinic: twice the reach, twice as fast, and it can treat serious cases. Costs more to run.',
       needs: [['A clinic at level 2', () => state.buildings.some((b) => b.type === 'clinic' && live(b) && b.level >= 2)], ['80 residents', () => city().residents >= 80]] },
     amusement: { name: 'Amusement park', cat: 'joy', size: 2, unlock: 3, cost: 260, work: 40, max: 3, color: '#9FCB6B', roof: '#E8503A', radius: 3, limit: [0, 0, 0, 1, 2],
@@ -1234,17 +1272,22 @@
       needs: [['2 parks', () => countLive('park') >= 2]] },
     cemetery: { name: 'Cemetery', cat: 'service', size: 1, unlock: 3, cost: 60, work: 12, max: 1, color: '#8FAF6A', roof: '#B9B2A4', limit: [0, 0, 0, 1, 1], near: { r: 1, v: -0.05, label: 'a cemetery next door' },
       blurb: 'A quiet place to say goodbye. Without one, a loss weighs on the town for much longer.', needs: [['A clinic', () => countLive('clinic') >= 1]] },
+    // 10.09 (Navid): the Courthouse sends repeat thieves here. Inmates do prison work (a little gold), but every one of
+    // them is a break-in the town already paid for.
+    prison: { name: 'Jail', cat: 'service', size: 1, unlock: 3, cost: 120, work: 25, max: 3, color: '#BFC3C9', roof: '#596273', limit: [0, 0, 0, 1, 1], near: { r: 1, v: -0.1, label: 'a prison next door' },
+      up: [null, null, [200, 40], [400, 80]], cells: [0, 3, 6, 10], blurb: 'Holds the thieves the Courthouse sentences. Each inmate earns a little gold from prison work, but a full prison means crime is costing the town far more. Homes next to it pay 10% less. It grows: Jail (1×1), Prison (2×1), High-security prison (2×2).',
+      needs: [['A Courthouse (the police post at level 3)', () => state.buildings.some((b) => b.type === 'police' && live(b) && b.level >= 3)]] },
     // Service buildings: home base for town staff. Each level gives room for more staff.
-    depot: { name: 'Cleaning depot', cat: 'service', size: 2, unlock: 1, cost: 30, work: 6, max: 2, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3], reach: 6,
-      up: [null, null, [60, 15]], staff: 'sweeper', slots: [0, 2, 4], blurb: 'Home of the street sweepers, who clean within 6 tiles. There is a landfill out back: homes right next to it pay 15% less.' },
-    shed: { name: 'Garden shed', cat: 'service', size: 1, unlock: 1, cost: 20, work: 5, max: 2, color: '#E4D2AE', roof: '#5E9A4B', limit: [0, 1, 1, 2, 2], reach: 6,
-      up: [null, null, [40, 10]], staff: 'gardener', slots: [0, 2, 4], blurb: 'Home of the gardeners. Within 6 tiles they tidy parks, rake leaves, clear fallen trees and keep fires from spreading.' },
-    firestation: { name: 'Fire station', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 2, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
-      up: [null, null, [90, 20]], staff: 'fire', slots: [0, 2, 4], blurb: 'Home of the firefighters. They rush out when a building catches fire, fastest within 6 tiles.' },
-    police: { name: 'Police station', cat: 'service', size: 1, unlock: 2, cost: 70, work: 12, max: 2, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
-      up: [null, null, [110, 25]], staff: 'police', slots: [0, 2, 4], blurb: 'Home of the police officers. Homes within 5 tiles of a staffed station feel safe: one station covers most of a town.' },
-    school: { name: 'School', cat: 'service', size: 2, unlock: 2, cost: 90, work: 14, max: 2, color: '#F1E2C8', roof: '#B0563A', reach: 6, limit: [0, 0, 1, 2, 2],
-      up: [null, null, [150, 30]], staff: 'teacher', slots: [0, 2, 4], blurb: 'Where the town\'s kids learn. With a teacher, homes within 6 tiles earn 12% more (and bored kids cause less trouble).',
+    depot: { name: 'Cleaning depot', cat: 'service', size: 1, unlock: 1, cost: 30, work: 6, max: 3, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3], reach: 6,
+      up: [null, null, [60, 15], [140, 30]], staff: 'sweeper', slots: [0, 2, 4, 6], blurb: 'Home of the street sweepers, who clean within reach. It smells: homes right next to it pay 15% less. It grows: Cleaning depot (1×1), Recycling center (2×1), Waste plant (2×2).' },
+    shed: { name: 'Garden shed', cat: 'service', size: 1, unlock: 1, cost: 20, work: 5, max: 3, color: '#E4D2AE', roof: '#5E9A4B', limit: [0, 1, 1, 2, 2], reach: 6,
+      up: [null, null, [40, 10], [100, 25]], staff: 'gardener', slots: [0, 2, 4, 6], blurb: 'Home of the gardeners. In reach they tidy parks, rake leaves, clear fallen trees and keep fires from spreading. It grows: Garden shed (1×1), Garden center (2×1), Parks department (2×2).' },
+    firestation: { name: 'Fire post', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 3, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
+      up: [null, null, [90, 20], [200, 40]], staff: 'fire', slots: [0, 2, 4, 6], blurb: 'Home of the firefighters. They rush out when a building in reach catches fire. It grows: Fire post (1×1), Fire station (2×1), Fire headquarters (2×2).' },
+    police: { name: 'Police post', cat: 'service', size: 1, unlock: 2, cost: 70, work: 12, max: 3, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
+      up: [null, null, [110, 25], [260, 50]], staff: 'police', slots: [0, 2, 4, 6], blurb: 'Home of the police officers. Buildings in reach of a staffed station feel safe. It grows: Police post (1×1), Police station (2×1), Courthouse (2×2), which finds out why things go wrong in town and sends repeat thieves to prison.' },
+    school: { name: 'Elementary school', cat: 'service', size: 1, unlock: 2, cost: 90, work: 14, max: 3, color: '#F1E2C8', roof: '#B0563A', reach: 6, limit: [0, 0, 1, 2, 2],
+      up: [null, null, [150, 30], [340, 60]], staff: 'teacher', slots: [0, 2, 4, 6], blurb: 'Where the town\'s kids learn. With a teacher, homes in reach earn 12% more (and bored kids cause less trouble). It grows: Elementary school (1×1), High school (2×1), University (2×2).',
       needs: [['20 residents', () => city().residents >= 20]] },
     stadium: { name: 'Stadium', cat: 'joy', size: 3, unlock: 4, cost: 600, work: 120, max: 2, color: '#D8D2C4', roof: '#B5473A', radius: 4, limit: [0, 0, 0, 0, 1],
       up: [null, null, [900, 180]], boost: [0, 0.2, 0.3], base: [0, 80, 120],
@@ -1306,7 +1349,7 @@
       needed: (ci) => ci.residents >= 16, neededText: 'Needed from 16 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
     police: { name: 'Police officer', plural: 'police officers', home: 'police', fee: 240, wage: 10, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
       needed: (ci) => ci.residents >= 24, neededText: 'Needed from 24 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 25)), needText: '1 for every 25 residents, and every home within 5 tiles of a station' },
-    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', alt: ['hospital'], fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
+    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
       needed: () => countLive('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
     teacher: { name: 'Teacher', plural: 'teachers', home: 'school', fee: 150, wage: 8, look: { shirt: '#7B5EA7', hat: '#4A3B6B', hair: '#6B4226', skin: '#E7B98F' }, what: 'Teaches the town\'s kids: homes near a school earn more.',
       needed: (ci) => countLive('school') >= 1 || (hallLevel() >= 2 && ci.residents >= 20), neededText: 'Needed from town hall level 2 and 20 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' }
@@ -1322,7 +1365,7 @@
   const BUILD_ORDER = ['cottage', 'market', 'cafe', 'park', 'townhouse', 'bakery', 'fountain', 'arcade', 'workshop', 'bookshop', 'amusement', 'stadium'];
   const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle'];
   const hasLandmark = (type) => state.buildings.some((b) => b.type === type && live(b));
-  const SERVICE_ORDER = ['depot', 'shed', 'firestation', 'police', 'clinic', 'hospital', 'school', 'bank', 'cemetery'];
+  const SERVICE_ORDER = ['depot', 'shed', 'firestation', 'police', 'clinic', 'school', 'bank', 'prison', 'cemetery'];
   // Focus badges: earned in order, at most one per session, only by the session you just finished.
   const BADGES = [
     { min: 10, reward: 12, tier: 0 }, { min: 15, reward: 18, tier: 0 }, { min: 25, reward: 28, tier: 1 }, { min: 45, reward: 42, tier: 1 },
@@ -1396,9 +1439,35 @@
   // 10.08: basic buildings are one tile again; the House is two tiles long (and turns); bigger, better versions are
   // separate buildings (Hospital, Amusement park).
   const FOOT = { townhouse: [2, 1] };
-  const dimsOf = (type, rot) => { const f = FOOT[type]; if (f) return rot ? [f[1], f[0]] : f; const s = sizeOf(type); return [s, s]; };
-  const dimsB = (b) => (b.fp1 ? [1, 1] : dimsOf(b.type, b.rot));
-  const rotFor = (type) => (FOOT[type] ? (ui.rot || 0) : 0);
+  // 10.09 (Navid): every service grows in three steps with its level: 1×1, then 2×1 (it can be turned), then 2×2,
+  // with a new name at each size. Upgrading grows the building into the free tiles next to it.
+  const GROW = {
+    depot: ['Cleaning depot', 'Recycling center', 'Waste plant'],
+    shed: ['Garden shed', 'Garden center', 'Parks department'],
+    firestation: ['Fire post', 'Fire station', 'Fire headquarters'],
+    police: ['Police post', 'Police station', 'Courthouse'],
+    clinic: ['Clinic', 'Medical center', 'Hospital'],
+    school: ['Elementary school', 'High school', 'University'],
+    bank: ['Bank office', 'Bank', 'Central bank'],
+    workshop: ['Workshop', 'Factory', 'Industrial park'],
+    prison: ['Jail', 'Prison', 'High-security prison']
+  };
+  const GROW_DIMS = [null, [1, 1], [2, 1], [2, 2]];
+  const growLv = (level) => clamp(level || 1, 1, 3);
+  const tierName = (type, level) => (GROW[type] ? GROW[type][growLv(level) - 1] : TYPES[type].name);
+  const nameOf = (b) => (b && TYPES[b.type] ? tierName(b.type, b.level) : '');
+  // The level whose size applies when a call doesn't say: the building being moved, or level 1 for a new one.
+  const heldLevel = (type) => { const h = ui.holding; if (!h || h.kind === 'new') return 1; const b = byId(h.id); return b && b.type === type ? b.level : 1; };
+  const dimsOf = (type, rot, level) => {
+    if (GROW[type]) { const f = GROW_DIMS[growLv(level == null ? heldLevel(type) : level)]; return rot ? [f[1], f[0]] : f; }
+    const f = FOOT[type]; if (f) return rot ? [f[1], f[0]] : f; const s = sizeOf(type); return [s, s];
+  };
+  // b.small: a service that had no room to grow when 10.09 came (it keeps its level, but stays this size until moved)
+  const dimsB = (b) => (b.fp1 ? [1, 1] : dimsOf(b.type, b.rot, b.small || b.level));
+  const turns = (type, level) => !!(FOOT[type] || (GROW[type] && growLv(level == null ? heldLevel(type) : level) === 2));
+  const rotFor = (type) => (FOOT[type] || GROW[type] ? (ui.rot || 0) : 0);
+  // How big a building is drawn (in tiles): the 2×2 steps are drawn twice as big.
+  const sizeB = (b) => { if (!b || !TYPES[b.type]) return 1; if (GROW[b.type]) { const [w, d] = dimsB(b); return w * d > 1 ? 2 : 1; } return b.fp1 ? 1 : sizeOf(b.type); };
   const spaceWord = (type) => { const [w, d] = dimsOf(type, 0); return w * d > 1 ? `${w}×${d} space` : 'tile'; };
   // How far the farthest tile of b is from a: a building counts as within reach only if all of it is (10.05).
   const distFull = (a, b) => {
@@ -1505,6 +1574,7 @@
     s.civic = Object.assign({ safety: 1, health: 1 }, s.civic || {});
     if (!(s.crime >= 0 && s.crime <= 100)) s.crime = 25;
     if (!Array.isArray(s.jail)) s.jail = [];
+    if (!Array.isArray(s.incidents)) s.incidents = []; if (!Array.isArray(s.thieves)) s.thieves = []; if (!Array.isArray(s.prison)) s.prison = []; // 10.09
     if (s.fireIn === undefined) s.fireIn = null;
     if (!(s.level >= 1)) s.level = 1;
     if (!Number.isFinite(s.xp)) s.xp = 0;
@@ -2110,9 +2180,22 @@
   const rushFor = (type) => state.rush.find((x) => x.type === type && x.left > 0) || null;
   const shopBoost = (type) => (1 + (state.perks[type] || 0)) * (rushFor(type) ? rushFor(type).mult : 1);
 
+  // 10.09 (Navid): jobs. Businesses, services and staff give work; homes bring workers. Too few jobs and homes pay less
+  // tax and crime goes up; too few workers and the shops earn less. A small new town doesn't feel either yet.
+  const JOBS = { townhall: [0, 2, 3, 4, 6], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
+    amusement: [0, 3, 4, 5], clinic: [0, 1, 2, 3], school: [0, 1, 1, 2], police: [0, 1, 1, 2], firestation: [0, 0, 1, 1], depot: [0, 1, 2, 3], shed: [0, 0, 1, 1], prison: [0, 2, 3, 4], cemetery: [0, 1], lighthouse: [0, 2], observatory: [0, 2], castle: [0, 3] };
+  const jobsOf = (type, level) => { const j = JOBS[type]; return j ? j[clamp(level || 1, 1, j.length - 1)] || 0 : 0; };
+  function jobsIn(act, residents) {
+    let jobs = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0);
+    for (const b of act) jobs += jobsOf(b.type, b.level);
+    const workers = Math.round(residents * 0.65), k = clamp((residents - 12) / 24, 0, 1);
+    const unemp = workers > 0 ? Math.max(0, workers - jobs) / workers : 0, short = jobs > 0 ? Math.max(0, jobs - workers) / jobs : 0;
+    return { jobs, workers, unemp, short, k, jobless: Math.max(0, workers - jobs) };
+  }
   function computeCity(bs) {
     const act = bs.filter(live);
     const homes = act.filter((b) => T(b).cat === 'home');
+    const J = jobsIn(act, homes.reduce((a, h) => a + Math.max(0, T(h).residents[h.level] - (h.loss ? 1 : 0)), 0));
     const castle = act.some((b) => b.type === 'castle'), lighthouse = act.some((b) => b.type === 'lighthouse');
     // schools with a teacher (one each first, like every service building)
     const schools = act.filter((b) => b.type === 'school').slice(0, Math.min(state.staff.teacher || 0, act.filter((b) => b.type === 'school').reduce((a, b) => a + (TYPES.school.slots[b.level] || 0), 0))), schoolOn = act.some((b) => b.type === 'school') || (hallLevel() >= TYPES.school.unlock && homes.length >= 5);
@@ -2146,6 +2229,7 @@
       else if (h.shaken && h.shaken.total) { const v = 0.3 * clamp(h.shaken.left / h.shaken.total, 0, 1); if (v > 0.01) { noise += v; from.push([h.shaken.label || 'after a scare', -v]); } }
       if (!h.fire && act.some((o) => o.fire && o !== h && dist(o, h) <= 1)) { noise += 0.1; from.push(['smoke from next door', -0.1]); }
       if (h.loss && h.loss.total) { const v = 0.1 + 0.2 * clamp(h.loss.left / h.loss.total, 0, 1); noise += v; from.push(['in mourning', -v]); } // 10.08
+      if (J.k > 0 && J.unemp > 0.02) { const v = Math.round(50 * J.unemp * J.k) / 100; if (v > 0) { noise += v; from.push(['jobs are scarce in town', -v]); } } // 10.09
       const mult = clamp(1 + joy + decor - noise, 0.3, 2.5);
       const res = Math.max(0, T(h).residents[h.level] - (h.loss ? 1 : 0));
       if (h.sick) from.push(['sick: can\'t work', -1]);
@@ -2159,8 +2243,9 @@
         const near = homes.filter((h) => dist(h, s) <= t.radius).length;
         const shaken = s.robbed ? 0.6 : s.shaken && s.shaken.total ? 1 - 0.3 * clamp(s.shaken.left / s.shaken.total, 0, 1) : 1;
         const pair = (s.type === 'bakery' || s.type === 'cafe') && act.some((o) => o.type === (s.type === 'bakery' ? 'cafe' : 'bakery') && dist(o, s) <= 2) ? 1.1 : 1;
-        const income = s.fire ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair;
-        total += income; info.set(s.id, { income, near });
+        const staffed = 1 - 0.5 * J.short * J.k; // 10.09: short of workers, it can't open all day
+        const income = s.fire ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair * staffed;
+        total += income; info.set(s.id, { income, near, short: 1 - staffed });
       } else if (t.cat === 'joy' || t.cat === 'decor') {
         const r = t.cat === 'joy' ? t.radius : 1;
         const income = t.base ? t.base[s.level] : 0;
@@ -2168,7 +2253,10 @@
         info.set(s.id, { near: homes.filter((h) => dist(h, s) <= r).length, income });
       }
     }
-    return { total, residents, info };
+    // 10.09: prison work: each inmate earns a little
+    const prisons = act.filter((b) => b.type === 'prison');
+    if (prisons.length) { const inm = Math.min((state.prison || []).length, prisons.reduce((a, b) => a + (TYPES.prison.cells[b.level] || 0), 0)), pay = inm * PRISON_PAY; total += pay; for (const b of prisons) info.set(b.id, { income: pay / prisons.length, inmates: inm }); }
+    return { total, residents, info, jobs: J };
   }
   let cityCache = null, occCache = null, hintCache = null;
   const city = () => cityCache || (cityCache = computeCity(state.buildings));
@@ -2179,16 +2267,20 @@
     if (occCache) return occCache;
     const m = new Map();
     for (const b of state.buildings) { const [w, d] = dimsB(b); for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) m.set((b.c + i) + ',' + (b.r + j), b); }
+    // 10.09: tiles kept free for a service that is growing (its upgrade is under way)
+    for (const b of state.buildings) if (b.grow && !state.queue.some((q) => q.bid === b.id && q.kind === 'upgrade')) delete b.grow; // the upgrade was cancelled
+    for (const b of state.buildings) if (b.grow) { const [w, d] = dimsOf(b.type, b.grow.rot, b.grow.level); for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) { const k = (b.grow.c + i) + ',' + (b.grow.r + j); if (!m.has(k)) m.set(k, b); } }
     return (occCache = m);
   }
   const at = (c, r) => occupancy().get(c + ',' + r);
-  function fits(type, c, r, ignoreId, rot) {
+  function fits(type, c, r, ignoreId, rot, level) {
     if (rot == null) rot = rotFor(type);
-    const [w, d] = dimsOf(type, rot);
+    if (level == null) { const ib = ignoreId != null ? byId(ignoreId) : null; level = ib && ib.type === type ? ib.level : heldLevel(type); }
+    const [w, d] = dimsOf(type, rot, level);
     if (c < 0 || r < 0 || c + w > N || r + d > N) return false;
     const occ = occupancy();
     for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) { if (!isOpen(c + i, r + j)) return false; const b = occ.get((c + i) + ',' + (r + j)); if (b && b.id !== ignoreId) return false; }
-    return whereOk(type, c, r, rot);
+    return whereOk(type, c, r, rot, level);
   }
   // Some buildings only make sense in certain places: a lighthouse by the sea, the castle up on the hill.
   const WHERE = {
@@ -2197,13 +2289,13 @@
     far: { text: 'at least 5 tiles from the town hall, where the sky is dark', short: 'away from the lights' },
     center: { text: 'downtown, within 4 tiles of the town hall', short: 'downtown' }
   };
-  function whereOk(type, c, r, rot) {
+  function whereOk(type, c, r, rot, level) {
     const w = TYPES[type] && TYPES[type].where; if (!w) return true;
-    const [sw, sd] = dimsOf(type, rot);
+    const [sw, sd] = dimsOf(type, rot, level);
     if (w === 'shore') return c === 0 || r === 0 || c + sw === N || r + sd === N;
     if (w === 'hill') return c >= 12 && r >= 12;
     const hall = state.buildings.find((b) => b.type === 'townhall'); if (!hall) return true;
-    const d = dist({ type, c, r, rot }, hall);
+    const d = dist({ type, c, r, rot, level: level || 1 }, hall);
     return w === 'far' ? d >= 5 : d <= 4;
   }
   const whereText = (type) => { const w = TYPES[type].where; return w ? `The ${TYPES[type].name.toLowerCase()} goes ${WHERE[w].text}.` : ''; };
@@ -2284,7 +2376,7 @@
 
   /* ---------- Town staff and the problems they solve ---------- */
   const homeOf = (k, type) => type === STAFF[k].home || !!(STAFF[k].alt && STAFF[k].alt.includes(type));
-  const staffBuildings = (k) => state.buildings.filter((b) => homeOf(k, b.type) && live(b) && !b.fire).sort((a, b) => (b.type === 'hospital') - (a.type === 'hospital'));
+  const staffBuildings = (k) => state.buildings.filter((b) => homeOf(k, b.type) && live(b) && !b.fire).sort((a, b) => b.level - a.level);
   const staffCapacity = (k) => staffBuildings(k).reduce((a, b) => a + (TYPES[b.type].slots[b.level] || 0), 0);
   const offSick = (k) => state.buildings.filter((b) => b.sick && homeOf(k, b.type)).length;
   const staffWorking = (k) => Math.max(0, Math.min(state.staff[k] || 0, staffCapacity(k)) - offSick(k));
@@ -2305,8 +2397,10 @@
   // ready 20% sooner and work 20% better (10.06).
   const stLevel = (st) => (st ? clamp(st.level || 1, 1, 4) : 1);
   const stationK = (st) => 1 + 0.2 * (stLevel(st) - 1);
-  const prepK = (st) => Math.max(0.4, 1 - 0.2 * (stLevel(st) - 1)) * (st && st.type === 'hospital' ? 0.6 : 1); // 10.08: a hospital is quicker off the mark
-  const baseReach = (type, level) => (TYPES[type].reach || 0) + Math.max(0, (level || 1) - 1);
+  const prepK = (st) => Math.max(0.4, 1 - 0.2 * (stLevel(st) - 1));
+  // 10.09: a service that grows reaches much further: 1.4× at its middle size, twice as far at its biggest
+  const REACH_K = [0, 1, 1.4, 2];
+  const baseReach = (type, level) => (GROW[type] ? Math.round((TYPES[type].reach || 0) * REACH_K[growLv(level)]) : (TYPES[type].reach || 0) + Math.max(0, (level || 1) - 1));
   const stationReach = (x) => Math.round(baseReach(x.type, x.level) * (x.vehicle ? 1.5 : 1));
   // The best of the staffed stations that reach this building (0 when none does).
   const coverK = (k, b, st) => (st || stationsOf(k)).reduce((m, x) => (distFull(x, b) <= stationReach(x) ? Math.max(m, stationK(x)) : m), 0);
@@ -2322,19 +2416,19 @@
     hospital: { kind: 'ambulance', name: 'Ambulance', cost: 400, upkeep: 8, what: 'Reach half again as far, and serious cases are brought in fast.' },
     school: { kind: 'bus', name: 'School bus', cost: 220, upkeep: 4, what: 'Kids from half again as far come to school.' }
   };
-  const vehLevel = (type) => (type === 'hospital' ? 1 : 2); // 10.08: a hospital has an ambulance bay from the start
+  const vehLevel = () => 2; // a garage comes with the second size
   const fleetUpkeep = () => state.buildings.reduce((a, b) => a + (b.vehicle && FLEET[b.type] && live(b) ? FLEET[b.type].upkeep : 0), 0);
   // Every service building costs a little to run (heating, water, paperwork), more at higher levels (10.04).
-  const RUNNING = { depot: 2, shed: 1, firestation: 3, police: 3, clinic: 4, school: 3, bank: 4, hospital: 9, cemetery: 1 };
+  const RUNNING = { depot: 2, shed: 1, firestation: 3, police: 3, clinic: 4, school: 3, bank: 4, hospital: 9, cemetery: 1, prison: 2 };
   const runningOf = (b) => (RUNNING[b.type] && live(b) ? RUNNING[b.type] * b.level : 0);
   const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0);
   // Thieves who are caught sit in the police station's cells for a while: each one costs a little to keep (10.04).
   const JAIL_COST = 3;
-  const jailCells = () => state.buildings.reduce((a, b) => a + (b.type === 'police' && live(b) ? [0, 2, 4][b.level] || 4 : 0), 0);
+  const jailCells = () => state.buildings.reduce((a, b) => a + (b.type === 'police' && live(b) ? [0, 2, 4, 6][b.level] || 6 : 0), 0);
   const jailUpkeep = () => (state.jail || []).length * JAIL_COST;
   function buyVehicle(id) {
     const b = byId(id), f = b && FLEET[b.type]; if (!f || b.vehicle) return;
-    if (b.level < vehLevel(b.type)) { toast(`A ${f.name.toLowerCase()} needs the ${T(b).name.toLowerCase()} at level 2 (a garage).`); return; }
+    if (b.level < vehLevel(b.type)) { toast(`A ${f.name.toLowerCase()} needs the ${nameOf(b).toLowerCase()} at level 2 (a garage).`); return; }
     if (state.gold + 1e-6 < f.cost) { toast(`A ${f.name.toLowerCase()} costs ${f.cost} gold.`); return; }
     accrue(Date.now()); goldChange(-f.cost, `Bought a ${f.name.toLowerCase()}`, 'buy'); b.vehicle = true; touch(); save(); sfx.coin(); renderAll();
     toast(`New ${f.name.toLowerCase()}! It is on duty right away: reach ${baseReach(b.type, b.level)} → ${stationReach(b)} tiles. Upkeep ${f.upkeep} gold an hour.`);
@@ -2366,7 +2460,7 @@
     return sum / hs.length * po.ratio;
   }
   const messy = (b) => live(b) && (T(b).cat === 'home' || T(b).cat === 'shop');
-  const robbable = (b) => live(b) && ['home', 'shop', 'service'].includes(T(b).cat);
+  const robbable = (b) => live(b) && ['home', 'shop', 'service'].includes(T(b).cat) && b.type !== 'prison';
   // The town keeps living: trash piles up without sweepers, parks grow wild without gardeners,
   // and people feel safe and healthy only with enough police and nurses. Minutes are town minutes
   // (real minutes while you focus or play, a tenth of that otherwise).
@@ -2397,6 +2491,7 @@
     state.civic.health += ((nu.needed ? nu.cover : 1) - state.civic.health) * ease;
     state.crime = crimeLevel() + (crimeTarget(ci) - crimeLevel()) * (1 - Math.exp(-min / 40));
     if (state.jail && state.jail.length) { for (const j of state.jail) j.left -= min; state.jail = state.jail.filter((j) => j.left > 0); }
+    prisonStep(min);
     for (const b of state.buildings) if (b.health != null && b.health < 100 && !b.fire && !b.burnt) { b.health = Math.min(100, b.health + min * 2); if (b.health >= 100) delete b.health; }
     cityCache = null;
   }
@@ -2407,10 +2502,10 @@
      a thief gets away with a lot more, and the sick get better only slowly (and pass it on). ---------- */
   const burningNow = () => state.buildings.find((b) => b.fire);
   const burningAll = () => state.buildings.filter((b) => b.fire);
-  function placeName(b) { return b.resident ? `${b.resident}'s ${T(b).name.toLowerCase()}` : `the ${T(b).name.toLowerCase()}`; }
+  function placeName(b) { return b.resident ? `${b.resident}'s ${nameOf(b).toLowerCase()}` : `the ${nameOf(b).toLowerCase()}`; }
   // Someone who lives or works there: "Jonas" at a home, "Ryan at the police station" at a service building (10.07).
   const staffName = (b) => NAMES[(b.id * 7 + 3) % NAMES.length];
-  const whoAt = (b) => (b.resident ? b.resident : `${staffName(b)} at the ${T(b).name.toLowerCase()}`);
+  const whoAt = (b) => (b.resident ? b.resident : `${staffName(b)} at the ${nameOf(b).toLowerCase()}`);
   // Lingering trouble: points off the town's mood that fade over town minutes.
   function addScar(label, pts, minutes) { state.scars = (state.scars || []).concat([{ label, pts, left: minutes, total: minutes }]).slice(-8); cityCache = null; }
   const troubleNow = () => -Math.min(20, (state.scars || []).reduce((a, s) => a + s.pts * clamp(s.left / s.total, 0, 1), 0));
@@ -2436,7 +2531,7 @@
     const ws = list.map(wf), tot = ws.reduce((a, w) => a + w, 0); if (!(tot > 0)) return null;
     let x = Math.random() * tot; for (let i = 0; i < list.length; i++) { if (x < ws[i]) return list[i]; x -= ws[i]; } return list[list.length - 1];
   }
-  const fireHp = (b) => 16 + 8 * (sizeOf(b.type) - 1);
+  const fireHp = (b) => 16 + 8 * (sizeB(b) - 1);
   // Seconds of full flames to burn one level away: upgraded buildings are sturdier.
   const BURN_SEC = [0, 75, 100, 130, 160];
   const healthOf = (b) => (b.health == null ? 100 : b.health);
@@ -2446,6 +2541,7 @@
     b.fire = { at: Date.now(), hp: fireHp(b), max: fireHp(b), spreadIn: 20 + Math.random() * 12, first }; // the very first fire (the lesson) never spreads or burns anything down
     if (b.health == null) b.health = 100;
     state.flags.fireSeen = true;
+    logIncident('fire', b, spread ? `The fire spread to ${placeName(b)}` : `Fire at ${placeName(b)}`, { spread });
     ui.bubbles = ui.bubbles.filter((x) => x.bid !== b.id);
     touch(); revealQuests(); save(); sfx.alarm();
     if (first && !st) { showOnMap(b, { kind: 'alert', bid: b.id }); return; }
@@ -2464,9 +2560,10 @@
     state.fireIn = null;
     addScar(`fire at ${placeName(b)}`, byCrew ? 4 : 6, byCrew ? 15 : 25);
     if (b.resident || T(b).cat === 'home') b.shaken = { left: byCrew ? 8 : 15, total: byCrew ? 8 : 15, label: 'after the fire' };
-    const p = centerOf(b), s = sizeOf(b.type), now = performance.now();
+    const p = centerOf(b), s = sizeB(b), now = performance.now();
     for (let i = 0; i < 16; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 30, y: p.y - 30, vx: (Math.random() - 0.5) * 30, vy: -20 - Math.random() * 30, life: 0, max: 1.2, puff: true, color: 'rgba(235,240,245,.8)', r: 4 });
     const hp = healthOf(b);
+    closeIncident('fire', b, byCrew ? `Put out by the firefighters, ${Math.round(hp)}% left${!first && hp < 50 ? '. Badly burned: it needs a repair' : ''}` : `It burned out on its own, ${Math.round(hp)}% left`);
     if (!first && hp < 50) { b.ruin = true; b.burnt = { health: Math.max(0, Math.round(hp)) }; touch(); floats.push({ x: p.x, y: p.y - HH * s - 30, t0: now, text: `Fire out · badly burned (${Math.round(hp)}%)` }); toast(`The fire at ${placeName(b)} is out, but it is badly burned. Repair it (${burnRepairCost(b)} gold) to open it again.`); }
     else floats.push({ x: p.x, y: p.y - HH * s - 30, t0: now, text: byCrew ? (hp < 99 ? `Fire out! ${Math.round(hp)}% left` : 'Fire out!') : 'It burned out', soft: !byCrew });
     if (byCrew) { ui.bubbles.push({ bid: b.id, text: pick(LINES.thanksFire), kind: 'good', t0: now + 500, dur: 3200 }); sfx.splash(); setTimeout(() => sfx.chime(), 300); }
@@ -2482,6 +2579,7 @@
       toast(`${capFirst(placeName(b))} burned down to level ${b.level}!${responderFor('fire', b) ? '' : ' Nobody can reach it: build a fire station near it or buy a fire engine.'}`);
       sfx.alarm(); save(); renderAll(); return;
     }
+    closeIncident('fire', b, 'It burned down completely');
     delete b.fire; b.health = 0; b.ruin = true; b.burnt = { health: 0 };
     b.noFireUntil = Date.now() + 10 * 60000;
     addScar(`${placeName(b)} burned down`, 8, 30);
@@ -2499,10 +2597,99 @@
     const st = stationsOf('police'), far = hs.filter((h) => !coversB('police', h, st)).length / hs.length;
     const mood = moodNow(Date.now()).value;
     const kids = TYPES.school && hallLevel() >= TYPES.school.unlock ? state.buildings.filter((h) => live(h) && T(h).cat === 'home' && !coversB('teacher', h)).length / Math.max(1, hs.length) : 0;
-    return clamp(10 + 45 * far + Math.max(0, 65 - mood) * 0.6 + 12 * kids - Math.min(10, (state.jail || []).length * 4), 0, 100);
+    const J = ci && ci.jobs ? ci.jobs : { unemp: 0, k: 0 }, gang = Math.min(15, freeRepeat().length * 3); // 10.09: no work, and thieves still out there
+    return clamp(10 + 45 * far + Math.max(0, 65 - mood) * 0.6 + 12 * kids + 35 * J.unemp * J.k + gang - Math.min(10, (state.jail || []).length * 4) - Math.min(12, (state.prison || []).length * 3), 0, 100);
   }
   const crimeLevel = () => clamp(state.crime == null ? 25 : state.crime, 0, 100);
   const crimeWord = (v) => (v < 20 ? 'Very low' : v < 40 ? 'Low' : v < 60 ? 'Medium' : v < 80 ? 'High' : 'Very high');
+
+  /* ---------- 10.09 (Navid): the Incident report, the Courthouse, named thieves and the Prison ----------
+     Every fire, break-in, sickness and storm goes into the report with what happened and what it cost. A Courthouse
+     (the police post at level 3) also finds out why, and sends thieves caught twice to prison. Inmates do prison work
+     (a little gold each), but every one of them is a break-in the town already paid for. */
+  const PRISON_PAY = 3;
+  const THIEF_NAMES = ['Sly Pete', 'Mona the Magpie', 'Quick Ruben', 'Nell Nightshade', 'Big Gus', 'Tiny Tam', 'Silent Sue', 'Lefty Lou', 'Dodger Dee', 'Otto the Owl', 'Velvet Vic', 'Shifty Shay', 'Midnight Mo', 'Butterfingers Bo'];
+  const courthouse = () => state.buildings.find((b) => b.type === 'police' && live(b) && b.level >= 3) || null;
+  const prisonCells = () => state.buildings.reduce((a, b) => a + (b.type === 'prison' && live(b) ? TYPES.prison.cells[b.level] || 0 : 0), 0);
+  const inPrison = (tid) => (state.prison || []).find((x) => x.tid === tid);
+  const thiefById = (tid) => (state.thieves || []).find((t) => t.id === tid) || null;
+  const freeRepeat = () => (state.thieves || []).filter((t) => t.caught >= 1 && t.crimes >= 2 && !inPrison(t.id));
+  // Who did it: often someone the police already know, more often when jobs are scarce.
+  function pickThief() {
+    const free = state.thieves.filter((t) => !inPrison(t.id)), ci = city(), u = ci.jobs ? ci.jobs.unemp * ci.jobs.k : 0;
+    if (free.length && Math.random() < 0.45 + 0.4 * u) return weighted(free, (t) => 1 + t.crimes) || free[0];
+    const used = new Set(state.thieves.map((t) => t.name));
+    const nm = THIEF_NAMES.find((n) => !used.has(n)) || `${pick(THIEF_NAMES)} ${state.thieves.length + 1}`;
+    const t = { id: (state.thiefSeq = (state.thiefSeq || 0) + 1), name: nm, crimes: 0, caught: 0 };
+    state.thieves.push(t); if (state.thieves.length > 16) state.thieves = state.thieves.filter((x) => inPrison(x.id) || x !== state.thieves.find((y) => !inPrison(y.id)));
+    return t;
+  }
+  // Why it happened, worked out at the moment it starts (the Courthouse shows these).
+  function whyFor(kind, b, extra) {
+    const out = [], t = T(b), ci = city(), J = ci.jobs || { unemp: 0, k: 0 };
+    if (kind === 'fire') {
+      if (extra && extra.spread) out.push('It spread from a burning building next door');
+      if (b.level === 1 && t.cat !== 'decor') out.push('A level-1 building: old wiring and wooden walls burn easily');
+      if (FIRE_RISK[b.type]) out.push({ bakery: 'Bakery ovens run hot all day', workshop: 'Sawdust and machines', cafe: 'A busy café kitchen', arcade: 'Lots of wiring and machines', market: 'Crates and awnings catch easily' }[b.type]);
+      if (b.leaves) out.push('Dry autumn leaves piled up against the walls');
+      if (crowd(b) >= 3) out.push(`A packed street: ${crowd(b)} buildings right next to it`);
+      if (!nearAddon(b, 'hydrant', 2)) out.push('No fire hydrant within 2 tiles');
+      if (!coversB('fire', b)) out.push('Out of fire station reach, so nobody checks the wiring');
+      if (skyNow().w.kind === 'storm' && skyNow().w.k > 0.3) out.push('A storm');
+    } else if (kind === 'theft') {
+      const th = extra && extra.thief;
+      if (th && th.crimes > 0) out.push(`${th.name} has done this ${th.crimes === 1 ? 'once' : `${th.crimes} times`} before${th.caught ? `, and was caught ${th.caught === 1 ? 'once' : `${th.caught} times`}` : ''}`);
+      if (!coversB('police', b)) out.push('Out of police reach: nobody patrols here');
+      if (nightK() > 0.5) out.push('At night, when most people are asleep');
+      if (J.k > 0 && J.unemp > 0.04) out.push(`${Math.round(J.unemp * 100)}% of workers have no job (${ci.jobs.jobless} people)`);
+      if (!nearAddon(b, 'lamp', 1)) out.push('No street lamp next to it');
+      if (crimeLevel() >= 45) out.push(`Crime in town is ${crimeWord(crimeLevel()).toLowerCase()} (${Math.round(crimeLevel())}%)`);
+      if (TYPES.school && hallLevel() >= TYPES.school.unlock && !coversB('teacher', b)) out.push('Bored kids: no school in reach');
+      if (moodNow(Date.now()).value < 50) out.push('An unhappy town');
+    } else if (kind === 'sick' || kind === 'serious') {
+      if (extra && extra.spread) out.push('Caught it from the neighbours');
+      if ((b.trash || 0) >= 0.8) out.push('Trash piled up outside');
+      if (!coversB('nurse', b)) out.push('Far from the clinic, so nobody comes for check-ups');
+      if (SEA.k === 'winter') out.push('Winter: colds go round');
+      if (nearType(b, ['depot', 'workshop'], 1)) out.push('Right next to the depot or the factory');
+      if (crowd(b) >= 3) out.push('A crowded street');
+      if (kind === 'serious') out.push('An elderly resident, so it hit hard');
+    } else if (kind === 'storm') { out.push('A storm blew it over'); if (!coversB('gardener', b)) out.push('No gardener in reach to clear it'); }
+    return out.filter(Boolean).slice(0, 5);
+  }
+  function logIncident(kind, b, text, extra) {
+    const e = { id: (state.incSeq = (state.incSeq || 0) + 1), at: Date.now(), kind, bid: b ? b.id : null, place: b ? placeName(b) : '', text, outcome: '', cost: (extra && extra.cost) || 0, why: b ? whyFor(kind, b, extra) : [] };
+    if (extra && extra.thief) e.thief = extra.thief.name;
+    state.incidents.push(e); if (state.incidents.length > 60) state.incidents.splice(0, state.incidents.length - 60);
+    return e;
+  }
+  function closeIncident(kinds, b, outcome, cost) {
+    const ks = Array.isArray(kinds) ? kinds : [kinds];
+    for (let i = state.incidents.length - 1; i >= 0; i--) { const e = state.incidents[i]; if (ks.includes(e.kind) && e.bid === (b && b.id) && !e.outcome) { e.outcome = outcome; if (cost) e.cost = (e.cost || 0) + cost; return e; } }
+    return null;
+  }
+  // The Courthouse looks at a thief who was just caught: twice caught means prison, when there is a free cell.
+  function judge(th) {
+    if (!th || !courthouse() || th.caught < 2) return '';
+    if ((state.prison || []).length >= prisonCells()) return prisonCells() ? ` The Courthouse would send ${th.name} to prison, but the cells are full.` : ` ${th.name} has been caught ${th.caught} times. The Courthouse would send them to prison, if the town had one.`;
+    const left = 180 + 60 * Math.min(4, th.caught);
+    state.prison.push({ tid: th.id, left, total: left });
+    state.crime = clamp(crimeLevel() - 8, 0, 100);
+    return ` The Courthouse sent ${th.name} to prison (caught ${th.caught} times).`;
+  }
+  // Prison sentences pass in town minutes. Out again, some find work and stop; with few jobs, more go back to stealing.
+  function prisonStep(min) {
+    if (!(state.prison && state.prison.length)) return;
+    const ci = city(), u = ci.jobs ? ci.jobs.unemp * ci.jobs.k : 0;
+    for (const x of state.prison) x.left -= min;
+    for (const x of state.prison.filter((y) => y.left <= 0)) {
+      const th = thiefById(x.tid);
+      if (th && Math.random() < 0.35 + 0.5 * (1 - u)) { state.thieves = state.thieves.filter((t) => t !== th); logIncident('release', null, `${th.name} was let out and found a job`); }
+      else if (th) logIncident('release', null, `${th.name} was let out of prison`);
+    }
+    state.prison = state.prison.filter((y) => y.left > 0);
+  }
+
   // Break-ins: far from the police they happen more and cost far more; the town pays the victims back what the
   // police don't recover.
   function startRobbery(b) {
@@ -2510,7 +2697,10 @@
     const st = responderFor('police', b), ci = city(), big = !st;
     const scale = 0.6 + 0.4 * Math.min(1, ci.residents / 60);
     const stolen = Math.round((big ? 60 + Math.random() * 60 : 8 + Math.random() * 14) * scale * (0.8 + crimeLevel() / 250));
-    b.robbed = { at: Date.now(), stolen, open: big ? 60 : 120, far: big };
+    const th = pickThief();
+    b.robbed = { at: Date.now(), stolen, open: big ? 60 : 120, far: big, thief: th.id };
+    logIncident('theft', b, `Break-in at ${placeName(b)}`, { thief: th, cost: 0 });
+    th.crimes += 1;
     touch(); save(); sfx.alarm();
     toast(`Break-in at ${placeName(b)}! The thief took ${stolen} gold.${st ? (st.vehicle ? ' The patrol car is on its way.' : ' Officers are running over (a patrol car would be faster and catch them more often).') : ' It is too far from the police, so nobody can come. The town will have to pay it back.'}`);
     ui.bubbles.push({ bid: b.id, text: pick(LINES.robbery), kind: 'bad', t0: performance.now(), dur: 4200, role: 'police' }); sfx.grumble();
@@ -2524,14 +2714,18 @@
     delete b.robbed;
     b.shaken = { left: caught ? 5 : 12, total: caught ? 5 : 12, label: 'after the break-in' };
     addScar(`break-in at ${placeName(b)}`, caught ? 2 : 5, caught ? 8 : 15);
-    let jailed = false;
-    if (caught) { if ((state.jail || []).length < jailCells()) { state.jail.push({ left: 30 }); jailed = true; state.crime = clamp(crimeLevel() - 6, 0, 100); } }
-    else state.crime = clamp(crimeLevel() + (r.far ? 10 : 6), 0, 100);
+    let jailed = false, verdict = '';
+    const th = thiefById(r.thief);
+    if (caught && th) { th.caught += 1; verdict = judge(th); if (verdict.includes('sent')) jailed = true; }
+    if (caught && !jailed) { if ((state.jail || []).length < jailCells()) { state.jail.push({ left: 30 }); jailed = true; state.crime = clamp(crimeLevel() - 6, 0, 100); } }
+    else if (!caught) state.crime = clamp(crimeLevel() + (r.far ? 10 : 6), 0, 100);
+    closeIncident('theft', b, caught ? `${th ? th.name : 'The thief'} was caught. ${back} of ${r.stolen} gold found.${verdict}` : `${th ? th.name : 'The thief'} got away with ${r.stolen} gold.`, owe);
     const p = centerOf(b), now = performance.now(), who = b.resident || 'the owner';
-    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: now, text: caught ? (owe ? `Caught! ${back} of ${r.stolen} back` : `Caught! ${back} gold back`) : `Got away with ${r.stolen}`, soft: !caught });
+    floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: now, text: caught ? (owe ? `Caught! ${back} of ${r.stolen} back` : `Caught! ${back} gold back`) : `Got away with ${r.stolen}`, soft: !caught });
     if (caught) { ui.bubbles.push({ bid: b.id, text: pick(LINES.thanksPolice), kind: 'good', t0: now + 400, dur: 3200 }); sfx.chime(); }
-    toast(caught ? `Thief caught${jailed ? ' and locked up' : ''}!${owe ? ` They had spent some: ${back} of ${r.stolen} gold found. The town paid ${who} the other ${owe}.` : ` All ${back} gold went back to ${who}.`}${caught && !jailed ? ' The cells are full, so they were let off with a warning (upgrade the police station for more cells).' : ''}`
-      : `The thief got away with ${r.stolen} gold. The town paid ${who} back. Crime in town is up.`);
+    toast(caught ? `${th ? th.name : 'Thief'} caught${jailed ? ' and locked up' : ''}!${owe ? ` They had spent some: ${back} of ${r.stolen} gold found. The town paid ${who} the other ${owe}.` : ` All ${back} gold went back to ${who}.`}${caught && !jailed ? ' The cells are full, so they were let off with a warning (upgrade the police station for more cells).' : ''}`
+      : `${th ? th.name : 'The thief'} got away with ${r.stolen} gold. The town paid ${who} back. Crime in town is up.`);
+    if (verdict) setTimeout(() => toast(verdict.trim()), 2600);
     touch(); save(); renderAll();
   }
 
@@ -2554,10 +2748,11 @@
   // ambulance to a hospital (or a level-2 clinic). Without one, someone may not pull through, and without a cemetery
   // the town grieves for longer. How long recovery takes will depend on age once residents have one (later).
   const ageK = () => 1;
-  const canCare = (s) => !!s && live(s) && (s.type === 'hospital' || (s.type === 'clinic' && s.level >= 2));
-  const careK = (s) => (s && s.type === 'hospital' ? 2 : 1); // a hospital treats twice as fast
+  // 10.09: the Medical center (clinic level 2) takes very sick patients; the Hospital (level 3) treats twice as fast
+  const canCare = (s) => !!s && live(s) && s.type === 'clinic' && s.level >= 2;
+  const careK = (s) => (s && s.type === 'clinic' ? [1, 1, 1.4, 2][growLv(s.level)] : 1);
   // A staffed hospital (first) or level-2 clinic with an ambulance that reaches this home.
-  function carerFor(b) { return stationsOf('nurse').filter((s) => canCare(s) && s.vehicle && distFull(s, b) <= stationReach(s)).sort((a, c) => (c.type === 'hospital') - (a.type === 'hospital') || dist(a, b) - dist(c, b))[0] || null; }
+  function carerFor(b) { return stationsOf('nurse').filter((s) => canCare(s) && s.vehicle && distFull(s, b) <= stationReach(s)).sort((a, c) => c.level - a.level || dist(a, b) - dist(c, b))[0] || null; }
   const SERIOUS_SEC = 150; // play seconds a serious case can wait for hospital care
   function startSick(b, spread, opt) {
     if (!b || b.sick || !live(b)) return;
@@ -2565,21 +2760,23 @@
     const serious = home && (opt && opt.serious != null ? !!opt.serious : !spread && Math.random() < 0.16 * (SEA.k === 'winter' ? 1.5 : 1));
     b.sick = { at: Date.now(), left: 240, spreadIn: 50 + Math.random() * 30, need: Math.round((25 + Math.random() * 65) * ageK(b)) };
     if (serious) { b.sick.serious = true; b.sick.crit = SERIOUS_SEC; }
+    logIncident(serious ? 'serious' : 'sick', b, `${whoAt(b)} fell ${serious ? 'very ' : ''}sick`, { spread });
     touch(); save(); sfx.grumble && sfx.grumble();
     const st = responderFor('nurse', b);
-    const sw = T(b).staff ? ` The ${T(b).name.toLowerCase()} has one ${STAFF[T(b).staff].name.toLowerCase()} fewer on duty until ${staffName(b)} gets better.` : '';
+    const sw = T(b).staff ? ` The ${nameOf(b).toLowerCase()} has one ${STAFF[T(b).staff].name.toLowerCase()} fewer on duty until ${staffName(b)} gets better.` : '';
     if (serious) {
       const cr = carerFor(b), noAmb = stationsOf('nurse').find((s) => canCare(s) && !s.vehicle);
-      toast(`${whoAt(b)} is very sick and needs hospital care.${cr ? ` The ${T(cr).name.toLowerCase()}'s ambulance is on its way.` : noAmb ? ` The ${T(noAmb).name.toLowerCase()} has no ambulance to bring them in: buy one there.` : ' Your town has no hospital (or level-2 clinic) for serious cases. A nurse can keep them comfortable, but they may not pull through.'}`);
+      toast(`${whoAt(b)} is very sick and needs hospital care.${cr ? ` The ${nameOf(cr).toLowerCase()}'s ambulance is on its way.` : noAmb ? ` The ${nameOf(noAmb).toLowerCase()} has no ambulance to bring them in: buy one there.` : ' Your town has no Medical center or Hospital (the clinic at level 2 or 3) for serious cases. A nurse can keep them comfortable, but they may not pull through.'}`);
     } else toast(`${spread ? 'It spread: ' : ''}${whoAt(b)} is sick and can't work.${sw}${st ? (st.vehicle ? ' The ambulance is on its way.' : ' A nurse is walking over (an ambulance would be faster).') : staffWorking('nurse') ? ' No nurse can reach it: it may spread to the neighbours.' : ' Hire a nurse at the clinic to treat it, or it may spread.'}`);
     ui.bubbles.push({ bid: b.id, text: pick(LINES.health), kind: 'bad', t0: performance.now(), dur: 3600, role: 'nurse' });
     renderAll();
   }
   function endSick(b, treated, how) {
     if (!b || !b.sick) return;
+    closeIncident(['sick', 'serious'], b, how === 'hosp' ? 'Treated in hospital and home again' : treated ? 'A nurse came; better after a rest' : 'No nurse came: better at last, slowly');
     delete b.sick; touch();
     const p = centerOf(b);
-    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: performance.now(), text: how === 'hosp' ? 'Home from hospital!' : treated ? 'All better!' : 'Better at last', soft: !treated });
+    floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: performance.now(), text: how === 'hosp' ? 'Home from hospital!' : treated ? 'All better!' : 'Better at last', soft: !treated });
     if (treated) sfx.chime();
     if (how === 'hosp') toast(`${whoAt(b)} is home from the hospital and back on their feet.`);
     save(); renderAll();
@@ -2595,25 +2792,27 @@
   // What would save a serious case here, in words.
   function seriousHelp(b) {
     const noAmb = stationsOf('nurse').find((s) => canCare(s) && !s.vehicle), far = stationsOf('nurse').find((s) => canCare(s) && s.vehicle);
-    return noAmb ? `Very sick: the ${T(noAmb).name.toLowerCase()} needs an ambulance to bring them in (buy one there).` : far ? `Very sick: this home is out of the ambulance's reach.` : 'Very sick: only a hospital, or a clinic at level 2 with an ambulance, can treat serious cases.';
+    return noAmb ? `Very sick: the ${nameOf(noAmb).toLowerCase()} needs an ambulance to bring them in (buy one there).` : far ? `Very sick: this home is out of the ambulance's reach.` : 'Very sick: only a Medical center or Hospital with an ambulance can treat serious cases.';
   }
   // A serious case that waited too long without hospital care.
   function seriousEnd(b) {
     const s = b.sick;
     if (Math.random() < (s.comfort ? 0.35 : 0.6)) { passAway(b); return; }
     s.serious = false; s.crit = 0; s.phase = 'rest'; s.rest = (s.need || 40) * 2;
-    toast(`${whoAt(b)} pulled through, but needs a long rest. A hospital (or a level-2 clinic with an ambulance) treats serious cases.`);
+    { const e = closeIncident('serious', b, 'No hospital care in time, but they pulled through'); if (e) { e.kind = 'sick'; e.outcome = ''; e.text += ' (pulled through)'; } }
+    toast(`${whoAt(b)} pulled through, but needs a long rest. A Medical center or Hospital with an ambulance treats serious cases.`);
     touch(); save(); renderAll();
   }
   function passAway(b) {
+    closeIncident(['serious', 'sick'], b, 'Passed away: no hospital care in time');
     delete b.sick;
     const cem = countLive('cemetery') > 0, mins = cem ? 30 : 90;
     b.loss = { left: mins, total: mins };
     addScar(`a loss at ${placeName(b)}`, cem ? 3 : 6, mins);
     state.stats.losses = (state.stats.losses || 0) + 1;
     const p = centerOf(b);
-    floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: performance.now(), text: '🕊', soft: true });
-    toast(`Sad news: an elderly relative at ${placeName(b)} passed away. ${cem ? 'The family said goodbye at the cemetery, and the street mourns for a while.' : 'With no cemetery in town, the grief lingers much longer (build one in Services).'} A hospital, or a level-2 clinic with an ambulance, can save serious cases.`);
+    floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: performance.now(), text: '🕊', soft: true });
+    toast(`Sad news: an elderly relative at ${placeName(b)} passed away. ${cem ? 'The family said goodbye at the cemetery, and the street mourns for a while.' : 'With no cemetery in town, the grief lingers much longer (build one in Services).'} A Medical center or Hospital with an ambulance can save serious cases.`);
     touch(); save(); renderAll();
   }
 
@@ -2638,12 +2837,14 @@
     if (!spots.length) return null;
     const sp = pick(spots), b = { id: state.nextId++, type: 'fallen', c: sp.c, r: sp.r, level: 1, origin: 'incident', fallen: { at: Date.now() } };
     state.buildings.push(b); touch(); save();
+    logIncident('storm', b, 'A tree blew over in the storm');
     const gd = coversB('gardener', b);
     toast(gd ? 'The storm blew a tree over! A gardener is on the way to clear it.' : 'The storm blew a tree over! No gardener reaches it: tap it to have the crew clear it, or build a garden shed nearby.');
     renderAll(); return b;
   }
   function endFallen(b, by) {
     if (!b || b.type !== 'fallen') return;
+    closeIncident('storm', b, by === 'gardener' ? 'Cleared by a gardener' : 'Cleared by the crew');
     state.buildings = state.buildings.filter((x) => x !== b);
     if (ui.panel && ui.panel.bid === b.id) closePanel(true);
     const p = centerOf(b);
@@ -3040,7 +3241,7 @@
     state.stats.hired = (state.stats.hired || 0) + 1;
     touch(); save(); sfx.coin();
     const home = staffBuildings(k)[0];
-    if (home) { const p = centerOf(home); burst(p.x, p.y - 20, 18); floats.push({ x: p.x, y: p.y - HH * sizeOf(home.type) - 30, t0: performance.now(), text: `New ${r.name.toLowerCase()}!`, soft: true }); }
+    if (home) { const p = centerOf(home); burst(p.x, p.y - 20, 18); floats.push({ x: p.x, y: p.y - HH * sizeB(home) - 30, t0: performance.now(), text: `New ${r.name.toLowerCase()}!`, soft: true }); }
     toast(`You hired your ${ordinal(ro.hired + 1)} ${r.name.toLowerCase()} for ${fee} gold. Wage: ${wage} gold an hour. Watch them get to work.`);
     checkQuests(false); renderAll();
     return true;
@@ -3082,8 +3283,9 @@
     const debt = state.gold < 0 ? -10 : 0; // staff aren't paid in full: everyone notices
     const te = roles.find((r) => r.k === 'teacher'), school = te && te.needed ? Math.round(te.cover * 8 - 4) : 0;
     const sick = -Math.min(9, state.buildings.filter((b) => b.sick).length * 3);
-    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt + school + sick), 0, 100);
-    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, school, sick, roles, mult: 0.6 + 0.8 * value / 100 };
+    const work = ci.jobs ? -Math.round(12 * ci.jobs.unemp * ci.jobs.k) : 0; // 10.09: people out of work
+    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt + school + sick + work), 0, 100);
+    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, school, sick, work, roles, mult: 0.6 + 0.8 * value / 100 };
   }
   const moodWord = (v) => (v < 25 ? 'Miserable' : v < 45 ? 'Grumpy' : v < 60 ? 'Okay' : v < 80 ? 'Happy' : 'Delighted');
   function econ(now) {
@@ -3146,7 +3348,7 @@
   function attachTo(b) {
     const k = ui.attach && ui.attach.type, t = k && TYPES[k]; if (!t) return;
     if (!canHost(b)) { toast(`A ${t.name.toLowerCase()} goes beside a building. Tap a home, a shop or a service building.`); return; }
-    if (b.addons && b.addons[k]) { toast(`The ${T(b).name.toLowerCase()} already has a ${t.name.toLowerCase()}.`); return; }
+    if (b.addons && b.addons[k]) { toast(`The ${nameOf(b).toLowerCase()} already has a ${t.name.toLowerCase()}.`); return; }
     if (state.gold + 1e-6 < t.cost) { toast(`A ${t.name.toLowerCase()} costs ${t.cost} gold.`); return; }
     goldChange(-t.cost, `${t.name} beside ${placeName(b)}`, 'buy');
     b.addons = Object.assign({}, b.addons || {}, { [k]: true });
@@ -3184,20 +3386,22 @@
   }
   function jobLabel(q) {
     if (q.kind === 'clear') return `Clear the ${PLOTS[q.plot].name.toLowerCase()}`;
-    const t = TYPES[q.type];
-    if (q.kind === 'remove') return `Clear away the ${t.name.toLowerCase()}`;
+    const t = TYPES[q.type], b = byId(q.bid), nm = b && b.type === q.type ? nameOf(b) : t.name;
+    if (q.kind === 'remove') return `Clear away the ${nm.toLowerCase()}`;
     if (q.kind === 'build') return `Build a ${t.name.toLowerCase()}`;
-    if (q.kind === 'repair') return `Repair the ${t.name.toLowerCase()}`;
-    return `${t.name} to level ${q.toLevel}`;
+    if (q.kind === 'repair') return `Repair the ${nm.toLowerCase()}`;
+    if (GROW[q.type] && growLv(q.toLevel) !== growLv(q.toLevel - 1)) return `${tierName(q.type, q.toLevel - 1)} → ${tierName(q.type, q.toLevel)}`;
+    return `${nm} to level ${q.toLevel}`;
   }
   // The job as the object of a sentence: "Sam finishes the new bakery".
   function jobName(q) {
     if (q.kind === 'clear') return `clearing the ${PLOTS[q.plot].name.toLowerCase()}`;
-    const t = TYPES[q.type];
-    if (q.kind === 'remove') return `clearing away the ${t.name.toLowerCase()}`;
+    const t = TYPES[q.type], b = byId(q.bid), nm = b && b.type === q.type ? nameOf(b) : t.name;
+    if (q.kind === 'remove') return `clearing away the ${nm.toLowerCase()}`;
     if (q.kind === 'build') return `the new ${t.name.toLowerCase()}`;
-    if (q.kind === 'repair') return `repairing the ${t.name.toLowerCase()}`;
-    return `${t.name} to level ${q.toLevel}`;
+    if (q.kind === 'repair') return `repairing the ${nm.toLowerCase()}`;
+    if (GROW[q.type] && growLv(q.toLevel) !== growLv(q.toLevel - 1)) return `the new ${tierName(q.type, q.toLevel).toLowerCase()}`;
+    return `${nm} to level ${q.toLevel}`;
   }
   const capFirst = (x) => x.charAt(0).toUpperCase() + x.slice(1);
   function checkNew(type, c, r, anchored) {
@@ -3221,6 +3425,20 @@
     if (!isOpen(c + Math.floor((w - 1) / 2), r + Math.floor((d - 1) / 2))) return 'That land is still wild. Clear it first.';
     return w * d > 1 ? `It needs a free ${w}×${d} space there${FOOT[type] ? ' (tap Turn it to try it the other way)' : ''}.` : 'That spot is taken. Pick a free tile.';
   }
+  // 10.09: where a service can grow to its next size: a spot for the bigger footprint that covers the one it stands on
+  // (where it is first, then the other ways round). null = no room.
+  function growSpot(b, L) {
+    if (!GROW[b.type]) return { same: true };
+    const [w0, d0] = dimsB(b), rot0 = b.rot || 0, rots = growLv(L) === 2 ? [rot0, rot0 ^ 1] : [0];
+    const [nw0] = dimsOf(b.type, 0, L), [cw] = dimsOf(b.type, rot0, b.level);
+    if (!b.small && growLv(L) === growLv(b.level)) return { same: true };
+    for (const rot of rots) {
+      const [w, d] = dimsOf(b.type, rot, L);
+      if (w === w0 && d === d0) return { c: b.c, r: b.r, rot, same: true };
+      for (let c = b.c; c >= b.c + w0 - w; c--) for (let r = b.r; r >= b.r + d0 - d; r--) if (fits(b.type, c, r, b.id, rot, L)) return { c, r, rot, level: L };
+    }
+    return null;
+  }
   function checkJob(kind, b) {
     if (state.session) return { ok: false, why: 'A session is running.' };
     const t = T(b); let cost, work;
@@ -3232,6 +3450,7 @@
       cost = t.up[L][0]; work = upgradeWork(b.type, L);
       if (jobMode('upgrade', b.type) === 'play') secs = upgradeSecs(b.type, L);
       if (b.type !== 'townhall' && L > hallLevel()) return { ok: false, why: `Upgrade the town hall to level ${L} first.`, cost, work };
+      if (GROW[b.type] && !growSpot(b, L)) { const [w, d] = dimsOf(b.type, 0, L); return { ok: false, noRoom: true, why: `The ${tierName(b.type, L)} needs ${w}×${d} tiles, and there is no free tile next to the ${nameOf(b).toLowerCase()} to grow into. Move it to a spot with room, or clear a neighbour.`, cost, work }; }
     }
     if (queueFull(jobMode(kind, b.type))) return { ok: false, why: fullWhy(jobMode(kind, b.type)), cost, work, secs };
     if (state.gold + 1e-6 < cost) return { ok: false, why: `Needs ${fmtGold(cost - state.gold + 0.999)} more gold.`, cost, work, secs, gold: true };
@@ -3243,10 +3462,12 @@
     const chk = checkJob(kind, b);
     if (!chk.ok) { if (!quiet) toast(chk.why); return null; }
     accrue(Date.now());
-    goldChange(-chk.cost, `${kind === 'repair' ? 'Repair' : 'Upgrade'}: ${T(b).name.toLowerCase()}${kind === 'upgrade' ? ` to level ${b.level + 1}` : ''}`, 'buy');
+    goldChange(-chk.cost, `${kind === 'repair' ? 'Repair' : 'Upgrade'}: ${nameOf(b).toLowerCase()}${kind === 'upgrade' ? ` to level ${b.level + 1}` : ''}`, 'buy');
     const q = { id: state.nextId++, kind, type: b.type, bid, fromLevel: b.level, toLevel: kind === 'upgrade' ? b.level + 1 : b.level, work: chk.work, done: 0, paid: chk.cost, mode: jobMode(kind, b.type) };
     if (chk.secs) q.secs = chk.secs;
     state.queue.push(q);
+    // 10.09: keep the tiles it will grow into free while the upgrade is under way
+    if (kind === 'upgrade' && GROW[b.type]) { const g = growSpot(b, q.toLevel); if (g && !g.same) b.grow = { c: g.c, r: g.r, rot: g.rot, level: q.toLevel }; touch(); }
     touch(); save(); sfx.coin();
     if (!quiet) toast(`Added to ${state.builder}'s plan: ${jobLabel(q).toLowerCase()}.`);
     return q;
@@ -3339,10 +3560,13 @@
       floats.push({ x: p.x, y: p.y - 30, t0: performance.now(), text: 'Cleared away', soft: true });
       return;
     }
-    if (q.kind === 'build') { b.site = false; result.built.push({ bid: b.id, kind: 'build', from: 0, type: b.type, level: 1, label: T(b).name, note: b.resident ? `${b.resident} moves in` : (T(b).cat === 'shop' ? 'Open for business' : 'Finished') }); }
-    else if (q.kind === 'repair') { b.ruin = false; if (b.burnt) { delete b.burnt; delete b.health; } result.built.push({ bid: b.id, kind: 'repair', from: b.level, type: b.type, level: b.level, label: T(b).name, note: b.resident ? `${b.resident} is back` : 'Open again' }); }
+    if (q.kind === 'build') { b.site = false; result.built.push({ bid: b.id, kind: 'build', from: 0, type: b.type, level: 1, label: nameOf(b), note: b.resident ? `${b.resident} moves in` : (T(b).cat === 'shop' ? 'Open for business' : 'Finished') }); }
+    else if (q.kind === 'repair') { b.ruin = false; if (b.burnt) { delete b.burnt; delete b.health; } result.built.push({ bid: b.id, kind: 'repair', from: b.level, type: b.type, level: b.level, label: nameOf(b), note: b.resident ? `${b.resident} is back` : 'Open again' }); }
     else {
-      b.level = q.toLevel; result.built.push({ bid: b.id, kind: 'upgrade', from: q.fromLevel || q.toLevel - 1, type: b.type, level: b.level, label: T(b).name, note: `Level ${b.level}` });
+      const grew = GROW[b.type] && growLv(q.toLevel) !== growLv(q.fromLevel || q.toLevel - 1);
+      if (!b.grow && grew && !b.small) { const g = growSpot(b, q.toLevel); if (g && !g.same) b.grow = { c: g.c, r: g.r, rot: g.rot, level: q.toLevel }; else if (!g) b.small = 1; } // moved during the upgrade
+      if (b.grow) { b.c = b.grow.c; b.r = b.grow.r; b.rot = b.grow.rot; delete b.grow; delete b.small; } else if (b.small && fits(b.type, b.c, b.r, b.id, b.rot || 0, q.toLevel)) delete b.small;
+      b.level = q.toLevel; touch(); result.built.push({ bid: b.id, kind: 'upgrade', from: q.fromLevel || q.toLevel - 1, type: b.type, level: b.level, label: nameOf(b), note: grew ? `Now a ${nameOf(b).toLowerCase()} (${dimsB(b).join('×')})` : `Level ${b.level}` });
       if (b.type === 'townhall') { const nw = Object.keys(TYPES).filter((k) => TYPES[k].unlock === b.level).map((k) => TYPES[k].name.toLowerCase()); const duty = HALL_DUTY[b.level]; setTimeout(() => toast(`Town hall level ${b.level}!${nw.length ? ` New: ${nw.join(', ')}.` : ''}${duty ? ` ${duty}` : ''}`), 1800); }
     }
   }
@@ -3866,7 +4090,7 @@
       toast(done.map((q) => `${q.from === 'Town council' ? 'Done' : q.from + ' says thanks'}: +${q.reward} gold`).join(' · ')); sfx.chime();
       const ups = addXp(25 * done.length);
       if (ups.length) setTimeout(() => levelToast(ups), 1800);
-      for (const q of done) { const b = q.at && q.at(); if (b) { const p = centerOf(b); burst(p.x, p.y - 20, 24); floats.push({ x: p.x, y: p.y - HH * sizeOf(b.type) - 30, t0: performance.now(), text: `+${q.reward} gold` }); } }
+      for (const q of done) { const b = q.at && q.at(); if (b) { const p = centerOf(b); burst(p.x, p.y - 20, 24); floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: performance.now(), text: `+${q.reward} gold` }); } }
     }
     return done;
   }
@@ -3883,7 +4107,7 @@
   function fireAlert() {
     const b = state.buildings.find((x) => x.fire);
     if (!b || (state.questsSeen.includes('fire1') && !isDone('fire1'))) return null;
-    const who = b.resident ? `${b.resident}'s ${T(b).name.toLowerCase()}` : `the ${T(b).name.toLowerCase()}`;
+    const who = b.resident ? `${b.resident}'s ${nameOf(b).toLowerCase()}` : `the ${nameOf(b).toLowerCase()}`;
     const ff = staffWorking('fire') >= 1;
     return { id: 'firenow', from: 'Fire!', text: ff ? `${who.charAt(0).toUpperCase() + who.slice(1)} is on fire. Your firefighters will put it out while you play.` : `${who.charAt(0).toUpperCase() + who.slice(1)} is on fire and nobody is there to put it out. Hire a firefighter.`,
       short: ff ? `Fire at ${who}! Firefighters are coming.` : `Fire at ${who}! Hire a firefighter.`, reward: 0, action: 'staff', role: 'fire', alert: true, at: () => b };
@@ -3967,7 +4191,7 @@
   }
   // Turn a two-tile building around while placing it (10.06).
   function turnHeld() {
-    const item = heldItem(), pv = ui.preview; if (!item || !pv || !FOOT[item.type]) return;
+    const item = heldItem(), pv = ui.preview; if (!item || !pv || !(FOOT[item.type] || turns(item.type, item.level))) return;
     const old = ui.rot || 0; ui.rot = old ^ 1; hintCache = null;
     const ok = [[0, 0], [-1, 0], [0, -1], [-1, 1], [1, -1]].map(([dc, dr]) => [pv.c + dc, pv.r + dr]).find(([c, r]) => fits(item.type, c, r, item.moveId));
     if (!ok) { ui.rot = old; hintCache = null; toast('No room to turn it here. Tap another spot, or turn it first.'); return; }
@@ -4007,14 +4231,17 @@
   function placeHeld(c, r) {
     const h = ui.holding, item = heldItem(); if (!h || !item) return;
     if (!fits(item.type, c, r, item.moveId)) return;
-    const b = byId(h.id), turned = b && FOOT[b.type] && (b.rot || 0) !== (ui.rot || 0);
+    const b = byId(h.id), turned = b && (FOOT[b.type] || turns(b.type, b.level)) && (b.rot || 0) !== (ui.rot || 0);
     if (b && (b.c !== c || b.r !== r || turned)) {
       accrue(Date.now());
       if (state.freeMoves > 0) { state.freeMoves -= 1; toast(`Free move used. ${state.freeMoves} left.`); }
-      else { const mc = moveCost(b); if (state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold.`); return; } goldChange(-mc, `Moving the ${T(b).name.toLowerCase()}`, 'buy'); floats.push({ x: tileCenter(c, r).x, y: tileCenter(c, r).y - 40, t0: performance.now(), text: `−${mc} gold`, soft: true }); }
+      else { const mc = moveCost(b); if (state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold.`); return; } goldChange(-mc, `Moving the ${nameOf(b).toLowerCase()}`, 'buy'); floats.push({ x: tileCenter(c, r).x, y: tileCenter(c, r).y - 40, t0: performance.now(), text: `−${mc} gold`, soft: true }); }
     }
     const moved = b && (b.c !== c || b.r !== r || turned);
-    if (b) { b.c = c; b.r = r; if (FOOT[b.type]) b.rot = ui.rot || 0; if (b.fp1) delete b.fp1; }
+    if (b) { b.c = c; b.r = r; if (FOOT[b.type] || GROW[b.type]) b.rot = turns(b.type, b.level) ? ui.rot || 0 : 0; if (b.fp1) delete b.fp1;
+      if (b.small) { delete b.small; toast(`Room at last: the ${nameOf(b).toLowerCase()} is full size now.`); }
+      if (b.grow) { delete b.grow; occCache = null; const g = growSpot(b, b.level + 1); if (g && !g.same) b.grow = { c: g.c, r: g.r, rot: g.rot, level: b.level + 1 }; } // an upgrade under way: keep room at the new spot
+    }
     setHolding(null); touch(); accrue(Date.now()); sfx.place(); bump(h.id);
     // the moving crew drives over and sets it up (10.04)
     if (moved && ui.screen === 'play') { const v = dispatch('builders', townHall(), b, 0.3); v.short = 6; }
@@ -4053,7 +4280,7 @@
     if (queueFull('play')) { toast(fullWhy('play')); return; }
     if (state.gold + 1e-6 < cost) { toast(`The crew costs ${cost} gold to clear it away.`); return; }
     accrue(Date.now());
-    goldChange(-cost, `Clearing away the ${T(b).name.toLowerCase()}`, 'buy');
+    goldChange(-cost, `Clearing away the ${nameOf(b).toLowerCase()}`, 'buy');
     state.queue.push({ id: state.nextId++, kind: 'remove', type: b.type, bid: b.id, fromLevel: b.level, toLevel: b.level, work: REMOVE_WORK, done: 0, paid: cost, mode: 'play', secs: 30 });
     touch(); save(); sfx.coin(); closePanel(); renderAll(); afterAction();
     toast('The construction crew is on its way to clear it.');
@@ -4251,7 +4478,7 @@
     return { L, R, B, T: Tp };
   }
   // 10.06: boxes on a w×d footprint. ac/ar are half the footprint along the c and the r axis (screen vectors).
-  function footVec(type, rot, hwT, hhT) { const [w, d] = dimsOf(type, rot); return { ac: [w / 2 * hwT, w / 2 * hhT], ar: [-d / 2 * hwT, d / 2 * hhT], w, d }; }
+  function footVec(type, rot, hwT, hhT, level) { const [w, d] = dimsOf(type, rot, level); return { ac: [w / 2 * hwT, w / 2 * hhT], ar: [-d / 2 * hwT, d / 2 * hhT], w, d }; }
   function rectPts(x, y, F, s) { const { ac, ar } = F; return { T: [x - s * (ac[0] + ar[0]), y - s * (ac[1] + ar[1])], R: [x + s * (ac[0] - ar[0]), y + s * (ac[1] - ar[1])], B: [x + s * (ac[0] + ar[0]), y + s * (ac[1] + ar[1])], L: [x - s * (ac[0] - ar[0]), y - s * (ac[1] - ar[1])] }; }
   function boxF(c, x, y, F, s, h, color) {
     const { L, R, B, T: Tp } = rectPts(x, y, F, s);
@@ -4430,12 +4657,297 @@
     return cy;
   }
 
+  /* 10.09: the bigger sizes of every service. Each takes (c, x, y, hw, hh, u, F, L, col, roofc, glass, now, ruin):
+     F is the footprint for the 2×1 sizes (like the House); for the 2×2 sizes hw/hh span the whole footprint. */
+  const faces2 = (f, F) => { const long = F.w >= F.d; return { lf: long ? [f.L, f.B] : [f.B, f.R], sf: long ? [f.B, f.R] : [f.L, f.B], back: long ? F.ac : F.ar, long }; };
+  const WQ = (c, fc, a1, b1, v0, v1, cl) => wallQuad(c, fc[0], fc[1], a1, b1, v0, v1, cl);
+  function flagAt(c, fx, fy, u, col, now, tall) { const wv = reduced ? 0 : Math.sin(now / 280) * 1.1 * u, t2 = (tall || 14) * u; line(c, [fx, fy], [fx, fy - t2], '#59606A', 0.9 * u); poly(c, [[fx, fy - t2], [fx + 6.5 * u, fy - t2 + 1.5 * u + wv], [fx, fy - t2 + 3.5 * u]], col); }
+  function columnsQ(c, fc, n, a0, a1, h, colA, u) { for (let i = 0; i < n; i++) { const t0 = a0 + (a1 - a0) * i / (n - 1) - 0.022, t1 = t0 + 0.044; WQ(c, fc, t0, t1, 0, h, colA); WQ(c, fc, t0 + 0.03, t1, 0, h, 'rgba(0,0,0,.1)'); } }
+  function domeAt(c, x, y, r, col, u) { c.fillStyle = shade(col, 0.82); c.beginPath(); c.ellipse(x, y, r, r * 0.42, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = col; c.beginPath(); c.ellipse(x, y, r, r * 1.05, 0, Math.PI, 0); c.fill(); c.fillStyle = 'rgba(255,255,255,.28)'; c.beginPath(); c.ellipse(x - r * 0.38, y - r * 0.55, r * 0.22, r * 0.36, -0.3, 0, Math.PI * 2); c.fill(); line(c, [x, y - r * 1.05], [x, y - r * 1.4], '#59606A', 0.8 * u); c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(x, y - r * 1.45, 1.2 * u, 0, Math.PI * 2); c.fill(); }
+  function bars(c, fc, a1, b1, v0, v1, u, n) { for (let i = 1; i <= (n || 3); i++) { const t = a1 + (b1 - a1) * i / ((n || 3) + 1); line(c, wallPt(fc[0], fc[1], t, v0), wallPt(fc[0], fc[1], t, v1), '#3C434C', 0.7 * u); } }
+  const TIER_ART = {
+    // ---- health
+    clinic2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // a long white Medical center: glass doors under a canopy, two rows of windows, red crosses, an ambulance bay
+      const h = 22 * u, f = boxF(c, x, y, F, 0.88, h, col), { lf, sf } = faces2(f, F);
+      WQ(c, lf, 0, 1, 0, h * 0.1, '#8FC7B8'); WQ(c, sf, 0, 1, 0, h * 0.1, '#7DB5A6');
+      WQ(c, lf, 0.42, 0.58, 0, h * 0.46, '#9ED0E0'); line(c, wallPt(lf[0], lf[1], 0.5, 0), wallPt(lf[0], lf[1], 0.5, h * 0.46), '#F4F6F7', 0.8 * u);
+      WQ(c, lf, 0.38, 0.62, h * 0.46, h * 0.54, roofc);
+      for (const a1 of [0.06, 0.2, 0.68, 0.82]) windowQ(c, lf[0], lf[1], a1, a1 + 0.1, h * 0.22, h * 0.42, glass, u);
+      for (const a1 of [0.06, 0.2, 0.34, 0.56, 0.7, 0.84]) windowQ(c, lf[0], lf[1], a1, a1 + 0.09, h * 0.6, h * 0.82, glass, u);
+      WQ(c, sf, 0.42, 0.58, h * 0.3, h * 0.86, roofc); WQ(c, sf, 0.26, 0.74, h * 0.5, h * 0.66, roofc);
+      boxF(c, x, y - h, F, 0.9, 2.2 * u, '#DCE2E6');
+      const cx = x, cy = y - h - 7.2 * u; c.fillStyle = '#FFFFFF'; roundRect(c, cx - 4.5 * u, cy - 4.5 * u, 9 * u, 9 * u, 1.5 * u); c.fill(); c.fillStyle = roofc; c.fillRect(cx - 1.2 * u, cy - 3.4 * u, 2.4 * u, 6.8 * u); c.fillRect(cx - 3.4 * u, cy - 1.2 * u, 6.8 * u, 2.4 * u);
+    },
+    // ---- fire
+    firestation2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now, ruin) {
+      const h = 19 * u, f = boxF(c, x, y, F, 0.9, h, col), { lf, sf, back, long } = faces2(f, F);
+      WQ(c, lf, 0, 1, h * 0.8, h * 0.93, roofc); WQ(c, sf, 0, 1, h * 0.8, h * 0.93, shade(roofc, 0.9));
+      for (const [a1, b1] of [[0.07, 0.44], [0.53, 0.9]]) {
+        WQ(c, lf, a1 - 0.015, b1 + 0.015, 0, h * 0.68, '#F4EEE0'); WQ(c, lf, a1, b1, 0, h * 0.64, ruin ? '#6E3A33' : '#C8473D');
+        for (let i = 1; i < 5; i++) WQ(c, lf, a1, b1, h * 0.64 * i / 5 - 0.22 * u, h * 0.64 * i / 5 + 0.22 * u, '#A23A30');
+        for (let i = 0; i < 3; i++) WQ(c, lf, a1 + (b1 - a1) * (0.1 + i * 0.29), a1 + (b1 - a1) * (0.32 + i * 0.29), h * 0.4, h * 0.5, 'rgba(205,228,240,.92)');
+      }
+      doorQ(c, sf[0], sf[1], 0.18, 0.44, h * 0.52, '#7A5230', u); windowQ(c, sf[0], sf[1], 0.58, 0.84, h * 0.38, h * 0.66, glass, u);
+      boxF(c, x, y - h, F, 0.94, 2.4 * u, shade(col, 0.9));
+      const tx = x - back[0] * 0.52, ty = y - h - 2.4 * u - back[1] * 0.52;
+      const tf = box(c, tx, ty, 5.6 * u, 2.8 * u, 1, 13 * u, col);
+      wallQuad(c, tf.L, tf.B, 0, 1, 10 * u, 12 * u, roofc); wallQuad(c, tf.B, tf.R, 0, 1, 10 * u, 12 * u, roofc);
+      windowQ(c, tf.B, tf.R, 0.3, 0.7, 4 * u, 8 * u, glass, u); pyramid(c, tx, ty, 5.6 * u, 2.8 * u, 1, 13 * u, 6 * u, roofc);
+      c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(tx, ty - 14.5 * u, 1.8 * u, 0, Math.PI * 2); c.fill();
+      const fp = wallPt(lf[0], lf[1], 0.48, h + 2.4 * u); const on = reduced || Math.floor(now / 400) % 2; c.fillStyle = on ? '#FF5A4A' : '#9A2A22'; c.beginPath(); c.arc(fp[0], fp[1] - 1.5 * u, 1.5 * u, 0, Math.PI * 2); c.fill();
+    },
+    firestation3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now, ruin) {
+      // Fire headquarters: three engine bays, an office floor, a tall watch tower with a bell and a flag
+      const h = 30 * u, f = box(c, x, y, hw, hh, 0.8, h, col);
+      wallQuad(c, f.L, f.B, 0, 1, h * 0.86, h * 0.96, roofc); wallQuad(c, f.B, f.R, 0, 1, h * 0.86, h * 0.96, shade(roofc, 0.9));
+      for (const [a1, b1] of [[0.06, 0.32], [0.37, 0.63], [0.68, 0.94]]) {
+        wallQuad(c, f.B, f.R, a1 - 0.015, b1 + 0.015, 0, h * 0.56, '#F4EEE0'); wallQuad(c, f.B, f.R, a1, b1, 0, h * 0.52, ruin ? '#6E3A33' : '#C8473D');
+        for (let i = 1; i < 5; i++) wallQuad(c, f.B, f.R, a1, b1, h * 0.52 * i / 5 - 0.25 * u, h * 0.52 * i / 5 + 0.25 * u, '#A23A30');
+        wallQuad(c, f.B, f.R, a1 + (b1 - a1) * 0.12, b1 - (b1 - a1) * 0.12, h * 0.31, h * 0.4, 'rgba(205,228,240,.92)');
+      }
+      for (const a1 of [0.12, 0.42, 0.72]) windowQ(c, f.B, f.R, a1, a1 + 0.15, h * 0.62, h * 0.8, glass, u);
+      for (const a1 of [0.08, 0.26, 0.6, 0.78]) windowQ(c, f.L, f.B, a1, a1 + 0.13, h * 0.58, h * 0.8, glass, u);
+      for (const a1 of [0.08, 0.26]) windowQ(c, f.L, f.B, a1, a1 + 0.13, h * 0.2, h * 0.42, glass, u);
+      doorQ(c, f.L, f.B, 0.5, 0.66, h * 0.44, '#7A5230', u);
+      box(c, x, y - h, hw, hh, 0.82, 2.6 * u, shade(col, 0.88));
+      const tx = x - hw * 0.46, ty = y - h - 2.6 * u - hh * 0.06;
+      const tf = box(c, tx, ty, 7 * u, 3.5 * u, 1, 24 * u, col);
+      wallQuad(c, tf.L, tf.B, 0, 1, 19 * u, 22 * u, roofc); wallQuad(c, tf.B, tf.R, 0, 1, 19 * u, 22 * u, roofc);
+      windowQ(c, tf.B, tf.R, 0.28, 0.72, 9 * u, 16 * u, glass, u); windowQ(c, tf.L, tf.B, 0.28, 0.72, 9 * u, 16 * u, glass, u);
+      pyramid(c, tx, ty, 7 * u, 3.5 * u, 1, 24 * u, 9 * u, roofc);
+      c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(tx, ty - 27 * u, 2.1 * u, 0, Math.PI * 2); c.fill();
+      flagAt(c, x + hw * 0.3, y - h - 2.6 * u + hh * 0.02, u, '#C8473D', now, 15);
+      const on = reduced || Math.floor(now / 380) % 2, sp = wallPt(f.B, f.R, 0.5, h + 2.6 * u); c.fillStyle = on ? '#FF5A4A' : '#9A2A22'; c.beginPath(); c.arc(sp[0], sp[1] - 2 * u, 1.8 * u, 0, Math.PI * 2); c.fill();
+    },
+    // ---- police
+    police2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      const h = 18 * u, f = boxF(c, x, y, F, 0.88, h, col), { lf, sf, back } = faces2(f, F);
+      WQ(c, lf, 0, 1, h * 0.84, h, roofc); WQ(c, sf, 0, 1, h * 0.84, h, shade(roofc, 0.85));
+      WQ(c, lf, 0, 1, 0, h * 0.08, shade(col, 0.7)); WQ(c, sf, 0, 1, 0, h * 0.08, shade(col, 0.66));
+      doorQ(c, lf[0], lf[1], 0.43, 0.57, h * 0.58, '#2F4E8C', u);
+      for (const a1 of [0.07, 0.24]) windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.38, h * 0.7, glass, u);
+      for (const a1 of [0.64, 0.81]) { windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.38, h * 0.7, glass, u); bars(c, lf, a1, a1 + 0.12, h * 0.38, h * 0.7, u); }
+      windowQ(c, sf[0], sf[1], 0.3, 0.7, h * 0.38, h * 0.7, glass, u);
+      const sp = wallPt(lf[0], lf[1], 0.5, h * 0.72); starShape(c, sp[0], sp[1], 2.4 * u, '#F3C64B');
+      boxF(c, x, y - h, F, 0.9, 2.4 * u, shade(col, 0.88));
+      const lp = wallPt(lf[0], lf[1], 0.5, h + 2.4 * u), blink = reduced ? 0.5 : (Math.sin(now / 260) + 1) / 2;
+      c.fillStyle = `rgba(80,150,255,${0.2 + 0.5 * blink})`; c.beginPath(); c.arc(lp[0], lp[1] - 3 * u, 5 * u, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#4C8DFF'; c.fillRect(lp[0] - 1.7 * u, lp[1] - 4.5 * u, 3.4 * u, 3 * u);
+      flagAt(c, x - back[0] * 0.7, y - h - 2.4 * u - back[1] * 0.7, u, '#2F4E8C', now, 16);
+    },
+    police3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Courthouse: wide steps, a row of columns under a pediment, a flat roof with a small dome, scales of justice
+      const st = 3 * u;
+      box(c, x, y, hw, hh, 0.86, st * 0.5, '#CFC7B6'); box(c, x, y - st * 0.5, hw, hh, 0.82, st * 0.5, '#DAD3C4');
+      const h = 26 * u, by = y - st, f = box(c, x, by, hw, hh, 0.76, h, '#EEE9DE');
+      wallQuad(c, f.L, f.B, 0, 1, h * 0.8, h * 0.9, '#E2DACA'); wallQuad(c, f.B, f.R, 0, 1, h * 0.8, h * 0.9, '#D8D0BF');
+      columnsQ(c, [f.L, f.B], 6, 0.12, 0.88, h * 0.8, '#FBF8F0', u);
+      wallQuad(c, f.L, f.B, 0.44, 0.56, 0, h * 0.5, '#5B4632');
+      for (const a1 of [0.12, 0.34, 0.56, 0.78]) windowQ(c, f.B, f.R, a1, a1 + 0.12, h * 0.4, h * 0.7, glass, u);
+      const p0 = wallPt(f.L, f.B, 0.06, h * 0.9), p1 = wallPt(f.L, f.B, 0.94, h * 0.9), pa = wallPt(f.L, f.B, 0.5, h * 0.9 + 10 * u);
+      poly(c, [p0, p1, pa], '#F4EFE4'); c.strokeStyle = 'rgba(38,28,18,.25)'; c.lineWidth = 0.8 * u; outline(c, [p0, p1, pa]);
+      // scales of justice in the pediment
+      const sc = wallPt(f.L, f.B, 0.5, h * 0.9 + 4.5 * u); line(c, [sc[0] - 3 * u, sc[1] - 1.5 * u], [sc[0] + 3 * u, sc[1] - 1.5 * u], '#B9862A', 0.8 * u); line(c, [sc[0], sc[1] - 3 * u], [sc[0], sc[1] + 2 * u], '#B9862A', 0.8 * u);
+      for (const dx of [-3, 3]) { c.strokeStyle = '#B9862A'; c.lineWidth = 0.7 * u; c.beginPath(); c.arc(sc[0] + dx * u, sc[1], 1.4 * u, 0, Math.PI); c.stroke(); }
+      box(c, x, by - h, hw, hh, 0.78, 2.4 * u, '#D8D0BF');
+      domeAt(c, x + hw * 0.08, by - h - 2.4 * u - hh * 0.04, 8 * u, '#7E93B8', u);
+      flagAt(c, x + hw * 0.5, by - h - 2.4 * u, u, '#2F4E8C', now, 14);
+      const lp = wallPt(f.L, f.B, 0.5, h * 0.55), blink = reduced ? 0.5 : (Math.sin(now / 260) + 1) / 2; c.fillStyle = `rgba(80,150,255,${0.15 + 0.4 * blink})`; c.beginPath(); c.arc(lp[0], lp[1], 3.4 * u, 0, Math.PI * 2); c.fill();
+    },
+    // ---- schools
+    school2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // a brick High school: two rows of windows, a canopy over the doors, a flat roof with a banner, a basketball hoop
+      const brick = '#C9765A', h = 24 * u, f = boxF(c, x, y, F, 0.88, h, brick), { lf, sf, back } = faces2(f, F);
+      for (let r0 = 1; r0 < 6; r0++) { WQ(c, lf, 0, 1, h * r0 / 6 - 0.2 * u, h * r0 / 6 + 0.2 * u, 'rgba(255,240,220,.18)'); WQ(c, sf, 0, 1, h * r0 / 6 - 0.2 * u, h * r0 / 6 + 0.2 * u, 'rgba(255,240,220,.12)'); }
+      for (const a1 of [0.05, 0.17, 0.29, 0.62, 0.74, 0.86]) { windowQ(c, lf[0], lf[1], a1, a1 + 0.09, h * 0.18, h * 0.42, glass, u); windowQ(c, lf[0], lf[1], a1, a1 + 0.09, h * 0.56, h * 0.8, glass, u); }
+      doorQ(c, lf[0], lf[1], 0.43, 0.57, h * 0.44, '#3E6FB0', u); WQ(c, lf, 0.39, 0.61, h * 0.46, h * 0.52, '#F4EEE0');
+      for (const a1 of [0.2, 0.62]) windowQ(c, sf[0], sf[1], a1, a1 + 0.18, h * 0.5, h * 0.78, glass, u);
+      WQ(c, lf, 0, 1, h * 0.9, h, '#F1E2C8'); WQ(c, sf, 0, 1, h * 0.9, h, '#E2D2B6');
+      boxF(c, x, y - h, F, 0.9, 2.2 * u, '#E4D2A4');
+      const bp = wallPt(lf[0], lf[1], 0.5, h + 2.2 * u); c.fillStyle = '#3E6FB0'; roundRect(c, bp[0] - 9 * u, bp[1] - 8 * u, 18 * u, 6 * u, 1.4 * u); c.fill(); c.fillStyle = '#FFFFFF'; c.font = `800 ${3.8 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('HIGH SCHOOL', bp[0], bp[1] - 5 * u);
+      const hx = x + back[0] * 0.95 + hw * 0.18, hy = y + back[1] * 0.95 + hh * 0.5; line(c, [hx, hy], [hx, hy - 14 * u], '#7A8590', 0.9 * u); c.fillStyle = '#FFFFFF'; c.fillRect(hx - 3 * u, hy - 17 * u, 6 * u, 4 * u); c.strokeStyle = '#E8503A'; c.lineWidth = 0.8 * u; c.beginPath(); c.ellipse(hx, hy - 12.6 * u, 1.8 * u, 0.7 * u, 0, 0, Math.PI * 2); c.stroke();
+    },
+    school3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the University: a stone hall with columns, a green copper dome and a clock, banners at the doors
+      const st = 2.6 * u; box(c, x, y, hw, hh, 0.86, st, '#D3CBBA');
+      const h = 28 * u, by = y - st, f = box(c, x, by, hw, hh, 0.74, h, '#EFE6D2');
+      for (const a1 of [0.08, 0.26, 0.6, 0.78]) { windowQ(c, f.L, f.B, a1, a1 + 0.12, h * 0.16, h * 0.4, glass, u); windowQ(c, f.L, f.B, a1, a1 + 0.12, h * 0.54, h * 0.78, glass, u); }
+      for (const a1 of [0.1, 0.32, 0.56, 0.78]) { windowQ(c, f.B, f.R, a1, a1 + 0.12, h * 0.16, h * 0.4, glass, u); windowQ(c, f.B, f.R, a1, a1 + 0.12, h * 0.54, h * 0.78, glass, u); }
+      columnsQ(c, [f.L, f.B], 4, 0.4, 0.6, h * 0.86, '#FBF8F0', u);
+      wallQuad(c, f.L, f.B, 0.46, 0.54, 0, h * 0.42, '#6B4A2C');
+      wallQuad(c, f.L, f.B, 0, 1, h * 0.88, h, '#E0D5BD'); wallQuad(c, f.B, f.R, 0, 1, h * 0.88, h, '#D6CAB0');
+      const p0 = wallPt(f.L, f.B, 0.34, h), p1 = wallPt(f.L, f.B, 0.66, h), pa = wallPt(f.L, f.B, 0.5, h + 7 * u); poly(c, [p0, p1, pa], '#F4EFE4');
+      for (const a1 of [0.3, 0.68]) { const bt = wallPt(f.L, f.B, a1, h * 0.8), bb = wallPt(f.L, f.B, a1, h * 0.5); poly(c, [bt, [bt[0] + 2.6 * u, bt[1] + 1.3 * u], [bb[0] + 2.6 * u, bb[1] + 1.3 * u], [bb[0] + 1.3 * u, bb[1] - 0.6 * u], bb], '#7B5EA7'); }
+      box(c, x, by - h, hw, hh, 0.76, 2.4 * u, '#D6CAB0');
+      const dx = x, dy = by - h - 2.4 * u; const df = box(c, dx, dy, 7 * u, 3.5 * u, 1, 7 * u, '#EFE6D2');
+      const cl = wallPt(df.B, df.R, 0.5, 3.6 * u); c.fillStyle = '#FFFFFF'; c.beginPath(); c.arc(cl[0], cl[1], 2.3 * u, 0, Math.PI * 2); c.fill(); line(c, cl, [cl[0], cl[1] - 1.6 * u], '#22252B', 0.5 * u); line(c, cl, [cl[0] + 1.2 * u, cl[1]], '#22252B', 0.5 * u);
+      domeAt(c, dx, dy - 7 * u, 8.5 * u, '#6FA59A', u);
+    },
+    // ---- cleaning
+    depot1(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // a small Cleaning depot: a green-roofed hut with a roller door, bins and a broom sign
+      const h = 13 * u, f = box(c, x, y, hw, hh, 0.6, h, col);
+      wallQuad(c, f.B, f.R, 0.18, 0.72, 0, h * 0.7, '#C9D3CC'); for (let i = 1; i < 6; i++) wallQuad(c, f.B, f.R, 0.18, 0.72, h * 0.7 * i / 6 - 0.3 * u, h * 0.7 * i / 6 + 0.15 * u, '#A3B1A7');
+      windowQ(c, f.L, f.B, 0.35, 0.65, h * 0.4, h * 0.75, glass, u);
+      box(c, x, y - h, hw, hh, 0.62, 2.6 * u, roofc);
+      const sx = x - hw * 0.05, sy = y - h - 9 * u; line(c, [sx, sy + 4 * u], [sx, y - h - 2.6 * u], '#59606A', 0.9 * u); c.fillStyle = '#FFFFFF'; c.beginPath(); c.arc(sx, sy, 4.4 * u, 0, Math.PI * 2); c.fill(); c.strokeStyle = roofc; c.lineWidth = 1.1 * u; c.stroke();
+      line(c, [sx - 2.2 * u, sy - 2.3 * u], [sx + 1 * u, sy + 1 * u], '#9A6B43', 1 * u); poly(c, [[sx + 0.2 * u, sy + 0.4 * u], [sx + 2.6 * u, sy + 2.6 * u], [sx + 0.8 * u, sy + 3.4 * u], [sx - 0.8 * u, sy + 1.8 * u]], '#E8C66A');
+      for (const [bx2, cc] of [[-0.62, '#3E8E57'], [-0.42, '#5A7FB0']]) box(c, x + bx2 * hw, y + hh * 0.2, 2.4 * u, 1.2 * u, 1, 4.6 * u, cc);
+    },
+    depot2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Recycling center: a green hall with an arched roof, colour-coded bins along the front, the recycling sign
+      const h = 16 * u, f = boxF(c, x, y, F, 0.86, h, col), { lf, sf } = faces2(f, F);
+      for (const [a1, b1] of [[0.08, 0.4], [0.6, 0.92]]) { WQ(c, lf, a1, b1, 0, h * 0.66, '#C9D3CC'); for (let i = 1; i < 6; i++) WQ(c, lf, a1, b1, h * 0.66 * i / 6 - 0.3 * u, h * 0.66 * i / 6 + 0.15 * u, '#A3B1A7'); }
+      windowQ(c, lf[0], lf[1], 0.44, 0.56, h * 0.36, h * 0.7, glass, u);
+      const R = rectPts(x, y - h, F, 0.88), m1 = [(R.T[0] + R.L[0]) / 2, (R.T[1] + R.L[1]) / 2], m2 = [(R.B[0] + R.R[0]) / 2, (R.B[1] + R.R[1]) / 2];
+      const long = F.w >= F.d, A = long ? [R.L, R.B] : [R.B, R.R], B2 = long ? [R.T, R.R] : [R.L, R.T];
+      for (let i = 0; i < 6; i++) { const t0 = i / 6, t1 = (i + 1) / 6, ha = Math.sin(Math.PI * (t0 + 0.0)) * 0 + 7 * u, lift = (t) => Math.sin(Math.PI * t) * 8 * u; poly(c, [lerpPt(A[0], A[1], t0), lerpPt(A[0], A[1], t1), [lerpPt(B2[0], B2[1], t1)[0], lerpPt(B2[0], B2[1], t1)[1]], [lerpPt(B2[0], B2[1], t0)[0], lerpPt(B2[0], B2[1], t0)[1]]], i % 2 ? shade(roofc, 1.05) : roofc); void ha; void lift; }
+      const cx = (m1[0] + m2[0]) / 2, cy = (m1[1] + m2[1]) / 2 - 4 * u;
+      c.strokeStyle = '#FFFFFF'; c.lineWidth = 1.3 * u; for (let i = 0; i < 3; i++) { const a = i * 2.094 - 1.57; c.beginPath(); c.arc(cx, cy, 3.6 * u, a + 0.25, a + 1.75); c.stroke(); }
+      const bins = ['#3B7DD8', '#F3C64B', '#3E8E57', '#7A8590'];
+      bins.forEach((cc, i) => { const p = wallPt(lf[0], lf[1], 0.12 + i * 0.25, 0); box(c, p[0] + 3 * u, p[1] + 3.2 * u, 2.4 * u, 1.2 * u, 1, 4.4 * u, cc); });
+    },
+    depot3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Waste plant: a big sorting hall, solar panels on the roof, a tall chimney breathing clean steam, a truck bay
+      const h = 22 * u, f = box(c, x, y, hw, hh, 0.8, h, col);
+      for (const [a1, b1] of [[0.08, 0.32], [0.4, 0.64]]) { wallQuad(c, f.B, f.R, a1, b1, 0, h * 0.6, '#C9D3CC'); for (let i = 1; i < 6; i++) wallQuad(c, f.B, f.R, a1, b1, h * 0.6 * i / 6 - 0.3 * u, h * 0.6 * i / 6 + 0.15 * u, '#A3B1A7'); }
+      for (const a1 of [0.72, 0.84]) windowQ(c, f.B, f.R, a1, a1 + 0.1, h * 0.4, h * 0.7, glass, u);
+      for (const a1 of [0.1, 0.3, 0.5, 0.7]) windowQ(c, f.L, f.B, a1, a1 + 0.12, h * 0.5, h * 0.78, glass, u);
+      wallQuad(c, f.L, f.B, 0, 1, h * 0.88, h, roofc); wallQuad(c, f.B, f.R, 0, 1, h * 0.88, h, shade(roofc, 0.88));
+      const top = box(c, x, y - h, hw, hh, 0.82, 2 * u, '#C6D2CA');
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { const px = x - hw * 0.34 + i * hw * 0.2 + j * hw * 0.1, py = y - h - 2 * u - hh * 0.05 + j * hh * 0.24 - i * hh * 0.1; poly(c, [[px - 4 * u, py], [px, py - 2 * u], [px + 4 * u, py], [px, py + 2 * u]], '#2E4A78'); line(c, [px - 4 * u, py], [px + 4 * u, py], 'rgba(255,255,255,.3)', 0.4 * u); }
+      void top;
+      const cx = x + hw * 0.42, cyb = y - h - 2 * u + hh * 0.05; c.fillStyle = '#A9B2AE'; c.fillRect(cx - 2.6 * u, cyb - 24 * u, 5.2 * u, 24 * u); c.fillStyle = '#8E9894'; c.fillRect(cx + 0.6 * u, cyb - 24 * u, 2 * u, 24 * u); c.fillStyle = '#C8473D'; c.fillRect(cx - 2.6 * u, cyb - 21 * u, 5.2 * u, 2 * u);
+      if (!reduced) for (let i = 0; i < 4; i++) { const k = ((now / 1500 + i / 4) % 1); c.fillStyle = `rgba(250,250,250,${0.6 * (1 - k)})`; c.beginPath(); c.arc(cx + k * 9 * u, cyb - 26 * u - k * 18 * u, (2.6 + k * 5) * u, 0, Math.PI * 2); c.fill(); }
+      const tb = wallPt(f.L, f.B, 0.92, 0); box(c, tb[0] - 6 * u, tb[1] + 4 * u, 4 * u, 2 * u, 1, 5 * u, '#3E8E57');
+    },
+    // ---- gardens
+    shed2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Garden center: a wooden shop at one end, a glasshouse along the rest, pots of flowers out front
+      const { back, long } = { back: F.w >= F.d ? F.ac : F.ar, long: F.w >= F.d };
+      const sx = x - back[0] * 0.5, sy = y - back[1] * 0.5, gx = x + back[0] * 0.5, gy = y + back[1] * 0.5;
+      const hwT = HW, hhT = HH, k1 = (hw / 2) / HW;
+      const sh = 13 * u, sf = box(c, sx, sy, hw / 2, hh / 2, 0.78, sh, col);
+      for (let i = 1; i < 5; i++) line(c, wallPt(sf.B, sf.R, i / 5, 0.3 * u), wallPt(sf.B, sf.R, i / 5, sh), 'rgba(90,60,30,.25)', 0.6 * u);
+      doorQ(c, sf.B, sf.R, 0.3, 0.66, sh * 0.75, '#7A5230', u); gable(c, sx, sy, hw / 2, hh / 2, 0.78, sh, 8 * u, roofc);
+      const gh = 12 * u, gL = [gx - hw / 2 * 0.82, gy], gB = [gx, gy + hh / 2 * 0.82], gR = [gx + hw / 2 * 0.82, gy], gT = [gx, gy - hh / 2 * 0.82];
+      poly(c, [gL, gB, [gB[0], gB[1] - gh], [gL[0], gL[1] - gh]], 'rgba(190,225,235,.62)'); poly(c, [gB, gR, [gR[0], gR[1] - gh], [gB[0], gB[1] - gh]], 'rgba(170,210,225,.62)');
+      const r1 = [(gT[0] + gL[0]) / 2, (gT[1] + gL[1]) / 2 - gh - 6 * u], r2 = [(gB[0] + gR[0]) / 2, (gB[1] + gR[1]) / 2 - gh - 6 * u];
+      poly(c, [[gL[0], gL[1] - gh], [gB[0], gB[1] - gh], r2, r1], 'rgba(205,235,242,.7)'); poly(c, [[gB[0], gB[1] - gh], [gR[0], gR[1] - gh], r2], 'rgba(180,215,228,.7)');
+      for (let i = 0; i <= 4; i++) { const t = i / 4; line(c, lerpPt(gL, gB, t), lerpPt([gL[0], gL[1] - gh], [gB[0], gB[1] - gh], t), 'rgba(255,255,255,.85)', 0.6 * u); }
+      for (let i = 0; i < 5; i++) { const p = lerpPt(gL, gB, 0.12 + i * 0.19); c.fillStyle = ['#E46B8A', '#F3C64B', '#FFFFFF', '#E5482F', '#8E5BB5'][i]; c.beginPath(); c.arc(p[0], p[1] - gh * 0.42, 1.5 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#4E8A3A'; c.beginPath(); c.arc(p[0], p[1] - gh * 0.3, 2 * u, 0, Math.PI * 2); c.fill(); }
+      for (const [a, b, cc] of [[0.2, 0.62, '#C8473D'], [0.4, 0.72, '#E8A93A'], [0.6, 0.62, '#E46B8A']]) { const px = x + (a - 0.5) * hw * 1.1, py = y + b * hh; c.fillStyle = '#B5653A'; c.fillRect(px - 1.8 * u, py - 3 * u, 3.6 * u, 3 * u); c.fillStyle = '#4E8A3A'; c.beginPath(); c.arc(px, py - 4 * u, 2.4 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = cc; c.beginPath(); c.arc(px + 0.6 * u, py - 5 * u, 1 * u, 0, Math.PI * 2); c.fill(); }
+      void hwT; void hhT; void k1; void long;
+    },
+    shed3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Parks department: an office with a green roof, a big glasshouse, nursery beds and young trees
+      const ox = x - hw * 0.42, oy = y - hh * 0.1, oh = 15 * u;
+      const of = box(c, ox, oy, hw * 0.42, hh * 0.42, 0.9, oh, col);
+      for (const a1 of [0.2, 0.6]) windowQ(c, of.B, of.R, a1, a1 + 0.2, oh * 0.4, oh * 0.75, glass, u); doorQ(c, of.L, of.B, 0.4, 0.6, oh * 0.6, '#7A5230', u);
+      gable(c, ox, oy, hw * 0.42, hh * 0.42, 0.9, oh, 9 * u, roofc);
+      const gx = x + hw * 0.12, gy = y - hh * 0.42, gw = hw * 0.4, ghh = hh * 0.4, gh = 14 * u;
+      const L1 = [gx - gw, gy], B1 = [gx, gy + ghh], R1 = [gx + gw, gy], T1 = [gx, gy - ghh];
+      poly(c, [L1, B1, [B1[0], B1[1] - gh], [L1[0], L1[1] - gh]], 'rgba(190,225,235,.62)'); poly(c, [B1, R1, [R1[0], R1[1] - gh], [B1[0], B1[1] - gh]], 'rgba(170,210,225,.62)');
+      const top = [gx, gy - gh - 9 * u]; poly(c, [[L1[0], L1[1] - gh], [B1[0], B1[1] - gh], top], 'rgba(205,235,242,.72)'); poly(c, [[B1[0], B1[1] - gh], [R1[0], R1[1] - gh], top], 'rgba(180,215,228,.72)'); void T1;
+      for (let i = 0; i <= 4; i++) { const t = i / 4; line(c, lerpPt(L1, B1, t), lerpPt([L1[0], L1[1] - gh], [B1[0], B1[1] - gh], t), 'rgba(255,255,255,.85)', 0.6 * u); line(c, lerpPt(B1, R1, t), lerpPt([B1[0], B1[1] - gh], [R1[0], R1[1] - gh], t), 'rgba(255,255,255,.75)', 0.6 * u); }
+      treeAt(c, gx, gy + ghh * 0.1 - 2 * u, 18 * u, '#3A8A4E');
+      for (let row = 0; row < 3; row++) { const bx0 = x + hw * 0.05 + row * hw * 0.16, by0 = y + hh * 0.2 + row * hh * 0.12; poly(c, [[bx0 - 9 * u, by0], [bx0 + 9 * u, by0 - 4.5 * u], [bx0 + 12 * u, by0 - 3 * u], [bx0 - 6 * u, by0 + 1.5 * u]], '#8A6A48'); for (let i = 0; i < 4; i++) { c.fillStyle = ['#6FB14E', '#E46B8A', '#F3C64B', '#6FB14E'][(i + row) % 4]; c.beginPath(); c.arc(bx0 - 6 * u + i * 5 * u, by0 - 1.2 * u - i * 1.4 * u, 1.6 * u, 0, Math.PI * 2); c.fill(); } }
+      for (const [a, b] of [[0.62, 0.05], [0.78, 0.25]]) treeAt(c, x + a * hw, y + b * hh, 14 * u, '#4F9A3E');
+    },
+    // ---- bank
+    bank2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      const st = 2.4 * u; boxF(c, x, y, F, 0.92, st, '#D8D0BE');
+      const h = 22 * u, f = boxF(c, x, y - st, F, 0.84, h, col), { lf, sf } = faces2(f, F);
+      columnsQ(c, lf, 6, 0.1, 0.9, h * 0.82, '#FBF8F0', u);
+      WQ(c, lf, 0.45, 0.55, 0, h * 0.6, '#5B4632'); WQ(c, lf, 0.03, 0.97, h * 0.82, h * 0.94, '#F4EEE0');
+      for (const a1 of [0.25, 0.6]) windowQ(c, sf[0], sf[1], a1, a1 + 0.16, h * 0.42, h * 0.74, glass, u);
+      gableF(c, x, y - st, F, 0.84, h, 7 * u, roofc);
+      const cp = wallPt(lf[0], lf[1], 0.5, h + 3 * u); c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(cp[0], cp[1], 2.8 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFE7A3'; c.beginPath(); c.arc(cp[0] - 0.7 * u, cp[1] - 0.7 * u, 1 * u, 0, Math.PI * 2); c.fill();
+    },
+    bank3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Central bank: a grand stone hall, eight columns, a gold dome and a big golden coin over the doors
+      const st = 3 * u; box(c, x, y, hw, hh, 0.86, st * 0.5, '#CFC7B6'); box(c, x, y - st * 0.5, hw, hh, 0.82, st * 0.5, '#D8D0BE');
+      const h = 30 * u, by = y - st, f = box(c, x, by, hw, hh, 0.74, h, col);
+      columnsQ(c, [f.B, f.R], 8, 0.08, 0.92, h * 0.84, '#FBF8F0', u);
+      wallQuad(c, f.B, f.R, 0.44, 0.56, 0, h * 0.56, '#5B4632'); wallQuad(c, f.B, f.R, 0.02, 0.98, h * 0.84, h * 0.94, '#F4EEE0');
+      for (const a1 of [0.1, 0.3, 0.56, 0.76]) windowQ(c, f.L, f.B, a1, a1 + 0.13, h * 0.42, h * 0.74, glass, u);
+      const p0 = wallPt(f.B, f.R, 0.04, h * 0.94), p1 = wallPt(f.B, f.R, 0.96, h * 0.94), pa = wallPt(f.B, f.R, 0.5, h * 0.94 + 9 * u); poly(c, [p0, p1, pa], '#F4EFE4');
+      const cp = wallPt(f.B, f.R, 0.5, h * 0.94 + 3.6 * u); c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(cp[0], cp[1], 2.8 * u, 0, Math.PI * 2); c.fill();
+      box(c, x, by - h, hw, hh, 0.76, 2.4 * u, '#E2DACA');
+      domeAt(c, x - hw * 0.08, by - h - 2.4 * u - hh * 0.04, 9 * u, '#E3B23C', u);
+      flagAt(c, x - hw * 0.5, by - h - 2.4 * u, u, '#5E6B7A', now, 13);
+    },
+    // ---- workshop
+    workshop2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Factory: brick with a sawtooth roof of skylights, a loading door and a smoking chimney
+      const brick = '#B9644E', h = 17 * u, f = boxF(c, x, y, F, 0.88, h, brick), { lf, sf, back, long } = faces2(f, F);
+      for (const a1 of [0.08, 0.26, 0.62, 0.8]) windowQ(c, lf[0], lf[1], a1, a1 + 0.12, h * 0.36, h * 0.72, glass, u);
+      WQ(c, lf, 0.42, 0.58, 0, h * 0.7, '#6E6A63'); for (let i = 1; i < 6; i++) WQ(c, lf, 0.42, 0.58, h * 0.7 * i / 6 - 0.3 * u, h * 0.7 * i / 6 + 0.15 * u, '#5B5751');
+      windowQ(c, sf[0], sf[1], 0.3, 0.7, h * 0.4, h * 0.72, glass, u);
+      const R = rectPts(x, y - h, F, 0.88), A = long ? [R.L, R.B] : [R.B, R.R], Bk = long ? [R.T, R.R] : [R.L, R.T];
+      for (let i = 0; i < 4; i++) { const t0 = i / 4, t1 = (i + 1) / 4, a0 = lerpPt(A[0], A[1], t0), a1 = lerpPt(A[0], A[1], t1), k0 = lerpPt(Bk[0], Bk[1], t0), k1 = lerpPt(Bk[0], Bk[1], t1); poly(c, [a0, a1, [k1[0], k1[1] - 7 * u], [k0[0], k0[1] - 7 * u]], roofc); poly(c, [a1, [k1[0], k1[1] - 7 * u], k1], 'rgba(170,205,225,.9)'); }
+      const cx = x - back[0] * 0.62 + hw * 0.04, cyb = y - h - back[1] * 0.62; c.fillStyle = '#4A4D53'; c.fillRect(cx - 2.4 * u, cyb - 22 * u, 4.8 * u, 22 * u); c.fillStyle = '#C8473D'; c.fillRect(cx - 2.4 * u, cyb - 20 * u, 4.8 * u, 1.6 * u);
+      if (!reduced) for (let i = 0; i < 3; i++) { const k = ((now / 1100 + i / 3) % 1); c.fillStyle = `rgba(150,150,150,${0.5 * (1 - k)})`; c.beginPath(); c.arc(cx + k * 8 * u, cyb - 24 * u - k * 16 * u, (2.5 + k * 4) * u, 0, Math.PI * 2); c.fill(); }
+    },
+    workshop3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Industrial park: two sawtooth halls, a water tower, two chimneys and crates in the yard
+      const brick = '#B9644E';
+      const hall = (hx, hy, s) => { const h = 18 * u, f = box(c, hx, hy, hw * s, hh * s, 0.86, h, brick); for (const a1 of [0.1, 0.36, 0.62]) windowQ(c, f.L, f.B, a1, a1 + 0.14, h * 0.4, h * 0.72, glass, u); wallQuad(c, f.B, f.R, 0.3, 0.7, 0, h * 0.68, '#6E6A63'); for (let i = 0; i < 3; i++) { const t0 = i / 3, t1 = (i + 1) / 3; const L0 = [hx - hw * s * 0.86, hy - h], B0 = [hx, hy + hh * s * 0.86 - h], T0 = [hx, hy - hh * s * 0.86 - h], R0 = [hx + hw * s * 0.86, hy - h]; const a0 = lerpPt(L0, B0, t0), a1 = lerpPt(L0, B0, t1), k0 = lerpPt(T0, R0, t0), k1 = lerpPt(T0, R0, t1); poly(c, [a0, a1, [k1[0], k1[1] - 6 * u], [k0[0], k0[1] - 6 * u]], roofc); poly(c, [a1, [k1[0], k1[1] - 6 * u], k1], 'rgba(170,205,225,.9)'); } return h; };
+      const h1 = hall(x - hw * 0.28, y - hh * 0.28, 0.5);
+      const h2 = hall(x + hw * 0.32, y + hh * 0.22, 0.48);
+      for (const [cx, base, tall] of [[x - hw * 0.62, y - hh * 0.3 - h1, 26], [x - hw * 0.44, y - hh * 0.46 - h1, 20]]) { c.fillStyle = '#4A4D53'; c.fillRect(cx - 2.4 * u, base - tall * u, 4.8 * u, tall * u); c.fillStyle = '#C8473D'; c.fillRect(cx - 2.4 * u, base - (tall - 3) * u, 4.8 * u, 1.6 * u); if (!reduced) for (let i = 0; i < 3; i++) { const k = ((now / 1200 + i / 3) % 1); c.fillStyle = `rgba(160,160,160,${0.45 * (1 - k)})`; c.beginPath(); c.arc(cx + k * 8 * u, base - (tall + 2) * u - k * 16 * u, (2.4 + k * 4) * u, 0, Math.PI * 2); c.fill(); } }
+      const wx = x + hw * 0.58, wy = y - hh * 0.32; for (const dx of [-3, 3]) line(c, [wx + dx * u, wy], [wx + dx * 0.6 * u, wy - 16 * u], '#7A8590', 0.9 * u); c.fillStyle = '#9AA4AE'; c.fillRect(wx - 5 * u, wy - 24 * u, 10 * u, 8 * u); c.fillStyle = '#7A8590'; c.beginPath(); c.ellipse(wx, wy - 24 * u, 5 * u, 1.8 * u, 0, 0, Math.PI * 2); c.fill();
+      for (let i = 0; i < 3; i++) { c.fillStyle = i % 2 ? '#B08356' : '#9A6B43'; c.fillRect(x - hw * 0.1 + i * 5 * u, y + hh * 0.6 - i * 2 * u, 4.5 * u, 3.4 * u); }
+      void h2;
+    },
+    // ---- prison
+    prison1(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Jail: a grey block with small barred windows and a blue door
+      const h = 15 * u, f = box(c, x, y, hw, hh, 0.66, h, col);
+      wallQuad(c, f.L, f.B, 0, 1, 0, h * 0.08, shade(col, 0.7)); wallQuad(c, f.B, f.R, 0, 1, 0, h * 0.08, shade(col, 0.66));
+      for (const a1 of [0.14, 0.58]) { wallQuad(c, f.L, f.B, a1, a1 + 0.22, h * 0.5, h * 0.72, '#3A414A'); bars(c, [f.L, f.B], a1, a1 + 0.22, h * 0.5, h * 0.72, u, 3); }
+      doorQ(c, f.B, f.R, 0.4, 0.6, h * 0.56, '#2F4E8C', u); wallQuad(c, f.B, f.R, 0.12, 0.3, h * 0.5, h * 0.7, '#3A414A'); bars(c, [f.B, f.R], 0.12, 0.3, h * 0.5, h * 0.7, u, 2);
+      box(c, x, y - h, hw, hh, 0.68, 2.2 * u, roofc);
+      line(c, [x + hw * 0.1, y - h - 2.2 * u], [x + hw * 0.1, y - h - 8 * u], '#59606A', 0.7 * u); c.fillStyle = '#E8503A'; c.beginPath(); c.arc(x + hw * 0.1, y - h - 8.5 * u, 1.2 * u, 0, Math.PI * 2); c.fill();
+    },
+    prison2(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the Prison: a long cell block with rows of barred windows, a guard tower at one end
+      const h = 18 * u, f = boxF(c, x, y, F, 0.84, h, col), { lf, sf, back } = faces2(f, F);
+      WQ(c, lf, 0, 1, 0, h * 0.08, shade(col, 0.7)); WQ(c, sf, 0, 1, 0, h * 0.08, shade(col, 0.66));
+      for (const v of [[0.2, 0.38], [0.58, 0.76]]) for (let i = 0; i < 6; i++) { const a1 = 0.06 + i * 0.155; WQ(c, lf, a1, a1 + 0.08, h * v[0], h * v[1], '#3A414A'); bars(c, lf, a1, a1 + 0.08, h * v[0], h * v[1], u, 2); }
+      doorQ(c, sf[0], sf[1], 0.38, 0.62, h * 0.5, '#2F4E8C', u);
+      boxF(c, x, y - h, F, 0.86, 2.2 * u, roofc);
+      const tx = x - back[0] * 0.6, ty = y - h - 2.2 * u - back[1] * 0.6; const tf = box(c, tx, ty, 4.6 * u, 2.3 * u, 1, 14 * u, shade(col, 0.95));
+      wallQuad(c, tf.L, tf.B, 0.15, 0.85, 9 * u, 12 * u, '#3A414A'); wallQuad(c, tf.B, tf.R, 0.15, 0.85, 9 * u, 12 * u, '#3A414A');
+      pyramid(c, tx, ty, 5.4 * u, 2.7 * u, 1, 14 * u, 5 * u, roofc);
+      const sweep = reduced ? 0.3 : (Math.sin(now / 900) + 1) / 2; c.fillStyle = `rgba(255,248,200,${0.15 + 0.2 * sweep})`; c.beginPath(); c.moveTo(tx, ty - 11 * u); c.lineTo(tx + (8 + sweep * 10) * u, ty - 2 * u); c.lineTo(tx + (14 + sweep * 10) * u, ty + 2 * u); c.closePath(); c.fill();
+    },
+    prison3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
+      // the High-security prison: a walled yard with corner towers and a cell block in the middle
+      const wallC = '#A9AEB6', wh = 9 * u, k = 0.9;
+      const L0 = [x - hw * k, y], B0 = [x, y + hh * k], R0 = [x + hw * k, y], T0 = [x, y - hh * k];
+      poly(c, [L0, B0, R0, T0], '#B8B09C');
+      const cb = box(c, x - hw * 0.05, y - hh * 0.12, hw * 0.46, hh * 0.46, 1, 20 * u, col);
+      for (let r0 = 0; r0 < 2; r0++) for (let i = 0; i < 4; i++) { const a1 = 0.08 + i * 0.23, v0 = 20 * u * (0.25 + r0 * 0.36); wallQuad(c, cb.L, cb.B, a1, a1 + 0.1, v0, v0 + 4.5 * u, '#3A414A'); wallQuad(c, cb.B, cb.R, a1, a1 + 0.1, v0, v0 + 4.5 * u, '#3A414A'); }
+      box(c, x - hw * 0.05, y - hh * 0.12 - 20 * u, hw * 0.46, hh * 0.46, 1.02, 2 * u, roofc);
+      // the outer walls (only the two front walls cover anything)
+      poly(c, [L0, B0, [B0[0], B0[1] - wh], [L0[0], L0[1] - wh]], shade(wallC, 0.86)); poly(c, [B0, R0, [R0[0], R0[1] - wh], [B0[0], B0[1] - wh]], shade(wallC, 0.96));
+      line(c, [L0[0], L0[1] - wh], [B0[0], B0[1] - wh], 'rgba(255,255,255,.35)', 0.6 * u); line(c, [B0[0], B0[1] - wh], [R0[0], R0[1] - wh], 'rgba(255,255,255,.35)', 0.6 * u);
+      for (let i = 0; i <= 10; i++) { const p = lerpPt([L0[0], L0[1] - wh], [B0[0], B0[1] - wh], i / 10), q = lerpPt([B0[0], B0[1] - wh], [R0[0], R0[1] - wh], i / 10); line(c, p, [p[0], p[1] - 2.6 * u], '#59606A', 0.5 * u); line(c, q, [q[0], q[1] - 2.6 * u], '#59606A', 0.5 * u); }
+      wallQuad(c, B0, R0, 0.42, 0.58, 0, wh * 0.8, '#2F4E8C');
+      for (const P of [L0, B0, R0, T0]) { const tf = box(c, P[0], P[1] + (P === T0 ? 2 * u : 0), 4.2 * u, 2.1 * u, 1, 17 * u, shade(wallC, 1.02)); wallQuad(c, tf.L, tf.B, 0.15, 0.85, 12 * u, 15 * u, '#3A414A'); wallQuad(c, tf.B, tf.R, 0.15, 0.85, 12 * u, 15 * u, '#3A414A'); pyramid(c, P[0], P[1] + (P === T0 ? 2 * u : 0), 5 * u, 2.5 * u, 1, 17 * u, 4.6 * u, roofc); }
+    }
+  };
+  const TIER_KEY = { clinic2: 'clinic2', firestation2: 'firestation2', firestation3: 'firestation3', police2: 'police2', police3: 'police3', school2: 'school2', school3: 'school3', depot1: 'depot1', depot2: 'depot2', depot3: 'depot3', shed2: 'shed2', shed3: 'shed3', bank2: 'bank2', bank3: 'bank3', workshop2: 'workshop2', workshop3: 'workshop3', prison1: 'prison1', prison2: 'prison2', prison3: 'prison3' };
   // Draws one building centred on its footprint at (x, y). hw/hh are the footprint's half sizes.
   function drawBuilding(c, type, level, x, y, hw, hh, opt) {
     opt = opt || {};
     const t = TYPES[type]; if (!t) return;
-    const now = opt.time || 0, ruin = !!opt.ruin, size = t.size || 1;
-    const fpv = FOOT[type] ? footVec(type, opt.rot || 0, hw / size, hh / size) : null;
+    // 10.09: services grow with their level: 1×1, 2×1 (drawn on its footprint, like the House), 2×2 (drawn twice as big)
+    const gl = GROW[type] ? growLv(level) : 0;
+    const now = opt.time || 0, ruin = !!opt.ruin, size = gl ? (gl >= 2 ? 2 : 1) : (t.size || 1);
+    const fpv = FOOT[type] || gl === 2 ? footVec(type, opt.rot || 0, hw / size, hh / size, gl || null) : null;
     const u = fpv ? (hw / size) / 30 * 1.12 : (hw / size) / 30 * (1 + 0.35 * (size - 1));
     if (opt.site) { drawSite(c, type, x, y, hw, hh, u, opt, fpv); return; }
     let col = ruin ? weather(t.color) : t.color;
@@ -4448,7 +4960,9 @@
     if (opt.alpha) c.globalAlpha = opt.alpha;
     if (fpv) { const q = rectPts(x + 3 * u, y + 2.5 * u, fpv, 1); poly(c, [q.T, q.R, q.B, q.L], 'rgba(30,50,30,.2)'); }
     else if (t.cat !== 'decor') { c.fillStyle = 'rgba(30,50,30,.2)'; c.beginPath(); c.ellipse(x + 3 * u, y + 2.5 * u, hw * 0.82, hh * 0.82, 0, 0, Math.PI * 2); c.fill(); }
-    switch (type) {
+    const tierKey = gl ? TIER_KEY[type + gl] : null;
+    if (tierKey) TIER_ART[tierKey](c, x, y, hw, hh, u, fpv, level, col, roofc, glass, now, ruin);
+    else switch (type === 'clinic' && gl === 3 ? 'hospital' : type) {
       case 'townhall': {
         const h = (20 + level * 5) * u;
         const f = box(c, x, y, hw, hh, 0.78, h, col);
@@ -5174,7 +5688,7 @@
   const MAYOR_LOOK = { skin: '#F2C9A0', hair: '#2B1E16', style: 2, shirt: '#5B2DB8', pants: '#2E2A3A', hat: null };
   // Soot after a fire: dark scorch marks (and, if it burned badly, a thin trail of smoke).
   function soot(c, b, p, hw, hh, u, now) {
-    const k = b.burnt ? 1 : clamp((100 - b.health) / 60, 0.2, 0.8), s0 = sizeOf(b.type);
+    const k = b.burnt ? 1 : clamp((100 - b.health) / 60, 0.2, 0.8), s0 = sizeB(b);
     c.save(); c.globalAlpha = 0.5 * k;
     for (const [dx, dy, r] of [[-0.35, 0.1, 0.32], [0.3, 0.18, 0.26], [0.02, -0.15, 0.22]]) { c.fillStyle = '#2A2420'; c.beginPath(); c.ellipse(p.x + dx * hw, p.y + dy * hh, r * hw, r * hh, 0, 0, Math.PI * 2); c.fill(); }
     c.restore();
@@ -5262,7 +5776,7 @@
         const sx = side[0] + (i0 > 0 ? -12 * i0 : 4) * facing, sy = side[1] + (i0 > 0 ? 4 * i0 : 0);
         const hand = person(c, sx, sy, 1, staffLook('fire'), { facing, arms: 'spray', tool: 'hose', t: now / 1000 });
         after.push(() => {
-          const ub = (HW / 30) * (1 + 0.35 * (sizeOf(b.type) - 1)), tx = bp.x + (i ? -6 : 6), ty = bp.y - topOf(b.type, b.level) * ub * 0.78;
+          const ub = (HW / 30) * (1 + 0.35 * (sizeB(b) - 1)), tx = bp.x + (i ? -6 : 6), ty = bp.y - topOf(b.type, b.level) * ub * 0.78;
           for (let k0 = 0; k0 < 14; k0++) { const k = ((now / 360) + k0 / 14 + i * 0.3) % 1; const x = hand[0] + (tx - hand[0]) * k, y = hand[1] + (ty - hand[1]) * k - Math.sin(k * Math.PI) * 16; c.fillStyle = `rgba(120,190,255,${0.9 - k * 0.45})`; c.beginPath(); c.arc(x, y, 1.1 + k * 1.3, 0, Math.PI * 2); c.fill(); }
           if (!reduced && Math.random() < 0.2) fx.push({ x: tx + (Math.random() - 0.5) * 16, y: ty, vx: (Math.random() - 0.5) * 16, vy: -26, life: 0, max: 1, puff: true, color: 'rgba(240,244,248,.75)', r: 3 });
         });
@@ -5485,7 +5999,7 @@
   }
   function finishAct(w, now) {
     const b = byId(w.act.bid); if (!b) return;
-    const p = centerOf(b), s = sizeOf(b.type);
+    const p = centerOf(b), s = sizeB(b);
     if (w.act.kind === 'sweep' && (b.trash || 0) > 0.2) {
       b.trash = 0;
       state.stats.cleaned = (state.stats.cleaned || 0) + 1;
@@ -5571,12 +6085,12 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 23 + 4 * L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
-    workshop: (L) => 36 + 3 * L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 22 + 3 * L, stadium: (L) => 44 + 4 * L, depot: (L) => 30 + 2 * L,
-    shed: (L) => 19 + 2 * L, firestation: (L) => 33 + 2 * L, police: (L) => 25 + 2 * L, hospital: (L) => 32 + 5 * L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
-    cherry: () => 26, statue: () => 25, goldstatue: () => 25, rainbow: () => 21, arcade: (L) => 33 + 3 * L, bank: (L) => 30 + 3 * L, lighthouse: () => 66, observatory: () => 40, castle: () => 50,
+  const ROOF = { townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => (L >= 3 ? 50 : L === 2 ? 32 : 31), market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+    workshop: (L) => (L >= 3 ? 44 : L === 2 ? 40 : 39), bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => (L >= 3 ? 45 : L === 2 ? 34 : 28), stadium: (L) => 44 + 4 * L, depot: (L) => (L >= 3 ? 50 : L === 2 ? 30 : 26),
+    shed: (L) => (L >= 3 ? 34 : L === 2 ? 28 : 21), firestation: (L) => (L >= 3 ? 62 : L === 2 ? 40 : 35), police: (L) => (L >= 3 ? 48 : L === 2 ? 30 : 27), prison: (L) => (L >= 3 ? 34 : L === 2 ? 34 : 22), hospital: (L) => 32 + 5 * L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
+    cherry: () => 26, statue: () => 25, goldstatue: () => 25, rainbow: () => 21, arcade: (L) => 33 + 3 * L, bank: (L) => (L >= 3 ? 52 : L === 2 ? 36 : 33), lighthouse: () => 66, observatory: () => 40, castle: () => 50,
     pumpkins: () => 10, snowman: () => 27, tulips: () => 11, parasol: () => 26 };
-  function labelY(b) { const p = centerOf(b), s = sizeOf(b.type), u = (HW / 30) * (1 + 0.35 * (s - 1)); return p.y - (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u - 4; }
+  function labelY(b) { const p = centerOf(b), s = sizeB(b), u = (HW / 30) * (1 + 0.35 * (s - 1)); return p.y - (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u - 4; }
   const tileHash = (c, r) => (((c + 1) * 73856093) ^ ((r + 1) * 19349663)) >>> 0;
   const clouds = [{ s: 0.3, y: 70, r: 1 }, { s: 0.55, y: 230, r: 0.8 }, { s: 0.8, y: 330, r: 1.2 }, { s: 0.42, y: 150, r: 0.9 }, { s: 0.65, y: 420, r: 1.1 }, { s: 0.36, y: 300, r: 0.7 }, { s: 0.5, y: 500, r: 1 }];
 
@@ -5867,12 +6381,19 @@
     if (ui.flash) {
       const fb = byId(ui.flash.bid), k = (now - ui.flash.t0) / 2600;
       if (!fb || k > 1) ui.flash = null;
-      else { const p = centerOf(fb), s = sizeOf(fb.type); for (let i = 0; i < 2; i++) { const kk = (k * 2.2 + i * 0.5) % 1; c.strokeStyle = `rgba(194,71,122,${0.85 * (1 - kk)})`; c.lineWidth = (3 - kk * 2) * px * 1.4; c.beginPath(); c.ellipse(p.x, p.y + 2, HW * s * (0.7 + kk * 0.5), HH * s * (0.7 + kk * 0.5), 0, 0, Math.PI * 2); c.stroke(); } }
+      else { const p = centerOf(fb), s = sizeB(fb); for (let i = 0; i < 2; i++) { const kk = (k * 2.2 + i * 0.5) % 1; c.strokeStyle = `rgba(194,71,122,${0.85 * (1 - kk)})`; c.lineWidth = (3 - kk * 2) * px * 1.4; c.beginPath(); c.ellipse(p.x, p.y + 2, HW * s * (0.7 + kk * 0.5), HH * s * (0.7 + kk * 0.5), 0, 0, Math.PI * 2); c.stroke(); } }
     }
     const objs = [], after = [];
     for (const b of state.buildings) {
       if (item && ui.holding.id === b.id) continue;
-      const s = b.fp1 ? 1 : sizeOf(b.type), [bw, bd] = dimsB(b), rot = b.rot || 0;
+      // 10.09: the ground it is growing into, staked out while the upgrade is under way
+      if (b.grow) { const [gw, gd] = dimsOf(b.type, b.grow.rot, b.grow.level), [ow, od] = dimsB(b);
+        for (let i = 0; i < gw; i++) for (let j = 0; j < gd; j++) { const tc = b.grow.c + i, tr = b.grow.r + j; if (tc >= b.c && tc < b.c + ow && tr >= b.r && tr < b.r + od) continue;
+          objs.push({ depth: tc + tr - 0.4, draw: () => { const tp = tileCenter(tc, tr); diamond(c, tp.x, tp.y, HW * 0.92, HH * 0.92, '#C9AE7E'); diamond(c, tp.x, tp.y, HW * 0.7, HH * 0.7, '#BB9E6C');
+            const k = HW / 30; for (const [dx, dy] of [[-0.78, 0], [0.78, 0], [0, -0.78], [0, 0.78]]) { const sx = tp.x + dx * HW, sy = tp.y + dy * HH; line(c, [sx, sy], [sx, sy - 6 * k], '#8A6A48', 1 * k); }
+            c.strokeStyle = '#F3A23A'; c.lineWidth = 0.9 * k; c.setLineDash([3 * k, 2 * k]); c.beginPath(); c.moveTo(tp.x - 0.78 * HW, tp.y - 5 * k); c.lineTo(tp.x, tp.y - 0.78 * HH - 5 * k); c.lineTo(tp.x + 0.78 * HW, tp.y - 5 * k); c.lineTo(tp.x, tp.y + 0.78 * HH - 5 * k); c.closePath(); c.stroke(); c.setLineDash([]); } });
+        } }
+      const s = sizeB(b), [bw, bd] = dimsB(b), rot = b.rot || 0;
       objs.push({ depth: b.c + b.r + (bw - 1) / 2 + (bd - 1) / 2, draw: () => {
         const p = centerOf(b), hw = HW * s, hh = HH * s, u = HW / 30;
         const q = jobFor(b.id);
@@ -5896,7 +6417,7 @@
           if (k < 1) {
             const sc = Math.max(0.05, easeBack(clamp(k, 0, 1)));
             c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3));
-            drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { time: now, rot });
+            drawBuilding(c, b.type, b.small || b.level, p.x, p.y, hw, hh, { time: now, rot });
             c.restore();
             return;
           }
@@ -5905,7 +6426,7 @@
         let sc = 1;
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
-        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
+        drawBuilding(c, b.type, b.small || b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
         if (b.addons) drawAddons(c, b, now);
         if (sc !== 1) c.restore();
         if (q && q.done === 0 && bigQ(q)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#5B2DB8', String(focusJobs().indexOf(q) + 1));
@@ -5960,7 +6481,7 @@
         if (w.state === 'act' && w.act && w.act.kind === 'spray') {
           const b = byId(w.act.bid);
           if (b) after.push(() => {
-            const bp = centerOf(b), ub = (HW / 30) * (1 + 0.35 * (sizeOf(b.type) - 1)), tx = bp.x, ty = bp.y - topOf(b.type, b.level) * ub * 0.78;
+            const bp = centerOf(b), ub = (HW / 30) * (1 + 0.35 * (sizeB(b) - 1)), tx = bp.x, ty = bp.y - topOf(b.type, b.level) * ub * 0.78;
             for (let i = 0; i < 16; i++) { const k = ((tt / 360) + i / 16) % 1; const x = hand[0] + (tx - hand[0]) * k, y = hand[1] + (ty - hand[1]) * k - Math.sin(k * Math.PI) * 16; c.fillStyle = `rgba(120,190,255,${0.9 - k * 0.45})`; c.beginPath(); c.arc(x, y, 1.1 + k * 1.3, 0, Math.PI * 2); c.fill(); }
             if (!reduced && Math.random() < 0.25) fx.push({ x: tx + (Math.random() - 0.5) * 16, y: ty, vx: (Math.random() - 0.5) * 16, vy: -26, life: 0, max: 1, puff: true, color: 'rgba(240,244,248,.75)', r: 3 });
           });
@@ -5971,7 +6492,7 @@
     const fq0 = focusJobs()[0], ab = null;
     const target = (fq0 && byId(fq0.bid)) || townHall();
     if (target) {
-      const s = sizeOf(target.type);
+      const s = sizeB(target);
       objs.push({ depth: target.c + target.r + 2 * (s - 1) + 0.5, draw: () => {
         const p = centerOf(target); const x = p.x - HW * s * 0.6, y = p.y + HH * s * 0.45;
         const ready = false; // Sam builds with your focus: in town he waits by his next project
@@ -6083,7 +6604,7 @@
     if (item) {
       const spot = ui.preview ? { c: ui.preview.c, r: ui.preview.r } : (ui.hover ? anchorFor(item.type, ui.hover.c, ui.hover.r) : null);
       if (spot && fits(item.type, spot.c, spot.r, item.moveId)) {
-        const s = sizeOf(item.type), ro = rotFor(item.type), [w, d] = dimsOf(item.type, ro), p = tileCenter(spot.c + (w - 1) / 2, spot.r + (d - 1) / 2);
+        const s = sizeB(item), ro = rotFor(item.type), [w, d] = dimsOf(item.type, ro), p = tileCenter(spot.c + (w - 1) / 2, spot.r + (d - 1) / 2);
         poly(c, footPts(spot.c, spot.r, w, d), 'rgba(255,244,194,.55)');
         drawBuilding(c, item.type, item.level, p.x, p.y, HW * s, HH * s, { alpha: ui.preview ? 0.92 : 0.6, time: now, rot: ro });
       }
@@ -6684,13 +7205,17 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (ov.classList.contains('go')) return;
       const x = e && e.clientX != null ? e.clientX : innerWidth / 2, y = e && e.clientY != null ? e.clientY : innerHeight / 2;
       const go = $('in-go'); go.style.setProperty('--gx', x + 'px'); go.style.setProperty('--gy', y + 'px');
-      go.replaceChildren(...[..."Let's goooo!"].map((ch, i) => { const sp = el('span', 'gl' + (ch === 'o' ? ' o' : ''), ch === ' ' ? '\u00a0' : ch); sp.style.setProperty('--d', `${0.05 + i * 0.045}s`); return sp; }));
+      // 10.09: each letter has its own 3D edge (data-ch feeds the ::before copy), rays and a glow behind, sparkles around
+      const gw = el('span', 'gw'); let oi = 0;
+      [..."Let's goooo!"].forEach((ch, i) => { const sp = el('span', 'gl' + (ch === 'o' ? ' o' : ch === '!' ? ' bang' : ch === ' ' ? ' sp' : ''), ch === ' ' ? '\u00a0' : ch); sp.dataset.ch = ch === ' ' ? '' : ch; sp.style.setProperty('--d', `${0.16 + i * 0.05}s`); sp.style.setProperty('--i', i); if (ch === 'o') sp.style.setProperty('--o', oi++); gw.append(sp); });
+      const sparks = [[8, -18, 1.0], [92, -10, 1.15], [104, 62, 1.3], [-4, 70, 1.22], [48, -34, 1.45], [70, 96, 1.55]].map(([sx, sy, sd]) => { const k = el('i', 'spk'); k.style.setProperty('--sx', sx + '%'); k.style.setProperty('--sy', sy + '%'); k.style.setProperty('--sd', sd + 's'); return k; });
+      go.replaceChildren(el('span', 'glow'), el('span', 'rays'), gw, ...sparks);
       const burst = $('in-burst'), cols = ['#A3E635', '#F6C65B', '#FF8FB1', '#7FB2FF', '#FFFFFF', '#8B5CF6'];
       const ring = el('b'); ring.style.setProperty('--x', x + 'px'); ring.style.setProperty('--y', y + 'px'); burst.append(ring);
       for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, c = el('i'); c.style.setProperty('--x', x + 'px'); c.style.setProperty('--y', y + 'px'); c.style.setProperty('--dx', `${Math.cos(a) * d}px`); c.style.setProperty('--dy', `${Math.sin(a) * d + 40}px`); c.style.setProperty('--r', `${Math.round(Math.random() * 720 - 360)}deg`); c.style.setProperty('--c', cols[i % cols.length]); c.style.animationDelay = `${Math.random() * 0.08}s`; burst.append(c); }
       ov.classList.add('go'); if (state.sound) sfx.fanfare();
-      setTimeout(() => ov.classList.add('out'), reduced ? 300 : 1500);
-      setTimeout(() => { ov.hidden = true; ov.classList.remove('on', 'go', 'out'); burst.replaceChildren(); }, reduced ? 650 : 2000);
+      setTimeout(() => ov.classList.add('out'), reduced ? 300 : 2050);
+      setTimeout(() => { ov.hidden = true; ov.classList.remove('on', 'go', 'out'); burst.replaceChildren(); }, reduced ? 650 : 2500);
     };
   }
   const sparkKey = () => (ui.spark ? `${ui.spark.kind}${ui.spark.lang || ''}${ui.spark.i}` : '');
@@ -6741,7 +7266,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const item = heldItem();
       if (item) {
         key = 'hold:' + (ui.holding.id != null ? ui.holding.id : ui.holding.type);
-        const s = sizeOf(item.type), name = TYPES[item.type].name.toLowerCase(), hs = hints();
+        const s = sizeB(item), name = tierName(item.type, item.isNew ? 1 : item.level).toLowerCase(), hs = hints();
         const legend = !hs.length ? ` There is no free spot for it right now.` : ` Green: it fits${hs.max - hs.min >= 0.5 ? ' (numbers = best)' : ''}.${hs.some((h) => h.bad) ? ' Red: bothers neighbours.' : ''}${hs.blocked.length ? ' Gray: not allowed.' : ''}`;
         const cost = item.moveId != null ? (state.freeMoves > 0 ? ' Uses a free move.' : ` Costs ${moveCost(byId(item.moveId))} gold.`) : '';
         text = (s > 1 ? `Tap where the ${name} should go (${s}×${s}), then tap Place.` : `Tap a spot for the ${name}.`) + cost + (TYPES[item.type].where ? ` It goes ${WHERE[TYPES[item.type].where].short}.` : '') + legend;
@@ -6892,7 +7417,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (b.vehicle) { const sv = el('button', 'btn sm', `Sell · +${Math.round(f.cost / 2)}`); sv.disabled = !playing; sv.addEventListener('click', () => { sellVehicle(b.id); renderPanel(); }); stp.append(sv); }
     else { const bv = el('button', 'btn sm ' + (b.level >= vehLevel(b.type) && state.gold + 1e-6 >= f.cost ? 'playc' : ''), 'Buy'); bv.disabled = b.level < vehLevel(b.type) || state.gold + 1e-6 < f.cost || !playing; bv.addEventListener('click', () => { buyVehicle(b.id); renderPanel(); }); stp.append(bv); }
     row.append(stp);
-    const why = b.vehicle ? null : b.level < 2 ? `Needs the ${t.name.toLowerCase()} at level 2 (a garage).` : !playing ? 'Buy it during play time.' : state.gold + 1e-6 < f.cost ? `You need ${fmtGold(f.cost - state.gold + 0.999)} more gold.` : null;
+    const why = b.vehicle ? null : b.level < 2 ? `Needs the ${nameOf(b).toLowerCase()} at level 2 (a garage).` : !playing ? 'Buy it during play time.' : state.gold + 1e-6 < f.cost ? `You need ${fmtGold(f.cost - state.gold + 0.999)} more gold.` : null;
     if (why) { const n = el('div', 'staffnotes'); n.style.gridColumn = '1 / -1'; n.append(el('div', 'snote', why)); row.append(n); }
     return row;
   }
@@ -6919,7 +7444,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (FLEET[b.type]) box.append(vehicleRow(b));
     if (b.type === 'police') { const cells = jailCells(), n = (state.jail || []).length; box.append(el('div', 'snote', `Cells: ${n} of ${cells} in use. Each prisoner costs ${JAIL_COST} gold an hour, and caught thieves scare others off (crime ${Math.round(crimeLevel())}%, ${crimeWord(crimeLevel()).toLowerCase()}).${b.level < 2 ? ' Level 2 has more cells.' : ''}`)); }
     const tot = sc.running + sc.wages + sc.fleet;
-    box.append(el('p', 'small', `This ${t.name.toLowerCase()} costs ${Math.round(tot)} gold an hour: ${sc.running} to run${sc.staff ? `, ${Math.round(sc.wages)} in wages for the ${sc.staff} ${sc.staff === 1 ? STAFF[t.staff].name.toLowerCase() : STAFF[t.staff].plural} here` : ''}${sc.fleet ? `, ${sc.fleet} for the ${FLEET[b.type].name.toLowerCase()}` : ''}.`));
+    box.append(el('p', 'small', `This ${nameOf(b).toLowerCase()} costs ${Math.round(tot)} gold an hour: ${sc.running} to run${sc.staff ? `, ${Math.round(sc.wages)} in wages for the ${sc.staff} ${sc.staff === 1 ? STAFF[t.staff].name.toLowerCase() : STAFF[t.staff].plural} here` : ''}${sc.fleet ? `, ${sc.fleet} for the ${FLEET[b.type].name.toLowerCase()}` : ''}.`));
   }
   // Every service building in town: where it is, what it costs, and whether it can be upgraded (10.04).
   function servicesSection(wrap) {
@@ -6929,8 +7454,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     for (const b of sv) {
       const t = T(b), sc = serviceCost(b), row = el('div', 'svcrow');
       row.append(icon(b.type, b.level, 40, 34, { ruin: b.ruin }));
-      const tx = el('div'); tx.append(el('b', '', `${t.name} · level ${b.level}${b.burnt ? ' · burned' : b.ruin ? ' · broken' : ''}`));
-      tx.append(el('small', '', t.staff ? `${sc.staff} of ${t.slots[b.level] || 0} ${STAFF[t.staff].plural} · reach ${stationReach(b)} tiles${b.vehicle ? ` · ${FLEET[b.type].name.toLowerCase()}` : ''}` : b.type === 'bank' ? `No staff needed · loans up to ${loanLimit()} gold · treasury +${BANK_SAFE[Math.min(3, b.level)]}` : 'No staff needed'));
+      const tx = el('div'); tx.append(el('b', '', `${nameOf(b)} · level ${b.level}${b.burnt ? ' · burned' : b.ruin ? ' · broken' : ''}`));
+      tx.append(el('small', '', t.staff ? `${sc.staff} of ${t.slots[b.level] || 0} ${STAFF[t.staff].plural} · reach ${stationReach(b)} tiles${b.vehicle ? ` · ${FLEET[b.type].name.toLowerCase()}` : ''}` : b.type === 'bank' ? `No staff needed · loans up to ${loanLimit()} gold · treasury +${BANK_SAFE[Math.min(3, b.level)]}` : b.type === 'prison' ? `${Math.min(state.prison.length, prisonCells())} of ${TYPES.prison.cells[b.level] || 0} cells full` : 'No staff needed'));
       tx.append(el('span', 'fee', `${Math.round(sc.running + sc.wages + sc.fleet)} gold an hour (${sc.running} running${sc.wages ? ` + ${Math.round(sc.wages)} wages` : ''}${sc.fleet ? ` + ${sc.fleet} vehicle` : ''})`));
       const q = jobFor(b.id), chk = checkJob('upgrade', b);
       const up = el('div', 'svcup');
@@ -6978,7 +7503,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (live(b) && t.cat === 'home' && roleInfo('nurse', ci).needed && stationsOf('nurse').length && !coversB('nurse', b)) chips.push(fixPill('Clinic too far', () => staffAction('nurse', b)));
     if (live(b) && messy(b) && staffWorking('fire') && !coversB('fire', b)) chips.push(fixPill('Far from fire station', () => staffAction('fire', b)));
     if (special(t)) chips.push(pill(t.chest ? `${RARITY[t.chest].name} chest find` : `${SEASONS[t.season].fest} find`, 'gold'));
-    box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${t.name}${b.resident ? ' · ' + b.resident : ''}`, chips));
+    box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${nameOf(b)}${b.resident ? ' · ' + b.resident : ''}`, chips));
     // Two tabs: what you can do here, and everything about it (including what people ask for).
     const reqs = questsAt(b).filter((rq) => !(b.fire && rq.alert));
     const hasStaffTab = !!t.staff, hall = b.type === 'townhall';
@@ -7004,7 +7529,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     const row = el('div', 'acts3');
     const moveBtn = () => { const fm = state.freeMoves || 0, mc = moveCost(b);
-      return actionBtn(FOOT[b.type] ? 'Move or turn' : 'Move', fm ? `free move · ${fm} left` : `${mc} gold`, '', () => { if (!fm && state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold. You need ${fmtGold(mc - state.gold + 0.999)} more.`); return; } ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); if (FOOT[b.type]) { ui.preview = { c: b.c, r: b.r }; ui.panel = { kind: 'place' }; } renderAll(); }); };
+      return actionBtn(FOOT[b.type] || turns(b.type, b.level) ? 'Move or turn' : 'Move', fm ? `free move · ${fm} left` : `${mc} gold`, '', () => { if (!fm && state.gold + 1e-6 < mc) { toast(`The moving crew costs ${mc} gold. You need ${fmtGold(mc - state.gold + 0.999)} more.`); return; } ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); if (FOOT[b.type] || turns(b.type, b.level)) { ui.preview = { c: b.c, r: b.r }; ui.panel = { kind: 'place' }; } renderAll(); }); };
     let why = null;
     if (q && bigQ(q)) {
       const left = exactMinutes(q.work - q.done);
@@ -7028,12 +7553,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       row.append(moveBtn());
     } else {
       const chk = checkJob('upgrade', b);
+      const nextLbl = GROW[b.type] && b.level < T(b).max ? `${tierName(b.type, b.level + 1)} (${dimsOf(b.type, 0, b.level + 1).join('×')})` : `Level ${b.level + 1}`; // 10.09
       if (!chk.max && isBigJob('upgrade', b.type, chk.work || 0)) {
         row.append(actionBtn('Upgrade now', `${fmtMin(exactMinutes(chk.work))} focus · ${chk.cost} gold`, 'primary', () => doNow(planJob('upgrade', b.id, true)), !chk.ok));
-        row.append(actionBtn('Add to plan', `Level ${b.level + 1} · ${chk.cost} gold`, '', () => { planJob('upgrade', b.id); renderAll(); }, !chk.ok));
+        row.append(actionBtn('Add to plan', `${nextLbl} · ${chk.cost} gold`, '', () => { planJob('upgrade', b.id); renderAll(); }, !chk.ok));
         if (chk.ok) why = `A big project: ${state.builder} needs ${fmtMin(exactMinutes(chk.work))} of your focus for it${chk.work > LONG_WORK ? '. You can split it over several sessions.' : ', in one session. End early and the upgrade is cancelled.'}`; else why = chk.why;
       } else if (!chk.max) {
-        row.append(actionBtn(`Upgrade · ${chk.cost} gold`, `Level ${b.level + 1} in ${fmtSecs(buildSecs(chk.work))}`, 'primary', () => { if (planJob('upgrade', b.id, true)) { toast(`${state.builder} is on it!`); renderAll(); } else toast(checkJob('upgrade', b).why); }, !chk.ok));
+        row.append(actionBtn(`Upgrade · ${chk.cost} gold`, `${nextLbl} in ${fmtSecs(buildSecs(chk.work))}`, 'primary', () => { if (planJob('upgrade', b.id, true)) { toast(`${state.builder} is on it!`); renderAll(); } else toast(checkJob('upgrade', b).why); }, !chk.ok));
         if (!chk.ok) why = chk.why;
       } else why = 'Fully upgraded.';
       row.append(moveBtn());
@@ -7041,6 +7567,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (q || b.ruin || b.site) { /* no move while it is being worked on */ }
     if (row.childNodes.length) { row.classList.toggle('two', row.childNodes.length === 2); if (row.childNodes.length === 1) row.style.gridTemplateColumns = '1fr'; box.append(row); }
     if (why) box.append(el('p', 'tiny muted', why));
+    if (b.small) box.append(el('p', 'tiny muted', `No room to grow: it works as a level-${b.level} ${nameOf(b).toLowerCase()}, but stays ${dimsB(b).join('×')} until you move it to a spot with ${dimsOf(b.type, 0, b.level).join('×')} free.`));
     if (sellable(b) && T(b).cat !== 'decor' && !special(T(b))) {
       const sl = el('button', 'link', `Sell for ${sellPrice(b)} gold (half of what it cost)`);
       sl.addEventListener('click', () => { if (sl.dataset.ask) sellBuilding(b.id); else { sl.dataset.ask = '1'; sl.textContent = `Tap again to sell it for ${sellPrice(b)} gold`; } });
@@ -7068,6 +7595,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const t = TYPES[type], L = level || 1, out = [];
     if (t.job) out.push(`Your job here while you focus: ${t.job.verb.toLowerCase()} · ${(t.job.gold * FOCUS_PAY).toFixed(1)} gold a minute · ${t.job.play === 1 ? 'normal play time' : `${t.job.play}× play time`}`);
     if (t.near) out.push(t.near.v < 0 ? `Homes right next to it pay ${Math.round(-t.near.v * 100)}% less (${t.near.label})` : `Homes right next to it pay ${Math.round(t.near.v * 100)}% more (${t.near.label})`);
+    if (GROW[type] && L < t.max) out.push(`Level ${L + 1}: it grows into a ${tierName(type, L + 1)} (${dimsOf(type, 0, L + 1).join('×')}, it needs the free tiles next to it)`);
+    if (type === 'police' && L >= 3) out.push('As a Courthouse it finds out why things go wrong in town (see the Incident report) and sends thieves caught twice to prison');
+    else if (type === 'police') out.push('At level 3 it becomes a Courthouse: it finds out why incidents happen and sends repeat thieves to prison');
+    if (type === 'prison') out.push(`Holds ${TYPES.prison.cells[L]} inmates. Each one earns ${PRISON_PAY} gold an hour from prison work`);
+    if (type === 'clinic') out.push(L >= 2 ? `Takes very sick patients (with an ambulance)${L >= 3 ? ', and treats them twice as fast' : ''}` : 'At level 2 (a Medical center, with an ambulance) it takes very sick patients');
     if (t.staff) out.push(`${capFirst(STAFF[t.staff].plural)} work here (room for ${t.slots[L]}) and look after every building fully within ${baseReach(type, L)} tiles`);
     if (t.staff && L < t.max) out.push(`Level ${L + 1}: reach ${baseReach(type, L)} → ${baseReach(type, L + 1)} tiles, its ${STAFF[t.staff].plural} get ready 20% sooner and work 20% better`);
     else if (t.staff && L > 1) out.push(`Level ${L}: ready ${Math.round((1 - prepK({ level: L })) * 100)}% sooner and ${Math.round((stationK({ level: L }) - 1) * 100)}% better than level 1`);
@@ -7078,7 +7610,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (type === 'hydrant') out.push('Fires start half as often within 2 tiles, and go out faster');
     if (type === 'bin') out.push('Trash piles up 40% slower within 2 tiles');
     if (type === 'school') out.push('With a teacher, homes within reach earn 12% more');
-    if (type === 'police') out.push(`Cells for ${[0, 2, 4][L] || 4} thieves (each costs ${JAIL_COST} gold an hour)`);
+    if (type === 'police') out.push(`Cells for ${[0, 2, 4, 6][L] || 6} thieves (each costs ${JAIL_COST} gold an hour)`);
+    if (jobsOf(type, L)) out.push(`Gives ${jobsOf(type, L)} job${jobsOf(type, L) > 1 ? 's' : ''} to people in town${L < (t.max || 1) && jobsOf(type, L + 1) > jobsOf(type, L) ? ` (${jobsOf(type, L + 1)} at level ${L + 1})` : ''}`);
     if (FLEET[type]) out.push(`${vehLevel(type) > 1 ? 'From level 2: a' : 'Can have a'} ${FLEET[type].name.toLowerCase()} for half again the reach${['firestation', 'police', 'clinic', 'hospital'].includes(type) ? ' and much faster help' : ''}`);
     if (FIRE_RISK[type]) out.push('Catches fire more easily than most (ovens, machines)');
     if (t.cat === 'landmark' && t.perk) out.push(`Town bonus: ${t.perk}`);
@@ -7095,7 +7628,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   function renderReportTab(box, b, reqs, inf, mood, myJob) {
     const t = T(b), q = jobFor(b.id);
     for (const rq of reqs) box.append(reqBox(rq));
-    box.append(el('p', 'rp-story', BLD_STORY[b.type] || String(t.blurb || '').split('. ')[0].replace(/\.$/, '') + '.'));
+    box.append(el('p', 'rp-story', storyOf(b.type, b.level) || String(t.blurb || '').split('. ')[0].replace(/\.$/, '') + '.'));
     if (b.site) { box.append(el('p', 'small', `${q && bigQ(q) ? `A focus project: ${state.builder} builds it while you focus.` : 'The crew builds it while you play (and while you focus).'} ${q && q.done > 0 ? `${Math.round(q.done / q.work * 100)}% done.` : 'Not started yet.'}`)); return; }
     if (b.burnt) { const p0 = el('p', 'small'); p0.append(colorize(`${b.burnt.health ? `Badly burned (${b.burnt.health}% left), so it is closed.` : 'Burned down to the ground.'}${b.resident ? ` ${b.resident} is staying with friends until it is fixed.` : ''} The repair costs ${burnRepairCost(b)} gold (more the worse the damage).`)); box.append(p0); return; }
     if (b.ruin) { box.append(el('p', 'small', `Broken and empty.${b.resident ? ` ${b.resident} is waiting to move back in.` : ''}`)); return; }
@@ -7109,6 +7642,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (t.cat === 'shop') cell('Customers', `${inf.near || 0} home${inf.near === 1 ? '' : 's'}`);
     if (t.staff) cell('Staff', `${sc.staff} of ${t.slots[b.level] || 0}`);
     if (t.reach) cell('Reach', `${stationReach(b)} tiles`, 'xpc');
+    if (b.type === 'prison') cell('Inmates', `${inf.inmates || 0} of ${TYPES.prison.cells[b.level] || 0}`);
+    else if (jobsOf(b.type, b.level) && live(b)) cell('Jobs', String(jobsOf(b.type, b.level)));
     if (inc || cost) cell('Per hour', `${net >= 0 ? '+' : '−'}${Math.abs(Math.round(net))} gold`, net >= 0 ? 'gc' : 'neg');
     box.append(grid);
     // the money, line by line
@@ -7129,6 +7664,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if ((b.type === 'bakery' || b.type === 'cafe') && state.buildings.some((o) => live(o) && o.type === (b.type === 'bakery' ? 'cafe' : 'bakery') && dist(o, b) <= 2)) row(b.type === 'bakery' ? 'Next to a café' : 'Next to a bakery', '+10%', 'pos');
       if (hasLandmark('lighthouse')) row('The lighthouse', '+10%', 'pos');
       if (b.robbed) row('Break-in', '−40%', 'neg'); else if (b.shaken && b.shaken.total) row(capFirst(b.shaken.label || 'after a scare'), `−${Math.round(30 * b.shaken.left / b.shaken.total)}%`, 'neg');
+      if ((inf.short || 0) >= 0.01) row('Short of workers', `−${Math.round(inf.short * 100)}%`, 'neg');
       row(`Town mood ${mood.value}%`, `×${mood.mult.toFixed(2)}`, mood.mult >= 1 ? 'pos' : 'neg');
       row('It earns', `+${Math.round(inc)}/h`, 'gc');
     } else if ((t.cat === 'joy' || t.cat === 'decor') && live(b)) {
@@ -7136,6 +7672,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (pct) { row(`Homes it makes happier (${t.cat === 'joy' ? `within ${t.radius} tile${t.radius > 1 ? 's' : ''}` : 'right next to it'})`, String(inf.near || 0)); row('Each of them pays', `+${Math.round(pct * 100)}%`, 'pos'); }
       if (t.cat === 'decor' && pct) row('Decorations add up to', '+15% at most', 'pos');
       if (inc) row('Its own income', `+${Math.round(inc)}/h`, 'gc');
+    } else if (b.type === 'prison' && live(b)) {
+      row(`Prison work (${inf.inmates || 0} inmate${inf.inmates === 1 ? '' : 's'} × ${PRISON_PAY} gold)`, `+${Math.round(inc)}/h`, 'gc');
     }
     if (sc) {
       if (sc.running) row('Running costs', `−${sc.running}/h`, 'neg');
@@ -7159,6 +7697,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // what is special about it
     const sp = specialFacts(b.type, b.level);
     if (sp.length) { const ul = el('ul', 'does'); for (const x of sp) { const li = el('li'); li.append(colorize(x)); ul.append(li); } box.append(el('h4', 'rp-h', 'Special'), ul); }
+    // 10.09: who is in prison, and the Courthouse's report
+    if (b.type === 'prison' && live(b)) {
+      const ul = el('ul', 'rp-money');
+      for (const pr of state.prison) { const th = thiefById(pr.tid), li = el('li'); li.append(el('span', '', th ? th.name : 'An inmate'), el('span', 'num', `${fmtMin(pr.left)} left`)); ul.append(li); }
+      box.append(el('h4', 'rp-h', 'Inmates'), state.prison.length ? ul : el('p', 'small muted', 'Empty. The Courthouse sends thieves here after their second time caught.'));
+    }
+    if ((b.type === 'police' && growLv(b.level) >= 3 && live(b)) || b.type === 'prison') { const ir = el('button', 'btn fresh', 'Open the incident report'); ir.addEventListener('click', openIncidents); box.append(ir); }
     if (b.addons) {
       const ul = el('ul', 'does');
       for (const k of Object.keys(b.addons)) { const li = el('li'); li.append(colorize(`${TYPES[k].name}: ${k === 'hydrant' ? 'fires start half as often within 2 tiles' : k === 'bin' ? 'trash piles up 40% slower within 2 tiles' : 'homes next to it pay 4% more, and fewer break-ins at night'} `)); const rm = el('button', 'link', 'Take down'); rm.addEventListener('click', () => removeAddon(b, k)); li.append(rm); ul.append(li); }
@@ -7291,6 +7836,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         { const run = RUNNING[type] || 0, wage = t.staff ? wageOf(t.staff, state.staff[t.staff] || 0) : 0;
           if (run || wage) meta.push(el('span', 'neg', `−${run + wage}/h${wage ? ` with a ${STAFF[t.staff].name.toLowerCase()}` : ' to run'}`));
           else if (!chk.locked && t.cat !== 'landmark') { const d = deltaAt(type, p.c, p.r); const est = d != null ? d : t.cat === 'home' ? t.residents[1] * HOME_TAX : t.base ? t.base[1] : 0; if (est >= 0.5) meta.push(el('span', 'gc', `+${Math.round(est)}/h${d != null ? ' here' : ''}`)); } }
+        { const J = city().jobs; if (J && J.k > 0 && !chk.locked) { if (J.unemp > 0.04 && jobsOf(type, 1)) meta.push(el('span', 'gc', `+${jobsOf(type, 1)} job${jobsOf(type, 1) > 1 ? 's' : ''}`)); else if (J.short > 0.04 && t.cat === 'home') meta.push(el('span', 'gc', `+${Math.round(t.residents[1] * 0.65) || 1} workers`)); } }
         let note = '', nc = '';
         if (chk.locked) { const miss = needsFor(type).filter((n) => !n.ok); note = miss.length ? `Needs ${miss.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(', ')}` : 'Locked'; nc = 'lock'; }
         else if (chk.capped) { note = capWhy(type).replace('Limit reached: ', 'Limit '); nc = 'lock'; }
@@ -7374,8 +7920,19 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     bank: 'Keeps the town\'s money safe and arranges loans.', park: 'Grass, trees and a playground.', fountain: 'A splash of water in the town square.', clinic: 'Where nurses look after the sick.',
     depot: 'Home of the street sweepers.', shed: 'Home of the gardeners.', firestation: 'Home of the firefighters.', police: 'Home of the police, with cells for thieves.',
     school: 'Where the town\'s kids learn.', stadium: 'Matches every weekend.', hydrant: 'Water for the firefighters, right on the street.', bin: 'Somewhere for the trash to go.',
-    tree: 'Shade and birdsong.', flowers: 'A splash of colour.', bench: 'A seat for a chat.', lamp: 'A warm light at night.'
+    tree: 'Shade and birdsong.', flowers: 'A splash of colour.', bench: 'A seat for a chat.', lamp: 'A warm light at night.',
+    // 10.09: each size of a service has its own line
+    clinic2: 'A medical center with a doctor on call and an ambulance bay.', clinic3: 'The town hospital: wards, an operating room and a helipad.',
+    police1: 'A small police post on the corner.', police2: 'The police station, with cells for thieves.', police3: 'The Courthouse: police, judges and the town\'s court.',
+    firestation1: 'A fire post with one engine.', firestation2: 'The fire station, with a tall hose tower.', firestation3: 'Fire headquarters: engines, a training yard and the lookout tower.',
+    school1: 'The elementary school, where the little ones learn.', school2: 'The high school, with a sports field.', school3: 'The university: lecture halls, a library and a dome.',
+    depot1: 'Home of the street sweepers.', depot2: 'A recycling center: sweepers sort what they collect.', depot3: 'The waste plant: the town\'s trash ends up here.',
+    shed1: 'Home of the gardeners.', shed2: 'A garden center with a greenhouse.', shed3: 'The parks department, looking after every green corner.',
+    bank1: 'A small bank office.', bank2: 'The bank, with a big safe.', bank3: 'The central bank, with columns and a vault.',
+    workshop1: 'Carpenters make furniture, tools and planks for the whole town.', workshop2: 'A factory, with a chimney and many hands.', workshop3: 'The industrial park: the town\'s biggest employer.',
+    prison: 'Where the thieves the Courthouse sentences serve their time.', prison2: 'A prison with a fenced yard.', prison3: 'A high-security prison with walls and watchtowers.'
   };
+  const storyOf = (type, level) => (GROW[type] && BLD_STORY[type + growLv(level)]) || BLD_STORY[type];
 
   function buildingFacts(type, level) {
     const t = TYPES[type], L = level || 1, out = [];
@@ -7399,7 +7956,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return out;
   }
   function storyBox(type, level, max) {
-    const t = TYPES[type], box = el('div', 'storybox'); box.append(el('p', 'rp-story', BLD_STORY[type] || String(t.blurb || '').split('. ')[0].replace(/\.$/, '') + '.'));
+    const t = TYPES[type], box = el('div', 'storybox'); box.append(el('p', 'rp-story', storyOf(type, level) || String(t.blurb || '').split('. ')[0].replace(/\.$/, '') + '.'));
     const f = specialFacts(type, level);
     if (t.cat === 'joy' && t.boost) f.unshift(`Homes within ${t.radius} tile${t.radius > 1 ? 's' : ''} pay ${Math.round(t.boost[level || 1] * 100)}% more`);
     else if (t.cat === 'decor' && !special(t) && (t.dec == null || t.dec > 0)) f.unshift(`Homes right next to it pay ${Math.round((t.dec != null ? t.dec : 0.05) * 100)}% more (decorations add up to 15%)`);
@@ -7421,7 +7978,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const chips = [];
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${fmtMin(exactMinutes(chk.work))} of focus${keepsWork({ kind: 'build', type: item.type, work: chk.work }) ? ', can be split' : ' in one go'}`, 'xp') : pill(`Built in ${fmtSecs(chk.secs || buildSecs(chk.work))} of play`, 'play')); }
     if (delta) chips.push(pill(`${delta > 0 ? '+' : '−'}${Math.abs(delta)} gold/hour`, delta > 0 ? 'good' : 'bad'));
-    box.append(panelHead(item.type, item.level, {}, item.isNew ? `Build a ${t.name.toLowerCase()} here?` : `Move the ${t.name.toLowerCase()} here?`, chips));
+    box.append(panelHead(item.type, item.level, {}, item.isNew ? `Build a ${t.name.toLowerCase()} here?` : `Move the ${tierName(item.type, item.level).toLowerCase()} here?`, chips));
     if (item.isNew) box.append(storyBox(item.type, 1, 5));
     const ul = el('ul', 'effects');
     const better = fx.homes.filter((h) => h.d > 0), worse = fx.homes.filter((h) => h.d < 0);
@@ -7435,7 +7992,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const grid = el('div', 'actions-grid');
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); grid.append(actionBtn(`Build it · ${chk.cost} gold`, big ? 'then focus to build it' : `${state.builder} starts right away`, 'playc', confirmPlace)); }
     else { const mb = byId(item.moveId), same = mb && ui.preview.c === mb.c && ui.preview.r === mb.r && (ui.rot || 0) === (mb.rot || 0); grid.append(actionBtn('Place here', same ? 'no change: free' : state.freeMoves > 0 ? 'free move' : `moving crew · ${moveCost(mb)} gold`, 'playc', () => { const pv = ui.preview; ui.panel = null; placeHeld(pv.c, pv.r); })); }
-    if (FOOT[item.type]) grid.append(actionBtn('Turn it', item.isNew ? 'free while you build it' : 'part of the move', '', turnHeld));
+    if (FOOT[item.type] || turns(item.type, item.level)) grid.append(actionBtn('Turn it', item.isNew ? 'free while you build it' : 'part of the move', '', turnHeld));
     grid.append(actionBtn('Cancel', null, '', () => { ui.panel = null; setHolding(null); renderAll(); afterAction(); }));
     box.append(grid);
     box.append(el('p', 'tiny muted', 'Tap another spot on the map to try it there.'));
@@ -7587,10 +8144,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   // What other mayors see of your town: stats and the layout (never your gold or anything personal).
   function townSnap() {
     const now = Date.now(), wk = weekKey(now), dk = dayKey(now);
-    return { v: 1, town: state.town, builder: state.builder, level: state.level, residents: city().residents, mood: moodNow(now).value, streak: state.streak.count,
+    return { v: 2, town: state.town, builder: state.builder, level: state.level, residents: city().residents, mood: moodNow(now).value, streak: state.streak.count,
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
-      b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works' && b.type !== 'fallen').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0), b.rot ? 1 : 0]),
+      b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works' && b.type !== 'fallen').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0) | (b.small === 1 ? 4 : b.small === 2 ? 8 : 0), b.rot ? 1 : 0]),
       staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])) };
   }
   function boardSoon() { if (!board.db || !state.board.joined) return; clearTimeout(board.timer); board.timer = setTimeout(boardPush, 1500); }
@@ -7674,7 +8231,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       staff: Object.assign(noStaff(), snap.staff || {}), flags: { tourDone: true, fireSeen: true } });
     vs.streak.count = snap.streak | 0;
     let nid = 1;
-    vs.buildings = snap.b.filter((x) => Array.isArray(x) && TYPES[x[0]]).map((x) => ({ id: nid++, type: x[0], c: clamp(x[1] | 0, 0, N - 1), r: clamp(x[2] | 0, 0, N - 1), level: clamp(x[3] | 0, 1, TYPES[x[0]].max || 1), ruin: !!(x[4] & 1), site: !!(x[4] & 2), origin: 'built', rot: x[5] ? 1 : 0, fp8: true, fp1: FOOT[x[0]] && x[5] == null ? true : undefined }));
+    vs.buildings = snap.b.filter((x) => Array.isArray(x) && TYPES[x[0]]).map((x) => ({ id: nid++, type: x[0], c: clamp(x[1] | 0, 0, N - 1), r: clamp(x[2] | 0, 0, N - 1), level: clamp(x[3] | 0, 1, TYPES[x[0]].max || 1), ruin: !!(x[4] & 1), site: !!(x[4] & 2), origin: 'built', rot: x[5] ? 1 : 0, fp8: true, fp1: FOOT[x[0]] && x[5] == null ? true : undefined, small: x[4] & 4 ? 1 : x[4] & 8 ? 2 : undefined }));
+    // an older town (before 10.09) sends its services' old sizes: show them one tile big so nothing overlaps
+    if (!(snap.v >= 2)) for (const b of vs.buildings) if (GROW[b.type] && b.level > 1) b.small = 1;
+    for (const b of vs.buildings) if (b.type === 'hospital') { b.type = 'clinic'; b.level = 3; }
     if (!vs.buildings.some((b) => b.type === 'townhall')) vs.buildings.unshift({ id: nid++, type: 'townhall', c: 5, r: 5, level: 1 });
     for (const b of vs.buildings) if (TYPES[b.type].cat === 'home') b.resident = NAMES[b.id % NAMES.length];
     closeSheet(); closePanel(true); setHolding(null);
@@ -7708,7 +8268,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (t.cat === 'landmark') chips.push(pill('Landmark', 'gold'));
     if (live(b) && inf.income >= 0.5) chips.push(pill(`+${Math.round(inf.income * mood.mult)} gold/hour`, 'gold'));
     if (live(b) && t.cat === 'home') chips.push(pill(`${inf.residents} residents`));
-    box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site }, t.name, chips), el('p', 'small', t.blurb || ''), el('p', 'tiny muted', `You are visiting ${state.town}. Look around as much as you like: nothing here costs play time, and nothing changes.`));
+    box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site }, nameOf(b), chips), el('p', 'small', t.blurb || ''), el('p', 'tiny muted', `You are visiting ${state.town}. Look around as much as you like: nothing here costs play time, and nothing changes.`));
   }
   /* Robot towns: computer-run neighbours on the board (once you are signed in), so there is always someone to visit
      and race. Their towns and minutes are made up from a fixed seed, so they look the same for everyone. */
@@ -7895,6 +8455,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return Math.max(1, Math.ceil((end - now) / 86400000));
   }
   function seasonProgress() { const sk = curSeasonKey(); return state.season.key === sk ? state.season : { key: sk, min: 0, got: [] }; }
+  // 10.09: the festival pill's colours for each season: [light, deep, text]. Autumn is a soft burnt orange.
+  const SEASON_PILL = { autumn: ['#EBA46C', '#C9693B', '#FFF8EE'], winter: ['#9FCBE8', '#5E95C4', '#F6FBFF'], spring: ['#F3AFC6', '#D46F98', '#FFF7FA'], summer: ['#F6CB6E', '#E29A33', '#3A2608'] };
   function renderSeason() {
     const node = $('season-card'), k = curSeason(), sz = SEASONS[k];
     if (ui.screen === 'play' || state.session || ui.visit || !isDone('gift')) { if (!node.hidden) node.hidden = true; return; }
@@ -7902,6 +8464,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const key = `${k}:${mins}:${st.got.join()}`;
     if (node.dataset.key === key && !node.hidden) return;
     node.dataset.key = key; node.style.setProperty('--sea-bar', sz.bar);
+    { const pal = SEASON_PILL[k] || SEASON_PILL.autumn; node.style.setProperty('--sea-a', pal[0]); node.style.setProperty('--sea-b', pal[1]); node.style.setProperty('--sea-ink', pal[2]); }
     const tx = el('span');
     tx.append(el('b', '', sz.fest), el('small', '', done ? 'Every prize won!' : `${Math.min(mins, goal)}/${goal} min`));
     if (!done) { const bar = el('div', 'bar'); const sp = el('span'); sp.style.width = clamp(mins / goal * 100, 3, 100) + '%'; bar.append(sp); tx.append(bar); }
@@ -8104,7 +8667,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
 
   /* ---------- Quick tour: Home, a little play, then a 10× focus. Skippable, and it can be replayed from the menu. ---------- */
-  const buildingRect = (b) => { if (!b) return null; const p = centerOf(b), s = sizeOf(b.type), sp = toScreen(p.x, p.y - 12), rc = canvas.getBoundingClientRect(), w = HW * 2 * s * cam.z * 1.1, h = 70 * cam.z; return { left: rc.left + sp.x - w / 2, top: rc.top + sp.y - h * 0.75, width: w, height: h }; };
+  const buildingRect = (b) => { if (!b) return null; const p = centerOf(b), s = sizeB(b), sp = toScreen(p.x, p.y - 12), rc = canvas.getBoundingClientRect(), w = HW * 2 * s * cam.z * 1.1, h = 70 * cam.z; return { left: rc.left + sp.x - w / 2, top: rc.top + sp.y - h * 0.75, width: w, height: h }; };
   const elRect = (sel) => { const n = document.querySelector(sel); if (!n || n.offsetParent === null && getComputedStyle(n).position !== 'fixed') return null; const r = n.getBoundingClientRect(); return r.width ? r : null; };
   const TOUR_START = [
     { text: () => `Welcome, Mayor! Here's how ${state.town} works, in about a minute. You can skip any time.`, next: 'Show me' },
@@ -8255,11 +8818,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const price = sellPrice(b);
     accrue(Date.now());
     state.buildings = state.buildings.filter((x) => x !== b);
-    goldChange(price, `Sold the ${T(b).name.toLowerCase()}`, 'sell');
+    goldChange(price, `Sold the ${nameOf(b).toLowerCase()}`, 'sell');
     const p = centerOf(b); for (let i = 0; i < 14; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 28, y: p.y - 10, vx: (Math.random() - 0.5) * 36, vy: -24 - Math.random() * 28, life: 0, max: 1.1, puff: true, color: 'rgba(210,200,180,.85)', r: 3.5 });
     floats.push({ x: p.x, y: p.y - 34, t0: performance.now(), text: `Sold · +${price} gold` });
     sfx.coin(); touch(); save(); closePanel(true); closeSheet(); renderAll();
-    toast(`Sold the ${T(b).name.toLowerCase()} for ${price} gold.${b.resident ? ` ${b.resident} moved away.` : ''}`);
+    toast(`Sold the ${nameOf(b).toLowerCase()} for ${price} gold.${b.resident ? ` ${b.resident} moved away.` : ''}`);
   }
   function openSell() {
     const wrap = el('div', 'list'), ci = city();
@@ -8267,7 +8830,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const rows = state.buildings.filter(sellable).sort((a, b) => sellPrice(b) - sellPrice(a));
     for (const b of rows) {
       const inf = ci.info.get(b.id), row = el('div', 'sellrow');
-      const tx = el('div'); tx.append(el('b', '', `${T(b).name}${b.resident ? ' · ' + b.resident : ''}`), el('small', '', `Level ${b.level}${inf && inf.income >= 0.5 ? ` · earns ${Math.round(inf.income)}/h` : ''}${T(b).staff ? ' · staff building' : ''}`));
+      const tx = el('div'); tx.append(el('b', '', `${nameOf(b)}${b.resident ? ' · ' + b.resident : ''}`), el('small', '', `Level ${b.level}${inf && inf.income >= 0.5 ? ` · earns ${Math.round(inf.income)}/h` : ''}${T(b).staff ? ' · staff building' : ''}`));
       const go = el('button', 'btn sm', `Sell · +${sellPrice(b)}`);
       go.addEventListener('click', () => { if (go.dataset.ask) sellBuilding(b.id); else { go.dataset.ask = '1'; go.textContent = `Sure? +${sellPrice(b)} gold`; go.classList.add('primary'); } });
       row.append(icon(b.type, b.level, 40, 34), tx, go); wrap.append(row);
@@ -8436,13 +8999,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const rows = state.buildings.filter((b) => ci.info.get(b.id) && ci.info.get(b.id).income > 0).sort((a, b) => ci.info.get(b.id).income - ci.info.get(a.id).income);
     if (!rows.length) { wrap.append(el('p', 'small muted', 'Nothing pays taxes yet. Place the gift cottage and repair the old town.')); return; }
     const list = el('ul', 'earners');
-    for (const b of rows.slice(0, 20)) { const li = el('li'); const nm = el('button', 'link', b.resident ? `${T(b).name} · ${b.resident}` : T(b).name); nm.addEventListener('click', () => { closeSheet(); showOnMap(b, { tab: 'report' }); }); li.append(nm, el('span', 'num gc', `+${Math.round(ci.info.get(b.id).income * ec.mood.mult)}/h`)); list.append(li); }
+    for (const b of rows.slice(0, 20)) { const li = el('li'); const nm = el('button', 'link', b.resident ? `${nameOf(b)} · ${b.resident}` : nameOf(b)); nm.addEventListener('click', () => { closeSheet(); showOnMap(b, { tab: 'report' }); }); li.append(nm, el('span', 'num gc', `+${Math.round(ci.info.get(b.id).income * ec.mood.mult)}/h`)); list.append(li); }
     wrap.append(list);
     const costs = state.buildings.filter((b) => runningOf(b) > 0).map((b) => [b, serviceCost(b)]).sort((a, c) => (c[1].running + c[1].wages + c[1].fleet) - (a[1].running + a[1].wages + a[1].fleet));
     if (costs.length) {
       wrap.append(el('h3', 'plan-h', 'What costs the most'));
       const ul = el('ul', 'earners');
-      for (const [b, c] of costs.slice(0, 8)) { const li = el('li'); const nm = el('button', 'link', T(b).name); nm.addEventListener('click', () => { closeSheet(); showOnMap(b, { tab: T(b).staff ? 'staff' : 'report' }); }); li.append(nm, el('span', 'num neg', `−${Math.round(c.running + c.wages + c.fleet)}/h`)); ul.append(li); }
+      for (const [b, c] of costs.slice(0, 8)) { const li = el('li'); const nm = el('button', 'link', nameOf(b)); nm.addEventListener('click', () => { closeSheet(); showOnMap(b, { tab: T(b).staff ? 'staff' : 'report' }); }); li.append(nm, el('span', 'num neg', `−${Math.round(c.running + c.wages + c.fleet)}/h`)); ul.append(li); }
       wrap.append(ul);
     }
   }
@@ -8621,7 +9184,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const sk = TYPES[type].staff;
       if (!rb && sk && staffBuildings(sk).length) rb = state.buildings.find((h) => SERVES[sk].what(h) && !coversB(sk, h));
       rb = rb || townHall();
-      const ref = centerOf(rb), rs = sizeOf(rb.type), t = TYPES[type];
+      const ref = centerOf(rb), rs = sizeB(rb), t = TYPES[type];
       let best = null, bd = Infinity;
       for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
         const a = anchorFor(type, c, r); if (!fits(type, a.c, a.r)) continue;
@@ -8668,11 +9231,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const avg = burn.reduce((a, b) => a + (fireRisk(b) || 1), 0) / burn.length, far = burn.filter((b) => !coversB('fire', b));
       out.push({ k: 'fire', name: 'Fire risk', v: clamp(Math.round((avg - 0.6) / 2.2 * 100), 0, 100), bad: true, tip: `${far.length ? `${far.length} building${far.length > 1 ? 's are' : ' is'} out of a fire station's reach (they would burn down). ` : ''}Lower it with upgrades, fire hydrants, parks between houses, and fewer packed streets.`, worst: far[0] || null, role: 'fire' });
     }
-    if (roleInfo('police', ci).needed || hallLevel() >= TYPES.police.unlock) out.push({ k: 'crime', name: 'Crime', v: Math.round(crimeLevel()), bad: true, tip: 'Up when thieves get away, homes are far from police, kids have no school and the town is unhappy. Down with every thief caught and locked up.', worst: state.buildings.find((b) => SERVES.police.what(b) && !coversB('police', b)) || null, role: 'police' });
+    if (roleInfo('police', ci).needed || hallLevel() >= TYPES.police.unlock) out.push({ k: 'crime', name: 'Crime', v: Math.round(crimeLevel()), bad: true, tip: `Up when thieves get away, homes are far from police, kids have no school, people have no job and the town is unhappy. Down with every thief caught and locked up${courthouse() ? '' : ' (a Courthouse sends repeat thieves to prison)'}.`, worst: state.buildings.find((b) => SERVES.police.what(b) && !coversB('police', b)) || null, role: 'police' });
     if (sickOn()) { const hs = state.buildings.filter((b) => live(b) && T(b).cat === 'home'), risk = hs.length ? hs.reduce((a, b) => a + (sickRisk(b) || 1), 0) / hs.length : 1; out.push({ k: 'health', name: 'Sickness risk', v: clamp(Math.round((risk - 0.6) / 1.8 * 100), 0, 100), bad: true, tip: 'Up with trash, packed streets, homes next to the depot or workshop, winter, and no clinic nearby. Parks, fountains and markets help.', worst: hs.find((b) => !coversB('nurse', b)) || null, role: 'nurse' }); }
     const dirty = state.buildings.filter(messy);
     if (dirty.length) { const avgT = dirty.reduce((a, b) => a + (b.trash || 0), 0) / dirty.length; out.push({ k: 'clean', name: 'Clean streets', v: clamp(Math.round(100 - avgT / 2 * 100), 0, 100), bad: false, tip: 'Sweepers clean within reach of their depot. Trash bins slow it down.', worst: dirty.filter((b) => (b.trash || 0) > 0.8).sort((a, b) => b.trash - a.trash)[0] || null, role: 'sweeper' }); }
     const te = roleInfo('teacher', ci);
+    const J = ci.jobs;
+    if (J && J.workers >= 6) {
+      const bal = J.jobs >= J.workers ? Math.round(J.workers / Math.max(1, J.jobs) * 100) : Math.round(J.jobs / J.workers * 100), soft = J.k < 1 ? ' A small town hardly feels it yet.' : '';
+      out.push({ k: 'jobs', name: 'Jobs', v: clamp(bal, 0, 100), bad: false, tip: J.jobless > 0 ? `${J.workers} workers, ${J.jobs} jobs: ${J.jobless} people have no work. They pay less tax and some turn to crime. Shops, workshops, services and staff make jobs.${soft}` : J.jobs > J.workers ? `${J.workers} workers, ${J.jobs} jobs: shops are short of ${J.jobs - J.workers} workers and earn less. More homes bring more workers.${soft}` : `${J.workers} workers, ${J.jobs} jobs: everyone who wants work has a job.` });
+    }
     if (te.needed) out.push({ k: 'school', name: 'School', v: Math.round(te.cover * 100), bad: false, tip: 'Homes within reach of a school with a teacher earn 12% more.', worst: state.buildings.find((b) => SERVES.teacher.what(b) && !coversB('teacher', b)) || null, role: 'teacher' });
     return out;
   }
@@ -8688,7 +9256,45 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (m.worst && cls !== 'ok') { const fx2 = el('button', 'link', 'Fix this'); fx2.addEventListener('click', () => { closeSheet(); staffAction(m.role, m.worst); }); row.append(fx2); }
       box.append(row);
     }
+    { const w = (state.incidents || []).filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length;
+      const ir = el('button', 'btn fresh full', `Incident report · ${w ? `${w} this week` : 'a quiet week'}`); ir.addEventListener('click', () => { closeSheet(); setTimeout(openIncidents, 60); }); box.append(ir); }
     return box;
+  }
+  /* ---------- 10.09: the Incident report ---------- */
+  const INC_ICON = { fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
+  const agoText = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+  function openIncidents() {
+    const wrap = el('div', 'list inc'), ct = courthouse(), week = Date.now() - 7 * 86400000;
+    const recent = state.incidents.filter((e) => e.at >= week && e.kind !== 'release');
+    const n = (k) => recent.filter((e) => (Array.isArray(k) ? k : [k]).includes(e.kind)).length, lost = Math.round(recent.reduce((a, e) => a + (e.cost || 0), 0));
+    const sum = el('div', 'inc-sum');
+    for (const [k, label, v] of [['fire', 'fires', n('fire')], ['theft', 'break-ins', n('theft')], ['sick', 'sick', n(['sick', 'serious'])], ['lost', 'gold paid back', lost]]) { const c0 = el('div', 'inc-st'); c0.append(el('b', '', String(v)), el('span', '', label)); if (k === 'lost' && v) c0.classList.add('neg'); sum.append(c0); }
+    wrap.append(el('p', 'tiny muted', 'The last 7 days in town.'), sum);
+    if (ct) wrap.append(el('p', 'small inc-ct', `⚖ The Courthouse looks into every incident and shows why it happened. Thieves caught twice go to prison${prisonCells() ? '' : ' (build a jail to hold them)'}.`));
+    else { const nb = el('div', 'inc-lock'); nb.append(el('b', '', 'Why did it happen?'), el('span', 'small', 'A Courthouse finds out. Upgrade the police post to level 3 (a Police station, then a Courthouse), and every entry here gets its reasons. It also sends repeat thieves to prison.')); wrap.append(nb); }
+    // repeat offenders and the prison
+    const th = state.thieves.filter((t) => t.crimes > 0).sort((a, b) => b.crimes - a.crimes).slice(0, 6);
+    if (ct && th.length) {
+      const box = el('div', 'inc-box'); box.append(el('b', '', 'Known thieves'));
+      for (const t of th) { const pr = inPrison(t.id), row = el('div', 'inc-thief'); row.append(el('span', '', t.name), el('small', '', `${t.crimes} break-in${t.crimes > 1 ? 's' : ''} · caught ${t.caught}×`), el('span', 'pill ' + (pr ? 'gold' : t.caught >= 1 ? 'bad' : ''), pr ? `in prison · ${fmtMin(pr.left)}` : 'free')); box.append(row); }
+      wrap.append(box);
+    }
+    if (prisonCells()) wrap.append(el('p', 'small', `Prison: ${state.prison.length} of ${prisonCells()} cells full · prison work earns ${state.prison.length * PRISON_PAY} gold an hour. Every inmate is a break-in the town already paid for.`));
+    const list = state.incidents.slice().reverse().slice(0, 30);
+    if (!list.length) wrap.append(el('p', 'small muted', 'Nothing has happened yet. Quiet town!'));
+    for (const e of list) {
+      const [colr, ic] = INC_ICON[e.kind] || ['#7A8590', '•'];
+      const it = el('div', 'inc-item'); const dot = el('span', 'inc-ic', ic); dot.style.background = colr;
+      const tx = el('div', 'inc-tx'); tx.append(el('b', '', e.text), el('small', 'muted', `${agoText(e.at)}${e.thief && e.kind === 'theft' ? ` · ${e.thief}` : ''}`));
+      tx.append(el('span', 'small' + (e.outcome ? '' : ' live'), e.outcome || (e.kind === 'release' ? '' : 'Still going on…')));
+      if (e.cost) tx.append(el('span', 'small neg', `−${Math.round(e.cost)} gold`));
+      if (ct && e.why && e.why.length) { const ul = el('ul', 'inc-why'); for (const w of e.why) ul.append(el('li', '', w)); tx.append(ul); }
+      it.append(dot, tx);
+      const b = e.bid != null ? byId(e.bid) : null;
+      if (b) { it.classList.add('tap'); it.addEventListener('click', () => { closeSheet(); showOnMap(b); }); }
+      wrap.append(it);
+    }
+    openSheet('Incident report', wrap);
   }
   function openMood() {
     const ec = econ(), m = ec.mood, playing = ui.screen === 'play';
@@ -8728,6 +9334,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (m.school) fac('School', m.school, m.school > 0 ? 'Kids near a school with a teacher learn, and their families earn more.' : 'Some homes are too far from a school (or there is no teacher).', null, [-4, 4]);
     if (m.sick) fac('Sick residents', m.sick, `${state.buildings.filter((b) => b.sick).length} home${state.buildings.filter((b) => b.sick).length > 1 ? 's are' : ' is'} sick and can't work. A nurse treats them.`, null, [-9, 0]);
     if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} out of reach of a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
+    if (m.work) fac('Jobs', m.work, `${city().jobs.jobless} people have no job. Shops, workshops and services create jobs (bigger ones create more).`, null, [-12, 0]);
     if (m.debt) fac('Money trouble', m.debt, 'The town is in debt and staff wages are late. Sell a building, take a loan or let someone go: tap your gold to see the options.', null, [-10, 0]);
     if (m.trouble <= -0.5) fac('Recent trouble', m.trouble, `${(state.scars || []).slice(-3).map((x) => x.label).join(', ') || 'A break-in'}${state.buildings.some((b) => b.robbed) ? ', and a break-in nobody has solved yet' : ''}. It fades slowly.`, 'up', [-20, 0]);
     if (m.burning) fac('Fire', m.fires, staffWorking('fire') ? 'A building is on fire. Your firefighters are on their way.' : 'A building is on fire and nobody can put it out. Hire a firefighter.', null, [-20, 0]);
@@ -8888,6 +9495,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     staff: '<path fill="currentColor" d="M8 11a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm8.5 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM2 20c0-3.6 2.7-6 6-6s6 2.4 6 6zm13.5 0c0-1.9-.6-3.5-1.7-4.7.8-.4 1.6-.6 2.7-.6 2.9 0 5 2.2 5 5.3z"/>',
     money: '<circle cx="12" cy="12" r="9" fill="currentColor"/><path d="M12 7.5v9M9.6 10c0-1 1-1.6 2.4-1.6s2.4.6 2.4 1.5c0 2.2-4.8 1.3-4.8 3.6 0 1 1 1.7 2.4 1.7s2.4-.6 2.4-1.6" stroke="var(--surface)" stroke-width="1.5" fill="none" stroke-linecap="round"/>',
     festival: '<path fill="currentColor" d="M5 21V3h2v1h11l-2.5 4.5L18 13H7v8z"/>',
+    incidents: '<path fill="currentColor" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5zM7 11v2h10v-2zm0 4v2h7v-2z"/>',
     settings: '<path fill="currentColor" d="M10.3 2h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9L2 13.7v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8zM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/>',
     help: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-.1 13.6a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zM12 6c-2 0-3.5 1.2-3.7 3h2.2c.2-.7.7-1 1.4-1 .8 0 1.4.5 1.4 1.2 0 .6-.3.9-1.2 1.5-1 .6-1.5 1.3-1.4 2.6h2.1c0-.7.2-1 1.1-1.6 1-.7 1.6-1.4 1.6-2.6C15.5 7.2 14 6 12 6z"/>',
     about: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm1.2 8h-2.4v8h2.4zM12 5.6a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/>',
@@ -8902,6 +9510,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       { k: 'friends', title: 'Friends & leaderboard', sub: board.me && board.kind === 'firebase' ? `On the board as ${state.board.name || 'Mayor'}` : 'Compete with friends and visit their towns', open: openFriends },
       { k: 'staff', title: 'Town staff & wages', sub: staffN ? `${staffN} staff · ${Math.round(ec.staffWages)} gold an hour in wages · services and buildings` : 'Nobody hired yet · services and buildings', page: staffPage },
       { k: 'money', title: 'Money', sub: `${state.gold < 0 ? '−' : ''}${fmtGold(Math.abs(state.gold))} gold · ${ec.net < 0 ? '−' : '+'}${Math.abs(Math.round(ec.net))} an hour${loans().length ? ` · ${loans().length} loan${loans().length > 1 ? 's' : ''}` : ''}`, open: () => openTown('overview') },
+      { k: 'incidents', title: 'Incident report', sub: (() => { const w = state.incidents.filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length; return `${w ? `${w} this week` : 'A quiet week'}${courthouse() ? ' · the Courthouse says why' : ''}`; })(), open: openIncidents },
       { k: 'festival', title: SEASONS[curSeason()].fest, sub: `${Math.floor(seasonProgress().min)} of ${SEASON_GOAL[0]} minutes for its prize`, open: openSeason },
       { k: 'settings', title: 'Settings', sub: 'Names, sounds, focus alarm, days, lock-screen timer', page: settingsPage },
       { k: 'help', title: 'Help', sub: 'Why this app, play-time limits, the quick tour', page: helpPage },
@@ -9922,7 +10531,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (ui.screen === 'home') { showOnMap(b, h.q ? { tab: 'info' } : null); return; }
       ui.flash = { bid: b.id, t0: performance.now() };
       openPanel(b.fire && staffWorking('fire') < 1 ? { kind: 'alert', bid: b.id } : { kind: 'info', bid: b.id, tab: h.q ? 'info' : 'actions' });
-      if (behind && (state.flags.tapHint = (state.flags.tapHint || 0) + 1) <= 4) toast(`Wanted the ${T(behind).name.toLowerCase()} behind? Tap the same spot again.`);
+      if (behind && (state.flags.tapHint = (state.flags.tapHint || 0) + 1) <= 4) toast(`Wanted the ${nameOf(behind).toLowerCase()} behind? Tap the same spot again.`);
       return;
     }
     if (ui.screen === 'home') { enterPlay(sx, sy); return; }
@@ -10065,7 +10674,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   function fitFootprints() {
     const moved = [];
     for (const b of state.buildings) {
-      if (!FOOT[b.type]) { if (b.rot != null || b.fp6) { delete b.rot; delete b.fp6; delete b.fp1; touch(); } continue; } // 10.08: one tile again
+      if (!FOOT[b.type]) { if (!GROW[b.type] && (b.rot != null || b.fp6)) { delete b.rot; delete b.fp6; delete b.fp1; touch(); } continue; } // 10.08: one tile again
       if (b.fp8) continue;
       b.fp8 = true; delete b.fp1; touch();
       const tryAt = (c, r, rot) => (fits(b.type, c, r, b.id, rot) ? (b.c = c, b.r = r, b.rot = rot, true) : false);
@@ -10073,15 +10682,48 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (near.some(([c, r, rot]) => tryAt(c, r, rot))) { touch(); continue; }
       let best = null, bd = 1e9;
       for (const rot of [0, 1]) for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const d = Math.abs(c - b.c) + Math.abs(r - b.r); if (d < bd && fits(b.type, c, r, b.id, rot)) { bd = d; best = { c, r, rot }; } }
-      if (best) { b.c = best.c; b.r = best.r; b.rot = best.rot; moved.push(T(b).name.toLowerCase()); } else b.fp1 = true; // no room anywhere: it stays small until you move it
+      if (best) { b.c = best.c; b.r = best.r; b.rot = best.rot; moved.push(nameOf(b).toLowerCase()); } else b.fp1 = true; // no room anywhere: it stays small until you move it
       touch();
     }
     if (state.buildings.some((b) => FOOT[b.type])) save();
     if (moved.length) setTimeout(() => toast(`Townhouses are now Houses, two tiles long: ${moved.length === 1 ? 'one' : moved.length} moved to the nearest free spot.`), 1500);
   }
+  // 10.09: services come in three sizes now. Old Hospitals become level-3 clinics; every service tries to take its
+  // new size where it stands. One with no room keeps its level (it works the same) but stays small until moved.
+  function migrateGrow() {
+    if (state.flags.grow9) return;
+    state.flags.grow9 = true;
+    for (const b of state.buildings) if (b.type === 'hospital') { b.type = 'clinic'; b.level = 3; delete b.rot; delete b.fp8; }
+    const gs = state.buildings.filter((b) => GROW[b.type]);
+    for (const b of gs) { b.level = clamp(b.level || 1, 1, 3); delete b.fp1; delete b.fp6; delete b.fp8; b.rot = 0; if (b.level > 1) b.small = 1; }
+    occCache = null;
+    let small = 0;
+    for (const b of gs) {
+      if (b.level === 1) continue;
+      const L = b.level; let done = false;
+      for (const lv of L === 3 ? [3, 2] : [2]) {
+        for (const rot of growLv(lv) === 2 ? [0, 1] : [0]) {
+          const [w, d] = dimsOf(b.type, rot, lv);
+          for (let c = b.c; !done && c > b.c - w; c--) for (let r = b.r; !done && r > b.r - d; r--) {
+            delete b.small; occCache = null;
+            if (fits(b.type, c, r, b.id, rot, lv)) { b.c = c; b.r = r; b.rot = rot; if (lv !== L) b.small = lv; done = true; }
+            else b.small = 1;
+            occCache = null;
+          }
+          if (done) break;
+        }
+        if (done) break;
+      }
+      if (!done) b.small = 1;
+      if (b.small) small++;
+    }
+    touch(); save();
+    if (small) setTimeout(() => toast(`Services now grow in three sizes (1×1, 2×1, 2×2). ${small === 1 ? 'One of yours' : `${small} of yours`} had no room to grow: ${small === 1 ? 'it works' : 'they work'} just the same, and grow${small === 1 ? 's' : ''} when you move ${small === 1 ? 'it' : 'them'} to a spot with room.`), 2600);
+  }
   function boot() {
     if (!devOn() && state.speed > 1) { state.speed = 1; save(); } // test speed is for the developer only
     attachOldAddons();
+    migrateGrow();
     fitFootprints();
     hideResult(); closeSheet(); hideFocus(); hideCelebration();
     CH.active = false; $('chest').hidden = true;
@@ -10186,7 +10828,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     order: (type) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r)) { const q = orderNew(type, c, r, true, true); return q ? { kind: q.kind, mode: q.mode, secs: q.secs || 0, work: q.work } : null; } return null; },
     spark: () => (ui.spark ? { ...ui.spark } : null),
     sparkSet: (o) => { state.sparkSet = Object.assign(sparkSet(), o); nextSpark(); renderBanner(true); return { ...ui.spark }; },
-    addBuilding: (type, level) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r)) { const b = { id: state.nextId++, type, c, r, level: level || 1, origin: 'built' }; if (TYPES[type].cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); save(); renderAll(); return b.id; } return null; },
+    addBuilding: (type, level) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r, null, 0, level || 1)) { const b = { id: state.nextId++, type, c, r, level: level || 1, origin: 'built' }; if (TYPES[type].cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); save(); renderAll(); return b.id; } return null; },
     sick: (bid, serious) => { const b = bid ? byId(bid) : state.buildings.find((x) => live(x) && T(x).cat === 'home'); startSick(b, false, serious == null ? { serious: false } : { serious }); return b && b.id; },
     sickOf: (bid) => { const b = byId(bid); return b ? { sick: b.sick ? JSON.parse(JSON.stringify(b.sick)) : null, loss: b.loss || null } : null; },
     setSick: (bid, patch) => { const b = byId(bid); if (b && b.sick) Object.assign(b.sick, patch); return b && b.sick; },
@@ -10218,6 +10860,17 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     walkersN: () => ({ res: walkers.filter((w) => !w.role).length, staff: walkers.filter((w) => w.role && !w.asleep).length }),
     radio: () => ({ playing: radio.playing(), track: radio.track(), fallback: radio.fallback }),
     complaint: () => { const o = complaintFor(); const f = (x) => (x ? { bid: x.b.id, text: x.text, role: x.role || null } : null); return { urgent: f(o.urgent), bad: f(o.bad), good: f(o.good) }; },
+    // 10.09
+    incidents: () => JSON.parse(JSON.stringify(state.incidents || [])),
+    openIncidents: () => { openIncidents(); return $('sheet').innerText; },
+    cityJobs: () => ({ ...city().jobs }),
+    endRob: (bid, caught, foot) => { endRobbery(byId(bid), !!caught, !!foot); return (state.incidents || []).slice(-1)[0] || null; },
+    thieves: () => ({ thieves: JSON.parse(JSON.stringify(state.thieves || [])), prison: JSON.parse(JSON.stringify(state.prison || [])), cells: prisonCells(), court: !!courthouse(), jail: (state.jail || []).length }),
+    prisonStep: (m) => { prisonStep(m); return (state.prison || []).length; },
+    planUp: (bid) => { const q = planJob('upgrade', bid, true), b = byId(bid); return { ok: !!q, why: q ? '' : checkJob('upgrade', b).why, grow: b.grow ? { ...b.grow } : null, gold: state.gold }; },
+    finishUp: (bid) => { const q = state.queue.find((x) => x.bid === bid && x.kind === 'upgrade'); if (!q) return null; state.queue = state.queue.filter((x) => x !== q); const res = { built: [] }; completeJob(q, res); touch(); save(); renderAll(); const b = byId(bid); return { c: b.c, r: b.r, rot: b.rot || 0, level: b.level, dims: dimsB(b), name: nameOf(b), small: !!b.small, note: res.built[0] && res.built[0].note }; },
+    nameOf: (bid) => nameOf(byId(bid)),
+    moveTo: (bid, c, r, rot) => { setHolding({ kind: 'move', id: bid }); ui.rot = rot || 0; occCache = null; const okf = fits(byId(bid).type, c, r, bid); if (okf) placeHeld(c, r); else setHolding(null); const b = byId(bid); return { ok: okf, c: b.c, r: b.r, rot: b.rot || 0, dims: dimsB(b), grow: b.grow ? { ...b.grow } : null }; },
     freeSpot: (c, r) => { for (let d = 0; d < 8; d++) for (let dc = -d; dc <= d; dc++) for (let dr = -d; dr <= d; dr++) { if (Math.max(Math.abs(dc), Math.abs(dr)) !== d) continue; if (freeTile(c + dc, r + dr)) return { c: c + dc, r: r + dr }; } return null; }
   });
 })();
