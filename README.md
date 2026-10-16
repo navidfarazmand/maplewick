@@ -12,7 +12,7 @@ A focus game for people with ADHD: you are the mayor of a small island town, rea
 | `app/github-pages/` | The home-screen copy as it is on `gh-pages`. |
 | `tools/build_pages.py` | Builds the home-screen copy from `app/maplewick.html`: `python3 tools/build_pages.py 10.15` |
 | `tools/README.md` | How to publish a new version, check the file, and run the browser tests in `tools/tests/`. |
-| `design/combo_options_preview.html` | Four looks for the combo bonus on the focus time blocks, to pick from. |
+| `design/combo_options_preview.html` | The four looks tried for the combo bonus on the focus time blocks (Stamp is the one in the game since 10.14). |
 
 ## A new version, step by step
 
