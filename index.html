@@ -505,6 +505,12 @@
   .bcard b { font-size: 14px; line-height: 1.15; padding-right: 26px; }
   .bcard .bc-meta { font-size: 12px; font-weight: 700; color: var(--muted); display: flex; gap: 2px 8px; flex-wrap: wrap; align-items: center; line-height: 1.25; }
   .bcard .bc-meta .reward { font-size: 12px; }
+  .fxchip { display: inline-flex; align-items: center; gap: 3px; padding: 0 6px; border-radius: 7px; font-size: 11.5px; font-weight: 800; line-height: 1.6; white-space: nowrap; }
+  .fxchip svg { width: 11px; height: 11px; flex: none; } .fxchip .coin { width: 11px; height: 11px; }
+  .fx-food { background: #F6E3C8; color: #8A4E16; } .fx-good { background: var(--good-soft); color: var(--good); } .fx-bad { background: var(--bad-soft); color: var(--bad); }
+  .fx-reach { background: var(--xp-soft); color: var(--xp); } .fx-job { background: var(--surface-2); color: var(--muted); } .fx-gold { background: var(--gold-soft); color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fx-food { background: #3A2A1A; color: #E2AE7A; } }
+  :root[data-theme="dark"] .fx-food { background: #3A2A1A; color: #E2AE7A; }
   .bcard .bc-big { color: var(--focus); background: var(--focus-soft); border-radius: 6px; padding: 0 5px; }
   .bcard .bc-cap { position: absolute; top: 6px; right: 8px; font-size: 11px; font-weight: 800; color: var(--muted); }
   .bcard .bc-note { grid-column: 1 / -1; font-size: 11.5px; font-weight: 700; line-height: 1.25; margin-top: 3px; }
@@ -656,7 +662,7 @@
   /* 10.14 (Navid picked "3 · Stamp"): with a combo, each block is struck from bottom left to top right and the combo
      reward is stamped on it, shortest first, each a quarter of a second after the one before. The resting styles are
      the end state, so with reduced motion everything simply shows stamped. */
-  .durations button.cmbon { position: relative; overflow: hidden; animation: cmbShake .2s ease-out; animation-delay: var(--dl, 0s); }
+  .durations button.cmbon { position: relative; overflow: visible; animation: cmbShake .2s ease-out; animation-delay: var(--dl, 0s); }
   .durations .cmbwrap { position: relative; display: grid; place-items: center; }
   .durations .cmbwrap .gold { opacity: .35; animation: cmbFade .26s ease-out both; animation-delay: var(--d0, 0s); }
   .durations .strike { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
@@ -666,6 +672,24 @@
     box-shadow: 0 2px 0 #9A3510, 0 4px 10px rgba(194, 65, 12, .35), inset 0 0 0 1.5px rgba(255, 255, 255, .55); text-shadow: 0 1px 0 rgba(120, 40, 10, .45); transform: translate(-50%, -50%) rotate(-8deg); animation: cmbStamp .42s both; animation-delay: var(--ds, 0s); }
   .durations .stamp .coin { width: 13px; height: 13px; }
   .durations .stamp-ring { position: absolute; left: 50%; top: 50%; z-index: 2; width: 62px; height: 34px; border-radius: 12px; border: 2px solid rgba(210, 72, 26, .55); pointer-events: none; opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(1.7); animation: cmbRing .42s ease-out forwards; animation-delay: var(--dl, 0s); }
+  /* 10.15: play time (and food) under the gold; the long-session bonus as a green stamp half over the corner */
+  .durations { row-gap: 13px; margin-top: 10px; }
+  .durations button { position: relative; overflow: visible; min-height: 74px; }
+  .durations .dmore { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 800; line-height: 1; white-space: nowrap; }
+  .durations .dmore > span { display: inline-flex; align-items: center; gap: 2px; }
+  .durations .dmore svg { width: 11px; height: 11px; }
+  .durations .dplay { color: var(--play-deep); }
+  .durations .dfood { color: #9A5B22; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .durations .dfood { color: #E2AE7A; } }
+  :root[data-theme="dark"] .durations .dfood { color: #E2AE7A; }
+  .durations button.cmbon .dmore { position: relative; z-index: 2; margin-top: 3px; }
+  .bonus-stamp { position: absolute; top: -9px; right: -7px; z-index: 4; padding: 1px 6px; border-radius: 8px; background: linear-gradient(180deg, #3FA466, #2B7548); color: #FFFFFF; font-family: var(--display); font-size: 12.5px; font-weight: 800; line-height: 1.25; box-shadow: 0 2px 0 #1C5233, 0 3px 8px rgba(30, 90, 50, .3), inset 0 0 0 1.2px rgba(255, 255, 255, .5); transform: rotate(9deg); animation: bonusStamp .4s both; animation-delay: var(--db, 0s); pointer-events: none; }
+  @keyframes bonusStamp { 0% { opacity: 0; transform: rotate(9deg) scale(1.9); } 25% { opacity: 1; } 55% { transform: rotate(9deg) scale(1); } 78% { transform: rotate(9deg) scale(.9); } 100% { opacity: 1; transform: rotate(9deg) scale(1); } }
+  .st-how { margin-left: 10px; font-family: var(--body); font-size: 15px; font-weight: 700; color: var(--muted); vertical-align: middle; }
+  .more-tog { display: block; margin: 8px auto 0; border: 0; background: none; padding: 6px 10px; color: var(--focus); font: 700 14px var(--body); cursor: pointer; }
+  .pextras-tog { justify-self: start; border: 0; background: none; padding: 4px 0; color: var(--focus); font: 700 13.5px var(--body); cursor: pointer; }
+  .pextras-tog::before { content: '★ '; color: var(--gold-bright); }
+  .btn.primary.combo, .bigfocus.combo { background: linear-gradient(135deg, var(--combo), #B8401A); border-color: #B8401A; color: #FFFFFF; }
   @keyframes cmbStrike { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
   @keyframes cmbFade { from { opacity: 1; } to { opacity: .35; } }
   @keyframes cmbStamp { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(1.9); } 20% { opacity: 1; } 48% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); } 74% { transform: translate(-50%, -50%) rotate(-8deg) scale(.93); } 100% { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg) scale(1); } }
@@ -1375,7 +1399,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.14'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.15'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -2871,7 +2895,7 @@
     const ws = list.map(wf), tot = ws.reduce((a, w) => a + w, 0); if (!(tot > 0)) return null;
     let x = Math.random() * tot; for (let i = 0; i < list.length; i++) { if (x < ws[i]) return list[i]; x -= ws[i]; } return list[list.length - 1];
   }
-  const fireHp = (b) => 16 + 8 * (sizeB(b) - 1);
+  const fireHp = (b) => { const [w, d] = dimsB(b); return 16 * Math.max(1, w * d); }; // 10.15 (Navid): a 2×1 house takes twice as long to put out as a 1×1 cottage
   // Seconds of full flames to burn one level away: upgraded buildings are sturdier.
   const BURN_SEC = [0, 75, 100, 130, 160];
   const healthOf = (b) => (b.health == null ? 100 : b.health);
@@ -3609,6 +3633,8 @@
 
   /* ---------- Residents speak up: a speech bubble every few seconds while you play ---------- */
   const LINES = {
+    // 10.15 (Navid): under the golden shield the whole town cheers you on
+    shield: ['You did it! What a focus!', 'Our mayor focused for all of us!', 'Best. Mayor. Ever.', 'That focus made my whole day!', 'Nothing can go wrong now, thanks to you!', 'We feel so safe right now!', 'Keep going, mayor, you are on a roll!', 'So proud of you!', 'The whole street is cheering for you!', 'Another one? You can do it!', 'Look at that shield shine!', 'Focus champion of the island!', 'Three cheers for the mayor!', 'You make this town better every day.'],
     trash: ['Ugh, look at all this trash!', "Who's picking this up?", 'It smells like old fish out here.', 'Trash again? Seriously?', 'Can we get a street sweeper?', 'A raccoon just waved at me from the bin.', 'I named the trash pile Gary. Gary is growing.', 'My cat refuses to go outside. I get it.', 'The seagulls are holding a party in our bins.'],
     park: ['The park is a jungle!', 'I lost my dog in the tall grass.', 'Someone trim that park, please!', 'I saw a tiger in the park. It was a very tall cat.', 'The grass is taller than my kids now.', 'Is that a park or a rainforest?'],
     safety: ['Someone took my bike!', 'I heard a noise last night...', 'We need police around here.', 'Someone stole my garden gnome. Again.', 'Who keeps taking the doormats?', 'My neighbour says he saw a mask. Not a Halloween one.'],
@@ -3680,6 +3706,15 @@
     if (ui.screen !== 'play' || ui.holding || ui.overlay || ui.visit) return;
     ui.bubbles = ui.bubbles.filter((x) => now < x.t0 + x.dur);
     if (ui.bubbles.some((x) => !x.reply) || now < ui.nextBubble) return;
+    // 10.15 (Navid): under the golden shield nobody complains; residents cheer you on instead, the whole time it lasts
+    if (shieldOn()) {
+      if (now < (ui.cheerAt || 0) || nightK() > 0.8) return;
+      const fans = state.buildings.filter((b) => live(b) && !b.fire && (T(b).cat === 'home' || T(b).cat === 'shop') && !revealFor(b.id));
+      if (!fans.length) return;
+      const b = pick(fans); ui.cheerAt = now + 9000 + Math.random() * 5000; ui.nextBubble = now + 5000;
+      ui.bubbles.push({ bid: b.id, text: pick(LINES.shield), kind: 'good', t0: now, dur: 4200 });
+      return;
+    }
     if (!ui.arriveAt || now - ui.arriveAt > ARRIVE_MS || (ui.bubbleCount | 0) >= ARRIVE_MAX) return;
     const seen = ui.bubbleSeen || (ui.bubbleSeen = new Set());
     // first the town's requests, one by one
@@ -4478,13 +4513,18 @@
      focused counts, so 26 minutes on a 2-hour project leaves 1 h 34 min), or skip the break and the next lap simply goes
      on. Ending in the middle of a lap keeps the laps you finished and loses only that lap's minutes. ---------- */
   function lapInfo(s, now) {
-    const m = sessionMinutes(s, now || Date.now()), len = s.lapLen || ROUND, lf = lapFocus(len), br = Math.max(2.5, lapBreakOf(len));
-    const k = Math.floor(m / lf + 1e-9), into = m - k * lf; // laps finished in this sitting, minutes into the next
+    const m = sessionMinutes(s, now || Date.now()), len = s.lapLen || ROUND, lf0 = lapFocus(len), br = Math.max(2.5, lapBreakOf(len));
+    // 10.15 (Navid): laps don't have to divide the project: 45-minute laps for 2 h 5 min of focus are 37½ + 37½ + 37½ + 12½.
+    // The last lap of the project is the part that is left; after the project, laps are full length again (your job).
+    const P = s.lapP > 0 ? s.lapP : Infinity;
+    let acc = 0, k = 0, lf = lf0;
+    for (;;) { const f = P - acc > 0.01 ? Math.min(lf0, P - acc) : lf0; if (m + 1e-9 >= acc + f && k < 400) { acc += f; k++; } else { lf = f; break; } }
+    const into = m - acc; // minutes into the lap you are on
     const win = k >= 1 && into < br && !((s.skip || 0) >= k); // the safe minutes after a lap (as long as its break)
     // 10.13: progress is saved after every lap and every 30 minutes (25 of focus), whichever came last
-    const saved = Math.max(k * lf, Math.floor(m / ROUND_FOCUS + 1e-9) * ROUND_FOCUS);
+    const saved = Math.max(acc, Math.floor(m / ROUND_FOCUS + 1e-9) * ROUND_FOCUS);
     const base = s.lapBase || 0;
-    return { m, k, into, win, banked: saved, lapEnd: k * lf, len, lf, br, left: lf - into, winLeft: br - into, lap: base + k + (win ? 0 : 1), done: base + k, of: Math.max(s.lapOf || 0, base + k + 1) };
+    return { m, k, into, win, banked: saved, lapEnd: acc, len, lf, br, left: lf - into, winLeft: br - into, lap: base + k + (win ? 0 : 1), done: base + k, of: Math.max(s.lapOf || 0, base + k + 1) };
   }
   // Laps in a row with breaks in between: the count carries on while the break (and the combo window after it) lasts.
   const breakMs = (speed, len) => lapBreakOf(len || ROUND) * 60000 / Math.min(10, Math.max(1, speed || 1)); // test speed: 30 s, so testing stays quick
@@ -4502,8 +4542,10 @@
   /* ---------- 10.13 (Navid): lap lengths. A project in rounds can be split into laps of 15 minutes (12½ + 2½), 30 (the
      standard round), 45, 1 hour (50 + 10)… as long as they add up to the whole project. ---------- */
   function lapOptions(P) {
-    const n = Math.max(1, Math.round(P / (lapFocus(15)))); // the project in 15-minute steps
-    return LAP_LENS.filter((L) => { const k = L / 15; return L === ROUND || (k <= n && n % k === 0); });
+    // 10.15 (Navid): any length up to the project; the last lap is what is left. One lap longer than the project is the
+    // whole project in one go.
+    const one = LAP_LENS.find((L) => lapFocus(L) >= P - 1e-9);
+    return LAP_LENS.filter((L) => L === ROUND || lapFocus(L) < P - 1e-9 || L === one);
   }
   // The laps of a project: [{ f: 25, b: 5 }, { f: 25, b: 5 }, { f: 25, b: 0 }]. The last one has no break.
   function lapPlan(P, len) {
@@ -6800,6 +6842,19 @@
   const HATS = { sweeper: 'cap', gardener: 'straw', fire: 'helmet', police: 'police', nurse: 'nurse', teacher: null };
   const staffLook = (k) => ({ skin: STAFF[k].look.skin, hair: STAFF[k].look.hair, style: 0, shirt: STAFF[k].look.shirt, pants: '#2E3A46', hat: HATS[k], hatColor: STAFF[k].look.hat });
   const residentLook = (i) => ({ skin: SKINS[(i * 7) % SKINS.length], hair: HAIRS[(i * 3 + 1) % HAIRS.length], style: (i * 5) % 4, shirt: SHIRTS[(i * 5 + 2) % SHIRTS.length], pants: PANTS[i % PANTS.length], hat: null });
+  // 10.15 (Navid): every field has its farmers (2 / 3 / 4 by level), people from your homes with farm jobs. Fewer turn up
+  // when the town is short of workers, and they go home at night.
+  const FARMER_LOOKS = [{ skin: '#E0AC7E', hair: '#5A3A22', style: 0, shirt: '#C8473D', pants: '#3E5A8C', hat: 'straw', hatColor: '#E8C66A' }, { skin: '#8D5B3C', hair: '#1A1A1A', style: 2, shirt: '#E9C46A', pants: '#4E6B3A', hat: 'straw', hatColor: '#D9B65A' }, { skin: '#F2C9A0', hair: '#B5652B', style: 1, shirt: '#5B8DB8', pants: '#5A3A22', hat: 'straw', hatColor: '#E8C66A' }, { skin: '#C68B5E', hair: '#2B1E16', style: 3, shirt: '#7FA34B', pants: '#3E5A8C', hat: 'straw', hatColor: '#E2C275' }];
+  const farmersOn = (b) => { const J = city().jobs, n = 1 + (b.level || 1); return Math.max(1, Math.round(n * (1 - ((J && J.short) || 0) * ((J && J.k) || 0)))); };
+  function drawFarmers(c, b, now) {
+    if (!live(b) || b.fire || nightK() > 0.6) return;
+    const [w, d] = dimsB(b), n = farmersOn(b), t = now / 1000;
+    for (let i = 0; i < n; i++) {
+      const tc = i % (w * d), tile = tileCenter(b.c + (tc % w), b.r + Math.floor(tc / w)), side = i < w * d ? -1 : 1;
+      const x = tile.x + side * HW * 0.28 + Math.sin(t * 0.4 + i * 2.1) * HW * 0.12, y = tile.y + (i % 2 ? -1 : 1) * HH * 0.18;
+      person(c, x, y, 1, FARMER_LOOKS[(b.id + i) % FARMER_LOOKS.length], { facing: Math.sin(t * 0.4 + i * 2.1 + 1.2) > 0 ? 1 : -1, arms: 'sweep', t: t + i * 0.7 });
+    }
+  }
   const BUILDER_LOOK = { skin: '#E0AC7E', hair: '#5A3A22', style: 0, shirt: '#E07A2F', pants: '#3B4A57', hat: 'hard', hatColor: '#F4C430' };
   const MAYOR_LOOK = { skin: '#F2C9A0', hair: '#2B1E16', style: 2, shirt: '#5B2DB8', pants: '#2E2A3A', hat: null };
   // Soot after a fire: dark scorch marks (and, if it burned badly, a thin trail of smoke).
@@ -7709,12 +7764,13 @@
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
         drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
         if (b.addons) drawAddons(c, b, now);
+        if (b.type === 'field') drawFarmers(c, b, now); // 10.15
         if (sc !== 1) c.restore();
         if (q && q.done === 0 && bigQ(q)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#5B2DB8', String(focusJobs().indexOf(q) + 1));
         else if (q && !bigQ(q) && !crewOnSite(q.bid)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
         if (b.burnt || (b.health != null && b.health < 100 && !b.fire)) soot(c, b, p, hw, hh, u, now);
         if (b.ruin && !q) badge(c, p.x + hw * 0.5, p.y - 26 * u, 7 * u, '#B3432B', '!');
-        if (T(b).cat !== 'decor' && !T(b).chest && b.level > 1 && !b.site) { const rt = (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u; rankBars(c, p.x - hw * 0.74, p.y - rt * 0.66, u, b.level); } // 10.13: rank stripes, top left
+        if (T(b).cat !== 'decor' && !T(b).chest && b.level > 1 && !b.site) { const rt = (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u; rankBars(c, p.x - hw * 0.46, p.y - rt * 0.5, u * 0.7, b.level); } // 10.13: rank stripes, top left (10.15: smaller, on the corner of the building)
         if (ui.selected === b.id) { c.strokeStyle = '#FFF4C2'; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(p.x, p.y + 2, hw * 0.9, hh * 0.9, 0, 0, Math.PI * 2); c.stroke(); }
       } });
     }
@@ -7936,6 +7992,9 @@
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
   const coinEl = () => { const s = el('span', 'coin'); s.setAttribute('aria-hidden', 'true'); return s; };
   const svgIcon = (name) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true'); s.innerHTML = ICONS[name]; return s; };
+  // 10.15: a small coloured chip for what a building adds (food, next door, reach…), next to its gold
+  const FX_IC = { food: '<path fill="currentColor" d="M11 22V12h2v10z"/><path fill="currentColor" d="M12 2c1.5 1.5 1.5 3.5 0 5-1.5-1.5-1.5-3.5 0-5zM7.5 6c2 .3 3.5 1.8 3.8 3.8-2-.3-3.5-1.8-3.8-3.8zm9 0c-.3 2-1.8 3.5-3.8 3.8.3-2 1.8-3.5 3.8-3.8zm-9 4.5c2 .3 3.5 1.8 3.8 3.8-2-.3-3.5-1.8-3.8-3.8zm9 0c-.3 2-1.8 3.5-3.8 3.8.3-2 1.8-3.5 3.8-3.8z"/>', good: '<path fill="currentColor" d="M12 21s-7.5-4.6-9.3-9.2C1.4 8.4 3.6 5 7 5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.4 0 5.6 3.4 4.3 6.8C19.5 16.4 12 21 12 21z"/>', bad: '<path fill="currentColor" d="M12 2 1.5 21h21zm-1 6h2v7h-2zm0 9h2v2h-2z"/>', reach: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>', job: '<path fill="currentColor" d="M9 4h6a1 1 0 0 1 1 1v2h4a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h4V5a1 1 0 0 1 1-1zm1 2v1h4V6z"/>' };
+  function fxChip(kind, text) { const s = el('span', 'fxchip fx-' + kind); if (kind === 'gold') s.append(coinEl()); else if (FX_IC[kind]) s.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${FX_IC[kind]}</svg>`; s.append(text); return s; }
   function goldLine(cost) { const s = el('span', 'reward'); s.append(coinEl(), String(cost)); return s; }
   function rewardTag(q) { const rw = el('span', 'reward'); rw.append(coinEl(), `+${q.reward}`); return rw; }
   function pulse(node) { node.classList.remove('tick'); void node.offsetWidth; node.classList.add('tick'); }
@@ -8085,6 +8144,7 @@
     const open = playing && !!ui.barOpen && !ui.panel && !ui.holding;
     if (!open) ui.barOpen = false;
     $('playbar').classList.toggle('open', open);
+    { const cb = comboNow() > 0 && !onBreak(); $('play-focus').classList.toggle('combo', cb); $('btn-focus').classList.toggle('combo', cb); } // 10.15: in the combo's colour while a combo runs
     const showHandle = playing && !open && !ui.panel && !ui.holding;
     if ($('barhandle').hidden === showHandle) $('barhandle').hidden = !showHandle;
     renderHandle();
@@ -9124,6 +9184,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (t.cat === 'decor' && pct) row('Decorations add up to', '+15% at most', 'pos');
       if (inc) row('Its own income', `+${Math.round(inc)}/h`, 'gc');
     } else if (b.type === 'field' && live(b)) {
+      row('Farmers at work', `${farmersOn(b)} of ${1 + b.level}${nightK() > 0.6 ? ' (home for the night)' : ''}`, '');
       row(`Level ${b.level}`, `+${TYPES.field.grow[b.level]} food/h`, 'gc');
       row(`${SEASONS[SEA.k].name}`, `×${FOOD_SEASON[SEA.k]}`, FOOD_SEASON[SEA.k] >= 1 ? 'pos' : 'neg');
       if (inf.dirty) row('Dirty air next door (workshop, factory or depot)', '−30%', 'neg');
@@ -9279,7 +9340,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         const d = deltaAt(type, p.c, p.r);
         const why = locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : !fitsHere ? 'This spot is taken.' : !money ? `Needs ${fmtGold(t.cost - state.gold + 0.999)} more gold.` : '';
         if (ADDON[type]) { const okA = !locked && !capped && money; card(type, okA ? '' : 'off', () => { if (okA) startAttach(type); else toast(locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : `Needs ${fmtGold(t.cost - state.gold + 0.999)} more gold.`); }, [goldLine(t.cost), el('span', '', ADDON[type].on ? 'on a building' : 'beside a building')], locked ? `Town hall ${t.unlock}` : ADDON[type].note, locked ? 'lock' : 'pos', locked ? '' : capLabel(type)); continue; }
-        card(type, ok ? '' : 'off', () => { if (ok) startDecor(type, p.c, p.r); else toast(why); }, [goldLine(t.cost), el('span', '', 'instant')], locked ? `Town hall ${t.unlock}` : d != null && d >= 0.5 ? `+${Math.round(d)} gold/h here` : '+5% next door', locked ? 'lock' : 'pos', locked ? '' : capLabel(type));
+        card(type, ok ? '' : 'off', () => { if (ok) startDecor(type, p.c, p.r); else toast(why); }, [goldLine(t.cost), d != null && d >= 0.5 && !locked ? fxChip('gold', `+${Math.round(d)}/h here`) : fxChip('good', `+${Math.round(((t.near && t.near.v) || 0.05) * 100)}% next door`), el('span', '', 'instant')], locked ? `Town hall ${t.unlock}` : '', locked ? 'lock' : 'pos', locked ? '' : capLabel(type));
       }
     } else {
       const order = (p.tab === 'services' ? SERVICE_ORDER : p.tab === 'landmarks' ? LANDMARK_ORDER : BUILD_ORDER).filter((type) => tierOf(type) === 1 || state.buildings.some((b) => b.type === SVC_LINES[lineOf(type)][tierOf(type) - 2] && !b.site));
@@ -9295,17 +9356,23 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         { const run = RUNNING[type] || 0, wage = t.staff ? wageOf(t.staff, state.staff[t.staff] || 0) : 0;
           if (run || wage) meta.push(el('span', 'neg', `−${run + wage}/h${wage ? ` with a ${STAFF[t.staff].name.toLowerCase()}` : ' to run'}`));
           else if (!chk.locked && t.cat !== 'landmark') { const d = deltaAt(type, p.c, p.r); const est = d != null ? d : t.cat === 'home' ? t.residents[1] * HOME_TAX : t.base ? t.base[1] : 0; if (est >= 0.5) meta.push(el('span', 'gc', `+${Math.round(est)}/h${d != null ? ' here' : ''}`)); } }
+        // 10.15 (Navid): what it adds, as chips like the gold (food, storage, next door, reach), not a line of text
+        if (!chk.locked) {
+          if (type === 'field') meta.push(fxChip('food', `+${t.grow[1]} food/h`));
+          else if (type === 'granary') meta.push(fxChip('food', `stores ${t.store[1]}`));
+          if (t.near) meta.push(fxChip(t.near.v < 0 ? 'bad' : 'good', `${t.near.v < 0 ? '−' : '+'}${Math.round(Math.abs(t.near.v) * 100)}% next door`));
+          if (t.staff && t.reach) meta.push(fxChip('reach', `reach ${baseReach(type, 1)}`));
+          if (t.job && !t.staff) meta.push(fxChip('job', 'a job for you'));
+        }
         { const J = city().jobs; if (J && J.k > 0 && !chk.locked) { if (J.unemp > 0.04 && jobsOf(type, 1)) meta.push(el('span', 'gc', `+${jobsOf(type, 1)} job${jobsOf(type, 1) > 1 ? 's' : ''}`)); else if (J.short > 0.04 && t.cat === 'home') meta.push(el('span', 'gc', `+${Math.round(t.residents[1] * 0.65) || 1} workers`)); } }
         let note = '', nc = '';
         if (chk.locked) { const miss = needsFor(type).filter((n) => !n.ok); note = miss.length ? `Needs ${miss.map((n) => n.text.charAt(0).toLowerCase() + n.text.slice(1)).join(', ')}` : 'Locked'; nc = 'lock'; }
         else if (chk.capped) { note = capWhy(type).replace('Limit reached: ', 'Limit '); nc = 'lock'; }
         else if (chk.nospot) { note = t.where ? `Only ${WHERE[t.where].short}: no free spot` : 'No free space'; nc = 'lock'; }
         else if (t.cat === 'landmark') { note = t.perk; nc = 'pos'; }
-        else if (type === 'field') { note = `+${t.grow[1]} food an hour (×2 while you focus)`; nc = 'pos'; }
-        else if (type === 'granary') { note = `Stores ${t.store[1]} food`; nc = 'pos'; }
-        else if (t.near && t.near.v < 0) { note = `−${Math.round(-t.near.v * 100)}% next door (${t.near.label})`; nc = 'neg'; }
-        else if (t.near) { note = `+${Math.round(t.near.v * 100)}% next door`; nc = 'pos'; }
-        else if (lineOf(type) === 'police') { note = `Keeps buildings within ${t.reach} tiles safe`; nc = 'pos'; }
+        else if (type === 'field') { note = 'Food grows twice as fast while you focus'; }
+        else if (t.near && t.near.v < 0) { note = `Bothers the neighbours (${t.near.label})`; nc = 'neg'; }
+        else if (lineOf(type) === 'police') { note = 'Keeps buildings in reach safe'; }
         else if (t.staff) { note = `Home of the ${STAFF[t.staff].plural}`; }
         else if (t.job && (t.job.play >= 2 || t.job.gold >= 2.5)) { note = `Job: ${jobLine(Object.assign({ gold: t.job.gold }, t.job))}`; nc = 'pos'; }
         else if (!chk.ok && chk.why) { note = chk.why; nc = 'lock'; }
@@ -9452,13 +9519,15 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const t = TYPES[item.type], fx = placeEffects(item, ui.preview.c, ui.preview.r);
     const delta = Math.round(fx.gold);
     const chips = [];
-    if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${lapText(chk.work)} of focus`, 'xp') : pill(`Built in ${fmtSecs(chk.secs || buildSecs(chk.work))} of play`, 'play')); }
+    if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${lapText(chk.work)} of focus`, 'xp') : pill(`Built in ${fmtSecs(chk.secs || buildSecs(chk.work))}`, 'play')); }
     if (item.isGift) chips.push(pill('Free', 'gold'));
     if (item.isDecor) chips.push(pill(`${t.cost} gold`, 'gold'), pill('Ready right away', 'play'));
     if (delta) chips.push(pill(`${delta > 0 ? '+' : '−'}${Math.abs(delta)} gold/hour`, delta > 0 ? 'good' : 'bad'));
     const ttl = item.isNew ? `Build a ${t.name.toLowerCase()} here?` : item.isGift ? `Place ${item.resident ? `${item.resident}'s cottage` : `the ${t.name.toLowerCase()}`} here?` : item.isDecor ? `Put a ${t.name.toLowerCase()} here?` : `Move the ${tierName(item.type, item.level).toLowerCase()} here?`;
     box.append(panelHead(item.type, item.level, {}, ttl, chips));
-    if (item.isNew || item.isGift || item.isDecor) box.append(storyBox(item.type, 1, 5));
+    // 10.15 (Navid): small, the card shows only its buttons (so the map stays visible); the text opens with a tap or full screen
+    const P = ui.panel || {}, open = !!(P.full || P.more), det = el('div', 'place-more');
+    if (item.isNew || item.isGift || item.isDecor) det.append(storyBox(item.type, 1, 5));
     const ul = el('ul', 'effects');
     const better = fx.homes.filter((h) => h.d > 0), worse = fx.homes.filter((h) => h.d < 0);
     if (better.length) ul.append(el('li', 'pos', `${better.length} home${better.length > 1 ? 's' : ''} nearby get${better.length > 1 ? '' : 's'} happier and pay more (green).`));
@@ -9467,7 +9536,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (fx.staff) { const sv = SERVES[fx.staff], st = STAFF[fx.staff]; ul.append(el('li', fx.safe ? 'pos' : '', `${capFirst(st.plural)} here look after ${fx.safe} of your ${sv.word} within ${fx.reach} tiles (dashed line)${fx.staff === 'police' ? ', day and night' : ''}.`)); }
     if (t.staff && item.isNew) ul.append(el('li', '', `Then hire ${STAFF[t.staff].plural} here.`));
     if (!ul.childNodes.length) ul.append(el('li', '', 'No effect on its neighbours.'));
-    box.append(ul);
+    det.append(ul);
     const grid = el('div', 'actions-grid');
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); grid.append(actionBtn(`Build it · ${chk.cost} gold`, big ? 'then focus to build it' : `${state.builder} starts right away`, 'playc', confirmPlace)); }
     else if (item.isGift) grid.append(actionBtn('Place it here', 'free', 'playc', confirmPlace));
@@ -9477,11 +9546,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const crew = mb && !here && !quickMove(mb), ms = crew ? moveSecs(mb) : null, fee = !mb ? 0 : here ? turnCost(mb) : moveCost(mb);
       grid.append(actionBtn(crew ? 'Move it here' : here && !same ? 'Turn it here' : 'Place here', same ? 'no change: free' : `${state.freeMoves > 0 ? 'free move' : `${fee} gold`}${crew ? ` · crew ${fmtSecs(ms.down + ms.up)}` : ''}`, 'playc', () => { const pv = ui.preview; ui.panel = null; placeHeld(pv.c, pv.r); }));
       // 10.13: say how a move works before the gold is spent
-      if (crew) box.insertBefore(el('p', 'small', `The crew takes it apart (${fmtSecs(ms.down)}), carries the pieces over on their trailer and puts it up here (${fmtSecs(ms.up)}). It is closed until then.${state.freeMoves > 0 ? ' A free move covers the gold, not the time.' : ` It costs a quarter of the last price you paid for it.`}`), ul);
+      if (crew) det.insertBefore(el('p', 'small', `The crew takes it apart (${fmtSecs(ms.down)}), carries the pieces over on their trailer and puts it up here (${fmtSecs(ms.up)}). It is closed until then.${state.freeMoves > 0 ? ' A free move covers the gold, not the time.' : ` It costs a quarter of the last price you paid for it.`}`), ul);
     }
     if (FOOT[item.type] || turns(item.type, item.level)) grid.append(actionBtn('Turn it', item.isNew || item.isGift ? 'free while you place it' : 'part of the move', '', turnHeld));
     grid.append(actionBtn('Cancel', null, '', () => { ui.panel = null; setHolding(null); renderAll(); afterAction(); }));
+    if (open) box.append(det);
     box.append(grid);
+    if (!P.full) { const mt = el('button', 'more-tog', open ? 'Hide the details' : 'Show the details'); mt.type = 'button'; mt.setAttribute('aria-expanded', String(open)); mt.addEventListener('click', () => { if (ui.panel) { ui.panel.more = !open; renderPanel(); } }); box.append(mt); }
     box.append(el('p', 'tiny muted', 'Tap another spot on the map to try it there.'));
   }
 
@@ -11074,7 +11145,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (!opts.includes(startPick.duration)) { opts[opts.length - 1] = startPick.duration; opts.sort((a, b) => a - b); }
     const pvs = new Map(opts.map((d) => [d, sessionPreview(d)]));
     const allD = singles.length ? opts.find((d) => !pvs.get(d).unfinished) : null;
-    wrap.append(el('span', 'label', hasRounds ? 'Or focus a set time:' : singles.length ? `How long? ${allD ? `${fmtMin(allD)} or more finishes ${singles.length === 1 ? jobName(singles[0]) : `all ${singles.length}`}.` : `${state.builder}'s projects need longer than 2 hours.`}` : `How long? ${state.builder} has nothing planned, so you work the whole time.`));
+    // 10.15 (Navid): no long sentence here: "How long?" sits next to the title (the ✓ on a block says what finishes Sam's plan)
+    if (hasRounds) wrap.append(el('span', 'label', 'Or focus a set time:'));
     const durs = el('div', 'durations' + (isLaps ? ' dim' : ''));
     for (const d of opts) {
       const pv = pvs.get(d);
@@ -11099,11 +11171,15 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         const wrap = el('span', 'cmbwrap'); wrap.append(gl, el('span', 'stamp-ring'), st);
         b.append(sv, wrap);
       } else { gl.append(`+${fmtGold(pv.gold)}`); b.append(gl); }
+      // 10.15 (Navid): play time (and food) under the gold, and the long-session bonus as a green stamp on the corner
+      const more = el('span', 'dmore'), pl = el('span', 'dplay'); pl.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO.play}</svg>`; pl.append(fmtClock(pv.play)); more.append(pl);
+      if (pv.shiftFood >= 0.5) { const fd = el('span', 'dfood'); fd.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO.food}</svg>`; fd.append(String(Math.round(pv.shiftFood))); more.append(fd); }
+      b.append(more);
+      if (pv.bonusPct >= 4) { const k = opts.indexOf(d), sb = (pv.combo > 1.001 ? 1.05 : 0.6) + 0.25 * k - (performance.now() - (startPick.cmbAt || 0)) / 1000; const bs = el('span', 'bonus-stamp', `+${pv.bonusPct}%`); bs.style.setProperty('--db', sb.toFixed(3) + 's'); b.append(bs); }
       let note = '', nc = '';
       if (pv.unfinished) { note = `−${pv.unfinished}`; nc = 'minus'; }
       else if (d === allD) { note = '✓ all'; nc = 'all'; }
       else if (coachGoal() === d) { note = 'goal'; nc = 'all'; }
-      else if (pv.bonusPct >= 4) { note = `+${pv.bonusPct}%`; nc = 'bonus'; }
       if (note) b.append(el('span', 'note ' + nc, note));
       b.setAttribute('aria-label', `${fmtMin(d)}: about ${fmtGold(pv.gold)} gold${pv.unfinished ? `, ${pv.unfinished} job${pv.unfinished > 1 ? 's' : ''} won't finish` : ''}`);
       b.addEventListener('click', () => { startPick.mode = 'fixed'; startPick.duration = d; renderStart(); });
@@ -11124,6 +11200,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else lab.append(`${state.builder} finishes `, finB(), ', then you:');
     } else lab.append('Your job');
     wrap.append(lab);
+    const oldJr = !$('scrim').hidden && document.querySelector('#sheet .startsheet .jobs'), jrLeft = oldJr ? oldJr.scrollLeft : null; // 10.15: keep the job row where it was
     const jr = el('div', 'jobs' + (planned && pv.sim.leftover < 0.05 ? ' idle' : ''));
     for (const j of jobs()) {
       const b = el('button', 'jobchip'); b.type = 'button'; b.setAttribute('aria-pressed', String(j.bid === currentJob().bid));
@@ -11164,16 +11241,24 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (nb) extras.push(`Focus ${fmtMin(nb[0])} or more for a +${Math.round(nb[1] * 100)}% long-session bonus`);
       if (coachGoal()) extras.push(coachLine(m, pv.coach));
       extras.push(`Finish it for a golden shield: for ${fmtMin(Math.max(1, Math.round(m * SHIELD_K)))} nothing bad can happen in town`); }
-    const ex = el('div', 'pextras'); for (const e of extras) ex.append(el('span', '', e)); box.append(ex);
-    if (pv.chest) box.append(oddsBar(m, pv.comboN));
+    if (pv.chest && pv.comboN > 0) extras.push(`Your combo gives a ${Math.round(12 * Math.min(pv.comboN, 4))}% chance to upgrade the chest one step`);
+    // 10.15 (Navid): the extra lines are folded away; one tap opens them
+    const ex = el('div', 'pextras'); for (const e of extras) ex.append(el('span', '', e)); ex.hidden = !startPick.extrasOpen;
+    const tog = el('button', 'pextras-tog', startPick.extrasOpen ? 'Hide the details' : `More about this session (${extras.length})`); tog.type = 'button'; tog.setAttribute('aria-expanded', String(!!startPick.extrasOpen));
+    tog.addEventListener('click', () => { startPick.extrasOpen = !startPick.extrasOpen; ex.hidden = !startPick.extrasOpen; tog.textContent = startPick.extrasOpen ? 'Hide the details' : `More about this session (${extras.length})`; tog.setAttribute('aria-expanded', String(startPick.extrasOpen)); });
+    box.append(tog, ex);
+    if (pv.chest) box.append(oddsBar(m, 0));
     wrap.append(box);
     const run = lapRunNow(), next = (run ? run.n : 0) + 1;
-    const go = el('button', 'btn primary full', isLaps ? `Start lap ${next} · ${fmtHalf(lapFocus(lenL))} min` : `Start ${fmtMin(m)} of focus`);
+    const go = el('button', 'btn primary full' + (comboNow() > 0 ? ' combo' : ''), isLaps ? `Start lap ${next} · ${fmtHalf(lapFocus(lenL))} min` : `Start ${fmtMin(m)} of focus`);
     go.style.minHeight = '52px'; go.style.fontSize = '17px';
     go.addEventListener('click', () => (isLaps ? startLaps(lenL) : startSession(m)));
     wrap.append(go);
     if (state.speed > 1) wrap.append(el('p', 'tiny muted', isLaps ? `Test speed is on: a lap takes ${Math.max(1, Math.round(lapFocus(lenL) * 60 / state.speed))} seconds, a break ${Math.round(breakMs(state.speed, lenL) / 1000)} seconds.` : `Test speed is on: this takes ${Math.max(1, Math.round(m * 60 / state.speed))} seconds.`));
-    openSheet('Start focus', wrap);
+    openSheet('Start focus', wrap, { full: true });
+    $('sheet-title').append(el('span', 'st-how', 'How long?'));
+    $('sheet').dataset.kind = 'start';
+    if (jrLeft != null) jr.scrollLeft = jrLeft;
   }
 
   /* ---------- The menu: a list of sections; each opens full-screen, with a back arrow to the list ---------- */
@@ -11231,15 +11316,15 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     $('sheet').dataset.kind = 'menu';
   }
   // Testing tools are hidden unless this phone was unlocked with Navid's code (or it's the private copy inside Claude).
-  const DEV_HASH = 'd04c591fd7cdfc600297101e43c0d412d358de4647049d6125e5ee2d90823b59';
-  function devOn() { return !!(state.flags && state.flags.dev) || inFrame || !!navigator.webdriver; }
+  const DEV_HASH = 'ed7952c9497518025b00bf4fdb244394522c958c822637d03ec9cf442fa4378e'; // 10.15: Navid's new code
+  function devOn() { if (navigator.webdriver) return true; if (state.flags && state.flags.devOff) return false; return !!(state.flags && state.flags.dev) || inFrame; } // 10.15: Testing can be hidden again
   async function sha256hex(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
   function openDevUnlock() {
     const wrap = el('div', 'stack');
     wrap.append(el('p', 'small', 'For the developer only. Enter the code to show the Testing tools on this phone.'));
     const inp = el('input'); inp.type = 'password'; inp.autocomplete = 'off'; inp.className = 'codebox'; inp.style.width = '100%'; inp.placeholder = 'Code';
     const go = el('button', 'btn primary full', 'Unlock');
-    go.addEventListener('click', async () => { let h = ''; try { h = await sha256hex(inp.value.trim()); } catch (e) { toast('This browser can\'t check the code here.'); return; } if (h === DEV_HASH) { state.flags.dev = true; save(); closeSheet(); toast('Testing unlocked on this phone.'); openMenu(); } else { toast('That is not the code.'); inp.value = ''; } });
+    go.addEventListener('click', async () => { let h = ''; try { h = await sha256hex(inp.value.trim()); } catch (e) { toast('This browser can\'t check the code here.'); return; } if (h === DEV_HASH) { state.flags.dev = true; delete state.flags.devOff; save(); closeSheet(); toast('Testing unlocked on this phone.'); openMenu(); } else { toast('That is not the code.'); inp.value = ''; } });
     wrap.append(inp, go);
     openSheet('Developer', wrap);
   }
@@ -11435,7 +11520,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const no = el('button', 'btn', 'Keep my town'); no.addEventListener('click', () => { conf.hidden = true; });
     const r = el('div', 'row'); r.append(no, yes); conf.append(r);
     reset.addEventListener('click', () => { conf.hidden = false; });
-    menuSec(wrap, null, sw, tr, reset, conf);
+    // 10.15 (Navid): hide the Testing tools again (unlock again by tapping the version 7 times and entering the code)
+    const hide = el('button', 'btn ghost', 'Hide the Testing tools');
+    hide.addEventListener('click', () => { state.flags.dev = false; state.flags.devOff = true; if (state.speed > 1) state.speed = 1; save(); closeSheet(); renderAll(); toast('Testing is hidden. To show it again, tap the version number in the menu 7 times and enter your code.'); });
+    menuSec(wrap, null, sw, tr, reset, conf, hide);
     return wrap;
   }
 
@@ -12352,8 +12440,14 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     $('barhandle').addEventListener('pointerdown', (e) => { down(e); try { $('barhandle').setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } });
     $('barhandle').addEventListener('pointermove', (e) => { if (sy != null && sy - e.clientY > 20) { sy = null; openBar(); } });
     $('playbar').addEventListener('pointerdown', down);
-    $('playbar').addEventListener('pointermove', (e) => { if (sy != null && e.clientY - sy > 28) { sy = null; closeBar(); } });
-    for (const n of ['barhandle', 'playbar']) { $(n).addEventListener('pointerup', up); $(n).addEventListener('pointercancel', up); }
+    // 10.15 (Navid): drag the bar up and it follows your finger, then opens Start focus full screen (like the building card)
+    const pb = $('playbar'), settle = () => { pb.style.transition = ''; pb.style.transform = ''; };
+    pb.addEventListener('pointermove', (e) => {
+      if (sy == null) return; const d = e.clientY - sy;
+      if (d > 28) { sy = null; settle(); closeBar(); return; }
+      if (d < -6) { pb.style.transition = 'none'; pb.style.transform = `translateY(${Math.max(-90, d)}px)`; if (d < -70) { sy = null; settle(); openStart(); } }
+    });
+    for (const n of ['barhandle', 'playbar']) { $(n).addEventListener('pointerup', () => { up(); settle(); }); $(n).addEventListener('pointercancel', () => { up(); settle(); }); }
   })();
   $('play-plan').addEventListener('click', openPlan);
   $('reqpill').addEventListener('click', taskTap);
