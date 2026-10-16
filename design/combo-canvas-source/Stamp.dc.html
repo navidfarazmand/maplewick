@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Combo blocks: stamp</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Figtree:wght@500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 300px; box-sizing: border-box; padding: 18px 16px; background: #FBFCF8; color: #1E2A28; font-family: 'Figtree', system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="font-size: 14px; font-weight: 700">How long?</span>
+<span style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 12px; background: #FFE6DA; color: #D9541E; font-weight: 800; font-size: 13px; white-space: nowrap">
+<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.3 1.2-3.7 2.5-5 .3 1.6 1 2.6 2 3 0-3 .2-5.5.5-8z"></path></svg>
+Combo ×1.4<span style="font-weight: 600">· 14:52 left</span>
+</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{blocks}}" as="b" hint-placeholder-count="8">
+<div style="position: relative; height: 70px; border-radius: 12px; overflow: hidden; background: {{b.bg}}; box-shadow: {{b.ring}}; transform: translateX({{b.shake}}px)">
+<div style="position: absolute; left: 0; right: 0; top: 7px; z-index: 3; text-align: center; font-family: 'Baloo 2', 'Trebuchet MS', sans-serif; font-weight: 700; font-size: 19px; line-height: 1.1; color: #1E2A28; text-shadow: {{b.halo}}">{{b.label}}</div>
+<div style="position: absolute; left: 0; right: 0; top: 34px; z-index: 1; display: flex; justify-content: center; align-items: center; gap: 3px; font-weight: 800; font-size: 13px; color: #A86E08; opacity: {{b.oldOp}}">
+<span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFE9A8, #E8A93A 55%, #B67A12); box-shadow: inset 0 0 0 1px rgba(140,90,10,.45)"></span>
+<span>{{b.was}}</span>
+</div>
+<div style="position: absolute; left: 0; right: 0; top: 53px; z-index: 1; text-align: center; font-size: 11px; font-weight: 800; color: #2B7548">{{b.note}}</div>
+<svg viewBox="0 0 85 70" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 2; overflow: visible; pointer-events: none">
+<path d="M7 63 C 26 49, 50 30, 79 7" pathLength="100" style="fill: none; stroke: #3A3340; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: {{b.off}}; opacity: .8"></path>
+</svg>
+<div style="position: absolute; left: 50%; top: 41px; z-index: 4; width: 60px; height: 34px; margin: -17px 0 0 -30px; border-radius: 12px; border: 2px solid rgba(210,72,26,.55); box-sizing: border-box; opacity: {{b.ringOp}}; transform: rotate(-8deg) scale({{b.ringS}}); pointer-events: none"></div>
+<div style="position: absolute; left: 0; right: 0; top: 28px; z-index: 5; display: flex; justify-content: center; opacity: {{b.stOp}}">
+<span style="display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px 1px; border-radius: 9px; background: linear-gradient(180deg, #F47A45, #D2481A); color: #FFFFFF; font-family: 'Baloo 2', 'Trebuchet MS', sans-serif; font-weight: 800; font-size: 18px; line-height: 1.15; box-shadow: 0 2px 0 #9A3510, 0 4px 10px rgba(194,65,12,.35), inset 0 0 0 1.5px rgba(255,255,255,.55); text-shadow: 0 1px 0 rgba(120,40,10,.45); transform: rotate(-8deg) scale({{b.stS}})">
+<span style="display: inline-block; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFE9A8, #E8A93A 55%, #B67A12); box-shadow: inset 0 0 0 1px rgba(140,90,10,.5)"></span>
+<span>{{b.now}}</span>
+</span>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: center">
+<button type="button" onClick="{{replay}}" style="min-height: 44px; padding: 0 18px; border: 0; border-radius: 22px; background: #EEF2E8; color: #1E2A28; font-family: 'Figtree', system-ui, sans-serif; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer">
+<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 12a8 8 0 1 0 2.4-5.7"></path><path d="M4 4v4h4"></path></svg>
+Replay
+</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"stagger":{"editor":"range","default":0.25,"min":0.1,"max":0.6,"step":0.05,"unit":"s"},"$preview":{"width":390,"height":300}}'>
+class Component extends DCLogic {
+  componentDidMount() { this.play(); }
+  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); }
+  play() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still) { this.setState({ t: 99 }); return; }
+    const t0 = performance.now();
+    const step = (now) => { const t = (now - t0) / 1000; this.setState({ t: t }); if (t < 6) this.raf = requestAnimationFrame(step); };
+    this.setState({ t: 0 });
+    this.raf = requestAnimationFrame(step);
+  }
+  renderVals() {
+    const t = this.state && this.state.t != null ? this.state.t : 0;
+    const stag = this.props.stagger ?? 0.25;
+    const rows = [['5m', 5, 6, 8, ''], ['10m', 10, 24, 33, ''], ['15m', 15, 30, 42, ''], ['25m', 25, 43, 60, '+5%'], ['45m', 45, 71, 99, '+10%'], ['1h', 60, 94, 132, '+15%'], ['1h30', 90, 141, 198, '+20%'], ['2h', 120, 192, 268, '+25%']];
+    const cl = (x) => Math.max(0, Math.min(1, x));
+    const out = (k) => 1 - Math.pow(1 - k, 3);
+    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16));
+    const mix = (a, b, k) => { const A = hex(a), B = hex(b); return '#' + A.map((v, j) => Math.round(v + (B[j] - v) * k).toString(16).padStart(2, '0')).join(''); };
+    const blocks = rows.map((r, i) => {
+      const g = cl(Math.log(r[1] / 5) / Math.log(24)), bg = mix('#F6DAD3', '#D8F2B0', g);
+      const s = 0.7 + i * stag, k1 = out(cl((t - s) / 0.26));
+      const kd = cl((t - s - 0.22) / 0.2), ks = cl((t - s - 0.42) / 0.2), kr = cl((t - s - 0.42) / 0.42);
+      const stS = kd < 1 ? 1.9 - 0.9 * kd * kd : 1 - 0.07 * Math.sin(ks * Math.PI);
+      const shake = ks > 0 && ks < 1 ? Math.sin(ks * Math.PI * 3) * (1 - ks) * 1.8 : 0;
+      return {
+        label: r[0], was: '+' + r[2], now: '+' + r[3], note: r[4], bg: bg,
+        halo: '0 0 3px ' + bg + ', 0 0 3px ' + bg + ', 0 0 6px ' + bg,
+        ring: r[1] === 25 ? '0 0 0 2px #5B2DB8, inset 0 0 0 1px #5B2DB8' : 'inset 0 0 0 1px rgba(30,42,40,.12)',
+        off: (100 * (1 - k1)).toFixed(2), oldOp: (1 - 0.65 * k1).toFixed(3),
+        stOp: kd > 0 ? Math.min(1, kd * 2.5).toFixed(3) : '0', stS: stS.toFixed(3),
+        ringOp: kr > 0 && kr < 1 ? ((1 - kr) * 0.8).toFixed(3) : '0', ringS: (0.8 + 0.9 * kr).toFixed(3),
+        shake: shake.toFixed(2)
+      };
+    });
+    return { blocks: blocks, replay: () => this.play() };
+  }
+}
+</script>
+</body>
+</html>

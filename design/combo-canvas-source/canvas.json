@@ -1,0 +1,18 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-15T12:00:00Z" },
+  "title": "Combo Reward Grid Options",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 390, "h": 300, "title": "1 · Red pen", "is_interactive": true, "radius": 24 },
+    "Swap.dc.html": { "x": 470, "y": 0, "w": 390, "h": 300, "title": "2 · Bold swap", "is_interactive": true, "radius": 24 },
+    "Stamp.dc.html": { "x": 940, "y": 0, "w": 390, "h": 300, "title": "3 · Stamp", "is_interactive": true, "radius": 24 },
+    "Fire.dc.html": { "x": 1410, "y": 0, "w": 390, "h": 300, "title": "4 · Combo fire", "is_interactive": true, "radius": 24 }
+  },
+  "order": ["Main.dc.html", "Swap.dc.html", "Stamp.dc.html", "Fire.dc.html"],
+  "notes": {
+    "head": { "x": 0, "y": -260, "text": "Combo ×1.4 on the eight time blocks: pick a look", "kind": "title1", "maxW": 1800 }
+  },
+  "designSystems": []
+}
