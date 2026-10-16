@@ -653,8 +653,24 @@
   .durations button b { font-family: var(--display); font-size: 19px; line-height: 1; }
   .durations .gold { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; color: var(--gold); font-size: calc(12px + var(--gs, 0px)); white-space: nowrap; }
   .durations .gold .coin { width: 12px; height: 12px; vertical-align: 0; }
-  .durations .gold s.was { color: var(--muted); font-weight: 700; font-size: .82em; text-decoration-color: var(--combo); text-decoration-thickness: 2px; }
-  .durations .gold .cmb { color: var(--combo); }
+  /* 10.14 (Navid picked "3 · Stamp"): with a combo, each block is struck from bottom left to top right and the combo
+     reward is stamped on it, shortest first, each a quarter of a second after the one before. The resting styles are
+     the end state, so with reduced motion everything simply shows stamped. */
+  .durations button.cmbon { position: relative; overflow: hidden; animation: cmbShake .2s ease-out; animation-delay: var(--dl, 0s); }
+  .durations .cmbwrap { position: relative; display: grid; place-items: center; }
+  .durations .cmbwrap .gold { opacity: .35; animation: cmbFade .26s ease-out both; animation-delay: var(--d0, 0s); }
+  .durations .strike { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
+  .durations .strike path { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; opacity: .72; stroke-dasharray: 100; stroke-dashoffset: 0; animation: cmbStrike .26s cubic-bezier(.2, .7, .3, 1) both; animation-delay: var(--d0, 0s); }
+  .durations button.cmbon > b { position: relative; z-index: 2; text-shadow: 0 0 3px var(--bgc, transparent), 0 0 3px var(--bgc, transparent), 0 0 6px var(--bgc, transparent); }
+  .durations .stamp { position: absolute; left: 50%; top: 50%; z-index: 3; display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px 1px; border-radius: 9px; background: linear-gradient(180deg, #F47A45, #D2481A); color: #FFFFFF; font-family: var(--display); font-weight: 800; font-size: calc(16px + var(--gs, 0px) * .6); line-height: 1.15; white-space: nowrap;
+    box-shadow: 0 2px 0 #9A3510, 0 4px 10px rgba(194, 65, 12, .35), inset 0 0 0 1.5px rgba(255, 255, 255, .55); text-shadow: 0 1px 0 rgba(120, 40, 10, .45); transform: translate(-50%, -50%) rotate(-8deg); animation: cmbStamp .42s both; animation-delay: var(--ds, 0s); }
+  .durations .stamp .coin { width: 13px; height: 13px; }
+  .durations .stamp-ring { position: absolute; left: 50%; top: 50%; z-index: 2; width: 62px; height: 34px; border-radius: 12px; border: 2px solid rgba(210, 72, 26, .55); pointer-events: none; opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(1.7); animation: cmbRing .42s ease-out forwards; animation-delay: var(--dl, 0s); }
+  @keyframes cmbStrike { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+  @keyframes cmbFade { from { opacity: 1; } to { opacity: .35; } }
+  @keyframes cmbStamp { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(1.9); } 20% { opacity: 1; } 48% { transform: translate(-50%, -50%) rotate(-8deg) scale(1); } 74% { transform: translate(-50%, -50%) rotate(-8deg) scale(.93); } 100% { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg) scale(1); } }
+  @keyframes cmbRing { 0% { opacity: .8; transform: translate(-50%, -50%) rotate(-8deg) scale(.8); } 100% { opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(1.7); } }
+  @keyframes cmbShake { 0% { transform: translateX(0); } 25% { transform: translateX(1.8px); } 50% { transform: translateX(-1.2px); } 75% { transform: translateX(.6px); } 100% { transform: none; } }
   .durations .note { font-size: 11px; font-weight: 800; white-space: nowrap; }
   .durations .note.minus { color: var(--bad); }
   .durations .note.all, .durations .note.bonus { color: var(--good); }
@@ -1359,7 +1375,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.13'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.14'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -10980,6 +10996,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   const startPick = { duration: 25, mode: 'fixed', lapLen: ROUND };
   function openStart(prefDuration, keepMode) {
     if (state.session) return;
+    startPick.cmbAt = performance.now(); // 10.14: the combo stamps play as the sheet opens
     if (!state.coach && !state.flags.coachAsked && !tour.steps && state.named) { state.flags.coachAsked = true; save(); openSurvey(() => openStart(prefDuration)); return; } // 10.11
     const cg = coachGoal(), rounds = roundJobs().length > 0;
     // 10.13: with a project in rounds, the sheet opens on its laps; the eight set lengths are always there too
@@ -11067,9 +11084,21 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       b.setAttribute('aria-pressed', String(!isLaps && startPick.duration === d));
       b.append(el('b', '', shortMin(d)));
       const gl = el('span', 'gold'); gl.append(coinEl());
-      // 10.08: with a combo, the normal amount is crossed out and the combo amount shown next to it (a new look is coming, 10.13)
-      if (pv.combo > 1.001 && pv.gold - pv.goldBase >= 1) { gl.append(el('s', 'was', `+${fmtGold(pv.goldBase)}`), el('span', 'cmb', `+${fmtGold(pv.gold)}`)); } else gl.append(`+${fmtGold(pv.gold)}`);
-      b.append(gl);
+      // 10.14 (Navid picked "3 · Stamp"): with a combo, the block is struck through from bottom left to top right and the
+      // combo reward is stamped on it. Shortest first, each block a quarter of a second after the one before. The
+      // animation plays once when the sheet opens; drawn again later (a tap on a length) it shows the end at once.
+      if (pv.combo > 1.001 && pv.gold - pv.goldBase >= 1) {
+        gl.append(`+${fmtGold(pv.goldBase)}`);
+        const k = opts.indexOf(d), s0 = 0.55 + 0.25 * k - (performance.now() - (startPick.cmbAt || 0)) / 1000;
+        b.classList.add('cmbon');
+        b.style.setProperty('--d0', s0.toFixed(3) + 's'); b.style.setProperty('--ds', (s0 + 0.22).toFixed(3) + 's'); b.style.setProperty('--dl', (s0 + 0.42).toFixed(3) + 's');
+        b.style.setProperty('--bgc', 'color-mix(in oklab, var(--high) var(--g, 50%), var(--low))');
+        const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('class', 'strike'); sv.setAttribute('viewBox', '0 0 100 100'); sv.setAttribute('preserveAspectRatio', 'none'); sv.setAttribute('aria-hidden', 'true');
+        const ph = document.createElementNS('http://www.w3.org/2000/svg', 'path'); ph.setAttribute('d', 'M8 90 C 30 72, 58 44, 92 10'); ph.setAttribute('pathLength', '100'); sv.append(ph);
+        const st = el('span', 'stamp'); st.append(coinEl(), `+${fmtGold(pv.gold)}`);
+        const wrap = el('span', 'cmbwrap'); wrap.append(gl, el('span', 'stamp-ring'), st);
+        b.append(sv, wrap);
+      } else { gl.append(`+${fmtGold(pv.gold)}`); b.append(gl); }
       let note = '', nc = '';
       if (pv.unfinished) { note = `−${pv.unfinished}`; nc = 'minus'; }
       else if (d === allD) { note = '✓ all'; nc = 'all'; }
