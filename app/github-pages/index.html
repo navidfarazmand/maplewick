@@ -490,6 +490,10 @@
   .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 12px; }
   .tabs button { border: 0; border-radius: 9px; min-height: 38px; background: transparent; font-weight: 700; font-size: 14px; padding: 4px 6px; }
   .tabs button[aria-selected="true"] { background: var(--surface); box-shadow: var(--shadow); }
+  .mood-tabs { position: sticky; top: -2px; z-index: 2; }
+  #sheet[data-kind="mood"] { min-height: min(88vh, 88dvh); }
+  .mood-tabs button { font-size: 13px; padding: 4px 2px; }
+  .tab-n { display: inline-block; min-width: 17px; height: 17px; line-height: 17px; margin-left: 4px; padding: 0 4px; border-radius: 9px; background: var(--bad, #D9534F); color: #fff; font-size: 11px; vertical-align: 1px; }
   .brow { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 10px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 14px; }
   .brow canvas { width: 52px; height: 46px; }
   .brow h3 { font-size: 16px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
@@ -1414,7 +1418,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.17'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.18'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -8246,7 +8250,7 @@
       if (pl.kind !== 'now' && ui.screen !== 'play' && state.playSec <= 0) { const b = el('button', cls + 'primary', 'Focus to earn play time'); b.addEventListener('click', () => openStart()); return b; }
       const b = el('button', cls + (pl.kind === 'now' ? 'primary' : 'playc'), pl.label); b.addEventListener('click', pl.fn); return b;
     }
-    if (q.action === 'mood') { const b = el('button', cls + 'fresh', 'Town mood and staff'); b.addEventListener('click', openMood); return b; }
+    if (q.action === 'mood') { const b = el('button', cls + 'fresh', 'Town mood and staff'); b.addEventListener('click', () => openMood('mood')); return b; }
     return null;
   }
   const PIN_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="vertical-align:-2px"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
@@ -9141,7 +9145,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       box.append(sl);
     }
     if (t.staff && live(b)) { const sc = serviceCost(b), go = el('button', 'btn fresh', `Staff · ${sc.staff} of ${t.slots[b.level] || 0}${FLEET[b.type] ? ` · ${b.vehicle ? FLEET[b.type].name.toLowerCase() : 'no vehicle'}` : ''}`); go.addEventListener('click', () => { p.tab = 'staff'; renderPanel(); }); box.append(go); }
-    if (b.type === 'townhall') { const staffBtn = el('button', 'btn fresh', `Hire town staff · mood ${mood.value}%`); staffBtn.addEventListener('click', openMood); box.append(staffBtn); }
+    if (b.type === 'townhall') { const staffBtn = el('button', 'btn fresh', `Hire town staff · mood ${mood.value}%`); staffBtn.addEventListener('click', () => openMood('staff')); box.append(staffBtn); }
     if (myJob && !isMine) { const w = actionBtn('Make this my job', jobLine(myJob), 'fresh', () => { state.job = b.id; save(); toast(`When ${state.builder} is done, you ${myJob.verb.toLowerCase()} ${myJob.at}.`); renderAll(); }); box.append(w); }
     else if (isMine) box.append(el('p', 'tiny muted', `Your job: ${myJob.verb.toLowerCase()} · ${jobLine(myJob)}.`));
     if (reqs.length) { const nudge = el('button', 'link', `${reqs[0].from === 'Town council' ? 'The town council' : reqs[0].from} asks something here · see Details`); nudge.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); box.append(nudge); }
@@ -9308,7 +9312,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   // The town hall's Services tab: every service building, its cost and upgrade, and where it is (10.05).
   function renderServicesTab(box) {
     const w = el('div'); servicesSection(w); box.append(w);
-    const sb = el('button', 'btn fresh', `Hire town staff · mood ${econ().mood.value}%`); sb.addEventListener('click', openMood); box.append(sb);
+    const sb = el('button', 'btn fresh', `Hire town staff · mood ${econ().mood.value}%`); sb.addEventListener('click', () => openMood('staff')); box.append(sb);
   }
   function renderInfoTab(box, b, reqs, inf, mood, myJob) {
     const t = T(b), q = jobFor(b.id);
@@ -10934,15 +10938,14 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (m.open) { const fx3 = el('button', 'link', 'Food & farms'); fx3.addEventListener('click', () => { closeSheet(); setTimeout(m.open, 60); }); row.append(fx3); }
       box.append(row);
     }
-    { const w = (state.incidents || []).filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length;
-      const ir = el('button', 'btn fresh full', `Incident report · ${w ? `${w} this week` : 'a quiet week'}`); ir.addEventListener('click', () => { closeSheet(); setTimeout(openIncidents, 60); }); box.append(ir); }
     return box;
   }
   /* ---------- 10.09: the Incident report ---------- */
   const INC_ICON = { fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
   const agoText = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
-  function openIncidents() {
-    const wrap = el('div', 'list inc'), ct = courthouse(), week = Date.now() - 7 * 86400000;
+  function openIncidents() { const wrap = el('div', 'list inc'); incidentsBody(wrap); openSheet('Incident report', wrap); }
+  function incidentsBody(wrap) {
+    const ct = courthouse(), week = Date.now() - 7 * 86400000;
     const recent = state.incidents.filter((e) => e.at >= week && e.kind !== 'release');
     const n = (k) => recent.filter((e) => (Array.isArray(k) ? k : [k]).includes(e.kind)).length, lost = Math.round(recent.reduce((a, e) => a + (e.cost || 0), 0));
     const sum = el('div', 'inc-sum');
@@ -10972,7 +10975,6 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (b) { it.classList.add('tap'); it.addEventListener('click', () => { closeSheet(); showOnMap(b); }); }
       wrap.append(it);
     }
-    openSheet('Incident report', wrap);
   }
   /* ---------- 10.10: the Food page ---------- */
   function openFood() {
@@ -11028,14 +11030,32 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     n = Math.min(n, Math.floor(state.food || 0)); if (n < 2) { toast('There is no food to sell.'); return; }
     accrue(Date.now()); state.food -= n; goldChange(Math.floor(n * FOOD_PRICE), `Sold ${n} food at the market`, 'sell'); touch(); save(); sfx.coin(); toast(`Sold ${n} food for ${Math.floor(n * FOOD_PRICE)} gold.`); openFood();
   }
-  function openMood() {
+  // 10.17 (Navid): the town page in four tabs: Mood, Town (how the town is doing), Incidents, Staff.
+  const MOOD_TABS = [['mood', 'Mood'], ['town', 'Town'], ['incidents', 'Incidents'], ['staff', 'Staff']];
+  function openMood(tab) {
+    if (typeof tab === 'string') ui.moodTab = tab;
+    const cur = MOOD_TABS.some(([k]) => k === ui.moodTab) ? ui.moodTab : 'mood';
     const ec = econ(), m = ec.mood, playing = ui.screen === 'play';
+    const outer = el('div', 'list');
     const wrap = el('div', 'list');
     const head = el('div', 'moodhead');
     const face = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); face.setAttribute('viewBox', '0 0 24 24'); face.setAttribute('aria-hidden', 'true'); face.innerHTML = faceMarkup(m.value);
     const ht = el('div'); ht.append(el('b', 'num', `${m.value}%`), el('div', '', `${moodWord(m.value)}. Taxes ×${m.mult.toFixed(2)}`), el('div', 'tiny muted', 'Happier towns pay more taxes. Mood changes bit by bit as the town changes.'));
-    head.append(face, ht); wrap.append(head);
-    const mb = metersBox(); if (mb) wrap.append(mb);
+    head.append(face, ht); outer.append(head);
+    const tabs = el('div', 'tabs mood-tabs'); tabs.setAttribute('role', 'tablist');
+    const weekInc = (state.incidents || []).filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length;
+    for (const [k, label] of MOOD_TABS) {
+      const tb = el('button', '', label); tb.setAttribute('role', 'tab'); tb.setAttribute('aria-selected', String(k === cur));
+      if (k === 'incidents' && weekInc) tb.append(el('span', 'tab-n', String(weekInc)));
+      tb.addEventListener('click', () => { if (ui.moodTab === k) return; ui.moodTab = k; const sc = $('sheet').scrollTop; openMood(); $('sheet').scrollTop = Math.min(sc, tabs.offsetTop); });
+      tabs.append(tb);
+    }
+    outer.append(tabs, wrap);
+    if (cur === 'town') {
+      const mb = metersBox();
+      if (mb) { mb.firstChild.remove(); wrap.append(mb); } else wrap.append(el('p', 'small muted', 'Nothing to measure yet. Fire risk, crime, sickness, clean streets, food, jobs and school show up here as the town grows.'));
+    } else if (cur === 'incidents') { wrap.classList.add('inc'); incidentsBody(wrap); }
+    if (cur === 'mood') {
     const fl = el('ul', 'factors');
     // Each factor shows where it sits between its lowest and highest possible value.
     const fac = (name, v, why, trend, range) => {
@@ -11075,13 +11095,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (m.landmarks) fac('Landmarks', m.landmarks, `${LANDMARK_ORDER.filter(hasLandmark).map((k) => TYPES[k].name).join(', ')}: the whole town is proud of ${LANDMARK_ORDER.filter(hasLandmark).length > 1 ? 'them' : 'it'}.`, null, [0, 17]);
     fac('Focus energy', m.boost, m.boost >= 0.5 ? `From your ${fmtMin((b.end - b.start) / 6 / 60000)} session. Fades in ${fmtMin((b.end - Date.now()) / 60000)}.` : 'Finish a session of 10 minutes or more. Longer sessions give a bigger boost that lasts longer (up to +20% after 80 minutes).', null, [0, 20]);
     wrap.append(fl);
-    const sh = el('div'); sh.append(el('h3', '', 'Town staff'), el('p', 'small muted', `Each one needs their own building, a one-off hiring fee and a wage every hour. ${playing ? 'Tap + to hire.' : 'Hire them during play time.'}`));
+    }
+    if (cur === 'staff') {
+    const sh = el('div'); sh.append( el('p', 'small muted', `Each one needs their own building, a one-off hiring fee and a wage every hour. ${playing ? 'Tap + to hire.' : 'Hire them during play time.'}`));
     wrap.append(sh);
     for (const k of STAFF_ORDER) wrap.append(staffRow(k));
     wrap.append(el('p', 'small', `Staff wages and running costs: ${Math.round(ec.wages)} gold an hour. Taxes after mood: ${Math.round(ec.taxes)} gold an hour.`));
     if (ec.net < 0) wrap.append(el('p', 'small', 'Wages are higher than taxes, so your gold is going down. Let someone go or grow the town.'));
     if (!playing && state.playSec > 0) { const go = el('button', 'btn playc full', 'Play to hire staff'); go.addEventListener('click', () => { closeSheet(); enterPlay(); }); wrap.append(go); }
-    openSheet('Town mood & staff', wrap);
+    }
+    openSheet('Your town', outer);
     $('sheet').dataset.kind = 'mood';
   }
   function reqBox(q) {
@@ -12547,7 +12570,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   window.addEventListener('scroll', unscroll, { passive: true });
   if (window.visualViewport) window.visualViewport.addEventListener('resize', () => { if (window.visualViewport.scale <= 1.01) setTimeout(unscroll, 60); });
   $('chip-res').addEventListener('click', notVisiting(() => (foodOn() ? openFood() : openTown())));
-  $('chip-mood').addEventListener('click', notVisiting(openMood));
+  $('chip-mood').addEventListener('click', notVisiting(() => openMood('mood')));
   $('xpline').addEventListener('click', notVisiting(openLevels));
   $('open-menu').addEventListener('click', notVisiting(openMenu));
   $('open-friends').addEventListener('click', notVisiting(openFriends));
