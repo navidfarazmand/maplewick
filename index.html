@@ -603,6 +603,7 @@
   .food-bar { height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; } .food-bar span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #E8B23A, #8FB84E); }
   .food-bar.low span { background: linear-gradient(90deg, #E5482F, #E8A93A); }
   .food-st { font-weight: 700; } .food-st.bad { color: var(--bad, #C8473D); } .food-st.ok { color: #4F8A2E; }
+  #residents .pp { width: 12px; height: 12px; margin-left: 2px; vertical-align: 0; opacity: .6; }
   .chip .sub.food { color: #9A6B12; font-weight: 800; } .chip .sub.food.hungry { color: var(--bad, #C8473D); }
   .mtile.k-incidents .mt-ic { background: #E4E8F3; color: #2F4E8C; }
   .inc-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
@@ -1399,7 +1400,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.15'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.16'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -4530,7 +4531,7 @@
   const breakMs = (speed, len) => lapBreakOf(len || ROUND) * 60000 / Math.min(10, Math.max(1, speed || 1)); // test speed: 30 s, so testing stays quick
   function lapRunNow(now) {
     const r = state.lapRun; now = now || Date.now();
-    if (!r || !roundJobs().length) return null;
+    if (!r || (!roundJobs().length && !r.free)) return null;
     if (now > (r.breakUntil || r.at || 0) + COMBO_WINDOW * 60000) return null;
     return r;
   }
@@ -4544,6 +4545,7 @@
   function lapOptions(P) {
     // 10.15 (Navid): any length up to the project; the last lap is what is left. One lap longer than the project is the
     // whole project in one go.
+    if (!(P > 0)) return LAP_LENS.slice(); // 10.16: laps with nothing planned (your job): any length
     const one = LAP_LENS.find((L) => lapFocus(L) >= P - 1e-9);
     return LAP_LENS.filter((L) => L === ROUND || lapFocus(L) < P - 1e-9 || L === one);
   }
@@ -4748,7 +4750,7 @@
   }
   // 10.13: laps are for projects in rounds (over 30 minutes): the session runs lap after lap until you stop it. Every
   // other session has a set length (the start sheet's eight), and Sam works his plan in it.
-  const lapsMode = (duration, opts) => !ui.tourSpeed && roundJobs().length > 0 && !!(opts && opts.laps);
+  const lapsMode = (duration, opts) => !ui.tourSpeed && !!(opts && opts.laps); // 10.16: laps also without a project
   function startLaps(len) {
     len = len || curLapLen();
     if (!lapOptions(roundsWork()).includes(len)) len = ROUND;
@@ -4969,8 +4971,8 @@
     state.lastTaxAt = now;
     state.session = null;
     // 10.12: after a lap: a 5-minute break, then the bell for the next lap. Ending in the middle of a lap stops the laps.
-    if (L && done && (reason0 === 'lap' || reason0 === 'complete' || L.win) && roundJobs().length) {
-      state.lapRun = { n: L.done, of: L.done + planLaps(L.len), at: now, breakUntil: now + breakMs(s.speed, L.len), rang: false, len: L.len };
+    if (L && done && (reason0 === 'lap' || reason0 === 'complete' || L.win) && (roundJobs().length || !s.lapP)) {
+      state.lapRun = { n: L.done, of: L.done + planLaps(L.len), at: now, breakUntil: now + breakMs(s.speed, L.len), rang: false, len: L.len, free: !s.lapP && !roundJobs().length };
       r.lapBreak = true; state.stats.laps = (state.stats.laps || 0) + L.k;
     } else { state.lapRun = null; if (L && done) state.stats.laps = (state.stats.laps || 0) + L.k; }
     touch();
@@ -8016,8 +8018,9 @@
     const gr = $('gold-rate');
     if (state.gold >= cap && net >= 0) gr.textContent = 'full';
     else { gr.textContent = `${rate}/h`; if (!playing) gr.append(el('span', 'wide', ' focus')); }
-    $('residents').textContent = ci.residents;
-    { const sub = $('res-sub'), F = ci.food; if (F) { sub.textContent = `🌾 ${Math.floor(state.food || 0)}`; sub.className = 'sub food' + (F.fed < 0.98 ? ' hungry' : ''); $('chip-res').setAttribute('aria-label', `Residents and food: ${Math.floor(state.food || 0)} food in store`); } else if (sub.textContent !== 'people') { sub.textContent = 'people'; sub.className = 'sub'; } }
+    // 10.16 (Navid asked what the 68 was): with food on, the number of people gets a little person next to it
+    { const rh = ci.food ? `${ci.residents}<svg class="pp" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z" fill="currentColor"/></svg>` : String(ci.residents); if ($('residents').dataset.h !== rh) { $('residents').dataset.h = rh; $('residents').innerHTML = rh; } }
+    { const sub = $('res-sub'), F = ci.food; if (F) { sub.textContent = `🌾 ${Math.floor(state.food || 0)}`; sub.className = 'sub food' + (F.fed < 0.98 ? ' hungry' : ''); $('chip-res').setAttribute('aria-label', `${ci.residents} people, ${Math.floor(state.food || 0)} food in store`); } else if (sub.textContent !== 'people') { sub.textContent = 'people'; sub.className = 'sub'; } }
     const mv = ec.mood.value;
     $('mood-face').innerHTML = faceMarkup(mv);
     $('mood').textContent = `${mv}%`;
@@ -10120,7 +10123,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // wait for the celebration and the chest (but not for ever: the bell is the point of the break)
     if (['celebrate', 'chest'].includes(ui.overlay) && now - run.breakUntil < 60000) return;
     run.rang = true; save();
-    if (!roundJobs().length) { state.lapRun = null; toast(`Break's over! ${state.builder}'s projects are done. Start a session any time.`); renderAll(); return; }
+    if (!roundJobs().length && !run.free) { state.lapRun = null; toast(`Break's over! ${state.builder}'s projects are done. Start a session any time.`); renderAll(); return; }
     showLapAlarm();
   }
   function showLapAlarm() {
@@ -10131,8 +10134,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     ui.overlay = 'alarm'; $('alarm').hidden = false; $('alarm').classList.add('lapal');
     const fq = roundJobs()[0], n = run.n + 1, len = run.len || ROUND, of = Math.max(n, run.n + planLaps(len));
     $('al-eye').textContent = 'Break over';
-    $('al-title').textContent = `Lap ${n} of ${of}`;
-    $('al-sub').textContent = `${state.builder} is ready to go on with ${fq ? jobLabel(fq).toLowerCase() : 'the plan'} (${workText(roundsWork(), 99)} to go). ${fmtHalf(lapFocus(len))} minutes, then another break.${comboNow() ? ` Start now to keep your ×${comboMultFor(comboNow()).toFixed(1)} combo.` : ''}`;
+    $('al-title').textContent = run.free ? `Lap ${n}` : `Lap ${n} of ${of}`;
+    if (run.free) $('al-sub').textContent = `${fmtHalf(lapFocus(len))} more minutes at your job, then another break.${comboNow() ? ` Start now to keep your ×${comboMultFor(comboNow()).toFixed(1)} combo.` : ''}`;
+    else $('al-sub').textContent = `${state.builder} is ready to go on with ${fq ? jobLabel(fq).toLowerCase() : 'the plan'} (${workText(roundsWork(), 99)} to go). ${fmtHalf(lapFocus(len))} minutes, then another break.${comboNow() ? ` Start now to keep your ×${comboMultFor(comboNow()).toFixed(1)} combo.` : ''}`;
     $('al-start').textContent = `Start lap ${n}`;
     $('al-snooze').disabled = false; $('al-snooze').textContent = '5 more minutes';
     $('al-skip').textContent = 'Stop for now';
@@ -11072,8 +11076,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const cg = coachGoal(), rounds = roundJobs().length > 0;
     // 10.13: with a project in rounds, the sheet opens on its laps; the eight set lengths are always there too
     if (!keepMode) startPick.mode = rounds && !prefDuration ? 'laps' : 'fixed';
-    if (!rounds) startPick.mode = 'fixed';
-    const run = lapRunNow(); if (run && run.len) startPick.lapLen = run.len;
+    if (!rounds && !(lapRunNow() && lapRunNow().free)) startPick.mode = 'fixed';
+    const run = lapRunNow(); startPick.lapLen = run && run.len ? run.len : ROUND; // 10.16: the switch opens on 30 minutes
     if (rounds && !lapOptions(roundsWork()).includes(startPick.lapLen)) startPick.lapLen = ROUND;
     startPick.duration = prefDuration ? Math.max(MIN_SESSION, prefDuration) : cg || 25;
     renderStart();
@@ -11082,7 +11086,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
      sits in the middle. Only lengths that add up to the whole project are on it. ---------- */
   function lapSwitch(opts, cur, onChange) {
     const ci = opts.indexOf(ROUND), lo = opts.slice(0, ci), hi = opts.slice(ci + 1);
-    const pos = (L) => (L === ROUND ? 0.5 : L < ROUND ? 0.5 * lo.indexOf(L) / Math.max(1, lo.length) : 0.5 + 0.5 * (hi.indexOf(L) + 1) / hi.length);
+    const pos = (L) => (opts.length > 1 ? opts.indexOf(L) / (opts.length - 1) : 0.5), pr = pos(ROUND); // 10.16 (Navid): evenly spaced
     const desc = (L) => `${fmtMin(L)} laps · ${fmtHalf(lapFocus(L))} focus + ${fmtHalf(lapBreakOf(L))} break`;
     const box = el('div', 'lapsw' + (hi.length ? '' : ' nohi')); box.tabIndex = 0; box.setAttribute('role', 'slider');
     box.setAttribute('aria-label', 'Lap length'); box.setAttribute('aria-valuemin', '0'); box.setAttribute('aria-valuemax', String(opts.length - 1));
@@ -11097,7 +11101,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     let curL = cur, drag = false;
     const show = (L) => {
       curL = L; const p = pos(L);
-      thumb.style.left = p * 100 + '%'; fill.style.left = Math.min(p, 0.5) * 100 + '%'; fill.style.width = Math.abs(p - 0.5) * 100 + '%';
+      thumb.style.left = p * 100 + '%'; fill.style.left = Math.min(p, pr) * 100 + '%'; fill.style.width = Math.abs(p - pr) * 100 + '%'; mid.style.left = pr * 100 + '%';
       val.textContent = desc(L); box.setAttribute('aria-valuenow', String(opts.indexOf(L))); box.setAttribute('aria-valuetext', desc(L));
       for (const [k, t] of tb) t.setAttribute('aria-pressed', String(k === L));
     };
@@ -11115,6 +11119,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
   // The purple card on top of the start sheet when Sam has a project in rounds.
   function lapCardEl(isLaps) {
+    if (!roundJobs().length) return freeLapCardEl(isLaps);
     const rq = roundJobs(), P = roundsWork(), run = lapRunNow(), n0 = run ? run.n : 0, brk = onBreak();
     const opts = lapOptions(P); if (!opts.includes(startPick.lapLen)) startPick.lapLen = ROUND;
     const card = el('div', 'lapcard'); card.setAttribute('aria-pressed', String(isLaps)); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Build in rounds');
@@ -11135,18 +11140,34 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
   }
+  // 10.16 (Navid): laps for any focus, not only for building: work your job in laps of 15 minutes to 4 hours, with a
+  // break after each, for as many laps as you like. The switch is the same as for a project.
+  function freeLapCardEl(isLaps) {
+    const run = lapRunNow(), n0 = run && run.free ? run.n : 0, brk = onBreak();
+    const card = el('div', 'lapcard'); card.setAttribute('aria-pressed', String(isLaps)); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Focus in laps');
+    const top = el('span', 'lc-top'), title = el('b', 'lc-title', `Lap ${n0 + 1}`);
+    top.append(el('span', 'lc-eye', brk ? `Break · ${fmtClock(breakLeft())} left` : 'Focus in laps'), title);
+    const planBox = el('div', 'lc-plan');
+    const oneLap = (L) => { const box = el('div', 'lapplan'), c = el('span', 'lp-chip now'); c.append(el('b', '', fmtHalf(lapFocus(L))), el('i', '', `+${fmtHalf(lapBreakOf(L))}`)); box.append(c, el('span', 'lp-plus', '+ …')); return box; };
+    const update = (L) => planBox.replaceChildren(oneLap(L), el('small', 'lc-sum', `Then a break and the next lap, as many as you like · stop after any lap · your job pays the whole time`));
+    const sw = lapSwitch(LAP_LENS, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
+    update(startPick.lapLen);
+    card.append(top, sw, planBox);
+    card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
+    return card;
+  }
   function renderStart() {
     const wrap = el('div', 'startsheet');
-    const rq = roundJobs(), hasRounds = rq.length > 0, isLaps = hasRounds && startPick.mode === 'laps';
+    const rq = roundJobs(), hasRounds = rq.length > 0, isLaps = startPick.mode === 'laps';
     const singles = focusJobs().filter((q) => !roundsQ(q)), planned = focusJobs().length > 0;
-    if (hasRounds) wrap.append(lapCardEl(isLaps));
+    wrap.append(lapCardEl(isLaps));
     // The eight set lengths (10.13: always the same eight).
     const opts = FIXED.slice();
     if (!opts.includes(startPick.duration)) { opts[opts.length - 1] = startPick.duration; opts.sort((a, b) => a - b); }
     const pvs = new Map(opts.map((d) => [d, sessionPreview(d)]));
     const allD = singles.length ? opts.find((d) => !pvs.get(d).unfinished) : null;
     // 10.15 (Navid): no long sentence here: "How long?" sits next to the title (the ✓ on a block says what finishes Sam's plan)
-    if (hasRounds) wrap.append(el('span', 'label', 'Or focus a set time:'));
+    wrap.append(el('span', 'label', 'Or focus a set time:'));
     const durs = el('div', 'durations' + (isLaps ? ' dim' : ''));
     for (const d of opts) {
       const pv = pvs.get(d);
@@ -11175,7 +11196,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const more = el('span', 'dmore'), pl = el('span', 'dplay'); pl.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO.play}</svg>`; pl.append(fmtClock(pv.play)); more.append(pl);
       if (pv.shiftFood >= 0.5) { const fd = el('span', 'dfood'); fd.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO.food}</svg>`; fd.append(String(Math.round(pv.shiftFood))); more.append(fd); }
       b.append(more);
-      if (pv.bonusPct >= 4) { const k = opts.indexOf(d), sb = (pv.combo > 1.001 ? 1.05 : 0.6) + 0.25 * k - (performance.now() - (startPick.cmbAt || 0)) / 1000; const bs = el('span', 'bonus-stamp', `+${pv.bonusPct}%`); bs.style.setProperty('--db', sb.toFixed(3) + 's'); b.append(bs); }
+      // 10.16 (Navid): first every combo stamp, then the bonus stamps one after another
+      if (pv.bonusPct >= 4) { const anyCombo = opts.some((x) => pvs.get(x).combo > 1.001 && pvs.get(x).gold - pvs.get(x).goldBase >= 1), j = opts.filter((x) => pvs.get(x).bonusPct >= 4).indexOf(d);
+        const sb = (anyCombo ? 0.55 + 0.25 * (opts.length - 1) + 0.6 : 0.6) + 0.25 * j - (performance.now() - (startPick.cmbAt || 0)) / 1000; const bs = el('span', 'bonus-stamp', `+${pv.bonusPct}%`); bs.style.setProperty('--db', sb.toFixed(3) + 's'); b.append(bs); }
       let note = '', nc = '';
       if (pv.unfinished) { note = `−${pv.unfinished}`; nc = 'minus'; }
       else if (d === allD) { note = '✓ all'; nc = 'all'; }
@@ -11189,7 +11212,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const lenL = startPick.lapLen, m = isLaps ? lapFocus(lenL) : startPick.duration, pv = isLaps ? sessionPreview(m, { laps: true }) : (pvs.get(m) || sessionPreview(m));
     // One line says what Sam does with this session and what you do after.
     const lab = el('span', 'label');
-    if (isLaps) { if (pv.sim.leftover > 0.05) lab.append(`${state.builder} finishes `, el('b', '', rq.length === 1 ? jobName(rq[0]) : `${rq.length} projects`), ' in this lap, then you:'); else lab.append(`Your job (once ${state.builder}'s projects are done)`); }
+    if (isLaps && !hasRounds) lab.append('Your job');
+    else if (isLaps) { if (pv.sim.leftover > 0.05) lab.append(`${state.builder} finishes `, el('b', '', rq.length === 1 ? jobName(rq[0]) : `${rq.length} projects`), ' in this lap, then you:'); else lab.append(`Your job (once ${state.builder}'s projects are done)`); }
     else if (planned) {
       const fin = pv.sim.items.filter((x) => x.finished), part = pv.sim.items.find((x) => !x.finished && !x.waiting), wait = pv.sim.items.find((x) => x.waiting);
       const pc = (q) => (q.done > 0.5 ? ` (already ${Math.floor(q.done / q.work * 100)}% done)` : '');
@@ -11225,7 +11249,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (isLaps) {
       const lf = lapFocus(lenL), br = lapBreakOf(lenL);
       extras.push(`After ${fmtHalf(lf)} minutes the bell rings and the clock keeps going. In the next ${fmtHalf(Math.max(2.5, br))} minutes you can stop safely for a ${fmtHalf(br)}-minute break (every minute counts), or skip the break and keep going.`);
-      extras.push('Progress is saved after every lap and every 30 minutes, so stopping in the middle of a lap only loses the minutes since the last save.');
+      if (hasRounds) extras.push('Progress is saved after every lap and every 30 minutes, so stopping in the middle of a lap only loses the minutes since the last save.');
       extras.push(`Every finished lap brings a chest and a golden shield: for ${fmtMin(Math.max(1, Math.round(lf * SHIELD_K)))} nothing bad can happen in town.`);
     } else {
       if (pv.playCap === 'daily') extras.push(`Daily play limit: you have earned ${fmtMin(Math.round(playDayNow().sec / 60))} of play today (${fmtMin(DAILY_PLAY / 60)} a day), so ${fmtMin(Math.round(playLeftToday() / 60))} is left to earn. Focus still pays gold and XP.${state.speed > 1 ? ' Test speed counts every test session as real minutes, so the limit comes quickly.' : ''}`);
@@ -11661,7 +11685,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const left = Math.ceil((s.start - now) / 1000);
       $('focus-eyebrow').textContent = 'Get ready';
       $('focus-clock').textContent = String(left);
-      if (L) $('focus-of').replaceChildren(el('b', 'ready-len', `Lap ${L.lap} of ${L.of}`), el('span', 'ready-sub', `${fmtHalf(L.lf)} minutes of focus, then a ${fmtHalf(lapBreakOf(L.len))}-minute break · cancel for free until then`));
+      if (L) $('focus-of').replaceChildren(el('b', 'ready-len', s.lapP ? `Lap ${L.lap} of ${L.of}` : `Lap ${L.lap}`), el('span', 'ready-sub', `${fmtHalf(L.lf)} minutes of focus, then a ${fmtHalf(lapBreakOf(L.len))}-minute break · cancel for free until then`));
       else $('focus-of').replaceChildren(el('b', 'ready-len', fmtMin(s.duration)), el('span', 'ready-sub', `of focus is about to start${sessionQueue(s).some(roundsQ) ? ' · progress saved every 30 minutes' : ''} · cancel for free until then`));
       $('focus-meter').style.width = '0%';
       $('focus-task').textContent = 'Put your phone face down and take a breath.';
@@ -11692,7 +11716,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (box.dataset.k !== key) {
       box.dataset.k = key; box.replaceChildren();
       if (rd) box.append(el('span', 'lp-title', 'This session'));
-      box.append(lapPlanEl(s.lapP || roundsWork(), L.len, cur, L.win ? k : k));
+      box.append(lapPlanEl(s.lapP || cur * lapFocus(L.len), L.len, cur, L.win ? k : k)); // 10.16: free laps show the laps so far
       if (rd) box.append(el('span', 'lp-legend', 'minutes of focus + break · stop after any lap'));
     }
     box.hidden = false;
@@ -11723,7 +11747,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     box.hidden = true;
     if ($('focus-confirm').hidden) $('focus-actions').hidden = false;
-    $('focus-eyebrow').textContent = `Lap ${L.lap} of ${L.of}${cur ? ` · building with ${state.builder}` : ' · at work'}`;
+    $('focus-eyebrow').textContent = `${s.lapP ? `Lap ${L.lap} of ${L.of}` : `Lap ${L.lap}`}${cur ? ` · building with ${state.builder}` : ' · at work'}`;
     $('focus-clock').textContent = fmtClock(L.left * 60);
     $('focus-of').textContent = `left in this lap · then a ${fmtHalf(lapBreakOf(L.len))}-minute break${state.speed > 1 && s.speed === state.speed ? ' · test speed' : ''}`;
     $('focus-meter').style.width = (L.into / L.lf * 100) + '%';
