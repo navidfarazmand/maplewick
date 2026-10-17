@@ -387,6 +387,7 @@
   .lapsw { display: grid; gap: 4px; margin-top: 4px; padding: 10px 12px 6px; border-radius: 14px; background: rgba(0,0,0,.16); cursor: default; outline: none; }
   .lapsw:focus-visible { box-shadow: 0 0 0 3px rgba(255,255,255,.55); }
   .lapsw .lsw-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+  .lapsw .lsw-head span { white-space: nowrap; }
   .lapsw .lsw-head b { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 800; color: #FFE7A3; text-align: right; }
   .lapsw .lsw-track { position: relative; height: 34px; margin: 0 14px; touch-action: none; cursor: grab; }
   .lapsw .lsw-track:active { cursor: grabbing; }
@@ -400,7 +401,8 @@
   .lapsw .lsw-tick.mid { font-weight: 900; opacity: .95; }
   .lapsw .lsw-tick[aria-pressed="true"] { opacity: 1; background: rgba(255,255,255,.2); }
   .lapsw .lsw-none { position: absolute; right: 0; top: 2px; width: 45%; text-align: right; font-size: 10.5px; font-weight: 600; opacity: .55; line-height: 1.15; }
-  .lapplan { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .lapplan { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
+  .lp-times { font-family: var(--display); font-size: 15px; font-weight: 800; margin-right: 1px; }
   .lp-chip { display: inline-flex; align-items: baseline; gap: 1px; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.16); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .lp-chip b { font-family: var(--display); font-size: 15px; line-height: 1.1; }
   .lp-chip i { font-style: normal; font-weight: 800; font-size: 12.5px; color: #8FF0E2; }
@@ -412,6 +414,13 @@
   .lp-plus { font-weight: 800; opacity: .6; font-size: 12px; }
   .lc-plan { display: grid; gap: 5px; }
   .lc-plan .lc-sum { font-size: 12px; font-weight: 600; opacity: .85; }
+  .lapcard .lc-job { font-size: 15px; font-weight: 800; min-width: 0; }
+  .lapcard.folded { padding: 10px 14px; gap: 2px; margin-bottom: 6px; }
+  .lapcard.folded .lc-title { font-size: 20px; }
+  .lapcard .lc-unfold { font-size: 12.5px; font-weight: 700; opacity: .85; }
+  .set-tog { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; background: none; padding: 6px 2px; font: inherit; font-weight: 700; font-size: 15px; color: var(--ink); text-align: left; }
+  .set-tog:disabled { opacity: 1; cursor: default; }
+  .set-tog .chev { margin-left: auto; font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
   .durations.dim button { opacity: .62; }
   .planbadge { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 8px; border-radius: 12px; background: var(--focus-soft); color: var(--focus); font-size: 13px; font-weight: 600; line-height: 1.3; }
   .planbadge .pb-n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #5B2DB8; color: #fff; font-family: var(--display); font-size: 16px; box-shadow: 0 0 0 2px #fff; }
@@ -490,7 +499,7 @@
   .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 12px; }
   .tabs button { border: 0; border-radius: 9px; min-height: 38px; background: transparent; font-weight: 700; font-size: 14px; padding: 4px 6px; }
   .tabs button[aria-selected="true"] { background: var(--surface); box-shadow: var(--shadow); }
-  .mood-tabs { position: sticky; top: -2px; z-index: 2; }
+  .mood-tabs { position: sticky; top: -2px; z-index: 2; box-shadow: 0 -16px 0 6px var(--surface); }
   #sheet[data-kind="mood"] { min-height: min(88vh, 88dvh); }
   .mood-tabs button { font-size: 13px; padding: 4px 2px; }
   .tab-n { display: inline-block; min-width: 17px; height: 17px; line-height: 17px; margin-left: 4px; padding: 0 4px; border-radius: 9px; background: var(--bad, #D9534F); color: #fff; font-size: 11px; vertical-align: 1px; }
@@ -624,6 +633,17 @@
   :root[data-theme="dark"] .chip.food { background: #3A2A1A; } :root[data-theme="dark"] .chip.food .val b { color: #F2D3AC; } :root[data-theme="dark"] .chip.food .sub { color: #E2AE7A; }
   .chip .sub.food { color: #9A6B12; font-weight: 800; } .chip .sub.food.hungry { color: var(--bad, #C8473D); }
   .mtile.k-incidents .mt-ic { background: #E4E8F3; color: #2F4E8C; }
+  .mtile.k-policies .mt-ic { background: #F6E3EC; color: #A23E6B; }
+  .pol-first { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; background: color-mix(in oklab, var(--focus) 14%, var(--surface)); border: 1.5px solid color-mix(in oklab, var(--focus) 45%, transparent); }
+  .pol-first b { font-family: var(--display); font-size: 19px; }
+  .pol-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 4px 0 8px; }
+  .pol-opt { display: grid; justify-items: center; gap: 1px; padding: 9px 4px 8px; border-radius: 13px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+  .pol-opt b { font-size: 14.5px; } .pol-opt small { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .pol-opt .pol-mood { font-size: 11px; font-weight: 800; color: var(--muted); } .pol-opt .pol-mood.pos { color: var(--good); } .pol-opt .pol-mood.neg { color: var(--bad); }
+  .pol-opt[aria-checked="true"] { border-color: var(--focus); background: color-mix(in oklab, var(--focus) 12%, var(--surface)); box-shadow: 0 0 0 2px color-mix(in oklab, var(--focus) 30%, transparent); }
+  .pol-mom { display: flex; gap: 10px; align-items: center; padding: 8px 4px; border-top: 1px solid var(--line); }
+  .pol-mom .pol-ic { font-size: 22px; } .pol-mom > div { display: grid; min-width: 0; } .pol-mom small { font-size: 12px; }
+  .pol-mom.tap { cursor: pointer; }
   .inc-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .inc-st { background: var(--surface-2); border-radius: 12px; padding: 8px 6px; text-align: center; display: grid; gap: 1px; } .inc-st b { font-family: var(--display); font-size: 20px; line-height: 1.1; } .inc-st span { font-size: 11.5px; color: var(--muted); font-weight: 700; } .inc-st.neg b { color: var(--bad, #C8473D); }
   .inc-lock, .inc-box { display: grid; gap: 4px; padding: 10px 12px; border-radius: 14px; background: color-mix(in oklab, #2F4E8C 10%, var(--surface)); border: 1px solid color-mix(in oklab, #2F4E8C 22%, transparent); }
@@ -1418,7 +1438,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.18'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.19'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1646,9 +1666,9 @@
     police: { name: 'Police officer', plural: 'police officers', home: 'police', alt: ['policestation', 'courthouse'], fee: 240, wage: 10, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
       needed: (ci) => ci.residents >= 24, neededText: 'Needed from 24 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 25)), needText: '1 for every 25 residents, and every home within 5 tiles of a station' },
     nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', alt: ['medcenter', 'hospital'], fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
-      needed: () => countLine('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
+      needed: () => countLine('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil((ci.residents + 4 * (state.fam ? babiesNow().length : 0)) / 30)), needText: '1 for every 30 residents (a baby counts as 4)' },
     teacher: { name: 'Teacher', plural: 'teachers', home: 'school', alt: ['highschool', 'university'], fee: 150, wage: 8, look: { shirt: '#7B5EA7', hat: '#4A3B6B', hair: '#6B4226', skin: '#E7B98F' }, what: 'Teaches the town\'s kids: homes near a school earn more.',
-      needed: (ci) => countLine('school') >= 1 || (hallLevel() >= 2 && ci.residents >= 20), neededText: 'Needed from town hall level 2 and 20 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' }
+      needed: (ci) => countLine('school') >= 1 || (hallLevel() >= 2 && ci.residents >= 20), neededText: 'Needed from town hall level 2 and 20 residents', need: (ci) => Math.max(1, Math.ceil((ci.residents + 2 * (state.fam ? kidsNow().length : 0)) / 30)), needText: '1 for every 30 residents (a kid counts as 2)' }
   };
   const STAFF_ORDER = ['sweeper', 'gardener', 'fire', 'police', 'nurse', 'teacher'];
   // Staff are expensive (version 10). Each extra person of the same kind costs more to hire and asks a higher wage: the 2nd 1.8× the fee and 1.6× the wage, the 3rd 2.6× and 2.2×, and so on.
@@ -2497,6 +2517,70 @@
   const rushFor = (type) => state.rush.find((x) => x.type === type && x.left > 0) || null;
   const shopBoost = (type) => (1 + (state.perks[type] || 0)) * (rushFor(type) ? rushFor(type).mult : 1);
 
+  /* ---------- 10.19 (Navid): families and the first policy ----------
+     Couples in town have babies (a town of 60 has about one a day, from 16 residents). When a baby is born, the mother
+     stays home on leave for as long as the mayor's policy says on that day: the town pays her 3 gold an hour and has one
+     worker fewer until she is back. Changing the policy only counts for babies born after the change. A year in town is
+     6 real days, so a month is 12 hours. Babies need care: the nurses have more to do, and a baby's home falls sick more
+     easily (more so out of a clinic's reach). After a year a baby is a kid; kids grow up after 6 years. Longer leave costs
+     more, but the family is happier and other families hear about it: the mood follows the leave given to the babies born
+     in the last year. */
+  const FAM_MONTH = 12 * 3600000, FAM_YEAR = 12 * FAM_MONTH, LEAVE_PAY = 3, BIRTH_RES = 16;
+  const LEAVE_OPTS = [1, 2, 3, 6, 9, 12];
+  const LEAVE_MOOD = { 1: -4, 2: -2, 3: 0, 6: 2, 9: 3, 12: 4 };
+  const GIRL_NAMES = ['Lily', 'Mila', 'Ava', 'Nora', 'Ivy', 'Zara', 'Elsa', 'Maya', 'Nina', 'Dara', 'Tess', 'Yara', 'Lena'];
+  const BOY_NAMES = ['Noah', 'Theo', 'Leo', 'Sami', 'Omid', 'Finn', 'Rumi', 'Kian', 'Arlo', 'Ben', 'Aras', 'Milo', 'Reza'];
+  const MOM_NAMES = ['Sara', 'Leila', 'Hana', 'Mira', 'Dana', 'Ines', 'Parisa', 'Ella', 'Shirin', 'Anna', 'Nasrin', 'Clara', 'Roya', 'Julia'];
+  const leftText = (ms) => { const m = Math.max(1, Math.round(ms / 60000)); if (m < 60) return `${m} min`; const h = Math.floor(m / 60); if (h < 48) return `${h} h${m % 60 ? ` ${m % 60} min` : ''}`; const d = Math.floor(h / 24); return `${d} days${h % 24 ? ` ${h % 24} h` : ''}`; };
+  const fam = () => { const F = state.fam || (state.fam = { at: Date.now(), kids: [], leave: 3, births: 0, seq: 1, unseen: [] }); if (!Array.isArray(F.kids)) F.kids = []; if (!Array.isArray(F.unseen)) F.unseen = []; if (!LEAVE_OPTS.includes(F.leave)) F.leave = 3; return F; };
+  const babiesNow = (t) => { t = t || Date.now(); return fam().kids.filter((k) => t - k.born < FAM_YEAR); };
+  const kidsNow = (t) => { t = t || Date.now(); return fam().kids.filter((k) => t - k.born >= FAM_YEAR); };
+  const onLeaveNow = (t) => { t = t || Date.now(); return fam().kids.filter((k) => t < k.leaveEnd); };
+  const leaveText = (m) => (m === 12 ? '1 year' : `${m} month${m > 1 ? 's' : ''}`);
+  const realText = (m) => (m === 1 ? '12 hours' : `${fmtHalf(m / 2)} day${m === 2 ? '' : 's'}`);
+  const babyAt = (b) => { const t = Date.now(); return fam().kids.find((k) => k.bid === b.id && t - k.born < FAM_YEAR) || null; };
+  const familiesOn = () => state.named && city().residents >= BIRTH_RES;
+  function familyStep(now) {
+    const F = fam(); if (!F.at) F.at = now;
+    const t0 = F.at, dt = now - t0; if (dt < 30000) return; F.at = now;
+    const span = Math.min(dt, 72 * 3600000);
+    let changed = false;
+    // mothers back at work, kids grown up
+    const back = F.kids.filter((k) => k.leaveEnd > t0 && k.leaveEnd <= now);
+    if (back.length) { changed = true; if (ui.screen === 'play' && !ui.hush) toast(`${back[0].mom} is back at work after ${leaveText(back[0].leave)} at home with ${back[0].name}.`); }
+    const n0 = F.kids.length; F.kids = F.kids.filter((k) => now - k.born < 6 * FAM_YEAR); if (F.kids.length !== n0) changed = true;
+    const ci = city();
+    if (ci.residents >= BIRTH_RES) {
+      const exp = ci.residents / 1440 * span / 3600000; let n = Math.floor(exp) + (Math.random() < exp % 1 ? 1 : 0); n = Math.min(n, 3);
+      for (let i = 0; i < n; i++) {
+        const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home' && !b.fire && T(b).residents[b.level] >= 4 && !babyAt(b));
+        if (!homes.length) break;
+        const h = pick(homes), born = now - Math.random() * span, girl = Math.random() < 0.5;
+        const mom = MOM_NAMES[(h.id * 3 + F.births * 5) % MOM_NAMES.length], nl = girl ? GIRL_NAMES : BOY_NAMES;
+        const kid = { id: F.seq++, bid: h.id, born, girl, name: nl[(F.births * 7 + h.id) % nl.length], mom, leave: F.leave, leaveEnd: born + F.leave * FAM_MONTH };
+        F.kids.push(kid); F.births += 1; F.unseen.push(kid.id); changed = true;
+      }
+    }
+    if (changed) touch();
+    if (F.unseen.length && ui.screen === 'play' && !ui.hush && $('scrim').hidden) {
+      const nb = F.kids.filter((k) => F.unseen.includes(k.id)); F.unseen = [];
+      if (nb.length) {
+        const k = nb[nb.length - 1], h = byId(k.bid);
+        if (h) { const p = centerOf(h); floats.push({ x: p.x, y: p.y - HH * sizeB(h) - 30, t0: performance.now(), text: `A baby ${k.girl ? 'girl' : 'boy'}!`, soft: true }); burst(p.x, p.y - 20, 14); }
+        toast(nb.length > 1 ? `${nb.length} babies were born in town! The newest is ${k.name}, at ${h ? placeName(h) : 'home'}. Their mothers stay home for ${leaveText(k.leave)}.` : `${k.name} was born at ${h ? placeName(h) : 'home'}! ${k.mom} stays home for ${leaveText(k.leave)} (${realText(k.leave)}).`);
+        if (!F.asked) { F.asked = true; setTimeout(() => { if ($('scrim').hidden && ui.screen === 'play') openPolicies(true); }, 2600); }
+      }
+    }
+  }
+  // what the families add to the mood: the leave the babies of the last year got (once a few families have talked),
+  // and babies out of reach of a nurse
+  function familyMood(now) {
+    const bs = babiesNow(now); if (!bs.length) return { families: 0, babyCare: 0 };
+    const heard = Math.min(1, fam().births / 3);
+    const families = Math.round(bs.reduce((a, k) => a + (LEAVE_MOOD[k.leave] || 0), 0) / bs.length * heard);
+    const far = sickOn() ? bs.filter((k) => { const h = byId(k.bid); return h && !coversB('nurse', h); }).length : 0;
+    return { families, babyCare: -Math.min(4, far) };
+  }
   // 10.09 (Navid): jobs. Businesses, services and staff give work; homes bring workers. Too few jobs and homes pay less
   // tax and crime goes up; too few workers and the shops earn less. A small new town doesn't feel either yet.
   const JOBS = { townhall: [0, 2, 3, 4, 6], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
@@ -2507,9 +2591,9 @@
   function jobsIn(act, residents) {
     let jobs = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0);
     for (const b of act) jobs += jobsOf(b.type, b.level);
-    const workers = Math.round(residents * 0.65), k = clamp((residents - 12) / 24, 0, 1);
+    const leaveN = state.fam ? onLeaveNow().length : 0, workers = Math.max(0, Math.round(residents * 0.65) - leaveN), k = clamp((residents - 12) / 24, 0, 1); // 10.19: mothers on leave
     const unemp = workers > 0 ? Math.max(0, workers - jobs) / workers : 0, short = jobs > 0 ? Math.max(0, jobs - workers) / jobs : 0;
-    return { jobs, workers, unemp, short, k, jobless: Math.max(0, workers - jobs), residents };
+    return { jobs, workers, unemp, short, k, jobless: Math.max(0, workers - jobs), residents, leaveN };
   }
   /* ---------- 10.10 (Navid): food, from town hall 3 ----------
      Fields grow food every town hour (6 / 9 / 12 by level; ×2 while you focus; best in summer and autumn, slow in
@@ -2574,6 +2658,7 @@
       if (!h.fire && act.some((o) => o.fire && o !== h && dist(o, h) <= 1)) { noise += 0.1; from.push(['smoke from next door', -0.1]); }
       if (h.loss && h.loss.total) { const v = 0.1 + 0.2 * clamp(h.loss.left / h.loss.total, 0, 1); noise += v; from.push(['in mourning', -v]); } // 10.08
       if (J.k > 0 && J.unemp > 0.02) { const v = Math.round(50 * J.unemp * J.k) / 100; if (v > 0) { noise += v; from.push(['jobs are scarce in town', -v]); } } // 10.09
+      { const bk = state.fam && babyAt(h); if (bk) { const v = Date.now() < bk.leaveEnd ? 0.03 + 0.005 * bk.leave : 0.02; joy += v; from.push([Date.now() < bk.leaveEnd ? `new baby, ${bk.mom} at home` : 'a baby at home', v]); } } // 10.19
       if (F && F.fed < 0.98) { const v = Math.round(30 * (1 - F.fed)) / 100; if (v > 0) { noise += v; from.push(['hungry: not enough food', -v]); } } // 10.10
       const mult = clamp(1 + joy + decor - noise, 0.3, 2.5);
       const res = Math.max(0, T(h).residents[h.level] - (h.loss ? 1 : 0));
@@ -2711,6 +2796,7 @@
   // Full taxes while you focus (paid at the end) or play; a tenth the rest of the time, so leaving the app open never pays.
   const taxRate = () => (ui.screen === 'play' ? 1 : AWAY_RATE);
   function accrue(now) {
+    if (state.named && !ui.visit) familyStep(now); // 10.19
     if (state.session || !state.named) { if (!state.session) state.lastTaxAt = now; return; }
     const dt = (now - state.lastTaxAt) / 60000;
     if (dt > 0) {
@@ -3122,6 +3208,7 @@
     let r = (staffed ? 0.6 : 1) + 0.5 * (b.trash || 0) + 0.15 * crowd(b);
     if (nearType(b, [...SVC_LINES.depot, ...SVC_LINES.workshop], 1)) r *= 1.3;
     if (!coversB('nurse', b)) r *= 1.5;
+    if (state.fam && babyAt(b)) r *= 1.25; // 10.19: a baby at home
     if (nearType(b, ['park', 'fountain'], 2)) r *= 0.7;
     if (nearType(b, ['market', 'bakery'], 3)) r *= 0.85;
     if (SEA.k === 'winter') r *= 1.4;
@@ -3810,18 +3897,20 @@
     const sick = -Math.min(9, state.buildings.filter((b) => b.sick).length * 3);
     const work = ci.jobs ? -Math.round(12 * ci.jobs.unemp * ci.jobs.k) : 0; // 10.09: people out of work
     const food = ci.food ? (ci.food.fed < 0.98 ? -Math.round(10 * (1 - ci.food.fed)) : (state.food || 0) >= ci.food.eaten * 2 ? 3 : 0) : 0; // 10.10
-    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt + school + sick + work + food), 0, 100);
-    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, school, sick, work, food, roles, mult: 0.6 + 0.8 * value / 100 };
+    const { families, babyCare } = familyMood(now); // 10.19
+    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt + school + sick + work + food + families + babyCare), 0, 100);
+    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, school, sick, work, food, families, babyCare, roles, mult: 0.6 + 0.8 * value / 100 };
   }
   const moodWord = (v) => (v < 25 ? 'Miserable' : v < 45 ? 'Grumpy' : v < 60 ? 'Okay' : v < 80 ? 'Happy' : 'Delighted');
   function econ(now) {
     const ci = city(), mood = moodNow(now || Date.now());
     const staffWages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0), fleet = fleetUpkeep(), running = runningCosts(), jail = jailUpkeep();
-    const wages = staffWages + fleet + running + jail;
+    const leave = (state.fam ? onLeaveNow().length : 0) * LEAVE_PAY; // 10.19: mothers on leave
+    const wages = staffWages + fleet + running + jail + leave;
     const taxes = ci.total * mood.mult, net = taxes - wages;
     // An open loan takes its instalment every hour you play or focus (shown as its own red line).
     const loanPay = loans().reduce((a, L) => a + (L.owed > 0 ? playInstalment(L) : 0), 0), loanFocus = loans().reduce((a, L) => a + (L.owed > 0 ? focusInstalment(L) : 0), 0);
-    return { ci, mood, taxes, wages, staffWages, fleet, running, jail, net, loanPay, loanFocus, keep: net - loanPay };
+    return { ci, mood, taxes, wages, staffWages, fleet, running, jail, leave, net, loanPay, loanFocus, keep: net - loanPay };
   }
   // 10.03: focusing pays twice the gold: your job pays double, and the town's shops are twice as busy while you focus.
   const FOCUS_PAY = 2;
@@ -4576,11 +4665,12 @@
   // "(25+5) + (25+5) + (25)", with long runs folded: "(25+5) ×11 + (25)". cur = the lap you are on (1-based).
   function lapPlanEl(P, len, cur, done) {
     const laps = lapPlan(P, len), box = el('div', 'lapplan'); let i = 0, first = true;
-    const chip = (x, n, idx) => { const c = el('span', 'lp-chip' + (idx != null && idx < (done || 0) ? ' done' : idx != null && idx + 1 === cur ? ' now' : '')); c.append(el('b', '', fmtHalf(x.f))); if (x.b) c.append(el('i', '', `+${fmtHalf(x.b)}`)); if (n > 1) c.append(el('small', '', `×${n}`)); return c; };
+    const chip = (x, n, idx) => { const c = el('span', 'lp-chip' + (idx != null && idx < (done || 0) ? ' done' : idx != null && idx + 1 === cur ? ' now' : '')); c.append(el('b', '', fmtHalf(x.f))); if (x.b) c.append(el('i', '', `+${fmtHalf(x.b)}`)); return c; };
     while (i < laps.length) {
       let j = i; while (j + 1 < laps.length && laps[j + 1].f === laps[i].f && laps[j + 1].b === laps[i].b) j++;
       const run = j - i + 1;
-      if (run > 4) { if (!first) box.append(el('span', 'lp-plus', '+')); box.append(chip(laps[i], run, (cur && cur - 1 >= i && cur - 1 <= j) ? cur - 1 : null)); first = false; }
+      // 10.19 (Navid): the count goes first, "5 × (12½ +2½) + 12½"
+      if (run > 2) { if (!first) box.append(el('span', 'lp-plus', '+')); box.append(el('span', 'lp-times', `${run} ×`), chip(laps[i], 1, (cur && cur - 1 >= i && cur - 1 <= j) ? cur - 1 : null)); first = false; }
       else for (let k = i; k <= j; k++) { if (!first) box.append(el('span', 'lp-plus', '+')); box.append(chip(laps[k], 1, k)); first = false; }
       i = j + 1;
     }
@@ -6840,6 +6930,7 @@
     else if (mode === 'trim') { const k = Math.sin(t * 13) * 0.18; arm(-1, f * (1.2 + k), 4); hand = arm(1, f * (1.3 - k), 4.2); }
     else if (mode === 'spray') { arm(-1, f * 1.35, 3.8); hand = arm(1, f * 1.5, 4.4); }
     else if (mode === 'umbrella') { arm(-1, -0.12 - sw * 0.4, 4.2); hand = arm(1, f * 2.5, 3.6); }
+    else if (mode === 'push') { arm(-1, f * 1.15, 4.3); hand = arm(1, f * 1.22, 4.4); } // 10.19: pushing a stroller
     else if (mode === 'hammer') { arm(-1, -0.15, 4.2); hand = arm(1, f * (Math.PI * 0.9 - (pose.swing || 0) * 2.1), 4.4); }
     else { arm(-1, -0.12, 4.2); hand = arm(1, 0.12, 4.2); }
     if (pose.tool === 'broom') { const tip = [hand[0] + f * 3.2 * u, y + 0.2 * u]; line(c, [hand[0] - f * 2.2 * u, hand[1] - 3.2 * u], tip, '#9A6B43', 0.9 * u); poly(c, [[tip[0] - 1.8 * u, tip[1] - 1.6 * u], [tip[0] + 1.8 * u, tip[1] - 1.6 * u], [tip[0] + 2.4 * u, tip[1] + 0.4 * u], [tip[0] - 2.4 * u, tip[1] + 0.4 * u]], '#E8C66A'); }
@@ -6861,6 +6952,19 @@
     }
     drawHat(c, look, hx, hy, u, f);
     return hand;
+  }
+  // 10.19: a stroller, pushed by the hand, with the baby peeking out under the hood
+  const PRAMS = ['#E46B8A', '#3B7DD8', '#8E5BB5', '#2E8F7A', '#E8A33D'];
+  function pram(c, x, y, u, f, col, hand, bob) {
+    y += bob || 0;
+    c.fillStyle = 'rgba(0,0,0,.16)'; c.beginPath(); c.ellipse(x, y + 0.4 * u, 4.2 * u, 1.4 * u, 0, 0, Math.PI * 2); c.fill();
+    line(c, [x - f * 3.4 * u, y - 5.6 * u], hand, '#3A3530', 0.8 * u);
+    c.fillStyle = '#2A2A2E'; for (const k of [-2.6, 2.6]) { c.beginPath(); c.arc(x + k * u, y - 1.2 * u, 1.3 * u, 0, Math.PI * 2); c.fill(); }
+    c.fillStyle = '#C9CED4'; for (const k of [-2.6, 2.6]) { c.beginPath(); c.arc(x + k * u, y - 1.2 * u, 0.45 * u, 0, Math.PI * 2); c.fill(); }
+    c.fillStyle = col; roundRect(c, x - 3.7 * u, y - 6.5 * u, 7.4 * u, 4.4 * u, 1.7 * u); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.22)'; roundRect(c, x - 3.2 * u, y - 6.1 * u, 6.4 * u, 1 * u, 0.5 * u); c.fill();
+    c.fillStyle = '#F2D2B6'; c.beginPath(); c.arc(x + f * 1.5 * u, y - 7 * u, 1.15 * u, 0, Math.PI * 2); c.fill();
+    c.fillStyle = shade(col, 0.78); c.beginPath(); c.moveTo(x - f * 3.7 * u, y - 6.2 * u); c.quadraticCurveTo(x - f * 3.9 * u, y - 10.6 * u, x + f * 0.4 * u, y - 6.3 * u); c.closePath(); c.fill();
   }
   // 10.08: an umbrella over someone's head (in the rain), tilting a little as they walk.
   const UMBRELLAS = ['#E5482F', '#3B7DD8', '#F3C64B', '#8E5BB5', '#2E8F7A', '#E46B8A', '#1E2A28'];
@@ -7273,6 +7377,16 @@
     const res = walkers.filter((w) => !w.role), staff = walkers.filter((w) => w.role);
     while (res.length < want) res.push(makeWalker(null));
     res.length = want;
+    // 10.19 (Navid): families out in town by day: a stroller for each baby (up to 3), parents walking a kid, couples
+    { const nb = state.fam ? Math.min(3, babiesNow().length) : 0, day = nightK() < 0.3; let sN = 0;
+      for (const w of res) {
+        w.kind = null;
+        if (!day) continue;
+        if (sN < nb) { w.kind = 'stroller'; sN++; }
+        else if (w.id % 6 === 1) w.kind = 'kid';
+        else if (w.id % 5 === 2) w.kind = 'couple';
+        if (w.kind && !w.mate) w.mate = residentLook(w.id * 13 + 5);
+      } }
     const roles = []; for (const k of STAFF_ORDER) for (let i = 0; i < staffWorking(k); i++) roles.push(k);
     roles.length = Math.min(roles.length, 12);
     const keep = [];
@@ -7863,9 +7977,15 @@
           else if (kind === 'chop') { pose.arms = 'hammer'; pose.tool = 'hammer'; pose.swing = reduced ? 0.5 : (Math.sin(now / 160) + 1) / 2; }
           else if (kind === 'spray') { pose.arms = 'spray'; pose.tool = 'hose'; }
         }
-        const umb = wetNow && (!w.role || (w.state === 'walk' && !w.act));
+        const umb = wetNow && (!w.role || (w.state === 'walk' && !w.act)) && w.kind !== 'stroller';
         if (umb) { pose.arms = 'umbrella'; pose.tool = null; }
+        // 10.19: a partner or a kid walks beside them (a step behind), a stroller goes in front
+        const wk = w.state === 'walk' ? w.phase : null;
+        if (!w.role && w.kind === 'couple' && w.mate) person(c, p.x - w.facing * 6.2, p.y - 1.6, 0.9, w.mate, { facing: w.facing, t: pose.t, walk: wk != null ? wk + Math.PI : undefined });
+        if (!w.role && w.kind === 'kid' && w.mate) person(c, p.x - w.facing * 5.4, p.y - 1.2, 0.56, w.mate, { facing: w.facing, t: pose.t, walk: wk != null ? wk * 1.5 : undefined });
+        if (!w.role && w.kind === 'stroller') pose.arms = 'push';
         const hand = person(c, p.x, p.y, w.role ? 1 : 0.92, w.look, pose);
+        if (!w.role && w.kind === 'stroller') pram(c, p.x + w.facing * 8.6, p.y, 0.92, w.facing, PRAMS[w.id % PRAMS.length], hand, wk != null && !reduced ? -Math.abs(Math.sin(wk)) * 0.3 : 0);
         if (umb) umbrella(c, hand, w.role ? 1 : 0.92, w.facing, UMBRELLAS[w.id % UMBRELLAS.length], w.state === 'walk' ? Math.sin(w.phase) * 0.06 : 0);
         if (w.state === 'act' && w.act && w.act.kind === 'sweep' && !reduced && Math.random() < 0.12) fx.push({ x: p.x + w.facing * 6, y: p.y, vx: w.facing * 12, vy: -12, life: 0, max: 0.7, puff: true, color: 'rgba(205,190,160,.7)', r: 1.6 });
         if (w.state === 'act' && w.act && w.act.kind === 'spray') {
@@ -10647,6 +10767,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (ec.running) frow('Running the service buildings', `−${Math.round(ec.running)}/h`, 'neg');
     if (ec.fleet) frow('Vehicles', `−${Math.round(ec.fleet)}/h`, 'neg');
     if (ec.jail) frow(`Prisoners in the cells (${state.jail.length})`, `−${Math.round(ec.jail)}/h`, 'neg');
+    if (ec.leave) frow(`Mothers on leave (${Math.round(ec.leave / LEAVE_PAY)})`, `−${Math.round(ec.leave)}/h`, 'neg');
     if (loans().length) frow(`Loan instalments while you play (${loans().length}) · ${Math.round(ec.loanFocus)}/h while you focus, no interest`, `−${Math.round(ec.loanPay)}/h`, 'neg');
     frow('You get', `${ec.keep < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep))}/h`, ec.keep >= 0 ? 'pos' : 'neg');
     wrap.append(fl);
@@ -11087,6 +11208,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (m.sick) fac('Sick residents', m.sick, `${state.buildings.filter((b) => b.sick).length} home${state.buildings.filter((b) => b.sick).length > 1 ? 's are' : ' is'} sick and can't work. A nurse treats them.`, null, [-9, 0]);
     if (nu.needed) fac('Health', m.health, nu.cover >= 0.99 ? 'Enough nurses, and every home is near a clinic.' : nu.covered < nu.homes ? `${nu.homes - nu.covered} home${nu.homes - nu.covered === 1 ? ' is' : 's are'} out of reach of a staffed clinic.${nu.working < nu.need ? ' The town also needs more nurses.' : ''}` : 'Not enough nurses: people feel unwell.', Math.abs(state.civic.health - nu.cover) > 0.03 ? (nu.cover > state.civic.health ? 'up' : 'down') : null, [-6, 6]);
     if (city().food) fac('Food', m.food, m.food < 0 ? 'The store is empty and the fields can\'t feed everyone: hungry homes pay less. Build or upgrade fields, or focus (fields grow twice as fast).' : m.food > 0 ? 'Fresh food from your own fields, and plenty in store.' : 'Everyone is fed, but the store is low.', null, [-10, 3]);
+    if (m.families || babiesNow().length) { const pl = fam().leave; fac('Families', m.families, `${babiesNow().length} bab${babiesNow().length === 1 ? 'y' : 'ies'} born in the last year (${realText(12)}). Their mothers got ${[...new Set(babiesNow().map((k) => leaveText(k.leave)))].join(' or ')} at home, and other families hear about it${fam().births < 3 ? ' (more as more babies are born)' : ''}. Your policy now: ${leaveText(pl)}.`, null, [-4, 4]); }
+    if (m.babyCare) fac('Care for babies', m.babyCare, 'Some babies live out of reach of a clinic with a nurse. Families worry, and babies fall sick more easily.', null, [-4, 0]);
     if (m.work) fac('Jobs', m.work, `${city().jobs.jobless} people have no job. Shops, workshops and services create jobs (bigger ones create more).`, null, [-12, 0]);
     if (m.debt) fac('Money trouble', m.debt, 'The town is in debt and staff wages are late. Sell a building, take a loan or let someone go: tap your gold to see the options.', null, [-10, 0]);
     if (m.trouble <= -0.5) fac('Recent trouble', m.trouble, `${(state.scars || []).slice(-3).map((x) => x.label).join(', ') || 'A break-in'}${state.buildings.some((b) => b.robbed) ? ', and a break-in nobody has solved yet' : ''}. It fades slowly.`, 'up', [-20, 0]);
@@ -11206,21 +11329,23 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (!roundJobs().length) return freeLapCardEl(isLaps);
     const rq = roundJobs(), P = roundsWork(), run = lapRunNow(), n0 = run ? run.n : 0, brk = onBreak();
     const opts = lapOptions(P); if (!opts.includes(startPick.lapLen)) startPick.lapLen = ROUND;
-    const card = el('div', 'lapcard'); card.setAttribute('aria-pressed', String(isLaps)); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Build in rounds');
+    // 10.19 (Navid): a shorter card: the project and "Lap 1 of 6" on one line, the switch, the laps. With a set time
+    // chosen below, the card folds to its first line (tap it to get the laps back).
+    const card = el('div', 'lapcard' + (isLaps ? '' : ' folded')); card.setAttribute('aria-pressed', String(isLaps)); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Build in laps');
     const top = el('span', 'lc-top'), title = el('b', 'lc-title', '');
-    top.append(el('span', 'lc-eye', brk ? `Break · ${fmtClock(breakLeft())} left` : 'Build in rounds'), title);
-    const ul = el('span', 'lc-jobs');
-    rq.slice(0, 3).forEach((q, i) => { const left = q.work - q.done; ul.append(el('span', i ? '' : 'first', `${jobLabel(q)} · ${workText(left, q.work)}${q.done > 0.5 ? ` left (${Math.floor(q.done / q.work * 100)}% done)` : ''}`)); });
-    if (rq.length > 3) ul.append(el('span', '', `+${rq.length - 3} more`));
+    const q0 = rq[0], jl = el('span', 'lc-job', `${jobLabel(q0)}${q0.done > 0.5 ? ` · ${Math.floor(q0.done / q0.work * 100)}% done` : ''}${rq.length > 1 ? ` +${rq.length - 1} more` : ''}`);
+    top.append(jl, title);
     const planBox = el('div', 'lc-plan');
     const update = (L) => {
       const lf = lapFocus(L), n = Math.max(1, Math.ceil(P / lf - 1e-9));
       title.textContent = `Lap ${n0 + 1} of ${n0 + n}`;
-      planBox.replaceChildren(lapPlanEl(P, L, 1), el('small', 'lc-sum', `${fmtMin(Math.round(P * ROUND / ROUND_FOCUS))} in all, with the breaks · saved after every lap${L > ROUND ? ' and every 30 minutes' : ''}`));
+      planBox.replaceChildren(lapPlanEl(P, L, 1));
     };
     const sw = lapSwitch(opts, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
     update(startPick.lapLen);
-    card.append(top, ul, sw, planBox);
+    if (brk) card.append(el('span', 'lc-eye', `Break · ${fmtClock(breakLeft())} left`));
+    card.append(top);
+    if (isLaps) card.append(sw, planBox); else card.append(el('span', 'lc-unfold', 'Build it in laps ▾'));
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
   }
@@ -11228,15 +11353,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   // break after each, for as many laps as you like. The switch is the same as for a project.
   function freeLapCardEl(isLaps) {
     const run = lapRunNow(), n0 = run && run.free ? run.n : 0, brk = onBreak();
-    const card = el('div', 'lapcard'); card.setAttribute('aria-pressed', String(isLaps)); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Focus in laps');
+    const card = el('div', 'lapcard' + (isLaps ? '' : ' folded')); card.setAttribute('aria-pressed', String(isLaps)); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'Focus in laps');
     const top = el('span', 'lc-top'), title = el('b', 'lc-title', `Lap ${n0 + 1}`);
     top.append(el('span', 'lc-eye', brk ? `Break · ${fmtClock(breakLeft())} left` : 'Focus in laps'), title);
     const planBox = el('div', 'lc-plan');
     const oneLap = (L) => { const box = el('div', 'lapplan'), c = el('span', 'lp-chip now'); c.append(el('b', '', fmtHalf(lapFocus(L))), el('i', '', `+${fmtHalf(lapBreakOf(L))}`)); box.append(c, el('span', 'lp-plus', '+ …')); return box; };
-    const update = (L) => planBox.replaceChildren(oneLap(L), el('small', 'lc-sum', `Then a break and the next lap, as many as you like · stop after any lap · your job pays the whole time`));
+    const update = (L) => planBox.replaceChildren(oneLap(L));
     const sw = lapSwitch(LAP_LENS, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
     update(startPick.lapLen);
-    card.append(top, sw, planBox);
+    card.append(top);
+    if (isLaps) card.append(sw, planBox); else card.append(el('span', 'lc-unfold', 'As many laps as you like, with breaks ▾'));
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
   }
@@ -11251,8 +11377,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const pvs = new Map(opts.map((d) => [d, sessionPreview(d)]));
     const allD = singles.length ? opts.find((d) => !pvs.get(d).unfinished) : null;
     // 10.15 (Navid): no long sentence here: "How long?" sits next to the title (the ✓ on a block says what finishes Sam's plan)
-    wrap.append(el('span', 'label', 'Or focus a set time:'));
-    const durs = el('div', 'durations' + (isLaps ? ' dim' : ''));
+    // 10.19 (Navid): while the laps are open the eight blocks are folded; opening them folds the laps
+    const setTog = el('button', 'set-tog', isLaps ? 'Or focus a set time' : 'Or focus a set time:'); setTog.type = 'button'; setTog.setAttribute('aria-expanded', String(!isLaps));
+    if (isLaps) { setTog.append(el('span', 'chev', '▾')); setTog.addEventListener('click', () => { startPick.mode = 'fixed'; renderStart(); }); } else setTog.disabled = true;
+    wrap.append(setTog);
+    const durs = el('div', 'durations'); durs.hidden = isLaps;
     for (const d of opts) {
       const pv = pvs.get(d);
       const g = pv.unfinished ? 0 : clamp(Math.log(d / 5) / Math.log(24), 0, 1);
@@ -11307,7 +11436,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (wait) lab.append(`${state.builder} finishes `, finB(), `, then you (${jobName(wait.q)} needs longer):`);
       else lab.append(`${state.builder} finishes `, finB(), ', then you:');
     } else lab.append('Your job');
-    wrap.append(lab);
+    const jobsHidden = isLaps && hasRounds && pv.sim.leftover < 0.05; // 10.19: the whole lap goes to the building
+    if (!jobsHidden) wrap.append(lab);
     const oldJr = !$('scrim').hidden && document.querySelector('#sheet .startsheet .jobs'), jrLeft = oldJr ? oldJr.scrollLeft : null; // 10.15: keep the job row where it was
     const jr = el('div', 'jobs' + (planned && pv.sim.leftover < 0.05 ? ' idle' : ''));
     for (const j of jobs()) {
@@ -11319,7 +11449,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       b.addEventListener('click', () => { state.job = j.bid; save(); renderStart(); });
       jr.append(b);
     }
-    wrap.append(jr);
+    if (!jobsHidden) wrap.append(jr);
     const box = el('div', 'preview');
     if (isLaps) box.append(el('span', 'eyebrow', 'For each lap'));
     const tl = el('div', 'ptiles');
@@ -11380,6 +11510,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     coach: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm0 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>',
     data: '<path fill="currentColor" d="M4 20V10h3.5v10zm6.25 0V4h3.5v16zM16.5 20v-7H20v7z"/>',
     food: '<path fill="currentColor" d="M11 22V12.6C8 12.3 5.7 10 5.3 7c2.9.2 5.2 2.4 5.7 5.2V9.6C8.4 9.1 6.5 6.9 6.3 4.2c2.6.3 4.6 2.3 4.7 4.9V6.4C9.6 5.6 8.8 4 8.9 2.3c1.6.5 2.8 1.9 3.1 3.5.3-1.6 1.5-3 3.1-3.5.1 1.7-.7 3.3-2.1 4.1v2.7c.1-2.6 2.1-4.6 4.7-4.9-.2 2.7-2.1 4.9-4.7 5.4v2.6c.5-2.8 2.8-5 5.7-5.2-.4 3-2.7 5.3-5.7 5.6V22z"/>',
+    policies: '<path fill="currentColor" d="M8 3h8v2h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3zm1 1v2h6V4zm1.4 12.6-3-3 1.4-1.4 1.6 1.6 4.8-4.8 1.4 1.4z"/>',
     incidents: '<path fill="currentColor" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5zM7 11v2h10v-2zm0 4v2h7v-2z"/>',
     settings: '<path fill="currentColor" d="M10.3 2h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9L2 13.7v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8zM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/>',
     help: '<path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-.1 13.6a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6zM12 6c-2 0-3.5 1.2-3.7 3h2.2c.2-.7.7-1 1.4-1 .8 0 1.4.5 1.4 1.2 0 .6-.3.9-1.2 1.5-1 .6-1.5 1.3-1.4 2.6h2.1c0-.7.2-1 1.1-1.6 1-.7 1.6-1.4 1.6-2.6C15.5 7.2 14 6 12 6z"/>',
@@ -11394,6 +11525,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       { k: 'progress', title: 'Your progress', sub: `Level ${state.level} · ${state.badges.length} badges · ${state.chestStats.opened} chests`, open: openLevels },
       { k: 'friends', title: 'Friends & leaderboard', sub: board.me && board.kind === 'firebase' ? `On the board as ${state.board.name || 'Mayor'}` : 'Compete with friends and visit their towns', open: openFriends },
       { k: 'staff', title: 'Town staff & wages', sub: staffN ? `${staffN} staff · ${Math.round(ec.staffWages)} gold an hour in wages · services and buildings` : 'Nobody hired yet · services and buildings', page: staffPage },
+      familiesOn() || fam().births ? { k: 'policies', title: 'Policies', sub: `Maternity leave: ${leaveText(fam().leave)} · ${babiesNow().length} bab${babiesNow().length === 1 ? 'y' : 'ies'}, ${kidsNow().length} kid${kidsNow().length === 1 ? '' : 's'}`, page: () => policiesPage(false) } : null,
       { k: 'money', title: 'Money', sub: `${state.gold < 0 ? '−' : ''}${fmtGold(Math.abs(state.gold))} gold · ${ec.net < 0 ? '−' : '+'}${Math.abs(Math.round(ec.net))} an hour${loans().length ? ` · ${loans().length} loan${loans().length > 1 ? 's' : ''}` : ''}`, open: () => openTown('overview') },
       { k: 'incidents', title: 'Incident report', sub: (() => { const w = state.incidents.filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length; return `${w ? `${w} this week` : 'A quiet week'}${courthouse() ? ' · the Courthouse says why' : ''}`; })(), open: openIncidents },
       foodOn() ? { k: 'food', title: 'Food & farms', sub: (() => { const F = city().food, net = F ? F.grown - F.eaten : 0; return `${Math.floor(state.food || 0)} of ${foodCap()} food · ${net >= 0 ? '+' : '−'}${Math.abs(Math.round(net))} an hour while you play${F && F.fed < 0.98 ? ' · hungry!' : ''}`; })(), open: openFood } : null,
@@ -11555,6 +11687,53 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const sc = $('sheet').scrollTop; $('sheet-body').replaceChildren(musicPage()); $('sheet').scrollTop = sc;
   }
   // Staff: every role, who works, what each one is paid, and what the next hire would cost.
+  /* ---------- 10.19 (Navid): Policies. The mayor's first rule: how long a new mother stays home. ---------- */
+  function openPolicies(first) { openSheet('Policies', policiesPage(first), { full: true }); $('sheet').dataset.kind = 'menu-policies'; }
+  function policiesPage(first) {
+    const wrap = el('div', 'list pol'), F = fam(), now = Date.now(), ci = city();
+    if (first) { const b = el('div', 'pol-first'); b.append(el('b', '', 'Your first baby!'), el('span', 'small', `${(F.kids[F.kids.length - 1] || {}).name || 'A baby'} was born in town. As the mayor you decide how long new mothers stay home with their baby. You can change it any time.`)); wrap.append(b); }
+    wrap.append(el('p', 'small muted', 'Policies are the town\'s rules. A change only counts from now on: families who already have a baby keep the leave they were given.'));
+    const card = el('div', 'menu-sec pol-card');
+    card.append(el('h3', '', 'Maternity leave'), el('p', 'tiny muted', `How long a mother stays home after a baby is born. A year in town is ${realText(12)}, so a month is ${realText(1)}.`));
+    const opts = el('div', 'pol-opts'); opts.setAttribute('role', 'radiogroup'); opts.setAttribute('aria-label', 'Maternity leave');
+    for (const m of LEAVE_OPTS) {
+      const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(F.leave === m));
+      const mood = LEAVE_MOOD[m];
+      b.append(el('b', '', leaveText(m)), el('small', '', realText(m)), el('span', 'pol-mood ' + (mood > 0 ? 'pos' : mood < 0 ? 'neg' : ''), `${mood > 0 ? '+' : mood < 0 ? '−' : '±'}${Math.abs(mood)}% mood`));
+      b.addEventListener('click', () => { if (F.leave === m) return; F.leave = m; save(); sfx.pop(); toast(`New rule: mothers stay home for ${leaveText(m)}. It counts for babies born from now on.`); wrap.replaceWith(policiesPage(first)); });
+      opts.append(b);
+    }
+    card.append(opts);
+    const m = F.leave, fl = el('ul', 'factors');
+    const frow = (a, b, cls) => { const li = el('li'); li.append(el('span', '', a), el('span', 'v ' + (cls || ''), b)); fl.append(li); };
+    frow('The town pays each mother at home', `−${LEAVE_PAY}/h`, 'neg');
+    frow(`For ${leaveText(m)} that is`, `−${Math.round(LEAVE_PAY * m * FAM_MONTH / 3600000)} gold`, 'neg');
+    frow('Workers while she is home', '−1', 'neg');
+    frow('Families\' mood (once word gets around)', `${LEAVE_MOOD[m] > 0 ? '+' : LEAVE_MOOD[m] < 0 ? '−' : '±'}${Math.abs(LEAVE_MOOD[m])}%`, LEAVE_MOOD[m] > 0 ? 'pos' : LEAVE_MOOD[m] < 0 ? 'neg' : '');
+    card.append(fl, el('p', 'tiny muted', 'Longer leave costs the town more and keeps workers away longer, but families are happier, and every family in town hears about it. Short leave saves gold, and families grumble.'));
+    wrap.append(card);
+    // the families in town now
+    const fs = el('div', 'menu-sec'); fs.append(el('h3', '', 'Families in town'));
+    if (ci.residents < BIRTH_RES) fs.append(el('p', 'small muted', `Babies start to come once ${BIRTH_RES} people live in town (now ${ci.residents}).`));
+    const st = el('div', 'inc-sum'), lv = onLeaveNow(now);
+    for (const [v, label] of [[babiesNow(now).length, 'babies'], [kidsNow(now).length, 'kids'], [lv.length, 'mothers at home'], [F.births, 'born so far']]) { const c0 = el('div', 'inc-st'); c0.append(el('b', '', String(v)), el('span', '', label)); st.append(c0); }
+    fs.append(st);
+    for (const k of lv.slice().sort((a, b) => a.leaveEnd - b.leaveEnd)) {
+      const h = byId(k.bid), row = el('div', 'pol-mom');
+      row.append(el('span', 'pol-ic', '👶'));
+      const tx = el('div'); tx.append(el('b', '', `${k.mom} and baby ${k.name}`), el('small', 'muted', `${k.girl ? 'a girl' : 'a boy'} · ${h ? placeName(h) : 'at home'} · ${leaveText(k.leave)} of leave · back at work in ${leftText(k.leaveEnd - now)}`)); row.append(tx);
+      if (h) { row.classList.add('tap'); row.addEventListener('click', () => { closeSheet(); showOnMap(h); }); }
+      fs.append(row);
+    }
+    const how = el('ul', 'how');
+    for (const x of [`About one baby a day in a town of 60 people (more people, more babies). Every home has room for one baby at a time.`,
+      `Babies need care: each one counts as 4 people for the nurses, and a home with a baby falls sick more easily, more so out of reach of a clinic.`,
+      `After a year (${realText(12)}) a baby is a kid. Kids go to school (each counts as 2 for the teachers) and grow up after 6 years.`,
+      'Out in town you see mothers and fathers with strollers, parents walking their kids, and couples.']) how.append(el('li', 'small', x));
+    fs.append(el('h4', 'rp-h', 'How families work'), how);
+    wrap.append(fs);
+    return wrap;
+  }
   function staffPage() {
     const wrap = el('div', 'list'), ec = econ();
     wrap.append(el('p', 'small muted', `Wages: ${Math.round(ec.staffWages)} gold an hour in total (plus ${Math.round(ec.running + ec.fleet + ec.jail)} to run the buildings, vehicles and cells). Each extra person of the same kind costs more to hire and asks a higher wage. ${ui.screen === 'play' ? 'Tap + to hire.' : 'You can hire during play time.'}`));
@@ -12753,6 +12932,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   if (FB.cfg && !inFrame && (state.board.fb || state.board.fbPending)) fbLoad(); // back on the online leaderboard
   if (devOn()) window.MaplewickDebug = Object.freeze({ // 10.08: only on Navid's unlocked phone (and in tests)
     state: () => JSON.parse(JSON.stringify(state)),
+    // 10.19: families. hours: pretend that many hours passed (births, leave ending)
+    famAhead: (hours) => { const F = fam(); F.at -= hours * 3600000; for (const k of F.kids) { k.born -= hours * 3600000; k.leaveEnd -= hours * 3600000; } familyStep(Date.now()); return { kids: F.kids.length, births: F.births, leave: onLeaveNow().length, babies: babiesNow().length }; },
+    birth: (n) => { const F = fam(); for (let i = 0; i < (n || 1); i++) { F.at = Date.now() - 1441 * 3600000 / Math.max(1, city().residents) - 60000; const b0 = F.births; let tries = 0; while (F.births === b0 && tries++ < 20) { F.at = Date.now() - 1441 * 3600000 / Math.max(1, city().residents); familyStep(Date.now()); } } return { births: F.births, leave: onLeaveNow().length, workers: city().jobs.workers, leavePay: econ().leave, mood: econ().mood.families }; },
+    fam: () => ({ ...JSON.parse(JSON.stringify(fam())), babies: babiesNow().length, kids: kidsNow().length, onLeave: onLeaveNow().length, mood: familyMood(Date.now()) }),
+    policies: (first) => openPolicies(!!first),
+    walkerKinds: () => walkers.filter((w) => !w.role).map((w) => w.kind || '-'),
     screen: () => ui.screen,
     overlay: () => ui.overlay,
     panel: () => (ui.panel ? { ...ui.panel } : null),
