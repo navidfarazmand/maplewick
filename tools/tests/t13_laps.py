@@ -34,7 +34,7 @@ with sync_playwright() as p:
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(500)
     check(pg.is_visible('.lapsw'), 'lap switch shows')
     ticks=pg.eval_on_selector_all('.lsw-tick','els => els.map(e => e.textContent)'); print('ticks',ticks)
-    check(ticks==['15m','30m','1h'], 'options for 2 rounds: 15, 30, 1h')
+    check(ticks==['15m','30m','45m','1h'], 'options for 2 rounds: 15, 30, 45 (37½ + 12½), 1h')
     durs=pg.eval_on_selector_all('.durations button b','els => els.map(e => e.textContent)'); print(durs)
     check(durs==['5m','10m','15m','25m','45m','1h','1h30','2h'], 'the eight fixed lengths')
     chips=pg.inner_text('.lc-plan .lapplan'); print('plan:',chips.replace('\n',' '))
