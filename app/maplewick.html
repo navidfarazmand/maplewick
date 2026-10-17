@@ -590,7 +590,21 @@
   .food-bar { height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; } .food-bar span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #E8B23A, #8FB84E); }
   .food-bar.low span { background: linear-gradient(90deg, #E5482F, #E8A93A); }
   .food-st { font-weight: 700; } .food-st.bad { color: var(--bad, #C8473D); } .food-st.ok { color: #4F8A2E; }
-  #residents .pp { width: 12px; height: 12px; margin-left: 2px; vertical-align: 0; opacity: .6; }
+  .rp-money li.ftotal { border-top: 2px solid var(--line); padding-top: 9px; margin-top: 2px; font-weight: 800; font-size: 16px; }
+  .rp-money li.ftotal .num { font-family: var(--display); font-size: 21px; color: var(--play-deep); }
+  .rp-money li.ftotal.neg .num { color: var(--bad); }
+  /* 10.17 (Navid): with food on, food sits beside gold the same way (store and an hour's change), and the people go under the mood */
+  .chips.foodon { grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr .85fr; }
+  #mood-sub .pp { width: 12px; height: 12px; margin-left: 2px; vertical-align: -1px; opacity: .8; }
+  #mood-sub { white-space: nowrap; overflow: hidden; text-overflow: clip; }
+  .chips.foodon #gold-cap { display: none; }
+  .chip.food { background: #F6E3C8; border-color: transparent; }
+  .chip.food .val b { color: #6E3F10; }
+  .chip.food .sub { color: #8A4E16; font-weight: 800; }
+  .chip.food.hungry { background: var(--bad-soft); box-shadow: inset 0 0 0 2px var(--bad); }
+  .chip.food .wheat { width: 22px; height: 22px; flex: none; color: #B8741E; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip.food { background: #3A2A1A; } :root:not([data-theme="light"]) .chip.food .val b { color: #F2D3AC; } :root:not([data-theme="light"]) .chip.food .sub { color: #E2AE7A; } }
+  :root[data-theme="dark"] .chip.food { background: #3A2A1A; } :root[data-theme="dark"] .chip.food .val b { color: #F2D3AC; } :root[data-theme="dark"] .chip.food .sub { color: #E2AE7A; }
   .chip .sub.food { color: #9A6B12; font-weight: 800; } .chip .sub.food.hungry { color: var(--bad, #C8473D); }
   .mtile.k-incidents .mt-ic { background: #E4E8F3; color: #2F4E8C; }
   .inc-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
@@ -1148,7 +1162,7 @@
       <button class="icon-btn" id="open-friends" aria-label="Friends and leaderboard"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm0 4H6v1a2 2 0 0 0 1 1.7zm10 0v2.7A2 2 0 0 0 18 8V7z"/></svg></button>
       <button class="icon-btn" id="open-menu" aria-label="Menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></button>
     </div>
-    <div class="chips">
+    <div class="chips" id="hud-chips">
       <button class="chip gold" id="chip-gold" aria-label="Gold, taxes and treasury"><span class="coin" aria-hidden="true"></span><span class="stack"><span class="val"><b class="num" id="gold">0</b><span class="cap num" id="gold-cap"> / 200</span></span><span class="sub num" id="gold-rate">+0/h</span></span></button>
       <button class="chip" id="chip-res" aria-label="Residents"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><circle cx="16.5" cy="9" r="2.6" fill="currentColor" opacity=".6"/><path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6z" fill="currentColor"/><path d="M14 19c.2-2.1 1.2-3.9 2.8-5 2.6.3 4.2 2.4 4.2 5z" fill="currentColor" opacity=".6"/></svg><span class="stack"><b class="num" id="residents">0</b><span class="sub" id="res-sub">people</span></span></button>
       <button class="chip mood" id="chip-mood" aria-label="Town mood and staff"><svg class="face" id="mood-face" viewBox="0 0 24 24" aria-hidden="true"></svg><span class="stack"><b class="num" id="mood">40%</b><span class="sub" id="mood-sub">mood</span></span></button>
@@ -1376,7 +1390,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.16'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '10.17'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -4653,6 +4667,7 @@
   }
   function lockStart() {
     const kind = state.lockSound; if (!state.session || !LOCK_SOUNDS[kind] || kind === 'off') return;
+    if (LOCK.away) { LOCK.away = false; lockStop(false); } // 10.17
     try {
       const a = LOCK.el || (LOCK.el = new Audio());
       a.setAttribute('playsinline', ''); a.onended = null; a.onerror = null; LOCK.song = null;
@@ -4684,7 +4699,38 @@
     const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
     warmSong(h.at(h.i + 1).url);
   }
-  function lockNext() { if (!LOCK.song) return; LOCK.song.i += 1; LOCK.song.time = 0; lockSong(LOCK.song, false); lockUpdate(true); }
+  function lockNext() { if (!LOCK.song) return; LOCK.song.i += 1; LOCK.song.time = 0; lockSong(LOCK.song, false); if (LOCK.away) awayMeta(); else lockUpdate(true); }
+  /* 10.17 (Navid): leave the app (not in focus) while a recorded song plays, and the same lock-screen player carries
+     the song on with the phone locked; back in the app, the music player takes it back at the same spot. The tunes made
+     in Maplewick and the background sounds can't play in the background on iPhone, so they stop as before. */
+  function awayMeta() {
+    if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !LOCK.song) return;
+    try { navigator.mediaSession.metadata = new MediaMetadata({ title: LOCK.song.at(LOCK.song.i).title, artist: `Kevin MacLeod · ${LOCK.song.station || 'Maplewick'}`, album: `Maplewick · ${state.town}`, artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] }); navigator.mediaSession.playbackState = 'playing'; } catch (e) { /* older browsers */ }
+  }
+  function awayMusicStart() {
+    if (state.session || LOCK.on || !state.music || !AUD.unlocked || state.src === 'gen') return;
+    let inf = null; try { inf = radio.info(); } catch (e) { return; }
+    if (!inf || inf.gen || !inf.playing) return;
+    try {
+      const a = LOCK.el || (LOCK.el = new Audio()); a.setAttribute('playsinline', ''); a.muted = false;
+      LOCK.on = true; LOCK.away = true; LOCK.title = ''; LOCK.fails = 0;
+      const h = radio.handoff(); lockSong(h, true); LOCK.song.station = h.station;
+      if ('mediaSession' in navigator) {
+        const ms = navigator.mediaSession;
+        for (const act of ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto', 'previoustrack', 'nexttrack']) {
+          try { ms.setActionHandler(act, act === 'play' ? () => { a.play(); ms.playbackState = 'playing'; } : act === 'pause' ? () => { a.pause(); ms.playbackState = 'paused'; } : act === 'nexttrack' ? () => lockNext() : null); } catch (e) { /* not supported */ }
+        }
+      }
+      awayMeta();
+    } catch (e) { LOCK.on = false; LOCK.away = false; }
+  }
+  function awayMusicStop() { if (!LOCK.away) return; LOCK.away = false; lockStop(false); musicUpdate(); }
+  // The lock-screen player has to be started once by a tap before it may play with the app in the background.
+  function primeLock() {
+    if (LOCK.primed || LOCK.on || !state.music || state.src === 'gen') return;
+    LOCK.primed = true;
+    try { const a = LOCK.el || (LOCK.el = new Audio()); a.setAttribute('playsinline', ''); a.muted = true; a.loop = false; a.src = wavUrl('quiet'); const pr = a.play(); const done = () => { if (!LOCK.on) { try { a.pause(); } catch (e) { /* ignore */ } } a.muted = false; }; if (pr && pr.then) pr.then(done, done); else done(); } catch (e) { /* ignore */ }
+  }
   function lockUpdate(force) {
     const s = state.session; if (!LOCK.on || !s || !('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
     const now = Date.now(), m = sessionMinutes(s, now), L = s.laps ? lapInfo(s, now) : null;
@@ -7978,7 +8024,9 @@
   function pulse(node) { node.classList.remove('tick'); void node.offsetWidth; node.classList.add('tick'); }
 
   const FLAME_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-1.2-.5-2.2-1-3 3 1.5 5 4.2 5 7.5A7 7 0 0 1 5 15.5C5 9.5 11 7 12 2z"/></svg>';
+  let CHIP_RES_HTML = null;
   function renderHud() {
+    if (CHIP_RES_HTML == null) CHIP_RES_HTML = $('chip-res').innerHTML;
     const cap = treasuryCap(), ec = econ(), ci = ec.ci;
     $('gold').textContent = state.gold < 0 ? `−${fmtGold(-state.gold + 0.999)}` : fmtGold(state.gold);
     $('gold-cap').textContent = state.gold >= cap || state.gold < 0 ? '' : ` / ${fmtGold(cap)}`;
@@ -7994,13 +8042,23 @@
     const gr = $('gold-rate');
     if (state.gold >= cap && net >= 0) gr.textContent = 'full';
     else { gr.textContent = `${rate}/h`; if (!playing) gr.append(el('span', 'wide', ' focus')); }
-    // 10.16 (Navid asked what the 68 was): with food on, the number of people gets a little person next to it
-    { const rh = ci.food ? `${ci.residents}<svg class="pp" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z" fill="currentColor"/></svg>` : String(ci.residents); if ($('residents').dataset.h !== rh) { $('residents').dataset.h = rh; $('residents').innerHTML = rh; } }
-    { const sub = $('res-sub'), F = ci.food; if (F) { sub.textContent = `🌾 ${Math.floor(state.food || 0)}`; sub.className = 'sub food' + (F.fed < 0.98 ? ' hungry' : ''); $('chip-res').setAttribute('aria-label', `${ci.residents} people, ${Math.floor(state.food || 0)} food in store`); } else if (sub.textContent !== 'people') { sub.textContent = 'people'; sub.className = 'sub'; } }
+    // 10.17 (Navid): with food on, this chip is the food (store and an hour's change, like the gold) and the people
+    // count goes under the mood
+    const FD = ci.food, chipR = $('chip-res');
+    $('hud-chips').classList.toggle('foodon', !!FD); chipR.classList.toggle('food', !!FD);
+    if (FD) {
+      const fcap = foodCap(), have = Math.floor(state.food || 0), fnet = FD.grown - FD.eaten;
+      const html = `<svg class="wheat" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 22V12.6C8 12.3 5.7 10 5.3 7c2.9.2 5.2 2.4 5.7 5.2V9.6C8.4 9.1 6.5 6.9 6.3 4.2c2.6.3 4.6 2.3 4.7 4.9V6.4C9.6 5.6 8.8 4 8.9 2.3c1.6.5 2.8 1.9 3.1 3.5.3-1.6 1.5-3 3.1-3.5.1 1.7-.7 3.3-2.1 4.1v2.7c.1-2.6 2.1-4.6 4.7-4.9-.2 2.7-2.1 4.9-4.7 5.4v2.6c.5-2.8 2.8-5 5.7-5.2-.4 3-2.7 5.3-5.7 5.6V22z"/></svg><span class="stack"><span class="val"><b class="num">${have}</b></span><span class="sub num">${have >= fcap - 0.5 && fnet >= 0 ? 'full' : `${fnet >= 0 ? '+' : '−'}${Math.round(Math.abs(fnet))}/h`}</span></span>`;
+      if (chipR.dataset.h !== html) { chipR.dataset.h = html; chipR.innerHTML = html; }
+      chipR.classList.toggle('hungry', FD.fed < 0.98);
+      chipR.setAttribute('aria-label', `Food: ${have} of ${fcap} in store, ${fnet >= 0 ? '+' : '−'}${g1(Math.abs(fnet))} an hour. Open Food & farms.`);
+    } else if (chipR.dataset.h) { delete chipR.dataset.h; chipR.innerHTML = CHIP_RES_HTML; chipR.classList.remove('hungry'); }
+    if (!FD) $('residents').textContent = ci.residents;
+    if (!FD) { const sub = $('res-sub'), F = ci.food; if (F) { sub.textContent = `🌾 ${Math.floor(state.food || 0)}`; sub.className = 'sub food' + (F.fed < 0.98 ? ' hungry' : ''); $('chip-res').setAttribute('aria-label', `${ci.residents} people, ${Math.floor(state.food || 0)} food in store`); } else if (sub.textContent !== 'people') { sub.textContent = 'people'; sub.className = 'sub'; } }
     const mv = ec.mood.value;
     $('mood-face').innerHTML = faceMarkup(mv);
     $('mood').textContent = `${mv}%`;
-    $('mood-sub').textContent = 'mood';
+    { const ms = FD ? `${ci.residents}<svg class="pp" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z" fill="currentColor"/></svg>` : 'mood'; if ($('mood-sub').dataset.h !== ms) { $('mood-sub').dataset.h = ms; $('mood-sub').innerHTML = ms; } }
     // The mood chip flashes green or red when the value moves.
     if (ui.lastMood != null && mv !== ui.lastMood) {
       const chip = $('chip-mood'), up = mv > ui.lastMood;
@@ -10908,9 +10966,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     row(`Grown by ${F.fields} field${F.fields === 1 ? '' : 's'} (${SEASONS[SEA.k].name.toLowerCase()} ×${FOOD_SEASON[SEA.k]})`, `+${g1(F.grown)}/h`, 'gc');
     row(`Eaten by ${F.residents} residents (${FOOD_EAT} each)`, `−${g1(F.people)}/h`, 'neg');
     if (F.shopEat) row('Sold at market stalls and bakeries (they earn 20% more)', `−${g1(F.shopEat)}/h`, 'neg');
-    row('While you play', `${net >= 0 ? '+' : '−'}${g1(Math.abs(net))}/h`, net >= 0 ? 'pos' : 'neg');
-    row('While you focus (fields grow twice as fast)', `${F.grown * 2 - F.eaten >= 0 ? '+' : '−'}${g1(Math.abs(F.grown * 2 - F.eaten))}/h`, F.grown * 2 - F.eaten >= 0 ? 'pos' : 'neg');
-    row('While you are away', 'a tenth of that', '');
+    // 10.17 (Navid): the bottom line, like the gold: what goes into the store in the end, big and bold
+    const tot = (a, v) => { const li = el('li', 'ftotal' + (v < 0 ? ' neg' : '')); li.append(el('span', '', a), el('span', 'num', `${v >= 0 ? '+' : '−'}${g1(Math.abs(v))}/h`)); ml.append(li); };
+    tot('Into your store while you play', net);
+    tot('Into your store while you focus (fields grow twice as fast)', F.grown * 2 - F.eaten);
+    row('While you are away', 'a tenth of what you get while you play', '');
+    row('People in town', String(F.residents), '');
     wrap.append(el('h4', 'rp-h', 'Every hour'), ml);
     const fl = state.buildings.filter((b) => b.type === 'field' && live(b));
     if (fl.length) {
@@ -12322,7 +12383,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   const localPt = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   // iPhone only lets sound start from a finished tap (touchend / pointerup), not from the moment a finger lands, and it
   // pauses the sound engine when the app goes to the background. So every tap wakes it up again (10.03).
-  const wakeAudio = () => { AUD.unlocked = true; if (state.sound || state.music || (state.noise && state.noise !== 'off') || AUD.ac) audioCtx(); musicUpdate(); };
+  const wakeAudio = () => { primeLock(); AUD.unlocked = true; if (state.sound || state.music || (state.noise && state.noise !== 'off') || AUD.ac) audioCtx(); musicUpdate(); };
   for (const ev of ['pointerdown', 'pointerup', 'touchend', 'keydown']) document.addEventListener(ev, wakeAudio, { passive: true, capture: true });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && AUD.ac && AUD.ac.state !== 'running') audioCtx(); });
   canvas.addEventListener('pointerdown', (e) => {
@@ -12562,7 +12623,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     lastTick = Date.now();
     try { anaEvent(document.hidden ? 'hide' : 'show', { s: state.session ? 1 : 0, screen: ui.screen }); if (state.session && document.hidden) state.session.away = (state.session.away || 0) + 1; } catch (e) { /* ignore */ }
     // 10.13: when you leave, note the time (the crew and the town go on); back again, see what happened
-    if (document.hidden) { if (!ui.visit) { state.awaySince = Date.now(); state.awayFocus = !!state.session; } save(); anaFlush(); } else { tick(); awayBack(false, null); }
+    if (document.hidden) { if (!ui.visit) { state.awaySince = Date.now(); state.awayFocus = !!state.session; } awayMusicStart(); save(); anaFlush(); } else { awayMusicStop(); tick(); awayBack(false, null); }
   });
   if (window.ResizeObserver) new ResizeObserver(() => layout()).observe(stage);
   window.addEventListener('resize', layout);
