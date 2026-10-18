@@ -1,0 +1,35 @@
+# Puts Maplewick's server live: the security rules and the functions in server/. Run by hand only:
+# Actions → Deploy server → Run workflow. Needs the Firebase project on the Blaze plan and one GitHub secret,
+# FIREBASE_SERVICE_ACCOUNT (see server/README.md).
+name: Deploy server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: |
+          cd server && npm ci
+          cd functions && npm ci
+
+      - name: Test first
+        run: cd server && npm test
+
+      - name: Deploy
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA" ]; then echo "The FIREBASE_SERVICE_ACCOUNT secret is missing (see server/README.md)."; exit 1; fi
+          echo "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          cd server && npx firebase deploy --only firestore:rules,functions --project maplewick-eb4df --non-interactive --force

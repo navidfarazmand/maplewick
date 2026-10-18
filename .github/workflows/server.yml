@@ -1,0 +1,36 @@
+# Tests Maplewick's server (server/) on GitHub's computers: the unit tests, then the security rules and functions
+# inside the Firebase emulators (a pretend Firebase, nothing real is touched). Runs when server/ or the game changes.
+name: Server tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['server/**', 'app/maplewick.html', '.github/workflows/server.yml']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install
+        run: |
+          cd server && npm ci
+          cd functions && npm ci
+
+      - name: Unit tests (and the league maths against the game file)
+        run: cd server && npm test
+
+      - name: Rules and functions in the emulators
+        run: cd server && npm run test:emulator

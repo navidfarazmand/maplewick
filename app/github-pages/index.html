@@ -1522,7 +1522,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.12'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.00'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -5092,6 +5092,30 @@
     }
   }
 
+  /* ---------- 12.00: the server (server/ in the repo). When you're signed in, each focus session is reported to
+     the server, which notes the start time itself, so a session can only count minutes that really passed. Once a
+     week the server works out the leagues from those minutes (robots still fill every group up to 30), and the game
+     shows the server's result instead of working it out itself. Before the server is deployed the calls simply fail
+     and everything works as in 11.x. ---------- */
+  const SRV = { res: null, asked: 0, done: false };
+  const srvApi = () => (FB.api && FB.api.call && FB.user && board.kind === 'firebase' ? FB.api : null);
+  // The server answered a session in the last 3 weeks: it is on, and it decides the leagues.
+  const srvUse = (now) => !!(state.srvAt && (now || Date.now()) - state.srvAt < 21 * 86400000 && srvApi());
+  function srvFocus(kind, s, minutes) {
+    const api = srvApi(); if (!api || !s || ui.tourSpeed || (s.speed || 1) > 1) return; // not the 10× tour session, nor test speed
+    if (kind === 'start') { s.sid = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); save(); }
+    if (!s.sid) return;
+    const req = kind === 'start' ? api.call('focusStart', { sid: s.sid, app: APP.on }) : api.call('focusEnd', { sid: s.sid, minutes: Math.round((minutes || 0) * 100) / 100 });
+    req.then((r) => { if (r && r.ok !== false) { state.srvAt = Date.now(); save(); } }).catch(() => { /* not deployed, or offline: the game goes on as before */ });
+  }
+  // Last week's result from the server (at most every 5 minutes)
+  function srvResult(now) {
+    const api = srvApi(); if (!api || !api.getDoc || now - SRV.asked < 300000) return;
+    SRV.asked = now;
+    api.getDoc('leagueResults/' + FB.user.uid).then((d) => { if (d && d.last) SRV.res = d.last; }).catch(() => {})
+      .then(() => { SRV.done = true; leagueStep(Date.now()); });
+  }
+
   /* ---------- Focus sessions ---------- */
   const sessionMinutes = (s, now) => Math.min(s.duration, Math.max(0, (now - s.start) / 60000 * s.speed));
   /* ---------- 10.12 (Navid): laps. A focus project is worked 25 minutes at a time. At the end of a lap the alarm goes
@@ -5473,7 +5497,7 @@
     anaEvent('start', { dur: laps ? 'laps' + state.session.lapLen : duration, job: currentJob().type, plan: plan.length, goal: coachGoal(), fromPlay, lap: laps ? state.session.lapBase + 1 : 0 });
     sfx.pop();
     save(); closeSheet(); renderAll(); showFocus();
-    lockStart(); appFocus(state.session); // 11.11
+    lockStart(); appFocus(state.session); srvFocus('start', state.session); // 11.11, 12.00
   }
   const inReady = (s, now) => !!s && (now || Date.now()) < s.start;
   // Cancelled during the get-ready countdown: as if it never started.
@@ -5484,7 +5508,7 @@
     const back = state.session.fromPlay && state.playSec > 0;
     if (state.session.prevRun) state.lapRun = Object.assign(state.session.prevRun, { rang: true }); // 10.12: the lap count carries on
     if (state.session.tg && state.together && state.together.id === state.session.tg) { state.together.st = 'stop'; state.together.fin = Date.now(); state.together.res = 'none'; boardSoon(); } // 11.10
-    state.session = null; state.lastTaxAt = Date.now(); appFocus(null); // 11.11
+    srvFocus('end', state.session, 0); state.session = null; state.lastTaxAt = Date.now(); appFocus(null); // 11.11, 12.00
     save(); hideFocus(); renderAll();
     if (back) enterPlay(); // back to your town, where you were (10.05)
     toast('Cancelled before it started. Nothing lost.');
@@ -5675,7 +5699,7 @@
     if (state.season.min >= SEASON_GOAL[0] && !state.season.got.includes(0)) { state.season.got.push(0); state.tray.push({ id: state.nextId++, type: sz.item, origin: 'season' }); r.seasonItem = sz.item; }
     if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { const prize = festPrize(100); state.season.got.push(1); state.gold += prize; state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize${prize > 100 ? ` (+${prize - 100} from your town)` : ''}`, n: prize }); r.seasonPrize = true; }
     state.lastTaxAt = now;
-    state.session = null; appFocus(null); // 11.11
+    state.session = null; appFocus(null); srvFocus('end', s, mAll); // 11.11, 12.00
     if (s.tg) togetherEnd(s, done, r); // 11.10
     // 10.12: after a lap: a 5-minute break, then the bell for the next lap. Ending in the middle of a lap stops the laps.
     if (L && done && (reason0 === 'lap' || reason0 === 'complete' || L.win) && (roundJobs().length || !s.lapP)) {
@@ -11075,6 +11099,15 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (L.w === wk) { const m = myWeekMin(now); if (m > (L.m | 0)) { L.m = m; boardSoon(); } return; }
     if (state.board.joined && board.kind === 'firebase' && !board.loaded && now - BOOT_AT < 120000) return;
     const W = L.w, t = L.t, m = Math.max(L.m | 0, state.week && state.week.key === W ? Math.round(state.week.min || 0) : 0);
+    // 12.00: the server works out the week. Wait for sign-in (2 minutes at most), then for its answer; with no result
+    // yet, keep waiting until 12 hours into the new week, then work it out here as before.
+    const srvRecent = state.srvAt && now - state.srvAt < 21 * 86400000;
+    if (srvRecent && state.board.fb && !srvApi() && now - BOOT_AT < 120000) return;
+    if (srvUse(now)) {
+      const r = SRV.res && SRV.res.w === W ? SRV.res : null;
+      if (r) { leagueFromServer(L, W, r, now, wk); return; }
+      if (!SRV.done || now - weekStart(now) < 12 * 3600000) { srvResult(now); return; }
+    }
     L.pw = W; L.pt = t; L.pm = m; L.w = wk; L.m = myWeekMin(now);
     if (m <= 0) { L.hist.push({ w: W, t, rank: 0, move: 0, min: 0 }); L.hist = L.hist.slice(-26); save(); boardSoon(); return; } // sat that week out: no move
     const tb = leagueTable(W, t, now + 14 * 86400000, m), move = lgMove(tb.rank, tb.n, t);
@@ -11086,6 +11119,19 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       state.stats.trophies = (state.stats.trophies || 0) + 1;
     }
     L.hist.push({ w: W, t, rank: tb.rank, move, min: m }); L.hist = L.hist.slice(-26);
+    L.pend = res; save(); boardSoon(); renderHud();
+  }
+  // 12.00: the server's result for last week: { w, t, g, rank, n, move, to, min, trophy }
+  function leagueFromServer(L, W, r, now, wk) {
+    L.pw = W; L.pt = r.t | 0; L.pm = r.min | 0; L.w = wk; L.m = myWeekMin(now);
+    L.t = clamp(r.to | 0, 0, LEAGUES.length - 1);
+    const res = { w: W, t: r.t | 0, rank: r.rank | 0, n: r.n | 0, move: r.move | 0, min: r.min | 0, to: L.t, srv: true };
+    if (res.rank >= 1 && res.rank <= 3) {
+      state.tray.push({ id: state.nextId++, type: 'trophy', origin: 'league', level: res.t + 1, place: res.rank, wk: W });
+      const loot = chestLoot(3); applyLoot(loot); res.loot = loot; res.trophy = true;
+      state.stats.trophies = (state.stats.trophies || 0) + 1;
+    }
+    L.hist.push({ w: W, t: res.t, rank: res.rank, move: res.move, min: res.min }); L.hist = L.hist.slice(-26);
     L.pend = res; save(); boardSoon(); renderHud();
   }
   // The week's result, shown once on Home when nothing else is going on.

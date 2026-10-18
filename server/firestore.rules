@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Maplewick leaderboard: anyone who has joined can read it; each player can only write their own entry.
+    match /board/{uid} {
+      allow read: if request.auth != null;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid && validEntry(request.resource.data);
+    }
+    function validEntry(d) {
+      return d.keys().hasOnly(['v', 'name', 'town', 'builder', 'level', 'residents', 'mood', 'streak', 'week', 'weekMin', 'day', 'dayMin', 'total', 'badges', 'hall', 'land', 'bs', 'staff', 'cheers', 'updatedAt'])
+        && d.name is string && d.name.size() <= 24
+        && d.town is string && d.town.size() <= 24
+        && d.weekMin is int && d.weekMin >= 0 && d.weekMin <= 10080
+        && d.dayMin is int && d.dayMin >= 0 && d.dayMin <= 1440
+        && d.total is int && d.total >= 0
+        && d.level is int && d.level >= 0 && d.level <= 1000
+        && d.bs is string && d.bs.size() <= 12000
+        && d.cheers is map && d.cheers.size() <= 500;
+    }
+
+    // Version 12: only the server writes these (Cloud Functions use admin access, which these rules don't limit).
+    // Focus minutes the server timed, and your league result: only you can read yours.
+    match /focus/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /leagueResults/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+    // Last week's final tables: anyone signed in.
+    match /leagueTables/{id} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+    match /leagueWeeks/{w} {
+      allow read, write: if false;
+    }
+    // Whether the server is on: anyone, so the game can check before signing in.
+    match /config/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

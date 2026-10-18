@@ -1,0 +1,7 @@
+{
+  "name": "maplewick-fb",
+  "private": true,
+  "description": "Builds app/github-pages/fb.js, the small Firebase helper the home-screen game loads",
+  "scripts": { "build": "esbuild fb-src.js --bundle --format=esm --minify --target=es2020 --outfile=../../app/github-pages/fb.js" },
+  "devDependencies": { "esbuild": "^0.28.2", "firebase": "13.0.0" }
+}

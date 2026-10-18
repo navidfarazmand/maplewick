@@ -42,7 +42,7 @@ with sync_playwright() as p:
 
     # 1. the hello, and the start message
     pg = fresh()
-    check(any(m.get('version') == '11.12' for m in posts(pg, 'hello')), 'the game says hello to the app with its version')
+    check(any(m.get('version') == '12.00' for m in posts(pg, 'hello')), 'the game says hello to the app with its version')
     start(pg)
     s = D(pg, 'state()')['session']
     f = posts(pg, 'focus')
