@@ -91,6 +91,16 @@ with sync_playwright() as p:
     check('Checked by the server: 42 min' in txt, 'the league tab shows the server-checked minutes')
     pg.close()
 
+    # 6. the Android app's push token goes to the server once signed in (for friends' notifications)
+    STUB = "window.__posts = []; window.MaplewickApp = { platform: 'android', post: (m) => window.__posts.push(m), on: (fn) => { window.__h = fn; }, recv: (m) => window.__h && window.__h(m) };"
+    pg = page(st, STUB)
+    pg.evaluate("() => window.MaplewickApp.recv({ t: 'pushToken', token: 'tok-123' })"); pg.wait_for_timeout(800)
+    reg = [c for c in pg.evaluate('() => window.__calls') if c['name'] == 'registerPush']
+    check(len(reg) == 1 and reg[0]['data']['token'] == 'tok-123', 'the app\'s push token is registered with the server')
+    pg.evaluate("() => window.MaplewickApp.recv({ t: 'pushToken', token: 'tok-123' })"); pg.wait_for_timeout(500)
+    check(len([c for c in pg.evaluate('() => window.__calls') if c['name'] == 'registerPush']) == 1, 'and only once a day for the same token')
+    pg.close()
+
     check(not errs, f'no page errors {errs}')
     print('FAILS', fails)
     b.close()

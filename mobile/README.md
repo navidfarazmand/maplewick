@@ -8,6 +8,7 @@ The phone app. It shows the game from GitHub Pages (https://navidfarazmand.githu
 | **"Your focus is still running"** | Unlock the phone with Maplewick in the back and a notification says so, so a reflex unlock can be undone in time. |
 | **Lock-screen countdown** | While Maplewick is in the back during focus, a quiet notification counts down to the end of the lap or session. |
 | **Alarms with the app closed** | Lap done, break over, "Focus done!", Today's focus plan blocks, and set times with friends (10 minutes before) are scheduled when you leave the app, and cleared when you come back. |
+| **Friends' notifications** | With the server live (`server/`), invitations to focus together, gifts, trades and loans from friends arrive as notifications, even with Maplewick closed. Uses Firebase Cloud Messaging (`google-services.json`, registered in Firebase as "Maplewick Android"). |
 | **Google sign-in** | Google doesn't allow its sign-in page inside apps, so the app signs in natively and hands the token to the game, which gives it to Firebase as before. |
 | **Back button** | Closes the open sheet; on Home it sends Maplewick to the back (it keeps running). |
 
@@ -20,6 +21,8 @@ The game side is the "11.11: the Android app" section of `app/maplewick.html`. I
 | `App.tsx` | The app: the game in a WebView, messages both ways, notifications, Google sign-in |
 | `src/bridge.ts` | The script put into the page before it loads: `window.MaplewickApp`, a stand-in for the browser's Notification API, and `document.hidden` when the app goes to the back |
 | `modules/focus-guard/` | The Android code (Kotlin): the pickup log, the nudge and the lock-screen countdown |
+| `app.config.js` | Adds `google-services.json` (Firebase messaging) to the build when the file is there |
+| `google-services.json` | The Firebase config for Android (not secret: the same public key the web game uses) |
 | `app.json` | Name, package `com.khoreh.maplewick`, icons, permissions, the game's address (`extra.gameUrl`) |
 | `eas.json` | Build profiles: `preview` makes an APK to install on your phone, `production` an app bundle for Google Play |
 

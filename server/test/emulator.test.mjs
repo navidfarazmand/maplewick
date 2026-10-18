@@ -38,6 +38,8 @@ test('rules: the server-only collections can be read by their owner and written 
   await assertFails(getDoc(doc(anon, 'leagueTables/2026-W42_0_0')));
   await assertSucceeds(getDoc(doc(anon, 'config/server')));
   await assertFails(setDoc(doc(alice, 'config/server'), { on: false }));
+  await assertFails(getDoc(doc(alice, 'push/alice')));
+  await assertFails(setDoc(doc(alice, 'push/alice'), { tokens: ['x'] }));
 });
 
 test('rules: the board works as before', async () => {

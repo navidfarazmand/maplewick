@@ -92,3 +92,29 @@ test('31 real players make two groups, each filled to 30 with robots', () => {
   assert.deepStrictEqual(gs.map((g) => g.rows.length), [30, 30]);
   assert.deepStrictEqual(gs.map((g) => g.rows.filter((r) => !r.bot).length), [30, 1]);
 });
+
+const { registerPush, friendPushes } = require('../core');
+const bs = (x) => '~' + encodeURIComponent(JSON.stringify(x)) + ';cottage:1:2:3:1';
+
+test('push tokens: kept per player, newest last, five at most, no repeats', async () => {
+  const db = fakeDb();
+  for (const t of ['a', 'b', 'a', 'c', 'd', 'e', 'f']) await registerPush(db, 'u1', { token: t, platform: 'android' }, T0);
+  assert.deepStrictEqual(db.data.get('push/u1').tokens, ['a', 'c', 'd', 'e', 'f']);
+  await assert.rejects(registerPush(db, 'u1', { token: '' }, T0), /token/);
+});
+
+test('friend notifications: only new, fresh messages, to the friend they are for', () => {
+  const now = T0;
+  const before = { name: 'Sara', bs: bs({ fr: ['u2'], ob: [{ i: 'm1', to: 'u2', k: 'gift', f: 20, at: now - 60000 }] }) };
+  const after = { name: 'Sara', bs: bs({ fr: ['u2', 'u3'], ob: [
+    { i: 'm1', to: 'u2', k: 'gift', f: 20, at: now - 60000 },        // already sent: no
+    { i: 'm2', to: 'u2', k: 'inv', t: 'x', len: 25, at: now - 1000 }, // new invitation
+    { i: 'm3', to: 'u3', k: 'lreq', g: 120, at: now - 1000 },         // new loan request
+    { i: 'm4', to: 'u2', k: 'offer', at: now - 3 * 3600000 },         // old, found on a resave: no
+  ] }) };
+  const p = friendPushes(before, after, now);
+  assert.deepStrictEqual(p.map((x) => [x.to, x.kind]), [['u2', 'inv'], ['u3', 'lreq'], ['u3', 'friend']]);
+  assert.match(p[0].title, /Sara invites you/); assert.match(p[0].body, /25 minutes/);
+  assert.deepStrictEqual(friendPushes(null, after, now).map((x) => x.kind), ['gift', 'inv', 'lreq']); // a new entry: messages, but not "added you"
+  assert.deepStrictEqual(friendPushes(before, null, now), []);
+});

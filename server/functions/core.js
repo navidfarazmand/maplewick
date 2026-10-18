@@ -95,4 +95,41 @@ async function runWeek(db, W, now) {
   return { players, groups };
 }
 
-module.exports = { TZ, focusStart, focusEnd, runWeek, boardExtra, tierFor };
+
+// ---- Friends: a notification when a friend sends you something (roadmap part 8) ----
+
+// Push tokens for a player's phones (the Android app sends its token once notifications are allowed).
+async function registerPush(db, uid, data, now) {
+  const token = String((data && data.token) || '');
+  if (!token || token.length > 400) throw bad('token');
+  const ref = db.collection('push').doc(uid), d = (await ref.get()).data() || {};
+  const tokens = (d.tokens || []).filter((x) => x !== token).concat([token]).slice(-5);
+  await ref.set({ tokens, platform: String((data && data.platform) || '').slice(0, 12), updatedAt: now });
+  return { ok: true };
+}
+
+const MSG_FRESH = 30 * 60000; // only messages written in the last half hour (not old ones found on a resave)
+// What a friend should hear about, from one player's board entry before and after a save:
+// [{ to, title, body, kind }]. New messages in their outbox, and new names on their friends list.
+function friendPushes(before, after, now) {
+  if (!after) return [];
+  const xa = boardExtra(after.bs), xb = before ? boardExtra(before.bs) : {};
+  const name = String(after.name || 'A friend').slice(0, 20);
+  const seen = new Set((Array.isArray(xb.ob) ? xb.ob : []).map((m) => m && m.i));
+  const out = [];
+  for (const m of Array.isArray(xa.ob) ? xa.ob : []) {
+    if (!m || !m.to || seen.has(m.i) || !(now - (m.at || 0) < MSG_FRESH)) continue;
+    const to = String(m.to);
+    if (m.k === 'inv') out.push({ to, kind: 'inv', title: `${name} invites you to focus together`, body: `${m.len | 0} minutes. Open Maplewick within 20 minutes to join.` });
+    else if (m.k === 'gift') out.push({ to, kind: 'gift', title: `${name} sent you a gift`, body: m.f ? `${m.f | 0} food for your town.` : 'A decoration for your town.' });
+    else if (m.k === 'offer') out.push({ to, kind: 'offer', title: `${name} offers a trade`, body: 'Open Maplewick to see it. Offers last two days.' });
+    else if (m.k === 'lreq') out.push({ to, kind: 'lreq', title: `${name} asks to borrow gold`, body: `${m.g | 0} gold. Open Maplewick to answer.` });
+    else if (m.k === 'lgive') out.push({ to, kind: 'lgive', title: `${name} lent you gold`, body: `${m.g | 0} gold is in your treasury.` });
+    else if (m.k === 'acc') out.push({ to, kind: 'acc', title: `${name} took your trade`, body: 'Open Maplewick to see what you got.' });
+  }
+  const fb = new Set(Array.isArray(xb.fr) ? xb.fr : []);
+  if (before) for (const f of Array.isArray(xa.fr) ? xa.fr : []) if (!fb.has(f)) out.push({ to: String(f), kind: 'friend', title: `${name} added you as a friend`, body: 'Add them back in Friends to focus together, trade and send gifts.' });
+  return out.slice(0, 10);
+}
+
+module.exports = { TZ, focusStart, focusEnd, runWeek, boardExtra, tierFor, registerPush, friendPushes };

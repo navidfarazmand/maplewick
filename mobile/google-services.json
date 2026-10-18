@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "816864251885",
+    "project_id": "maplewick-eb4df",
+    "storage_bucket": "maplewick-eb4df.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816864251885:android:722a7b4388b1aae1d861e4",
+        "android_client_info": {
+          "package_name": "com.khoreh.maplewick"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_iBo8PgoV37nLH-BZQxIvZ-ZU6mmxffk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

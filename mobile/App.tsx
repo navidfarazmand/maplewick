@@ -101,6 +101,15 @@ function Game() {
     return () => sub.remove();
   }, [send]);
 
+  // The phone's push token, for friends' notifications (needs google-services.json in the build; quietly skipped without)
+  const sendPushToken = useCallback(async () => {
+    try {
+      const p = await Notifications.getPermissionsAsync(); if (!p.granted) return;
+      const t = await Notifications.getDevicePushTokenAsync();
+      if (t && typeof t.data === 'string') send({ t: 'pushToken', token: t.data });
+    } catch { /* no Firebase messaging in this build */ }
+  }, [send]);
+
   const sendLog = useCallback(() => {
     if (!FocusGuard) return send({ t: 'log', events: [] });
     let events: unknown = [];
@@ -135,6 +144,7 @@ function Game() {
         const p = await askNotifications();
         setPerm(p);
         send({ t: 'perm', perm: p });
+        if (p === 'granted') sendPushToken();
         break;
       }
       case 'notify':
@@ -153,7 +163,7 @@ function Game() {
         if (FocusGuard) FocusGuard.moveToBack(); else BackHandler.exitApp();
         break;
     }
-  }, [send, sendLog]);
+  }, [send, sendLog, sendPushToken]);
 
   async function scheduleAway(countdown: Countdown, notes: Note[]) {
     scheduled.current = notes || [];
@@ -211,7 +221,7 @@ function Game() {
           injectedJavaScriptBeforeContentLoaded={bridgeScript({ appVersion: APP_VERSION, notifPermission: perm })}
           onMessage={onMessage}
           onShouldStartLoadWithRequest={onNavigate}
-          onLoadEnd={sendLog}
+          onLoadEnd={() => { sendLog(); sendPushToken(); }}
           onError={() => setFailed(true)}
           onRenderProcessGone={() => setKey((k) => k + 1)}
           javaScriptEnabled
@@ -241,6 +251,11 @@ async function setupChannel() {
     name: 'Laps, breaks and focus plans',
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 300, 150, 300],
+  }).catch(() => {});
+  await Notifications.setNotificationChannelAsync('friends', {
+    name: 'Friends',
+    description: 'Invitations to focus together, gifts, trades and loans',
+    importance: Notifications.AndroidImportance.HIGH,
   }).catch(() => {});
 }
 

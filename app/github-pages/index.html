@@ -1522,7 +1522,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.02'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.03'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -5086,6 +5086,7 @@
     if (!m || typeof m !== 'object') return;
     if (m.t === 'log') { appEvents(m.events); APP.hold = 0; if (state.session) tick(); }
     else if (m.t === 'ev') { appEvents([{ t: m.at, e: m.e }]); }
+    else if (m.t === 'pushToken' && typeof m.token === 'string') { APP.pushTok = m.token; srvPushToken(); } // 12.03
     else if (m.t === 'back') { appPost({ t: 'back', handled: appBackButton() }); }
     else if (m.t === 'google') {
       if (m.tok) googleWithToken(m.tok);
@@ -5114,6 +5115,13 @@
     const api = srvApi(); if (!api || !api.getDoc || now - (SRV.fAsked || 0) < 60000) return;
     SRV.fAsked = now;
     api.getDoc('focus/' + FB.user.uid).then((d) => { const had = JSON.stringify(SRV.focus || null); SRV.focus = d; if (JSON.stringify(d) !== had) refreshFriends(); }).catch(() => {});
+  }
+  // 12.03: the Android app's push token goes to the server, so friends' invitations, gifts and trades reach the phone
+  // even when Maplewick is closed. Sent once a day at most, and again when it changes.
+  function srvPushToken() {
+    const api = srvApi(), tok = APP.pushTok; if (!api || !tok) return;
+    const key = FB.user.uid + '|' + tok; if (state.pushSent && state.pushSent.k === key && Date.now() - state.pushSent.at < 86400000) return;
+    api.call('registerPush', { token: tok, platform: 'android' }).then(() => { state.pushSent = { k: key, at: Date.now() }; save(); }).catch(() => {});
   }
   // Last week's result from the server (at most every 5 minutes)
   function srvResult(now) {
@@ -10775,7 +10783,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (!state.board.name && u.name) state.board.name = u.name.split(' ')[0].slice(0, 20);
       state.board.fb = true; state.board.joined = true; save();
       if (board.unsub) { board.unsub(); board.unsub = null; }
-      board.kind = 'firebase'; board.last = '';
+      board.kind = 'firebase'; board.last = ''; setTimeout(() => { try { srvPushToken(); } catch (e) { /* later */ } }, 1500); // 12.03
       connectBoard(fbDb(FB.api), fbPeople, u.uid).then(() => {
         // usernames are unique: if someone else already has this one, ask for another
         const nm = (state.board.name || '').toLowerCase();
