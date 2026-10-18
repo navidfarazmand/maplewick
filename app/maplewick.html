@@ -1453,7 +1453,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.02'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.03'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1636,7 +1636,7 @@
     university: { name: 'University', reach: 12, slots: [0, 6, 9, 12], blurb: 'Lecture halls, a library and a dome. Homes in reach of a staffed university earn 20% more.' },
     citybank: { name: 'Bank', blurb: 'A real bank with a big safe: bigger loans, and the treasury holds more.' },
     centralbank: { name: 'Central bank', blurb: 'Columns and a vault: the biggest loans, and the treasury holds much more.' },
-    factory: { name: 'Factory', radius: 0, base: [0, 90, 120, 150], per: [0, 0, 0, 0], near: { r: 1, v: -0.25, label: 'factory noise' },
+    factory: { name: 'Factory', radius: 0, base: [0, 90, 120, 150], per: [0, 0, 0, 0], near: { r: 1, v: -0.25, label: 'factory noise' }, nearOT: -0.35,
       job: { verb: 'Run the line', at: 'at the factory', gold: 2, play: 0.7, lines: ['The conveyor belt sang a little song. You hummed along.', 'You found a faster way to pack boxes. Nobody thanked you.', 'A machine beeped. You beeped back.'] },
       blurb: 'A big employer with a chimney: earns a lot and gives many jobs, but homes right next to it pay 25% less.' },
     induspark: { name: 'Industrial park', radius: 0, base: [0, 180, 230, 280], per: [0, 0, 0, 0], near: { r: 2, v: -0.15, label: 'the industrial park' },
@@ -1706,6 +1706,32 @@
       blurb: 'A covered market, two tiles long: it sells three times the food of a stall and draws homes from 3 tiles away. Stalls inside its reach earn 20% less (competition).',
       needs: [['A market stall at level 2', () => hasLevel('market', 2)]] }
   });
+  // 11.03 (roadmap part 2, Navid): new kinds of business. Each plugs into something the game already has and gives one choice.
+  Object.assign(TYPES, {
+    hardware: { name: 'Hardware store', cat: 'shop', size: 1, unlock: 2, cost: 150, work: 10, max: 3, color: '#D9C9A8', roof: '#3E6F8E', radius: 3, limit: [0, 0, 1, 1, 2, 2, 3],
+      up: [null, null, [200, 25], [600, 50]], base: [0, 4, 6, 9], per: [0, 0.8, 1.2, 1.6],
+      job: { verb: 'Cut keys', at: 'at the hardware store', gold: 1.2, play: 0.95, lines: ['You cut a key that opens nothing. It is beautiful.', 'Someone wanted "the screw that fits". You found it.', 'You alphabetised the nails. Nobody asked.'] },
+      blurb: 'Nails, paint and tools for the town: repairs after fires cost 25% less. Together with a workshop on repairs, a fire costs very little to fix.' },
+    icecream: { name: 'Ice-cream kiosk', cat: 'shop', size: 1, unlock: 2, cost: 100, work: 8, max: 3, color: '#F7E1EA', roof: '#5BC0C8', radius: 2, limit: [0, 0, 1, 1, 2, 2, 2],
+      up: [null, null, [130, 20], [400, 40]], base: [0, 4, 6, 8], per: [0, 1, 1.4, 1.8], fun: 0.08,
+      blurb: 'Open only in summer: homes within 2 tiles are 8% happier while it is open. You can pay to keep it ready all year (half the fun out of season).' },
+    rink: { name: 'Skating rink', cat: 'shop', size: 2, unlock: 2, cost: 300, work: 15, max: 3, color: '#DCEBF5', roof: '#3B6FB0', radius: 3, limit: [0, 0, 1, 1, 1, 1, 2],
+      up: [null, null, [400, 30], [1000, 60]], base: [0, 6, 9, 12], per: [0, 1.2, 1.8, 2.4], fun: 0.1,
+      blurb: 'An ice rink, open only in winter: homes within 3 tiles are 10% happier while it is open. You can pay to keep it ready all year (half the fun out of season).' },
+    pharmacy: { name: 'Pharmacy', cat: 'shop', size: 1, unlock: 3, cost: 260, work: 18, max: 3, color: '#EEF5EE', roof: '#2E8F5A', radius: 3, limit: [0, 0, 0, 1, 2, 2, 3],
+      up: [null, null, [350, 30], [900, 60]], base: [0, 5, 8, 11], per: [0, 0.6, 0.9, 1.2],
+      job: { verb: 'Count pills', at: 'at the pharmacy', gold: 1.4, play: 0.9, lines: ['You counted 1,000 pills. Then the pharmacist counted them again.', 'A grandma brought you cake. Pharmacies get cake.', 'You explained the dose three times. Gently.'] },
+      blurb: 'Medicine for the neighbourhood: homes within 3 tiles fall sick 20% less often, and homes with a baby even less.',
+      needs: [['A clinic', () => countLine('clinic') >= 1]] },
+    pub: { name: 'Pub', cat: 'shop', size: 1, unlock: 3, cost: 240, work: 15, max: 3, color: '#8A5A3A', roof: '#2F4A3A', radius: 2, limit: [0, 0, 0, 1, 1, 2, 2],
+      up: [null, null, [320, 30], [850, 60]], base: [0, 6, 9, 13], per: [0, 1, 1.4, 2], evening: true,
+      job: { verb: 'Pull pints', at: 'at the pub', gold: 1.3, play: 1.2, lines: ['You won the pub quiz. The question was about you.', 'Someone sang the town song. Everyone knew the words but you.', 'You wiped the same glass for ten minutes. Very shiny.'] },
+      blurb: 'Big evening income and a cosy room: homes within 2 tiles are 3% happier, but break-ins around it rise 10% at night. You choose the closing time.' },
+    gym: { name: 'Gym', cat: 'shop', size: 2, unlock: 3, cost: 380, work: 20, max: 3, color: '#E9EEF2', roof: '#D9541E', radius: 3, limit: [0, 0, 0, 1, 1, 2, 2],
+      up: [null, null, [480, 40], [1200, 70]], base: [0, 5, 7, 10], per: [0, 1, 1.5, 2],
+      job: { verb: 'Coach a class', at: 'at the gym', gold: 1, play: 1.3, lines: ['Ten squats. Then ten more. Then a nap.', 'You spotted a lifter. They lifted. You cheered.', 'The spin class played your favourite song.'] },
+      blurb: 'Treadmills and classes: homes within 3 tiles fall sick 10% less and are 2% happier. With a stadium in town it earns 10% more.' }
+  });
   TYPES.prison2.unlock = 5; TYPES.prison2.limit = [0, 0, 0, 0, 0, 1, 1]; TYPES.maxprison.unlock = 6; TYPES.maxprison.limit = [0, 0, 0, 0, 0, 0, 1]; // 11.02: a prison at town hall 5, high security at 6
   const GROWERS = ['field', 'farm', 'greenhouse'];
   const isGrower = (b) => !!b && GROWERS.includes(b.type);
@@ -1735,7 +1761,7 @@
   const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
   const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th');
   const noStaff = () => ({ sweeper: 0, police: 0, fire: 0, gardener: 0, nurse: 0, teacher: 0 });
-  const BUILD_ORDER = ['cottage', 'market', 'markethall', 'cafe', 'park', 'townhouse', 'apartment', 'field', 'farm', 'granary', 'bakery', 'fountain', 'arcade', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
+  const BUILD_ORDER = ['cottage', 'market', 'markethall', 'cafe', 'park', 'townhouse', 'apartment', 'field', 'farm', 'granary', 'bakery', 'hardware', 'icecream', 'rink', 'fountain', 'arcade', 'pharmacy', 'pub', 'gym', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
   const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle'];
   const hasLandmark = (type) => state.buildings.some((b) => b.type === type && live(b));
   const SERVICE_ORDER = ['depot', 'recycling', 'wasteplant', 'shed', 'gardencenter', 'parksdept', 'firestation', 'firehall', 'firehq', 'police', 'policestation', 'courthouse', 'clinic', 'medcenter', 'hospital', 'school', 'highschool', 'university', 'bank', 'citybank', 'centralbank', 'prison', 'prison2', 'maxprison', 'cemetery'];
@@ -1811,7 +1837,7 @@
   // (b.rot: 0 = long along c, 1 = long along r). Everything else is square.
   // 10.08: basic buildings are one tile again; the House is two tiles long (and turns); bigger, better versions are
   // separate buildings (Hospital, Amusement park).
-  const FOOT = { markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
+  const FOOT = { rink: [2, 1], gym: [2, 1], markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
   // 10.09 (Navid): every service grows in three steps with its level: 1×1, then 2×1 (it can be turned), then 2×2,
   // with a new name at each size. Upgrading grows the building into the free tiles next to it.
   // 10.10: undone (Navid): a building keeps its size; bigger versions are separate buildings (SVC_LINES).
@@ -2611,7 +2637,7 @@
     const n0 = F.kids.length; F.kids = F.kids.filter((k) => now - k.born < 6 * FAM_YEAR); if (F.kids.length !== n0) changed = true;
     const ci = city();
     if (ci.residents >= BIRTH_RES) {
-      const exp = ci.residents / 1440 * span / 3600000; let n = Math.floor(exp) + (Math.random() < exp % 1 ? 1 : 0); n = Math.min(n, 3);
+      const exp = ci.residents / 1440 * span / 3600000 * (taxOn() && pol().tax === 'low' ? 1.2 : 1); // 11.03: low taxes, more babies let n = Math.floor(exp) + (Math.random() < exp % 1 ? 1 : 0); n = Math.min(n, 3);
       for (let i = 0; i < n; i++) {
         const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home' && !b.fire && T(b).residents[b.level] >= 4 && babiesIn(b, now) < babyRoom(b)); // 11.02: a House has room for two little ones, an apartment block three
         if (!homes.length) break;
@@ -2643,14 +2669,14 @@
   }
   // 10.09 (Navid): jobs. Businesses, services and staff give work; homes bring workers. Too few jobs and homes pay less
   // tax and crime goes up; too few workers and the shops earn less. A small new town doesn't feel either yet.
-  const JOBS = { farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
+  const JOBS = { hardware: [0, 2, 3, 3], icecream: [0, 1, 2, 2], rink: [0, 2, 3, 3], pharmacy: [0, 2, 3, 4], pub: [0, 3, 4, 5], gym: [0, 3, 4, 5], farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
     field: [0, 2, 3, 4], granary: [0, 1, 1, 2], amusement: [0, 3, 4, 5], clinic: [0, 1, 2, 3], school: [0, 1, 1, 2], police: [0, 1, 1, 2], firestation: [0, 0, 1, 1], depot: [0, 1, 2, 3], shed: [0, 0, 1, 1], prison: [0, 2, 3, 4], cemetery: [0, 1], lighthouse: [0, 2], observatory: [0, 2], castle: [0, 3],
     medcenter: [0, 4, 5, 6], hospital: [0, 8, 10, 12], recycling: [0, 3, 4, 5], wasteplant: [0, 6, 8, 10], gardencenter: [0, 2, 2, 3], parksdept: [0, 3, 4, 5], firehall: [0, 2, 2, 3], firehq: [0, 3, 4, 5],
     policestation: [0, 2, 3, 4], courthouse: [0, 5, 6, 8], highschool: [0, 3, 4, 5], university: [0, 8, 10, 12], citybank: [0, 6, 8, 10], centralbank: [0, 10, 12, 15], factory: [0, 16, 20, 24], induspark: [0, 28, 34, 40], prison2: [0, 4, 5, 6], maxprison: [0, 8, 10, 12] };
   const jobsOf = (type, level) => { const j = JOBS[type]; if (!j) return 0; let L = clamp(level || 1, 1, j.length - 1); if (type !== 'townhall' && L >= 3) L = 2; return j[L] || 0; }; // 11.00: level 3 gives the same jobs as level 2
   function jobsIn(act, residents) {
     let jobs = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0);
-    for (const b of act) jobs += jobsOf(b.type, b.level);
+    for (const b of act) jobs += b.shut || (SEASONAL[b.type] && !seasonOpen(b)) ? 0 : Math.max(0, jobsOf(b.type, b.level) - (b.layoff || 0)); // 11.03: layoffs
     const leaveN = state.fam ? onLeaveNow().length : 0, workers = Math.max(0, Math.round(residents * 0.65) - leaveN), k = clamp((residents - 12) / 24, 0, 1); // 10.19: mothers on leave
     const unemp = workers > 0 ? Math.max(0, workers - jobs) / workers : 0, short = jobs > 0 ? Math.max(0, jobs - workers) / jobs : 0;
     return { jobs, workers, unemp, short, k, jobless: Math.max(0, workers - jobs), residents, leaveN };
@@ -2706,11 +2732,20 @@
         if (o.addons && o.addons.lamp && d <= 1) decor += 0.04; // a lamp post beside a building next door
         // Some buildings bother (or delight) the homes right next to them.
         if (t.near && d <= t.near.r) {
-          if (t.near.v < 0) { noise += -t.near.v; from.push([t.near.label, t.near.v, o.id]); }
+          if (t.near.v < 0) { const nv = t.nearOT && choiceOf(o) === 'on' ? t.nearOT : t.near.v; noise += -nv; from.push([nv !== t.near.v ? `${t.near.label} (overtime)` : t.near.label, nv, o.id]); }
           else { joy += t.near.v; from.push([t.near.label, t.near.v, o.id]); }
         }
       }
       if (h.addons && h.addons.lamp) decor += 0.04;
+      // 11.03: prices and the new businesses around a home
+      for (const o of act) {
+        if (o === h || T(o).cat !== 'shop' || o.fire || o.shut) continue;
+        const d = dist(o, h), R = T(o).radius || 0; if (d > R) continue;
+        if (PRICED.includes(o.type) && !SEASONAL[o.type]) { const p = priceOf(o); if (p === 'cheap') { joy += 0.02; from.push([`low prices at the ${T(o).name.toLowerCase()}`, 0.02, o.id]); } else if (p === 'dear') { noise += 0.02; from.push([`dear prices at the ${T(o).name.toLowerCase()}`, -0.02, o.id]); } }
+        if (o.type === 'pub') { joy += 0.03; from.push(['a cosy pub nearby', 0.03, o.id]); }
+        if (o.type === 'gym') { const v = choiceOf(o) === 'cheap' ? 0.03 : choiceOf(o) === 'dear' ? 0.01 : 0.02; joy += v; from.push(['a gym nearby', v, o.id]); }
+        if (SEASONAL[o.type] && seasonOpen(o)) { const v = (T(o).fun || 0.08) * (inSeason(o) ? 1 : 0.5); joy += v; from.push([`the ${T(o).name.toLowerCase()} is open`, v, o.id]); }
+      }
       decor = Math.min(decor, 0.15);
       if (decor) from.push(['decorations', decor]);
       if (schoolOn) { const sc = schools.find((x) => distFull(x, h) <= stationReach(x)); if (sc) { const v = SCHOOL_K[tierOf(sc.type)]; joy += v; from.push([`${nameOf(sc).toLowerCase()} nearby`, v]); } else { noise += 0.05; from.push(['no school nearby', -0.05]); } }
@@ -2737,9 +2772,10 @@
         const pair = (s.type === 'bakery' || s.type === 'cafe') && act.some((o) => o.type === (s.type === 'bakery' ? 'cafe' : 'bakery') && dist(o, s) <= 2) ? 1.1 : 1;
         const staffed = 1 - 0.5 * J.short * J.k; // 10.09: short of workers, it can't open all day
         const fresh = F && F.supplied && (s.type === 'market' || s.type === 'bakery' || s.type === 'markethall') ? 1.2 : 1; // 10.10: selling food from your own fields
-        const goods = !isFactory(s) && act.some((o) => o.type === 'factory' && !o.fire && !o.goodsGone) ? 1.1 : 1; // 11.02: the factory's goods
+        const fac = act.find((o) => o.type === 'factory' && !o.fire && !o.goodsGone && !o.shut), goods = !isFactory(s) && fac ? (choiceOf(fac) === 'on' ? 1.13 : 1.1) : 1; // 11.02: the factory's goods (11.03: overtime)
         const rival = s.type === 'market' && act.some((o) => o.type === 'markethall' && !o.fire && dist(o, s) <= TYPES.markethall.radius) ? 0.8 : 1; // the market hall draws the customers
-        const income = s.fire || s.closed ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair * staffed * fresh * goods * rival + appliedGold(s);
+        const pk = PRICE_K[priceOf(s)] * (s.type === 'pub' ? (choiceOf(s) === 'late' ? 1.3 : choiceOf(s) === 'early' ? 0.85 : 1) * (1 + 0.6 * nightK()) : s.type === 'gym' ? (choiceOf(s) === 'dear' ? 1.4 : choiceOf(s) === 'cheap' ? 0.85 : 1) * (act.some((o) => o.type === 'stadium') ? 1.1 : 1) : s.type === 'factory' && choiceOf(s) === 'on' ? 1.3 : 1) * (1 - 0.25 * Math.min(3, s.layoff || 0)) * (SEASONAL[s.type] && !inSeason(s) ? 0.5 : 1);
+        const income = s.fire || s.closed || s.shut || !seasonOpen(s) ? 0 : (t.base[s.level] + t.per[s.level] * near * (s.cust == null ? 1 : s.cust)) * pk * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair * staffed * fresh * goods * rival + appliedGold(s);
         total += income; info.set(s.id, { income, near, short: 1 - staffed, fresh: fresh > 1, applied: appliedGold(s), goods: goods > 1, rival: rival < 1, closed: !!s.closed });
       } else if (t.cat === 'joy' || t.cat === 'decor') {
         const r = t.cat === 'joy' ? t.radius : 1;
@@ -2933,10 +2969,10 @@
     recycling: 4, wasteplant: 7, gardencenter: 2, parksdept: 4, firehall: 6, firehq: 10, policestation: 6, courthouse: 10, medcenter: 7, hospital: 12, highschool: 5, university: 9, citybank: 7, centralbank: 12, prison2: 4, maxprison: 7 };
   // 11.00 (balance): every working building costs upkeep, in whole gold an hour by level. Small level-1 buildings run
   // for free, so a new town isn't punished. Service buildings cost twice what they did.
-  const RUNNING_BY_LEVEL = { farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
+  const RUNNING_BY_LEVEL = { hardware: [0, 1, 2, 3], icecream: [0, 1, 2, 3], rink: [0, 2, 4, 5], pharmacy: [0, 2, 3, 4], pub: [0, 2, 3, 4], gym: [0, 3, 4, 6], farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
     factory: [0, 4, 9, 13], induspark: [0, 9, 18, 27], park: [0, 0, 1, 1], fountain: [0, 1, 1, 2], amusement: [0, 3, 6, 9], stadium: [0, 6, 13], field: [0, 0, 1, 2], granary: [0, 0, 1, 2] };
   const runAt = (type, L) => { const r = RUNNING_BY_LEVEL[type]; if (r) return r[clamp(L || 1, 1, r.length - 1)] || 0; return RUNNING[type] ? RUNNING[type] * 2 * (L || 1) : 0; };
-  const runningOf = (b) => (live(b) && runAt(b.type, b.level) ? Math.max(0, Math.round(runAt(b.type, b.level) * (isServiceType(b.type) && state.buildings.some((x) => x.type === 'wasteplant' && live(x)) ? 0.85 : 1)) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
+  const runningOf = (b) => (live(b) && !b.shut && (seasonOpen(b) || !SEASONAL[b.type]) && runAt(b.type, b.level) ? Math.max(0, Math.round(runAt(b.type, b.level) * (isServiceType(b.type) && state.buildings.some((x) => x.type === 'wasteplant' && live(x)) ? 0.85 : 1)) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
   const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0);
   // Thieves who are caught sit in the police station's cells for a while: each one costs a little to keep (10.04).
   const JAIL_COST = 3;
@@ -3033,6 +3069,7 @@
     if (state.jail && state.jail.length) { for (const j of state.jail) j.left -= min; state.jail = state.jail.filter((j) => j.left > 0); }
     for (const b of state.buildings) { for (const k of ['closed', 'goodsGone']) if (b[k]) { b[k].left -= min; if (b[k].left <= 0) delete b[k]; } } // 11.02
     gangStep(Date.now());
+    if (!calm) shopStep(min); else for (const b of state.buildings) if (b.custT != null && b.cust != null) b.cust += (b.custT - b.cust) * (1 - Math.exp(-min / 16)); // 11.03
     prisonStep(min);
     for (const b of state.buildings) if (b.health != null && b.health < 100 && !b.fire && !b.burnt) { b.health = Math.min(100, b.health + min * 2); if (b.health >= 100) delete b.health; }
     cityCache = null;
@@ -3137,7 +3174,7 @@
     toast(`${capFirst(placeName(b))} burned down completely. Rebuild it for ${burnRepairCost(b)} gold.`);
     sfx.grumble && sfx.grumble(); touch(); save(); renderAll();
   }
-  const burnRepairCost = (b) => Math.max(10, Math.round(paidFor(Object.assign({}, b, { level: Math.max(1, b.level) })) * (1 - (b.burnt ? b.burnt.health : healthOf(b)) / 100) * 0.7));
+  const burnRepairCost = (b) => Math.max(10, Math.round(paidFor(Object.assign({}, b, { level: Math.max(1, b.level) })) * (1 - (b.burnt ? b.burnt.health : healthOf(b)) / 100) * 0.7 * (hasLive('hardware') ? 0.75 : 1) * (state.buildings.some((x) => x.type === 'workshop' && live(x) && choiceOf(x) === 'repairs') ? 0.5 : 1))); // 11.03
   const burnRepairSecs = (b) => Math.round(30 + 150 * (1 - (b.burnt ? b.burnt.health : healthOf(b)) / 100));
 
   // ---- Crime. A town-wide crime level (0–100): up when thieves get away, when homes are far from the police and when
@@ -3148,7 +3185,7 @@
     const mood = moodNow(Date.now()).value;
     const kids = TYPES.school && hallLevel() >= TYPES.school.unlock ? state.buildings.filter((h) => live(h) && T(h).cat === 'home' && !coversB('teacher', h)).length / Math.max(1, hs.length) : 0;
     const J = ci && ci.jobs ? ci.jobs : { unemp: 0, k: 0 }, gang = gangFree() ? 15 : 0; // 10.09: no work; 11.02: a gang that is free
-    return clamp(10 + 45 * far + Math.max(0, 65 - mood) * 0.6 + 12 * kids + 35 * J.unemp * J.k + gang - Math.min(10, (state.jail || []).length * 4) - Math.min(12, (state.prison || []).length * 3), 0, 100);
+    return clamp(10 + 45 * far + Math.max(0, 65 - mood) * 0.6 + 12 * kids + 35 * J.unemp * J.k + gang + (taxOn() && pol().tax === 'high' ? 8 : 0) - Math.min(10, (state.jail || []).length * 4) - Math.min(12, (state.prison || []).length * 3), 0, 100);
   }
   const crimeLevel = () => clamp(state.crime == null ? 25 : state.crime, 0, 100);
   const crimeWord = (v) => (v < 20 ? 'Very low' : v < 40 ? 'Low' : v < 60 ? 'Medium' : v < 80 ? 'High' : 'Very high');
@@ -3352,6 +3389,8 @@
     if (state.fam && babyAt(b)) r *= 1.25; // 10.19: a baby at home
     if (nearType(b, ['park', 'fountain'], 2)) r *= 0.7;
     if (nearType(b, ['market', 'bakery'], 3)) r *= 0.85;
+    { const ph = state.buildings.find((o) => o.type === 'pharmacy' && live(o) && !o.shut && dist(o, b) <= 3); if (ph) { const c0 = choiceOf(ph); r *= c0 === 'cheap' ? 0.7 : c0 === 'dear' ? 0.9 : 0.8; if (state.fam && babyAt(b)) r *= 0.8; } } // 11.03
+    { const gy = state.buildings.find((o) => o.type === 'gym' && live(o) && !o.shut && dist(o, b) <= 3); if (gy) r *= choiceOf(gy) === 'cheap' ? 0.85 : choiceOf(gy) === 'dear' ? 0.95 : 0.9; }
     if (SEA.k === 'winter') r *= 1.4;
     return r;
   }
@@ -3851,7 +3890,7 @@
     if ((roleInfo('police', ci).needed || (hallLevel() >= TYPES.police.unlock && homesCount() >= 6)) && !state.buildings.some((b) => b.robbed)) {
       const nk = nightK();
       if (ui.robIn == null) ui.robIn = 240 + Math.random() * 240;
-      ui.robIn -= dt * (1 + 1.2 * nk) * (0.5 + crimeLevel() / 50) * (hasLive('cinema') ? 0.85 : 1); // more break-ins at night, and when crime is high
+      ui.robIn -= dt * (1 + 1.2 * nk * (nightShift() ? 0.5 : 1)) * (0.5 + crimeLevel() / 50) * (hasLive('cinema') ? 0.85 : 1); // 11.03: a night shift halves the night break-ins // more break-ins at night, and when crime is high
       if (ui.robIn <= 0 && ui.playVisit >= 25 && !ui.panel) {
         ui.robIn = null;
         const st = stationsOf('police');
@@ -3859,7 +3898,7 @@
         const w = (b) => { if (coversB('police', b, st)) return 0.4; const d = st.length ? Math.min(...st.map((x) => dist(x, b) - stationReach(x))) : 4; return (2 + 0.6 * Math.max(0, d)) * (T(b).cat === 'shop' ? 1.3 : 1) * (nearAddon(b, 'lamp', 1) ? 0.7 : 1); };
         const bank = gangFree() && harshCrime() && Date.now() - (state.lastHeist || 0) > HEIST_GAP ? state.buildings.find((b) => isBank(b) && live(b) && !b.robbed && !b.fire) : null;
         if (bank && Math.random() < 0.35) startRobbery(bank, true); // 11.02: a heist, only while a gang is free
-        else startRobbery(weighted(state.buildings.filter((b) => messy(b) && !b.fire && !revealFor(b.id)), (b) => w(b) * (teenCover(b) ? 0.7 : 1)));
+        else startRobbery(weighted(state.buildings.filter((b) => messy(b) && !b.fire && !revealFor(b.id)), (b) => w(b) * (teenCover(b) ? 0.7 : 1) * pubNight(b)));
       }
     }
     if (sickOn() && homesCount() >= 4 && !state.buildings.some((b) => b.sick)) {
@@ -4042,16 +4081,17 @@
     const work = ci.jobs ? -Math.round(12 * ci.jobs.unemp * ci.jobs.k) : 0; // 10.09: people out of work
     const food = ci.food ? (ci.food.fed < 0.98 ? -Math.round(10 * (1 - ci.food.fed)) : (state.food || 0) >= ci.food.eaten * 2 ? 3 : 0) : 0; // 10.10
     const { families, babyCare } = familyMood(now); // 10.19
-    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt + school + sick + work + food + families + babyCare), 0, 100);
-    return { value, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, school, sick, work, food, families, babyCare, roles, mult: 0.6 + 0.8 * value / 100 };
+    const taxes = taxMood(); // 11.03: the tax rate
+    const value = clamp(Math.round(50 + neigh + quality + clean + safety + health + fires + boost + landmarks + trouble + debt + school + sick + work + food + families + babyCare + taxes), 0, 100);
+    return { value, taxes, neigh, quality, clean, avgTrash, safety, health, fires, burning, boost, landmarks, trouble, debt, school, sick, work, food, families, babyCare, roles, mult: 0.6 + 0.8 * value / 100 };
   }
   const moodWord = (v) => (v < 25 ? 'Miserable' : v < 45 ? 'Grumpy' : v < 60 ? 'Okay' : v < 80 ? 'Happy' : 'Delighted');
   function econ(now) {
     const ci = city(), mood = moodNow(now || Date.now());
-    const staffWages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0), 0), fleet = fleetUpkeep(), running = runningCosts(), jail = jailUpkeep();
+    const staffWages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0) * (k === 'police' && nightShift() ? 1.5 : 1), 0), fleet = fleetUpkeep(), running = runningCosts(), jail = jailUpkeep();
     const leave = (state.fam ? onLeaveNow().length : 0) * LEAVE_PAY; // 10.19: mothers on leave
     const wages = staffWages + fleet + running + jail + leave;
-    const taxes = ci.total * mood.mult, net = taxes - wages;
+    const taxes = ci.total * mood.mult * taxK(), net = taxes - wages; // 11.03: the tax rate
     // An open loan takes its instalment every hour you play or focus (shown as its own red line).
     const loanPay = loans().reduce((a, L) => a + (L.owed > 0 ? playInstalment(L) : 0), 0), loanFocus = loans().reduce((a, L) => a + (L.owed > 0 ? focusInstalment(L) : 0), 0);
     return { ci, mood, taxes, wages, staffWages, fleet, running, jail, leave, net, loanPay, loanFocus, keep: net - loanPay };
@@ -4239,7 +4279,7 @@
       const L = b.level + 1;
       if (L > t.max) return { ok: false, why: 'Fully upgraded.', max: true };
       cost = t.up[L][0]; work = upgradeWork(b.type, L);
-      if (b.type !== 'townhall' && state.buildings.some((x) => lineOf(x.type) === 'workshop' && live(x) && !x.fire)) cost = Math.max(5, Math.round(cost * 0.9 / 5) * 5); // 11.02: building materials
+      if (b.type !== 'townhall' && state.buildings.some((x) => lineOf(x.type) === 'workshop' && live(x) && !x.fire && (x.type !== 'workshop' || choiceOf(x) === 'materials'))) cost = Math.max(5, Math.round(cost * 0.9 / 5) * 5); // 11.02: building materials
       if (jobMode('upgrade', b.type) === 'play') secs = upgradeSecs(b.type, L);
       if (b.type !== 'townhall' && L > hallLevel()) return { ok: false, why: `Upgrade the town hall to level ${L} first.`, cost, work };
       if (b.type === 'townhall' && city().residents < (HALL_RES[L] || 0)) return { ok: false, why: `The town needs ${HALL_RES[L]} residents first (it has ${city().residents}).`, cost, work, people: true };
@@ -5962,7 +6002,7 @@
   function starShape(c, x, y, r, col) { c.fillStyle = col; c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
   function tongue(c, x, y, w, h, col) { c.fillStyle = col; c.beginPath(); c.moveTo(x - w, y); c.quadraticCurveTo(x - w * 0.95, y - h * 0.55, x, y - h); c.quadraticCurveTo(x + w * 0.95, y - h * 0.55, x + w, y); c.closePath(); c.fill(); }
   // How tall each burnable building is (in building units), so flames sit on the roof.
-  const topOf = (type, L) => ({ apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
+  const topOf = (type, L) => ({ hardware: 19 + 3 * L, icecream: 14 + 2 * L, rink: 8, pharmacy: 18 + 3 * L, pub: 22 + 3 * L, gym: 18 + 2 * L, apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
   function flames(c, x, y, hw, u, topH, k) {
     const t = reduced ? 0 : ART.t, top = y - topH * u;
     const g = c.createRadialGradient(x, y - topH * u * 0.45, 2 * u, x, y - topH * u * 0.45, hw * 1.15);
@@ -6730,6 +6770,67 @@
       case 'cherry': {
         treeAt(c, x, y, 26 * u, col);
         if (!reduced) for (let i = 0; i < 4; i++) { const k = ((now / 2600) + i / 4) % 1; c.fillStyle = `rgba(244,166,198,${1 - k})`; c.beginPath(); c.ellipse(x - 8 * u + i * 5 * u + Math.sin(k * 6 + i) * 3 * u, y - 22 * u + k * 22 * u, 1.3 * u, 0.8 * u, k * 4, 0, Math.PI * 2); c.fill(); }
+        break;
+      }
+      case 'hardware': { // 11.03: a shop with a big shop window, a sign with a hammer, ladders and paint pots outside
+        const h = (13 + level * 3) * u, f = box(c, x, y, hw, hh, 0.6, h, col);
+        if (ruin) wallQuad(c, f.B, f.R, 0.1, 0.9, h * 0.15, h * 0.6, '#3A322B'); else { wallQuad(c, f.B, f.R, 0.1, 0.62, h * 0.12, h * 0.6, glass); doorQ(c, f.B, f.R, 0.68, 0.88, h * 0.6, '#3E6F8E', u); }
+        wallQuad(c, f.L, f.B, 0.1, 0.9, h * 0.66, h * 0.9, ruin ? '#5A4A3A' : '#F4EEE0');
+        if (!ruin) { const a = wallPt(f.L, f.B, 0.35, h * 0.72), b0 = wallPt(f.L, f.B, 0.65, h * 0.84); line(c, a, b0, '#6B4A33', 1.1 * u); const hd = wallPt(f.L, f.B, 0.62, h * 0.84); c.fillStyle = '#59606A'; c.fillRect(hd[0] - 2 * u, hd[1] - 1.2 * u, 4 * u, 2.4 * u); }
+        pyramid(c, x, y, hw, hh, 0.6, h, 7 * u, roofc);
+        if (!ruin && level >= 2) { const lp = [x + hw * 0.62, y + hh * 0.1]; line(c, lp, [lp[0] - 3 * u, lp[1] - 16 * u], '#B08356', 0.8 * u); line(c, [lp[0] + 2 * u, lp[1]], [lp[0] - 1 * u, lp[1] - 16 * u], '#B08356', 0.8 * u); for (let i = 1; i < 5; i++) line(c, [lp[0] - 0.6 * i * u, lp[1] - i * 3.2 * u], [lp[0] + 2 * u - 0.6 * i * u, lp[1] - i * 3.2 * u], '#B08356', 0.6 * u); }
+        if (!ruin) for (const [dx, cc] of [[-0.55, '#C8473D'], [-0.4, '#3E8E57']]) box(c, x + dx * hw, y + hh * 0.45, 1.6 * u, 0.8 * u, 1, 2.6 * u, cc);
+        break;
+      }
+      case 'icecream': { // 11.03: a little striped kiosk with a giant cone on top (shutters down out of season)
+        const open = seasonOpen({ type, choice: opt.choice }) && !ruin, h = (10 + level * 2) * u, f = box(c, x, y, hw, hh, 0.48, h, col);
+        wallQuad(c, f.B, f.R, 0.12, 0.88, h * 0.35, h * 0.8, open ? '#FFF6E8' : '#9AA6AE');
+        if (!open) for (let i = 1; i < 5; i++) line(c, wallPt(f.B, f.R, 0.12, h * (0.35 + i * 0.09)), wallPt(f.B, f.R, 0.88, h * (0.35 + i * 0.09)), '#7E8A93', 0.6 * u);
+        for (let i = 0; i < 4; i++) wallQuad(c, f.L, f.B, i / 4, (i + 1) / 4, h * 0.82, h, i % 2 ? '#F7F3EA' : roofc);
+        for (let i = 0; i < 4; i++) wallQuad(c, f.B, f.R, i / 4, (i + 1) / 4, h * 0.82, h, i % 2 ? '#F7F3EA' : roofc);
+        const tx = x, ty = y - h - 2 * u; poly(c, [[tx - 3 * u, ty], [tx + 3 * u, ty], [tx, ty + 7 * u]], '#D9A55A');
+        for (const [dy, cc] of [[0, '#F7B3CC'], [-3.4, '#FFF3D6'], [-6.4, '#8A5A3A']]) { c.fillStyle = cc; c.beginPath(); c.arc(tx, ty + dy * u - 1 * u, 3.1 * u, 0, Math.PI * 2); c.fill(); }
+        if (open && level >= 2) { c.fillStyle = '#E8503A'; c.beginPath(); c.arc(tx + 0.6 * u, ty - 9.6 * u, 1 * u, 0, Math.PI * 2); c.fill(); }
+        if (open) for (const [dx, cc] of [[-0.6, '#E46B8A'], [0.55, '#5BC0C8']]) { const px0 = x + dx * hw, py0 = y + hh * 0.4; line(c, [px0, py0], [px0, py0 - 10 * u], '#59606A', 0.6 * u); poly(c, [[px0 - 5 * u, py0 - 10 * u], [px0 + 5 * u, py0 - 10 * u], [px0, py0 - 14 * u]], cc); }
+        break;
+      }
+      case 'rink': { // 11.03: an ice rink with a little hut; skaters in winter (or all year), a tarp out of season
+        const F = fpv, open = seasonOpen({ type, choice: opt.choice }) && !ruin;
+        const q = rectPts(x, y, F, 0.94); poly(c, [q.T, q.R, q.B, q.L], '#8B98A2');
+        const q2 = rectPts(x, y - 1.2 * u, F, 0.86); poly(c, [q2.T, q2.R, q2.B, q2.L], open ? '#E8F4FB' : '#5F7A8C');
+        if (open) { c.strokeStyle = 'rgba(120,170,210,.5)'; c.lineWidth = 0.6 * u; for (let i = 0; i < 4; i++) { c.beginPath(); c.ellipse(x + (i - 1.5) * 6 * u, y - 1.2 * u, 5 * u, 2 * u, 0.3, 0, Math.PI * 2); c.stroke(); } }
+        for (const [P, Q] of [[q2.L, q2.B], [q2.B, q2.R]]) poly(c, [P, Q, [Q[0], Q[1] - 2.2 * u], [P[0], P[1] - 2.2 * u]], '#F4F6F7');
+        const hx = x + F.ac[0] * 0.55 - F.ar[0] * 0.55, hy = y + F.ac[1] * 0.55 - F.ar[1] * 0.55, hf = box(c, hx, hy - 1 * u, 6 * u, 3 * u, 1, 7 * u, col);
+        windowQ(c, hf.B, hf.R, 0.25, 0.75, 7 * u * 0.4, 7 * u * 0.8, glass, u, true); pyramid(c, hx, hy - 1 * u, 6 * u, 3 * u, 1, 7 * u, 4 * u, roofc);
+        if (open && !reduced) for (let i = 0; i < 2 + level; i++) { const a = now / 2600 + i * 2.1, sx = x + Math.cos(a) * 9 * u, sy = y - 1.5 * u + Math.sin(a) * 3.5 * u; person(c, sx, sy, 0.85 * u / (HW / 30), residentLook(i + 2), { arms: 'cheer', t: now / 1000 + i, facing: Math.sin(a) > 0 ? -1 : 1 }); }
+        break;
+      }
+      case 'pharmacy': { // 11.03: a white shop with a green cross and a big window
+        const h = (14 + level * 3) * u, f = box(c, x, y, hw, hh, 0.58, h, col);
+        if (ruin) wallQuad(c, f.B, f.R, 0.12, 0.88, h * 0.15, h * 0.62, '#3A322B'); else { wallQuad(c, f.B, f.R, 0.1, 0.55, h * 0.12, h * 0.62, glass); doorQ(c, f.B, f.R, 0.62, 0.86, h * 0.62, '#2E8F5A', u); }
+        wallQuad(c, f.L, f.B, 0, 1, h * 0.7, h * 0.78, ruin ? '#5A4A3A' : '#2E8F5A');
+        const cp = wallPt(f.L, f.B, 0.5, h * 0.5); if (!ruin) { c.fillStyle = '#2E8F5A'; c.fillRect(cp[0] - 4 * u, cp[1] - 1.3 * u, 8 * u, 2.6 * u); c.fillRect(cp[0] - 1.3 * u, cp[1] - 4 * u, 2.6 * u, 8 * u); }
+        box(c, x, y - h, hw * 0.58, hh * 0.58, 1.04, 2 * u, roofc);
+        if (!ruin && level >= 2) { const sp = [x + hw * 0.32, y - h - 2 * u]; line(c, sp, [sp[0], sp[1] - 7 * u], '#59606A', 0.8 * u); c.fillStyle = '#2E8F5A'; c.fillRect(sp[0] - 3 * u, sp[1] - 11 * u, 6 * u, 1.8 * u); c.fillRect(sp[0] - 0.9 * u, sp[1] - 13 * u, 1.8 * u, 6 * u); }
+        break;
+      }
+      case 'pub': { // 11.03: a dark timbered pub with a hanging sign and warm windows (busier at night)
+        const h = (14 + level * 3) * u, f = box(c, x, y, hw, hh, 0.6, h, col), warm = nightK() > 0.3;
+        for (const a of [0.1, 0.62]) { if (ruin) wallQuad(c, f.B, f.R, a, a + 0.24, h * 0.25, h * 0.55, '#3A322B'); else windowQ(c, f.B, f.R, a, a + 0.24, h * 0.25, h * 0.55, '#C9A86A', u, warm); }
+        if (!ruin) doorQ(c, f.L, f.B, 0.4, 0.6, h * 0.5, '#3A2618', u);
+        for (const v of [0.6, 0.62]) wallQuad(c, f.L, f.B, 0, 1, h * v, h * (v + 0.04), '#3A2618');
+        gable(c, x, y, hw, hh, 0.6, h, 10 * u, roofc);
+        if (!ruin) { const sp = wallPt(f.B, f.R, 0.98, h * 0.72); line(c, sp, [sp[0] + 6 * u, sp[1] - 2 * u], '#3A2618', 0.8 * u); line(c, [sp[0] + 5 * u, sp[1] - 1.6 * u], [sp[0] + 5 * u, sp[1] + 1 * u], '#3A2618', 0.5 * u); box(c, sp[0] + 5 * u, sp[1] + 5 * u, 2.6 * u, 1.3 * u, 1, 4.2 * u, '#E8A93A'); }
+        if (!ruin && level >= 2) for (const dx of [-0.75, -0.45]) { const bx = x + dx * hw, by = y + hh * 0.5; box(c, bx, by, 2.4 * u, 1.2 * u, 1, 2.6 * u, '#6B4A33'); line(c, [bx - 2 * u, by - 2.6 * u], [bx - 2 * u, by - 7 * u], '#59606A', 0.5 * u); poly(c, [[bx - 5 * u, by - 7 * u], [bx + 1 * u, by - 7 * u], [bx - 2 * u, by - 9.4 * u]], '#C8473D'); }
+        break;
+      }
+      case 'gym': { // 11.03: a long modern gym with a glass front and a big dumbbell on the roof
+        const F = fpv, h = (15 + level * 2) * u, f = boxF(c, x, y, F, 0.86, h, col), { lf, sf } = faces2(f, F);
+        if (ruin) WQ(c, lf, 0.06, 0.94, h * 0.12, h * 0.75, '#3A322B'); else { WQ(c, lf, 0.06, 0.94, h * 0.12, h * 0.75, glass); for (let i = 1; i < 6; i++) line(c, wallPt(lf[0], lf[1], 0.06 + i * 0.147, h * 0.12), wallPt(lf[0], lf[1], 0.06 + i * 0.147, h * 0.75), '#F4F6F7', 0.6 * u); }
+        WQ(c, lf, 0, 1, h * 0.8, h * 0.95, roofc); WQ(c, sf, 0, 1, h * 0.8, h * 0.95, shade(roofc, 0.85));
+        if (!ruin) doorQ(c, sf[0], sf[1], 0.38, 0.62, h * 0.55, '#2B3A44', u);
+        const { L: rL, R: rR, B: rB, T: rT } = rectPts(x, y - h, F, 0.86); poly(c, [rT, rR, rB, rL], shade(col, 1.08));
+        if (!ruin) { const m = [x, y - h - 4 * u], dir = lf[1][0] > lf[0][0] ? 1 : -1; line(c, [m[0] - 7 * u, m[1] + dir * 1.5 * u], [m[0] + 7 * u, m[1] - dir * 1.5 * u], '#59606A', 1.2 * u); for (const s0 of [-1, 1]) { c.fillStyle = '#2B3A44'; c.beginPath(); c.ellipse(m[0] + s0 * 6 * u, m[1] - s0 * dir * 1.3 * u, 1.6 * u, 3 * u, 0, 0, Math.PI * 2); c.fill(); } }
         break;
       }
       case 'apartment': { // 11.02: four storeys of flats on 2×2 tiles, balconies from level 2, a roof garden at level 3
@@ -7750,7 +7851,7 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+  const ROOF = { hardware: (L) => 26 + 3 * L, icecream: (L) => 26 + 2 * L, rink: () => 14, pharmacy: (L) => 20 + 3 * L, pub: (L) => 28 + 3 * L, gym: (L) => 26 + 2 * L, apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
     workshop: (L) => 36 + 3 * L, factory: (L) => 39 + L, induspark: (L) => 43 + L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 25 + 3 * L, medcenter: (L) => 33 + L, hospital: (L) => 44 + L, stadium: (L) => 44 + 4 * L, depot: (L) => 24 + 2 * L, recycling: (L) => 29 + L, wasteplant: (L) => 49 + L,
     shed: (L) => 19 + 2 * L, gardencenter: (L) => 27 + L, parksdept: (L) => 33 + L, firestation: (L) => 33 + 2 * L, firehall: (L) => 39 + L, firehq: (L) => 61 + L, police: (L) => 25 + 2 * L, policestation: (L) => 29 + L, courthouse: (L) => 47 + L,
     prison: (L) => 20 + 2 * L, prison2: (L) => 33 + L, maxprison: (L) => 33 + L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
@@ -8159,7 +8260,7 @@
         let sc = 1;
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
-        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
+        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, choice: b.choice, ruin: b.ruin || !!b.shut, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
         if (b.addons) drawAddons(c, b, now);
         if (isGrower(b)) drawFarmers(c, b, now); // 10.15; 11.02: farms too
         if (sc !== 1) c.restore();
@@ -9491,6 +9592,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (row.childNodes.length) { row.classList.toggle('two', row.childNodes.length === 2); if (row.childNodes.length === 1) row.style.gridTemplateColumns = '1fr'; box.append(row); }
     if (why) box.append(el('p', 'tiny muted', why));
     if (b.small) box.append(el('p', 'tiny muted', `No room to grow: it works as a level-${b.level} ${nameOf(b).toLowerCase()}, but stays ${dimsB(b).join('×')} until you move it to a spot with ${dimsOf(b.type, 0, b.level).join('×')} free.`));
+    { const cb = choiceBox(b); if (cb && !q && !b.ruin) box.append(cb); } // 11.03: one choice for every building
+    if (b.shut && !b.ruin) { const ro = actionBtn(`Open it again · ${reopenCost(b)} gold`, 'with all its staff', 'primary', () => reopenShop(b), state.gold + 1e-6 < reopenCost(b)); ro.style.width = '100%'; box.append(el('p', 'small', `Closed: it earned less than its upkeep for three town days. Change its price, build homes nearby, or open it again.`), ro); }
     if (sellable(b) && T(b).cat !== 'decor' && !special(T(b))) {
       const sl = el('button', 'link', `Sell for ${sellPrice(b)} gold (half of what it cost)`);
       sl.addEventListener('click', () => { if (sl.dataset.ask) sellBuilding(b.id); else { sl.dataset.ask = '1'; sl.textContent = `Tap again to sell it for ${sellPrice(b)} gold`; } });
@@ -9648,6 +9751,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (b.fire) bad('On fire', `${Math.round(healthOf(b))}% left`);
     if (b.health != null && b.health < 100 && !b.fire && !b.burnt) bad('Scorched by a fire', `${Math.round(b.health)}%, fixing itself`);
     if (b.robbed) bad(b.robbed.kind === 'heist' ? 'Bank robbery' : 'Break-in', b.robbed.kind === 'goods' ? 'goods taken' : `${b.robbed.stolen} gold taken`);
+    if (b.shut) bad('Closed for good', 'it lost money three days running');
+    else if (b.layoff) bad(`${b.layoff} worker${b.layoff > 1 ? 's' : ''} let go`, `−${25 * b.layoff}% income`);
+    if (SEASONAL[b.type] && !seasonOpen(b)) bad('Closed for the season', `opens in ${SEASONAL[b.type]}`);
     if (b.closed) bad('Closed after a break-in', `opens in ${Math.max(1, Math.ceil(b.closed.left))} h`);
     if (b.goodsGone) bad('Goods stolen', 'the shops miss its +10% for a day');
     if (isBank(b) && live(b)) { const ps = stationsOf('police').find((s) => tierOf(s.type) >= 2 && distFull(s, b) <= stationReach(s)); if (!ps) bad(gangFree() ? 'A gang is free, and no police station reaches the bank' : 'No police station (2×1 or bigger) reaches the bank', gangFree() ? 'a heist could take 15% of the treasury' : 'if a gang forms, a heist could take 15%'); } // 11.02
@@ -9906,6 +10012,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     bank: 'A small bank office.', citybank: 'The bank, with a big safe.', centralbank: 'The central bank, with columns and a vault.',
     factory: 'A factory, with a chimney and many hands.', induspark: 'The industrial park: the town\'s biggest employer.',
     monument: 'A monument of the projects you finished, one stone each.',
+    hardware: 'Nails, paint, tools and good advice.', icecream: 'Cones in every colour, all summer long.', rink: 'Skates, hot chocolate and music on the ice.', pharmacy: 'Medicine and a friendly word.', pub: 'Warm light, a quiz on Thursdays and a fire in winter.', gym: 'Treadmills, weights and the Saturday spin class.',
     apartment: 'Flats for many families, stacked four storeys high.', farm: 'A red barn, a silo and fields full of crops.', markethall: 'A covered market: stalls of fruit, cheese and bread under one roof.',
     prison: 'A small jail where the thieves the Central police sentences serve their time.', prison2: 'A prison with a fenced yard.', maxprison: 'A high-security prison with walls and watchtowers.'
   };
@@ -11325,7 +11432,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return box;
   }
   /* ---------- 10.09: the Incident report ---------- */
-  const INC_ICON = { gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
+  const INC_ICON = { layoff: ['#8A5A2B', '📉'], shut: ['#7A8590', '🔒'], gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
   const agoText = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   function openIncidents() { const wrap = el('div', 'list inc'); incidentsBody(wrap); openSheet('Incident report', wrap); }
   function incidentsBody(wrap) {
@@ -11483,6 +11590,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (city().food) fac('Food', m.food, m.food < 0 ? 'The store is empty and the fields can\'t feed everyone: hungry homes pay less. Build or upgrade fields, or focus (fields grow twice as fast).' : m.food > 0 ? 'Fresh food from your own fields, and plenty in store.' : 'Everyone is fed, but the store is low.', null, [-10, 3]);
     if (m.families || babiesNow().length) { const pl = fam().leave; fac('Families', m.families, `${babiesNow().length} bab${babiesNow().length === 1 ? 'y' : 'ies'} born in the last year (${realText(12)}). Their mothers got ${[...new Set(babiesNow().map((k) => leaveText(k.leave)))].join(' or ')} at home, and other families hear about it${fam().births < 3 ? ' (more as more babies are born)' : ''}. Your policy now: ${leaveText(pl)}.`, null, [-4, 4]); }
     if (m.babyCare) fac('Care for babies', m.babyCare, 'Some babies live out of reach of a clinic with a nurse. Families worry, and babies fall sick more easily.', null, [-4, 0]);
+    if (m.taxes) fac('Taxes', m.taxes, m.taxes > 0 ? 'Low taxes: people keep more of what they earn.' : 'High taxes: people grumble about the town\'s tax rate (Policies).', null, [-8, 5]);
     if (m.work) fac('Jobs', m.work, `${city().jobs.jobless} people have no job. Shops, workshops and services create jobs (bigger ones create more).`, null, [-12, 0]);
     if (m.debt) fac('Money trouble', m.debt, 'The town is in debt and staff wages are late. Sell a building, take a loan or let someone go: tap your gold to see the options.', null, [-10, 0]);
     if (m.trouble <= -0.5) fac('Recent trouble', m.trouble, `${(state.scars || []).slice(-3).map((x) => x.label).join(', ') || 'A break-in'}${state.buildings.some((b) => b.robbed) ? ', and a break-in nobody has solved yet' : ''}. It fades slowly.`, 'up', [-20, 0]);
@@ -11638,6 +11746,93 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (isLaps) card.append(sw, planBox); else card.append(el('span', 'lc-unfold', 'As many laps as you like, with breaks ▾'));
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
+  }
+  /* ---------- 11.03 (roadmap parts 2 and 3, Navid): every building has a job and one choice ----------
+     Shop prices (cheap / normal / dear): dear pays 25% more at once, but over the next two town days some customers
+     stay away and the homes around grumble (−2%); cheap pays 20% less at once, then more customers come and the homes
+     around are happier (+2%). Each choice wins somewhere: dear for the only shop in a happy street, cheap with many
+     homes or a rival nearby, normal in a grumpy town. A shop that earns less than its upkeep for a whole town day lets
+     a worker go (−25%); after three such days it closes. The tax rate is a policy. */
+  const PRICED = ['market', 'markethall', 'cafe', 'bakery', 'bookshop', 'arcade', 'hardware', 'pharmacy', 'restaurant', 'hotel', 'theater', 'icecream', 'rink'];
+  const PRICE_K = { cheap: 0.8, normal: 1, dear: 1.25 };
+  const priceOf = (b) => (b && PRICED.includes(b.type) && PRICE_K[b.choice] ? b.choice : 'normal');
+  const SEASONAL = { icecream: 'summer', rink: 'winter' };
+  const seasonOpen = (b) => !SEASONAL[b.type] || SEA.k === SEASONAL[b.type] || b.choice === 'allyear';
+  const inSeason = (b) => !SEASONAL[b.type] || SEA.k === SEASONAL[b.type];
+  // What each building lets you decide, and what each option does.
+  const CHOICES = {
+    price: { title: 'Prices', opts: [['cheap', 'Cheap', '−20% now, then more customers · homes around +2%'], ['normal', 'Normal', 'as it is'], ['dear', 'Dear', '+25% now, some customers stay away · homes around −2%']] },
+    food: { title: 'Food price', opts: [['cheap', 'Cheap', '−20%, sells 25% more food · homes around +2%'], ['normal', 'Normal', 'as it is'], ['dear', 'Dear', '+25% per food, sells less · homes around −2%']] },
+    medicine: { title: 'Medicine price', opts: [['cheap', 'Cheap', 'sickness −30% in reach, earns 20% less'], ['normal', 'Normal', 'sickness −20% in reach'], ['dear', 'Dear', 'sickness −10% in reach, earns 25% more']] },
+    pub: { title: 'Closing time', opts: [['early', 'Early', 'safer: night break-ins around it +5%, earns 15% less'], ['normal', 'Normal', 'night break-ins around it +10%'], ['late', 'Late', 'more money (+30%), night break-ins around it +20%']] },
+    gym: { title: 'Membership', opts: [['cheap', 'Cheap', 'more members: sickness −15%, mood +3% in reach, earns less'], ['normal', 'Normal', 'sickness −10%, mood +2%'], ['dear', 'Dear', 'earns 40% more: sickness −5%, mood +1%']] },
+    workshop: { title: 'What it makes', opts: [['materials', 'Materials', 'upgrades cost 10% less'], ['repairs', 'Repairs', 'fires cost half as much to repair']] },
+    factory: { title: 'Overtime', opts: [['off', 'Off', 'normal shifts'], ['on', 'On', '+30% goods (shops +13%), more noise next door, and staff grumble']] },
+    season: { title: 'Open', opts: [['season', 'In its season', 'no upkeep the rest of the year'], ['allyear', 'All year', 'pay upkeep all year; half the fun out of season']] }
+  };
+  const choiceKind = (type) => (type === 'pharmacy' ? 'medicine' : type === 'pub' ? 'pub' : type === 'gym' ? 'gym' : type === 'workshop' ? 'workshop' : type === 'factory' ? 'factory' : SEASONAL[type] ? 'season' : type === 'market' || type === 'markethall' ? 'food' : PRICED.includes(type) ? 'price' : null);
+  const choiceOf = (b) => { const k = choiceKind(b.type); if (!k) return null; const o = CHOICES[k].opts.map((x) => x[0]); return o.includes(b.choice) ? b.choice : o.includes('normal') ? 'normal' : o[0]; };
+  // Customers drift toward their target over two town days after a price change.
+  function custTarget(b, near, rivals, moodV) {
+    const p = priceOf(b);
+    if (p === 'dear') return 1 - Math.min(0.7, 0.15 + 0.03 * Math.max(0, near - 3) + (moodV < 50 ? 0.35 : 0) + 0.2 * Math.min(1, rivals));
+    if (p === 'cheap') return 1 + Math.min(0.6, 0.25 + 0.05 * Math.max(0, near - 3) + 0.35 * Math.min(1, rivals));
+    return 1;
+  }
+  const rivalsOf = (b, bs) => (bs || state.buildings).filter((o) => o !== b && o.type === b.type && live(o) && !o.shut && dist(o, b) <= (TYPES[b.type].radius || 2)).length;
+  function shopStep(min) {
+    const ci = city(), mv = moodNow(Date.now()), mult = mv.mult;
+    const homes = state.buildings.filter((h) => live(h) && T(h).cat === 'home');
+    for (const b of state.buildings) {
+      if (!live(b) || T(b).cat !== 'shop') continue;
+      const near = homes.filter((h) => dist(h, b) <= (T(b).radius || 0)).length;
+      const tgt = custTarget(b, near, rivalsOf(b), mv.value), cur = b.cust == null ? 1 : b.cust;
+      b.custT = tgt; b.cust = cur + (tgt - cur) * (1 - Math.exp(-min / 16)); if (Math.abs(b.cust - 1) < 0.005 && tgt === 1) { delete b.cust; delete b.custT; }
+      // layoffs: a whole town day earning less than its upkeep lets a worker go; three such days and it closes
+      if (b.shut || b.fire) continue;
+      const inc = ((ci.info.get(b.id) || {}).income || 0) * mult, up = shopCost(b);
+      if (up > 0 && inc + 0.01 < up) { b.redMin = (b.redMin || 0) + min; b.okMin = 0; }
+      else { b.okMin = (b.okMin || 0) + min; b.redMin = Math.max(0, (b.redMin || 0) - min * 0.5); }
+      if (b.redMin >= 24) {
+        b.redMin = 0; b.layoff = (b.layoff || 0) + 1; touch();
+        if (b.layoff >= 3) { b.shut = true; logIncident('shut', b, `${capFirst(placeName(b))} closed: it lost money for three days`); if (!ui.hush) toast(`${capFirst(placeName(b))} lost money for three days and closed. Change its price, build homes nearby, or pay to open it again.`); }
+        else { logIncident('layoff', b, `${capFirst(placeName(b))} let a worker go (it earns less than its upkeep)`); if (!ui.hush) toast(`${capFirst(placeName(b))} earns less than it costs to run (${Math.round(up)} gold an hour with its staff) and let a worker go. Try another price, or build homes nearby.`); }
+      }
+      if (b.okMin >= 24 && b.layoff) { b.layoff -= 1; b.okMin = 0; touch(); if (!b.layoff) delete b.layoff; }
+    }
+  }
+  const pubNight = (b) => { const pb = state.buildings.find((o) => o.type === 'pub' && live(o) && !o.shut && dist(o, b) <= 2); if (!pb) return 1; return 1 + ({ late: 0.2, early: 0.05 }[choiceOf(pb)] || 0.1) * nightK(); }; // the pub: more break-ins around it at night
+  // What a shop costs to run, for layoffs: its upkeep and its workers' pay (0.75 gold an hour each; the town doesn't pay it).
+  const shopCost = (b) => runningOf(b) + 0.75 * Math.max(0, jobsOf(b.type, b.level) - (b.layoff || 0));
+  const reopenCost = (b) => Math.max(20, Math.round(paidFor(b) * 0.25 / 5) * 5);
+  function reopenShop(b) {
+    const cost = reopenCost(b);
+    if (state.gold + 1e-6 < cost) { toast(`Opening it again costs ${cost} gold.`); return; }
+    goldChange(-cost, `Opened ${placeName(b)} again`, 'buy'); delete b.shut; delete b.layoff; b.redMin = 0; touch(); save(); sfx.coin(); renderAll();
+    toast(`${capFirst(placeName(b))} is open again with all its staff.`);
+  }
+  // The tax rate (from town hall 3) and the night shift, in Policies.
+  const pol = () => { const P = state.policy || (state.policy = {}); if (!['low', 'normal', 'high'].includes(P.tax)) P.tax = 'normal'; return P; };
+  const TAX_OPTS = { low: { k: 0.85, mood: 5, label: 'Low', sub: '−15% taxes · +5% mood · more babies' }, normal: { k: 1, mood: 0, label: 'Normal', sub: 'as it is' }, high: { k: 1.15, mood: -8, label: 'High', sub: '+15% taxes · −8% mood · more crime' } };
+  const taxOn = () => hallLevel() >= 3;
+  const taxK = () => (taxOn() ? TAX_OPTS[pol().tax].k : 1);
+  const taxMood = () => (taxOn() ? TAX_OPTS[pol().tax].mood : 0);
+  const nightShift = () => !!pol().night && countLine('police') > 0;
+  // The choice box on a building's card.
+  function choiceBox(b) {
+    const k = choiceKind(b.type); if (!k || !live(b)) return null;
+    const C = CHOICES[k], cur = choiceOf(b), box = el('div', 'menu-sec pol-card choicebox');
+    box.append(el('h3', '', C.title));
+    const opts = el('div', 'pol-opts'); opts.style.gridTemplateColumns = `repeat(${C.opts.length}, minmax(0, 1fr))`; opts.setAttribute('role', 'radiogroup'); opts.setAttribute('aria-label', C.title);
+    for (const [v, label, sub] of C.opts) {
+      const o = el('button', 'pol-opt'); o.type = 'button'; o.setAttribute('role', 'radio'); o.setAttribute('aria-checked', String(cur === v)); o.append(el('b', '', label), el('small', '', sub));
+      o.addEventListener('click', () => { if (cur === v) return; accrue(Date.now()); b.choice = v; touch(); save(); sfx.pop(); anaEvent('choice', { type: b.type, v }); renderPanel(); toast(`${nameOf(b)}: ${label.toLowerCase()}.`); });
+      opts.append(o);
+    }
+    box.append(opts);
+    if (PRICED.includes(b.type) && b.cust != null && Math.abs(b.cust - 1) > 0.02) box.append(el('p', 'tiny muted', `Customers: ${b.cust > 1 ? '+' : '−'}${Math.round(Math.abs(b.cust - 1) * 100)}% compared with normal prices${Math.abs(b.custT - b.cust) > 0.02 ? ', still changing' : ''}.`));
+    if (k === 'season' && !inSeason(b)) box.append(el('p', 'tiny muted', choiceOf(b) === 'allyear' ? 'Out of season it stays open with half the fun.' : `Closed until ${SEASONAL[b.type]}: no upkeep until then.`));
+    return box;
   }
   /* ---------- 11.01 (roadmap part 5, Navid): focus that produces results ----------
      Name what you build after your real task ("Lighthouse · Thesis chapter 2"), a small step for each lap, an if-then
@@ -12022,7 +12217,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       { k: 'progress', title: 'Your progress', sub: `Level ${state.level} · ${state.badges.length} badges · ${state.chestStats.opened} chests`, open: openLevels },
       { k: 'friends', title: 'Friends & leaderboard', sub: board.me && board.kind === 'firebase' ? `On the board as ${state.board.name || 'Mayor'}` : 'Compete with friends and visit their towns', open: openFriends },
       { k: 'staff', title: 'Town staff & wages', sub: staffN ? `${staffN} staff · ${Math.round(ec.staffWages)} gold an hour in wages · services and buildings` : 'Nobody hired yet · services and buildings', page: staffPage },
-      familiesOn() || fam().births ? { k: 'policies', title: 'Policies', sub: `Maternity leave: ${leaveText(fam().leave)} · ${babiesNow().length} bab${babiesNow().length === 1 ? 'y' : 'ies'}, ${kidsNow().length} kid${kidsNow().length === 1 ? '' : 's'}`, page: () => policiesPage(false) } : null,
+      familiesOn() || fam().births || taxOn() ? { k: 'policies', title: 'Policies', sub: `${taxOn() ? `Taxes ${TAX_OPTS[pol().tax].label.toLowerCase()} · ` : ''}Maternity leave: ${leaveText(fam().leave)} · ${babiesNow().length} bab${babiesNow().length === 1 ? 'y' : 'ies'}`, page: () => policiesPage(false) } : null,
       { k: 'money', title: 'Money', sub: `${state.gold < 0 ? '−' : ''}${fmtGold(Math.abs(state.gold))} gold · ${ec.net < 0 ? '−' : '+'}${Math.abs(Math.round(ec.net))} an hour${loans().length ? ` · ${loans().length} loan${loans().length > 1 ? 's' : ''}` : ''}`, open: () => openTown('overview') },
       { k: 'incidents', title: 'Incident report', sub: (() => { const w = state.incidents.filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length; return `${w ? `${w} this week` : 'A quiet week'}${courthouse() ? ' · the Central police says why' : ''}`; })(), open: openIncidents },
       foodOn() ? { k: 'food', title: 'Food & farms', sub: (() => { const F = city().food, net = F ? F.grown - F.eaten : 0; return `${Math.floor(state.food || 0)} of ${foodCap()} food · ${net >= 0 ? '+' : '−'}${Math.abs(Math.round(net))} an hour while you play${F && F.fed < 0.98 ? ' · hungry!' : ''}`; })(), open: openFood } : null,
@@ -12190,6 +12385,19 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const wrap = el('div', 'list pol'), F = fam(), now = Date.now(), ci = city();
     if (first) { const b = el('div', 'pol-first'); b.append(el('b', '', 'Your first baby!'), el('span', 'small', `${(F.kids[F.kids.length - 1] || {}).name || 'A baby'} was born in town. As the mayor you decide how long new mothers stay home with their baby. You can change it any time.`)); wrap.append(b); }
     wrap.append(el('p', 'small muted', 'Policies are the town\'s rules. A change only counts from now on: families who already have a baby keep the leave they were given.'));
+    // 11.03 (roadmap part 3): the tax rate, from town hall 3, and the police night shift
+    if (taxOn()) {
+      const tc = el('div', 'menu-sec pol-card'); tc.append(el('h3', '', 'Tax rate'), el('p', 'tiny muted', 'What homes pay. Low taxes make people happier and families bigger; high taxes fill the treasury but people grumble and crime rises.'));
+      const to = el('div', 'pol-opts'); to.setAttribute('role', 'radiogroup'); to.setAttribute('aria-label', 'Tax rate');
+      for (const k of ['low', 'normal', 'high']) { const o = TAX_OPTS[k], b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(pol().tax === k)); b.append(el('b', '', o.label), el('small', '', o.sub)); b.addEventListener('click', () => { if (pol().tax === k) return; accrue(Date.now()); pol().tax = k; touch(); save(); sfx.pop(); toast(`Taxes are ${o.label.toLowerCase()} now.`); wrap.replaceWith(policiesPage(first)); }); to.append(b); }
+      tc.append(to); wrap.append(tc);
+    }
+    if (countLine('police')) {
+      const nc = el('div', 'menu-sec pol-card'), on = !!pol().night; nc.append(el('h3', '', 'Police night shift'), el('p', 'tiny muted', `Officers on duty at night cost 50% more in wages (${Math.round(wagesFor('police', state.staff.police || 0) * 0.5)} gold an hour now), and night break-ins drop by half.`));
+      const no = el('div', 'pol-opts'); no.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+      for (const [v, label, sub] of [[false, 'Off', 'day shifts only'], [true, 'On', 'night break-ins −50%']]) { const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(on === v)); b.append(el('b', '', label), el('small', '', sub)); b.addEventListener('click', () => { if (on === v) return; accrue(Date.now()); pol().night = v; touch(); save(); sfx.pop(); wrap.replaceWith(policiesPage(first)); }); no.append(b); }
+      nc.append(no); wrap.append(nc);
+    }
     const card = el('div', 'menu-sec pol-card');
     card.append(el('h3', '', 'Maternity leave'), el('p', 'tiny muted', `How long a mother stays home after a baby is born. A year in town is ${realText(12)}, so a month is ${realText(1)}.`));
     const opts = el('div', 'pol-opts'); opts.setAttribute('role', 'radiogroup'); opts.setAttribute('aria-label', 'Maternity leave');
@@ -13521,6 +13729,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     order: (type) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r)) { const q = orderNew(type, c, r, true, true); return q ? { kind: q.kind, mode: q.mode, secs: q.secs || 0, work: q.work } : null; } return null; },
     spark: () => (ui.spark ? { ...ui.spark } : null),
     sparkSet: (o) => { state.sparkSet = Object.assign(sparkSet(), o); nextSpark(); renderBanner(true); return { ...ui.spark }; },
+    addAt: (type, level, c, r) => { if (!fits(type, c, r, null, 0, level || 1)) return null; const b = { id: state.nextId++, type, c, r, level: level || 1, origin: 'built' }; if (TYPES[type].cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); save(); renderAll(); return b.id; },
     addBuilding: (type, level) => { for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (fits(type, c, r, null, 0, level || 1)) { const b = { id: state.nextId++, type, c, r, level: level || 1, origin: 'built' }; if (TYPES[type].cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); save(); renderAll(); return b.id; } return null; },
     sick: (bid, serious) => { const b = bid ? byId(bid) : state.buildings.find((x) => live(x) && T(x).cat === 'home'); startSick(b, false, serious == null ? { serious: false } : { serious }); return b && b.id; },
     sickOf: (bid) => { const b = byId(bid); return b ? { sick: b.sick ? JSON.parse(JSON.stringify(b.sick)) : null, loss: b.loss || null } : null; },
@@ -13580,6 +13789,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     heist: (bid) => { const b = byId(bid); startRobbery(b, true); return b && b.robbed ? { ...b.robbed } : null; },
     shopInfo: (bid) => { const i = city().info.get(bid); return i ? { income: i.income, goods: !!i.goods, rival: !!i.rival, closed: !!i.closed } : null; },
     responder: (k, bid) => { const s = responderFor(k, byId(bid)); return s ? s.type : null; },
+    // 11.03: choices, prices, layoffs and the tax rate
+    choose: (bid, v) => { const b = byId(bid); b.choice = v; touch(); return choiceOf(b); },
+    shopStep: (min) => { shopStep(min); touch(); return state.buildings.filter((b) => T(b).cat === 'shop').map((b) => ({ id: b.id, type: b.type, cust: b.cust || 1, layoff: b.layoff || 0, shut: !!b.shut, red: b.redMin || 0 })); },
+    tax: (k) => { pol().tax = k; touch(); const e = econ(); return { taxes: e.taxes, mood: e.mood.value, policyMood: e.mood.taxes, target: crimeTarget(city()) }; },
+    homeInfo: (bid) => { const i = city().info.get(bid); return i ? { mult: i.mult, from: i.from.map((f) => [f[0], f[1]]) } : null; },
+    sickRisk: (bid) => sickRisk(byId(bid)),
     hold: (tid) => { state.jail.push({ left: 24, tid }); touch(); return gangFree(); },
     thieves: () => ({ thieves: JSON.parse(JSON.stringify(state.thieves || [])), prison: JSON.parse(JSON.stringify(state.prison || [])), cells: prisonCells(), court: !!courthouse(), jail: (state.jail || []).length }),
     prisonStep: (m) => { prisonStep(m); return (state.prison || []).length; },
@@ -13602,7 +13817,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     monument: () => ({ m: JSON.parse(JSON.stringify(state.monument || null)), tray: state.tray.map((x) => x.type), carry: state.carryTask ? state.carryTask.name : null, labels: state.buildings.filter((b) => b.label).map((b) => [b.type, b.label, !!b.plaque]) }),
     snapMonu: () => townSnap().monu,
     // 11.01: a sheet of building drawings, for checking new art. items: [[type, level, rot, opts], ...]
-    artShot: (items, cols) => { cols = cols || 4; const W = 160, H = 170, Z = 2, rows = Math.ceil(items.length / cols), cv = document.createElement('canvas'); cv.width = cols * W * Z; cv.height = rows * H * Z; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, cv.width, cv.height);
+    artShot: (items, cols) => { cols = cols || 4; SEA.k = curSeason(); const W = 160, H = 170, Z = 2, rows = Math.ceil(items.length / cols), cv = document.createElement('canvas'); cv.width = cols * W * Z; cv.height = rows * H * Z; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, cv.width, cv.height);
       items.forEach(([type, level, rot, o], i) => { const s = Math.max(1, TYPES[type].size || 1), hw = HW * s * 0.9, hh = HH * s * 0.9, x = (i % cols) * W + W / 2, y = Math.floor(i / cols) * H + H * 0.72; c.setTransform(Z, 0, 0, Z, 0, 0); diamond(c, x, y, hw, hh, '#8AB85E'); try { drawBuilding(c, type, level || 1, x, y, hw, hh, Object.assign({ time: performance.now(), rot: rot || 0 }, o || {})); } catch (e) { c.fillStyle = 'red'; c.fillText(String(e).slice(0, 30), x - 60, y); } c.fillStyle = '#1E2A28'; c.font = '11px sans-serif'; c.fillText(`${type} ${level || 1}`, x - 60, Math.floor(i / cols) * H + 14); });
       return cv.toDataURL('image/png'); },
     setMonu: (n) => { state.monument = { stones: Array.from({ length: n }, (_, i) => ({ id: i, name: `Project ${i + 1}`, planned: 2, laps: 3, focus: 75, date: Date.now() })), show: 'names' }; renderAll(); return monuCount(); },

@@ -4,7 +4,7 @@ A focus game for people with ADHD: you are the mayor of a small island town, rea
 
 - **Play it:** https://navidfarazmand.github.io/maplewick/ (add it to the iPhone home screen; it works offline).
 - **The live app** is the `gh-pages` branch (what GitHub Pages serves).
-- **This branch (`main`)** keeps the source and the tools, at version 11.02:
+- **This branch (`main`)** keeps the source and the tools, at version 11.03:
 
 | | |
 |---|---|
