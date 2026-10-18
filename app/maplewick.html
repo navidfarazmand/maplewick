@@ -399,6 +399,7 @@
   .lp-chip.now { background: #fff; color: var(--focus); box-shadow: 0 0 0 3px rgba(255,255,255,.3); }
   .lp-chip.now i { color: #0B7F77; }
   .lp-plus { font-weight: 800; opacity: .6; font-size: 12px; }
+  .lp-more { font-weight: 700; font-size: 12px; opacity: .85; white-space: nowrap; }
   .lc-plan { display: grid; gap: 5px; }
   .lc-plan .lc-sum { font-size: 12px; font-weight: 600; opacity: .85; }
   .lapcard .lc-job { font-size: 15px; font-weight: 800; min-width: 0; }
@@ -1453,7 +1454,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.07'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.08'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -2469,7 +2470,21 @@
       fadeTimer = setInterval(() => { const k = clamp((performance.now() - t0) / ms, 0, 1); setV(from + (to - from) * k); if (k >= 1) { clearInterval(fadeTimer); fadeTimer = 0; if (then) then(); } }, 50);
     }
     const trackAt = (i) => STATIONS[st].tracks[order[((i % order.length) + order.length) % order.length]];
-    function prep(s2) { if (prepSt === s2 && order.length === STATIONS[s2].tracks.length) return; st = s2; prepSt = s2; order = shuffle(STATIONS[st].tracks.length); idx = 0; }
+    function prep(s2, ord) { if (!ord && prepSt === s2 && order.length === STATIONS[s2].tracks.length) return; st = s2; prepSt = s2; order = ord || shuffle(STATIONS[st].tracks.length); idx = 0; }
+    // 11.08 (Navid): when every song of a station has played, the next station starts (with the phone locked too)
+    let nextOrd = null;
+    function upNext() {
+      if (idx + 1 < order.length) return trackAt(idx + 1);
+      const ns = (st + 1) % STATIONS.length;
+      if (!nextOrd || nextOrd.s !== ns) nextOrd = { s: ns, o: shuffle(STATIONS[ns].tracks.length) };
+      return STATIONS[ns].tracks[nextOrd.o[0]];
+    }
+    function advance() {
+      if (idx + 1 < order.length) { idx += 1; return false; }
+      upNext(); const n = nextOrd; nextOrd = null;
+      state.track = n.s; save(); prep(n.s, n.o);
+      return true;
+    }
     function load() {
       const t = trackAt(idx);
       cur = t[1]; curUrl = songUrl(t);
@@ -2479,9 +2494,9 @@
       fade(vol(), 1500);
       // saved on the phone but not ready yet: switch over to the saved copy as soon as it is
       if (!SONGS.urls[curUrl] && songList().includes(curUrl)) { const want = curUrl; warmSong(want).then((u) => { if (u && curUrl === want && a && a.src !== u) { const t = a.currentTime || 0, was = !a.paused; a.src = u; seekTo = t; if (was) { const p2 = a.play(); if (p2 && p2.catch) p2.catch(() => {}); } } }); }
-      warmSong(songUrl(trackAt(idx + 1)));
+      warmSong(songUrl(upNext()));
     }
-    function next() { idx += 1; load(); }
+    function next() { if (advance()) { if (!document.hidden) toast(`♪ ${STATIONS[st].name}`); refreshMusicPage(); } load(); }
     function meta() {
       if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || LOCK.on) return;
       try {
@@ -2531,13 +2546,16 @@
       pos: () => (a && !(state.src === 'gen' || fallback) ? { t: a.currentTime || 0, d: isFinite(a.duration) ? a.duration : 0 } : { t: 0, d: 0 }),
       seek(f) { if (a && isFinite(a.duration) && a.duration > 0) { try { a.currentTime = clamp(f, 0, 0.995) * a.duration; } catch (e) { /* not seekable */ } } },
       // Focus: the lock-screen player takes over the same song at the same spot, and hands it back after.
+      // 11.08: the lock-screen player moves through the same list (and on to the next station), so the music player
+      // carries on from wherever it got to.
       handoff() {
         prep(s2now());
-        if (a && !a.paused) fade(0, 300, () => a.pause());
+        if (a && !a.paused) { if (document.hidden) { clearInterval(fadeTimer); fadeTimer = 0; try { a.pause(); } catch (e) { /* ignore */ } } else fade(0, 300, () => a.pause()); }
+        const now = () => { const x = trackAt(idx); return { url: songUrl(x), title: x[1], station: STATIONS[st].name }; };
         const t = trackAt(idx);
-        return { i: idx, url: songUrl(t), title: t[1], station: STATIONS[st].name, time: a && curUrl === songUrl(t) ? a.currentTime || 0 : 0, at: (i) => { const x = trackAt(i); return { url: songUrl(x), title: x[1] }; } };
+        return { time: a && curUrl === songUrl(t) ? a.currentTime || 0 : 0, now, next: () => { const x = upNext(); return { url: songUrl(x), title: x[1] }; }, step: () => { advance(); return now(); } };
       },
-      takeBack(i, t) { idx = i; seekTo = t || 0; if (a) { try { a.pause(); } catch (e) { /* ignore */ } } on = false; },
+      takeBack(t) { seekTo = t || 0; if (a) { try { a.pause(); } catch (e) { /* ignore */ } } on = false; },
       info() {
         const gen = state.src === 'gen' || fallback;
         return gen ? { title: music.track(), artist: 'Made in Maplewick', station: fallback && state.src !== 'gen' ? `${STATIONS[(state.track | 0) % STATIONS.length].name} (offline)` : 'Made in Maplewick', gen: true, playing: music.playing(), volumeWorks: true }
@@ -4923,18 +4941,17 @@
     while (rem > 0.01 && out.length < 400) { const f = Math.min(lf, rem); rem -= f; out.push({ f, b: rem > 0.01 ? br : 0 }); }
     return out;
   }
-  // "(25+5) + (25+5) + (25)", with long runs folded: "(25+5) ×11 + (25)". cur = the lap you are on (1-based).
+  // 11.08 (Navid): every lap on its own, "25+5 + 25+5 + 25+5 + 25", never folded into "5 × 25+5". A long plan shows
+  // 12 laps around the one you are on, with how many come before and after. cur = the lap you are on (1-based).
+  const LAP_SHOW = 12;
   function lapPlanEl(P, len, cur, done) {
-    const laps = lapPlan(P, len), box = el('div', 'lapplan'); let i = 0, first = true;
-    const chip = (x, n, idx) => { const c = el('span', 'lp-chip' + (idx != null && idx < (done || 0) ? ' done' : idx != null && idx + 1 === cur ? ' now' : '')); c.append(el('b', '', fmtHalf(x.f))); if (x.b) c.append(el('i', '', `+${fmtHalf(x.b)}`)); return c; };
-    while (i < laps.length) {
-      let j = i; while (j + 1 < laps.length && laps[j + 1].f === laps[i].f && laps[j + 1].b === laps[i].b) j++;
-      const run = j - i + 1;
-      // 10.19 (Navid): the count goes first, "5 × (12½ +2½) + 12½"
-      if (run > 2) { if (!first) box.append(el('span', 'lp-plus', '+')); box.append(el('span', 'lp-times', `${run} ×`), chip(laps[i], 1, (cur && cur - 1 >= i && cur - 1 <= j) ? cur - 1 : null)); first = false; }
-      else for (let k = i; k <= j; k++) { if (!first) box.append(el('span', 'lp-plus', '+')); box.append(chip(laps[k], 1, k)); first = false; }
-      i = j + 1;
-    }
+    const laps = lapPlan(P, len), box = el('div', 'lapplan');
+    const chip = (x, idx) => { const c = el('span', 'lp-chip' + (idx < (done || 0) ? ' done' : idx + 1 === cur ? ' now' : '')); c.append(el('b', '', fmtHalf(x.f))); if (x.b) c.append(el('i', '', `+${fmtHalf(x.b)}`)); return c; };
+    let a = 0, z = laps.length;
+    if (laps.length > LAP_SHOW) { a = clamp((cur || 1) - 3, 0, laps.length - LAP_SHOW); z = a + LAP_SHOW; }
+    if (a > 0) box.append(el('span', 'lp-more', `${a} lap${a > 1 ? 's' : ''} before`), el('span', 'lp-plus', '+'));
+    for (let k = a; k < z; k++) { if (k > a) box.append(el('span', 'lp-plus', '+')); box.append(chip(laps[k], k)); }
+    if (z < laps.length) box.append(el('span', 'lp-plus', '+'), el('span', 'lp-more', `${laps.length - z} more`));
     box.setAttribute('aria-label', `${laps.length} lap${laps.length > 1 ? 's' : ''}: ${laps.map((x) => `${fmtHalf(x.f)} minutes of focus${x.b ? ` and a ${fmtHalf(x.b)}-minute break` : ''}`).join(', then ')}`);
     return box;
   }
@@ -4988,7 +5005,7 @@
   /* ---------- Lock-screen timer. A web app can't put a real countdown on the iPhone lock screen (that needs the native
      app), but a page that plays sound gets the "now playing" tile there. So during focus an optional soft sound plays,
      and the tile reads "18 min left · until 15:25". ---------- */
-  const LOCK = { el: null, urls: {}, title: '', on: false, art: null, song: null, i: 0, fails: 0 };
+  const LOCK = { el: null, els: null, urls: {}, title: '', on: false, art: null, song: null, fails: 0, fetchAt: {} };
   // Made-up sounds: soft rain, brown noise, ocean waves, a crackling fire, a near-silent hush, and a bell. 12-second loops.
   function genSound(kind, sr) {
     sr = sr || 22050;
@@ -5044,22 +5061,83 @@
     } catch (e) { LOCK.art = ''; }
     return LOCK.art;
   }
+  /* 11.08 (Navid): two plain players take turns. The next song starts on the second one just before the last one ends,
+     so the phone never goes quiet: an iPhone stops a page in the background once its sound stops, and then the next
+     song could not start with the phone locked. Both players are started once by a tap, which lets them play later. */
+  const LOCK_LEAD = 1.2; // seconds of overlap between songs
+  function lockEls() {
+    if (!LOCK.els) {
+      LOCK.els = [LOCK.el || new Audio(), new Audio()]; LOCK.el = LOCK.els[0];
+      for (const x of LOCK.els) { x.setAttribute('playsinline', ''); x.preload = 'auto'; lockWatch(x); }
+    }
+    return LOCK.els;
+  }
+  const lockOther = () => { const e = lockEls(); return e[0] === LOCK.el ? e[1] : e[0]; };
+  // The lock screen's play/pause button follows what really happens (taking the headphones out pauses the song).
+  function lockWatch(x) {
+    const ps = (v) => { try { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = v; } catch (e) { /* older browsers */ } };
+    x.addEventListener('playing', () => { if (x === LOCK.el && LOCK.on) ps('playing'); });
+    x.addEventListener('pause', () => {
+      if (x !== LOCK.el || !LOCK.on || x.ended) return;
+      ps('paused');
+      if (LOCK.song) lockFetch(LOCK.song.now().url); // while it waits, get the song onto the phone: Play then needs no download
+    });
+  }
+  // A muted moment of silence, started by a tap: after that this player may start sound by itself.
+  function lockBless(x, then) {
+    try {
+      x.muted = true; x.loop = false; x.src = wavUrl('quiet');
+      const pr = x.play(); const done = (okk) => { if (!LOCK.on || x !== LOCK.el) { try { x.pause(); } catch (e) { /* ignore */ } } x.muted = false; if (then) then(okk); };
+      if (pr && pr.then) pr.then(() => done(true), () => done(false)); else done(true);
+    } catch (e) { if (then) then(false); }
+  }
+  // iOS 17 and later: say this is music, so it keeps playing with the screen locked (and the lap bell can ring).
+  function audioKind(bg) { try { const s = navigator.audioSession; if (s && 'type' in s) { const want = bg ? 'playback' : 'auto'; if (s.type !== want) s.type = want; } } catch (e) { /* older phones */ } }
+  // Save the next song on the phone a little ahead of time (once a minute at most if it fails).
+  function lockFetch(url) {
+    if (!url || SONGS.urls[url] || (LOCK.fetchAt[url] || 0) > Date.now() - 60000) return;
+    LOCK.fetchAt[url] = Date.now();
+    (songList().includes(url) ? Promise.resolve(true) : keepSong(url)).then((okk) => (okk ? warmSong(url) : null)).catch(() => { /* streams instead */ });
+  }
+  function lockHandlers(music) {
+    if (!('mediaSession' in navigator)) return;
+    const ms = navigator.mediaSession;
+    for (const act of ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto', 'previoustrack', 'nexttrack']) {
+      try { ms.setActionHandler(act, act === 'play' ? () => lockResume() : act === 'pause' ? () => { if (LOCK.el) LOCK.el.pause(); try { ms.playbackState = 'paused'; } catch (e) { /* ignore */ } } : act === 'nexttrack' && music ? () => lockNext(false) : null); } catch (e) { /* not supported */ }
+    }
+  }
+  // Play on the lock screen (or on the headphones) after a pause.
+  function lockResume() {
+    const a = LOCK.el; if (!a || !LOCK.on) return;
+    const again = () => { const t = a.currentTime || 0; a.addEventListener('loadedmetadata', () => { try { a.currentTime = t; } catch (e) { /* not seekable */ } }, { once: true }); };
+    if (LOCK.song) {
+      if (a.ended || a.error) { lockNext(true); return; }
+      // a song that was streaming and is on the phone now: carry on from the saved copy, with nothing to download
+      const b = SONGS.urls[LOCK.song.now().url];
+      if (b && a.src !== b) { again(); a.src = b; }
+    }
+    const pr = a.play();
+    if (pr && pr.catch) pr.catch(() => {
+      // the stream went stale while it was paused: open it again at the same spot
+      if (!LOCK.on || a !== LOCK.el) return;
+      again(); a.src = a.src; const p2 = a.play(); if (p2 && p2.catch) p2.catch(() => {});
+    });
+    try { navigator.mediaSession.playbackState = 'playing'; } catch (e) { /* ignore */ }
+  }
   function lockStart() {
     const kind = state.lockSound; if (!state.session || !LOCK_SOUNDS[kind] || kind === 'off') return;
     if (LOCK.away) { LOCK.away = false; lockStop(false); } // 10.17
     try {
-      const a = LOCK.el || (LOCK.el = new Audio());
-      a.setAttribute('playsinline', ''); a.onended = null; a.onerror = null; LOCK.song = null;
+      lockEls(); const a = LOCK.el, o = lockOther();
+      for (const x of LOCK.els) { x.onended = null; x.onerror = null; x.ontimeupdate = null; }
+      LOCK.song = null; a.muted = false; LOCK.fails = 0;
+      if (kind === 'music') lockBless(o); // the start is a tap: the second player may then take the next song
+      audioKind(true);
       if (kind === 'music') lockSong(radio.handoff(), true);
       else { a.loop = true; a.src = wavUrl(kind); a.volume = kind === 'rain' ? 0.55 : 0.6; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); }
       LOCK.on = true; LOCK.title = '';
-      if ('mediaSession' in navigator) {
-        const ms = navigator.mediaSession;
-        for (const act of ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto', 'previoustrack', 'nexttrack']) {
-          try { ms.setActionHandler(act, act === 'play' ? () => { a.play(); ms.playbackState = 'playing'; } : act === 'pause' ? () => { a.pause(); ms.playbackState = 'paused'; } : act === 'nexttrack' && kind === 'music' ? () => lockNext() : null); } catch (e) { /* not supported */ }
-        }
-        ms.playbackState = 'playing';
-      }
+      lockHandlers(kind === 'music');
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
       lockUpdate(true);
     } catch (e) { LOCK.on = false; }
     renderLockBtn();
@@ -5067,48 +5145,62 @@
   // Focus with your music: the same song carries on from where it was, then the station plays on (10.04).
   // A plain audio element (not the sound engine) so it keeps playing with the screen off.
   function lockSong(h, first) {
-    const a = LOCK.el; LOCK.song = h; LOCK.i = h.i;
-    const t = h.at(h.i);
-    a.loop = false; a.src = songSrc(t.url); a.volume = clamp(state.vol == null ? 0.7 : state.vol, 0, 1) * 0.8;
+    const a = LOCK.el; LOCK.song = h;
+    const t = h.now(), nx = h.next();
+    a.loop = false; a.muted = false; a.src = songSrc(t.url); a.volume = clamp(state.vol == null ? 0.7 : state.vol, 0, 1) * 0.8;
     LOCK.title = '';
     if (first && h.time > 1) a.addEventListener('loadedmetadata', () => { try { a.currentTime = h.time; } catch (e) { /* not seekable */ } }, { once: true });
-    a.onended = () => { if (LOCK.on && LOCK.song) lockNext(); };
-    a.onerror = () => { if (!LOCK.on || !LOCK.song) return; LOCK.fails += 1; if (LOCK.fails >= 2) { LOCK.song = null; a.onerror = null; a.loop = true; a.src = wavUrl('quiet'); const p2 = a.play(); if (p2 && p2.catch) p2.catch(() => {}); } else lockNext(); };
-    a.ontimeupdate = () => { if (a.currentTime > 30 && LOCK.song && !songList().includes(t.url)) keepSong(t.url); if (a.currentTime > 2) LOCK.fails = 0; };
+    a.onended = () => { if (a === LOCK.el && LOCK.on && LOCK.song) lockNext(true); };
+    a.onerror = () => { if (a !== LOCK.el || !LOCK.on || !LOCK.song) return; LOCK.fails += 1; if (LOCK.fails >= 2) { LOCK.song = null; a.onerror = null; a.ontimeupdate = null; a.loop = true; a.src = wavUrl('quiet'); const p2 = a.play(); if (p2 && p2.catch) p2.catch(() => {}); } else lockNext(true); };
+    a.ontimeupdate = () => {
+      if (a !== LOCK.el || !LOCK.song) return;
+      const ct = a.currentTime || 0, d = a.duration;
+      if (ct > 2) LOCK.fails = 0;
+      if (ct > 30 && !songList().includes(t.url)) keepSong(t.url);
+      if (ct > 15) lockFetch(nx.url);
+      if (isFinite(d) && d > 20 && d - ct < LOCK_LEAD) lockNext(true); // the next song starts before this one stops
+    };
     const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
-    warmSong(h.at(h.i + 1).url);
+    warmSong(nx.url);
   }
-  function lockNext() { if (!LOCK.song) return; LOCK.song.i += 1; LOCK.song.time = 0; lockSong(LOCK.song, false); if (LOCK.away) awayMeta(); else lockUpdate(true); }
+  // auto: the song is ending, so it plays out its last second under the next one; a tap on ⏭ stops it at once.
+  function lockNext(auto) {
+    if (!LOCK.song) return;
+    const old = LOCK.el; old.onended = null; old.onerror = null; old.ontimeupdate = null;
+    if (!auto) { try { old.pause(); } catch (e) { /* ignore */ } }
+    LOCK.el = lockOther(); LOCK.song.step(); LOCK.song.time = 0;
+    lockSong(LOCK.song, false);
+    if (LOCK.away) awayMeta(); else lockUpdate(true);
+  }
   /* 10.17 (Navid): leave the app (not in focus) while a recorded song plays, and the same lock-screen player carries
      the song on with the phone locked; back in the app, the music player takes it back at the same spot. The tunes made
      in Maplewick and the background sounds can't play in the background on iPhone, so they stop as before. */
   function awayMeta() {
     if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !LOCK.song) return;
-    try { navigator.mediaSession.metadata = new MediaMetadata({ title: LOCK.song.at(LOCK.song.i).title, artist: `Kevin MacLeod · ${LOCK.song.station || 'Maplewick'}`, album: `Maplewick · ${state.town}`, artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] }); navigator.mediaSession.playbackState = 'playing'; } catch (e) { /* older browsers */ }
+    try { const t = LOCK.song.now(); navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: `Kevin MacLeod · ${t.station || 'Maplewick'}`, album: `Maplewick · ${state.town}`, artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] }); navigator.mediaSession.playbackState = 'playing'; } catch (e) { /* older browsers */ }
   }
   function awayMusicStart() {
     if (state.session || LOCK.on || !state.music || !AUD.unlocked || state.src === 'gen') return;
     let inf = null; try { inf = radio.info(); } catch (e) { return; }
     if (!inf || inf.gen || !inf.playing) return;
     try {
-      const a = LOCK.el || (LOCK.el = new Audio()); a.setAttribute('playsinline', ''); a.muted = false;
+      lockEls(); const a = LOCK.el; a.muted = false;
+      for (const x of LOCK.els) { x.onended = null; x.onerror = null; x.ontimeupdate = null; }
       LOCK.on = true; LOCK.away = true; LOCK.title = ''; LOCK.fails = 0;
-      const h = radio.handoff(); lockSong(h, true); LOCK.song.station = h.station;
-      if ('mediaSession' in navigator) {
-        const ms = navigator.mediaSession;
-        for (const act of ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'seekto', 'previoustrack', 'nexttrack']) {
-          try { ms.setActionHandler(act, act === 'play' ? () => { a.play(); ms.playbackState = 'playing'; } : act === 'pause' ? () => { a.pause(); ms.playbackState = 'paused'; } : act === 'nexttrack' ? () => lockNext() : null); } catch (e) { /* not supported */ }
-        }
-      }
+      audioKind(true);
+      lockSong(radio.handoff(), true);
+      lockHandlers(true);
       awayMeta();
     } catch (e) { LOCK.on = false; LOCK.away = false; }
   }
   function awayMusicStop() { if (!LOCK.away) return; LOCK.away = false; lockStop(false); musicUpdate(); }
-  // The lock-screen player has to be started once by a tap before it may play with the app in the background.
+  // The lock-screen players have to be started once by a tap before they may play with the app in the background.
+  // 11.08: only a finished tap counts on iPhone, so this tries again until it has worked, and starts both players.
   function primeLock() {
-    if (LOCK.primed || LOCK.on || !state.music || state.src === 'gen') return;
-    LOCK.primed = true;
-    try { const a = LOCK.el || (LOCK.el = new Audio()); a.setAttribute('playsinline', ''); a.muted = true; a.loop = false; a.src = wavUrl('quiet'); const pr = a.play(); const done = () => { if (!LOCK.on) { try { a.pause(); } catch (e) { /* ignore */ } } a.muted = false; }; if (pr && pr.then) pr.then(done, done); else done(); } catch (e) { /* ignore */ }
+    if (LOCK.primed || LOCK.priming || LOCK.on || !state.music || state.src === 'gen') return;
+    LOCK.priming = true;
+    const els = lockEls(); let n = 0, ok = 0;
+    for (const x of els) lockBless(x, (good) => { n += 1; if (good) ok += 1; if (n === els.length) { LOCK.priming = false; if (ok === els.length) LOCK.primed = true; } });
   }
   function lockUpdate(force) {
     const s = state.session; if (!LOCK.on || !s || !('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
@@ -5121,7 +5213,7 @@
     LOCK.title = title;
     const f = focusNow(now);
     try {
-      const song = LOCK.song ? LOCK.song.at(LOCK.song.i).title : '';
+      const song = LOCK.song ? LOCK.song.now().title : '';
       navigator.mediaSession.metadata = new MediaMetadata({ title, artist: `${song ? `♪ ${song} · ` : ''}${f && f.cur ? `${state.builder} is building: ${jobLabel(f.cur.q).toLowerCase()}` : `Focus · ${state.town}`}`, album: 'Maplewick', artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] });
       const dur = (L ? L.lf : s.duration) * 60 / (s.speed || 1), pos = L ? Math.min(L.lf, L.into) * 60 / (s.speed || 1) : (now - s.start) / 1000;
       if (navigator.mediaSession.setPositionState && !LOCK.song) navigator.mediaSession.setPositionState({ duration: dur, playbackRate: 1, position: clamp(pos, 0, dur) });
@@ -5132,14 +5224,15 @@
     LOCK.on = false; LOCK.title = '';
     const a = LOCK.el, ms = 'mediaSession' in navigator ? navigator.mediaSession : null;
     // hand the song back to the music player, at the spot it reached
-    if (LOCK.song && a) { radio.takeBack(LOCK.song.i, a.currentTime || 0); LOCK.song = null; a.onended = null; a.onerror = null; a.ontimeupdate = null; }
+    if (LOCK.song && a) { radio.takeBack(a.currentTime || 0); LOCK.song = null; }
+    for (const x of LOCK.els || []) { x.onended = null; x.onerror = null; x.ontimeupdate = null; if (x !== a) { try { x.pause(); } catch (e) { /* ignore */ } } }
     try {
       if (done && a) {
         // a soft bell to say the session is over, then the lock-screen tile goes away
         a.loop = false; a.src = wavUrl('bell'); a.volume = 0.8; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {});
         if (ms && typeof MediaMetadata !== 'undefined') ms.metadata = new MediaMetadata({ title: 'Focus done!', artist: 'Your chest is waiting in Maplewick', album: 'Maplewick', artwork: lockArt() ? [{ src: lockArt(), sizes: '256x256', type: 'image/png' }] : [] });
-        a.onended = () => { a.onended = null; if (!LOCK.on && ms) { ms.metadata = null; ms.playbackState = 'none'; } };
-      } else { if (a) a.pause(); if (ms) { ms.metadata = null; ms.playbackState = 'none'; } }
+        a.onended = () => { a.onended = null; if (!LOCK.on) { audioKind(false); if (ms) { ms.metadata = null; ms.playbackState = 'none'; } } };
+      } else { if (a) a.pause(); audioKind(false); if (ms) { ms.metadata = null; ms.playbackState = 'none'; } }
     } catch (e) { /* ignore */ }
     renderLockBtn();
   }
@@ -11988,7 +12081,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const top = el('span', 'lc-top'), title = el('b', 'lc-title', `Lap ${n0 + 1}`);
     top.append(el('span', 'lc-eye', brk ? `Break · ${fmtClock(breakLeft())} left` : 'Focus in laps'), title);
     const planBox = el('div', 'lc-plan');
-    const oneLap = (L) => { const box = el('div', 'lapplan'), c = el('span', 'lp-chip now'); c.append(el('b', '', fmtHalf(lapFocus(L))), el('i', '', `+${fmtHalf(lapBreakOf(L))}`)); box.append(c, el('span', 'lp-plus', '+ …')); return box; };
+    // 11.08: lap after lap, each with its break, for as long as you like
+    const oneLap = (L) => { const box = el('div', 'lapplan'); for (let k = 0; k < 3; k++) { if (k) box.append(el('span', 'lp-plus', '+')); const c = el('span', 'lp-chip' + (k ? '' : ' now')); c.append(el('b', '', fmtHalf(lapFocus(L))), el('i', '', `+${fmtHalf(lapBreakOf(L))}`)); box.append(c); } box.append(el('span', 'lp-plus', '+ …')); return box; };
     const update = (L) => planBox.replaceChildren(oneLap(L));
     const sw = lapSwitch(LAP_LENS, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
     update(startPick.lapLen);
@@ -13859,7 +13953,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   const localPt = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   // iPhone only lets sound start from a finished tap (touchend / pointerup), not from the moment a finger lands, and it
   // pauses the sound engine when the app goes to the background. So every tap wakes it up again (10.03).
-  const wakeAudio = () => { primeLock(); AUD.unlocked = true; if (state.sound || state.music || (state.noise && state.noise !== 'off') || AUD.ac) audioCtx(); musicUpdate(); };
+  const wakeAudio = (e) => { if (!e || e.type !== 'pointerdown') primeLock(); AUD.unlocked = true; if (state.sound || state.music || (state.noise && state.noise !== 'off') || AUD.ac) audioCtx(); musicUpdate(); };
   for (const ev of ['pointerdown', 'pointerup', 'touchend', 'keydown']) document.addEventListener(ev, wakeAudio, { passive: true, capture: true });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && AUD.ac && AUD.ac.state !== 'running') audioCtx(); });
   canvas.addEventListener('pointerdown', (e) => {
@@ -14281,8 +14375,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     newCost: (type) => newCost(type),
     upgradeJob: (bid) => { const x = checkJob('upgrade', byId(bid)); return { cost: x.cost, work: x.work, ok: x.ok, secs: x.secs, mode: jobMode('upgrade', byId(bid).type) }; },
     songs: () => ({ saved: songList().slice(), urls: Object.keys(SONGS.urls).length, pos: radio.pos(), info: radio.info() }),
-    lock: () => ({ on: LOCK.on, song: LOCK.song ? LOCK.song.at(LOCK.song.i).title : null, src: LOCK.el ? LOCK.el.src : '', paused: LOCK.el ? LOCK.el.paused : true, time: LOCK.el ? LOCK.el.currentTime : 0 }),
+    lock: () => ({ on: LOCK.on, song: LOCK.song ? LOCK.song.now().title : null, other: LOCK.els ? (LOCK.els[0] === LOCK.el ? 1 : 0) : 0, src: LOCK.el ? LOCK.el.src : '', paused: LOCK.el ? LOCK.el.paused : true, time: LOCK.el ? LOCK.el.currentTime : 0 }),
     seek: (f) => radio.seek(f),
+    lockSeek: (left) => { const a = LOCK.el; if (a && isFinite(a.duration)) a.currentTime = Math.max(0, a.duration - left); return a ? a.duration : null; }, // 11.08
+    lockPause: () => { if (LOCK.el) LOCK.el.pause(); return navigator.mediaSession ? navigator.mediaSession.playbackState : null; },
+    lockPlay: () => { const h = navigator.mediaSession && navigator.mediaSession.__h; if (h && h.play) h.play(); else lockResume(); },
+    lockState: () => ({ ps: navigator.mediaSession ? navigator.mediaSession.playbackState : null, els: (LOCK.els || []).map((x) => ({ paused: x.paused, src: x.src.slice(-40), t: Math.round(x.currentTime * 10) / 10, muted: x.muted })), track: state.track | 0, kind: navigator.audioSession ? navigator.audioSession.type : null }),
     audio: () => (AUD.ac ? AUD.ac.state : null),
     plan: () => ({ focus: focusJobs().length, all: state.queue.length, work: planWork() }),
     lap: () => (state.session && state.session.laps ? Object.assign(lapInfo(state.session, Date.now()), { skip: state.session.skip || 0, rung: state.session.lapRung || 0 }) : null), // 10.12
