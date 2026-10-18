@@ -1175,6 +1175,43 @@
     .bigplan .bp-ic { width: 34px; height: 34px; }
     .homebar { gap: 6px; padding: 8px 16px 10px; }
   }
+  /* 11.01: named projects, a step for each lap, check-ins and the Monument */
+  .focus-list li.step { color: #FFE7A3; font-weight: 700; }
+  .taskcard { display: grid; gap: 7px; padding: 12px 13px; margin: -4px 0 12px; border-radius: 16px; background: var(--focus-soft); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--focus) 35%, transparent); }
+  .tk-head { display: grid; gap: 2px; }
+  textarea.tk-if { resize: none; line-height: 1.35; }
+  .taskcard .tk-q, .taskcard .tk-title { font-size: 15.5px; color: var(--focus); }
+  .taskcard .tk-sub { font-size: 12.5px; color: var(--muted); }
+  .taskcard .tk-lbl { font-size: 11.5px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+  .tk-name, .tk-if, .tk-step input { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 9px 11px; border-radius: 11px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); }
+  .tk-if { font-size: 13.5px; }
+  .tk-name:focus, .tk-if:focus, .tk-step input:focus { outline: none; border-color: var(--focus); }
+  .tk-kinds { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tk-kind { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12.5px; font-weight: 700; }
+  .tk-kind[aria-checked="true"], .tk-kind[aria-pressed="true"] { border-color: var(--focus); background: var(--focus); color: var(--focus-ink); }
+  .tk-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tk-steps { display: grid; gap: 5px; }
+  .tk-step { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 6px; }
+  .tk-step .tk-lap { font-size: 12px; font-weight: 800; color: var(--focus); }
+  .tk-step input { padding: 7px 9px; font-size: 14px; }
+  .tk-ob { display: grid; gap: 5px; }
+  .checkin { display: grid; gap: 7px; text-align: left; }
+  .checkin b { font-size: 14.5px; }
+  .ck-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ck-btn { border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.1); color: inherit; border-radius: 11px; min-height: 40px; padding: 6px 12px; font: inherit; font-weight: 700; }
+  .ck-btn.ck-yes { background: #2E8F5A; border-color: #2E8F5A; color: #fff; }
+  .ck-btn.ck-partly { background: rgba(232,169,58,.3); border-color: rgba(232,169,58,.7); }
+  .cele-check { margin: 4px auto 12px; max-width: 360px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+  .ck-done { font-size: 14px; font-weight: 700; }
+  .lapcheck { margin-top: 2px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.18); }
+  .plaque { display: grid; gap: 3px; padding: 10px 12px; border-radius: 12px; background: linear-gradient(160deg, #EADFC6, #D8C9A6); color: #3B2F1C; box-shadow: inset 0 0 0 1.5px #B59B66; margin: 6px 0; }
+  .plaque b { font-family: var(--display); font-size: 16px; }
+  .plaque small { font-size: 12.5px; }
+  .monu-list { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 6px; }
+  .monu-stone { display: grid; gap: 1px; padding: 8px 11px; border-radius: 11px; background: var(--surface-2); box-shadow: inset 3px 0 0 #B9B2A4; }
+  .monu-stone.off { opacity: .55; }
+  .monu-stone small { color: var(--muted); font-size: 12px; }
+  .monu-stone .link { justify-self: start; font-size: 12px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 
@@ -1267,6 +1304,7 @@
     <div class="lapdone" id="focus-lapdone" hidden role="group" aria-labelledby="lapdone-title">
       <b id="lapdone-title">Lap done!</b>
       <span id="lapdone-text"></span>
+      <div class="lapcheck" id="lapdone-check" hidden></div>
       <div class="focus-actions"><button class="night-btn brk" id="lap-break">Take my 5-minute break</button><button class="night-btn" id="lap-skip">Skip the break</button></div>
     </div>
     <div class="focus-combo" id="focus-combo" hidden></div>
@@ -1296,6 +1334,7 @@
     <div class="cele-unit" id="cele-unit">minutes of focus</div>
     <h2 class="cele-title" id="cele-title">Great focus!</h2>
     <ul class="cele-lines" id="cele-lines"></ul>
+    <div class="cele-check" id="cele-check" hidden></div>
     <button class="btn goldc" id="cele-go">See what you earned</button>
     <div class="cele-badge" id="cele-badge" hidden><canvas id="cele-medal" width="180" height="200" aria-hidden="true"></canvas><span><b id="cele-badge-text">New badge</b><small id="cele-badge-sub"></small></span></div>
   </div>
@@ -1414,7 +1453,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.00'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.01'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1645,8 +1684,11 @@
   TYPES.townhall.up = [null, null, [200, 15], [900, 60], [3000, 240]];
   TYPES.townhall.cap = [0, 300, 1200, 3500, 6500];
   TYPES.townhouse.residents = [0, 12, 16, 22]; // 11.00: a House gives more per tile than a cottage
+  // 11.01: the Monument, a free gift for your first finished named project (gold can't buy it)
+  TYPES.monument = { name: 'Monument', cat: 'joy', size: 1, gift: true, max: 1, color: '#D8D2C4', roof: '#9C9486', radius: 2, boost: [0, 0.05], blurb: 'A stone for every project you finish. Homes within 2 tiles pay 5% more.' };
+  const monuCount = () => (state.monument ? Math.max(state.monument.n || 0, (state.monument.stones || []).length) : 0);
   const g1 = (x) => String(Math.round(x * 10) / 10);
-  const special = (t) => !!(t.chest || t.season); // finds you place for free: no upgrades, no cost
+  const special = (t) => !!(t.chest || t.season || t.gift); // finds you place for free: no upgrades, no cost (11.01: and the Monument)
   // Town staff: hired at their own building (or the town hall) for a one-off fee, then paid a wage every hour.
   // needed() says when the town starts to need them; need() how many it needs.
   const STAFF = {
@@ -4218,6 +4260,7 @@
       return;
     }
     const b = byId(q.bid); if (!b) return;
+    if (q.task && q.kind !== 'remove' && q.kind !== 'move') { b.label = b.label || q.task.name; (q.task.parts = q.task.parts || []).push(b.type); } // 11.01
     if (q.kind === 'remove') {
       state.buildings = state.buildings.filter((x) => x !== b);
       const p = centerOf(b); for (let i = 0; i < 10; i++) fx.push({ x: p.x + (Math.random() - 0.5) * 24, y: p.y - 6, vx: (Math.random() - 0.5) * 30, vy: -20 - Math.random() * 25, life: 0, max: 1, puff: true, color: 'rgba(200,190,170,.8)', r: 3 });
@@ -4919,6 +4962,7 @@
     const run = laps ? lapRunNow(now) : null;
     state.session = { duration, jobBid: currentJob().bid, start: now + ready * 1000, ready, speed: ui.tourSpeed || state.speed, income: focusNet(econ(now)), combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone, fromPlay, rescue: opts && opts.rescue ? opts.rescue : null };
     if (laps) { const len = (opts && opts.len) || ROUND; startPick.lapLen = len; Object.assign(state.session, { laps: true, lapLen: len, lapP: roundsWork(), lapBase: run ? run.n : 0, lapOf: (run ? run.n : 0) + planLaps(len), lapRung: 0, skip: 0, prevRun: run ? Object.assign({}, run) : null }); }
+    { const tq0 = taskQ(state.session); if (tq0) state.session.taskQ = tq0.id; } // 11.01
     state.lapRun = null; // the break is over
     if (ALARM.lap) closeAlarm();
     state.lastTaxAt = now;
@@ -5010,6 +5054,15 @@
       });
       leftW = simAll.leftover;
     }
+    // 11.01: the named project's laps and focus time, and the check-ins still to answer
+    { const tq = s.taskQ != null ? sessionQueue(s).find((q) => q.id === s.taskQ) : null;
+      if (tq && tq.task) {
+        const t = tq.task, d0 = (s.startDone && s.startDone[tq.id]) || 0, d1 = gone.has(tq) ? tq.work : tq.done, work = Math.max(0, d1 - d0);
+        const n = s.laps && r.lap ? taskLapsIn(s, tq, r.lap.k, lapFocus(r.lap.len)) : work >= ROUND_FOCUS / 2 ? Math.max(1, Math.round(work / ROUND_FOCUS)) : 0;
+        t.laps += n; t.focus += work;
+        const left = Math.max(0, n - (s.chk || 0));
+        if (left > 0 || gone.has(tq)) r.task = { t, n: left, bid: tq.bid, type: tq.type, done: gone.has(tq) && tq.kind !== 'clear' };
+      } }
     state.queue = state.queue.filter((q) => !gone.has(q));
     touch();
     if (leftW > 0.05 && m > 0) {
@@ -6579,6 +6632,20 @@
         if (!reduced) for (let i = 0; i < 4; i++) { const k = ((now / 2600) + i / 4) % 1; c.fillStyle = `rgba(244,166,198,${1 - k})`; c.beginPath(); c.ellipse(x - 8 * u + i * 5 * u + Math.sin(k * 6 + i) * 3 * u, y - 22 * u + k * 22 * u, 1.3 * u, 0.8 * u, k * 4, 0, Math.PI * 2); c.fill(); }
         break;
       }
+      case 'monument': { // 11.01: an obelisk that grows taller at 5, 10, 25, 50 and 100 stones
+        const n = monuCount(), st = monuStage(n), h = (13 + st * 5.5) * u;
+        box(c, x, y, hw * 0.66, hh * 0.66, 1, 3.5 * u, '#A9A294');
+        box(c, x, y - 3.5 * u, hw * 0.46, hh * 0.46, 1, 3 * u, '#C9C2B4');
+        const y0 = y - 6.5 * u, bw = hw * 0.24, bh = hh * 0.24, top = y0 - h;
+        const L = [x - bw, y0], R = [x + bw, y0], B = [x, y0 + bh], tL = [x - bw * 0.62, top], tR = [x + bw * 0.62, top], tB = [x, top + bh * 0.62];
+        poly(c, [L, B, tB, tL], shade(col, 0.8)); poly(c, [B, R, tR, tB], shade(col, 0.97));
+        const apex = [x, top - 6 * u], gold = st >= 5;
+        poly(c, [tL, tB, apex], gold ? '#D9962A' : shade(col, 0.88)); poly(c, [tB, tR, apex], gold ? '#F6C65B' : shade(col, 1.06));
+        for (let i = 0; i < Math.min(14, n); i++) { const k = (i + 1) / 15, p1 = lerpPt(L, tL, k), p2 = lerpPt(B, tB, k); line(c, lerpPt(p1, p2, 0.18), lerpPt(p1, p2, 0.82), 'rgba(70,58,44,.4)', 0.55 * u); }
+        if (ART.w) { c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; outline(c, [L, B, R, tR, apex, tL]); }
+        if (st >= 3 && !reduced) for (let i = 0; i < 2; i++) { const k = ((now / 1500) + i / 2) % 1, a = 1 - Math.abs(k * 2 - 1); starShape(c, x + (i ? 4 : -5) * u, top - (i ? 2 : 8) * u, 1.6 * u * a, `rgba(255,248,210,${a})`); }
+        break;
+      }
       case 'statue': case 'goldstatue': {
         const gold = type === 'goldstatue';
         box(c, x, y, hw * 0.5, hh * 0.5, 1, 6 * u, gold ? '#E9DFC8' : '#B9B2A6');
@@ -7526,7 +7593,7 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+  const ROOF = { monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
     workshop: (L) => 36 + 3 * L, factory: (L) => 39 + L, induspark: (L) => 43 + L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 25 + 3 * L, medcenter: (L) => 33 + L, hospital: (L) => 44 + L, stadium: (L) => 44 + 4 * L, depot: (L) => 24 + 2 * L, recycling: (L) => 29 + L, wasteplant: (L) => 49 + L,
     shed: (L) => 19 + 2 * L, gardencenter: (L) => 27 + L, parksdept: (L) => 33 + L, firestation: (L) => 33 + 2 * L, firehall: (L) => 39 + L, firehq: (L) => 61 + L, police: (L) => 25 + 2 * L, policestation: (L) => 29 + L, courthouse: (L) => 47 + L,
     prison: (L) => 20 + 2 * L, prison2: (L) => 33 + L, maxprison: (L) => 33 + L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
@@ -9157,6 +9224,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (ui.visit) { renderVisitInfo(box, b); return; }
     if (b.type === 'works') { renderWorksPanel(box, b); return; }
     if (b.type === 'fallen') { renderFallenPanel(box, b); return; }
+    if (b.type === 'monument') { renderMonumentPanel(box, b, false); return; } // 11.01
     const p = ui.panel, t = T(b), ci = city(), inf = ci.info.get(b.id) || {}, q = jobFor(b.id), mood = econ().mood;
     const chips = [];
     if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast(fireStatus(b) + '.'); else openPanel({ kind: 'alert', bid: b.id }); }));
@@ -9180,7 +9248,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (live(b) && t.cat === 'home' && roleInfo('nurse', ci).needed && stationsOf('nurse').length && !coversB('nurse', b)) chips.push(fixPill('Clinic too far', () => staffAction('nurse', b)));
     if (live(b) && messy(b) && staffWorking('fire') && !coversB('fire', b)) chips.push(fixPill('Far from fire station', () => staffAction('fire', b)));
     if (special(t)) chips.push(pill(t.chest ? `${RARITY[t.chest].name} chest find` : `${SEASONS[t.season].fest} find`, 'gold'));
-    box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${nameOf(b)}${b.resident ? ' · ' + b.resident : ''}`, chips));
+    box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${nameOf(b)}${b.label ? ' · ' + b.label : b.resident ? ' · ' + b.resident : ''}`, chips));
     // Two tabs: what you can do here, and everything about it (including what people ask for).
     const reqs = questsAt(b).filter((rq) => !(b.fire && rq.alert));
     const hasStaffTab = !!t.staff, hall = b.type === 'townhall';
@@ -9273,6 +9341,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     if (t.staff && live(b)) { const sc = serviceCost(b), go = el('button', 'btn fresh', `Staff · ${sc.staff} of ${t.slots[b.level] || 0}${FLEET[b.type] ? ` · ${b.vehicle ? FLEET[b.type].name.toLowerCase() : 'no vehicle'}` : ''}`); go.addEventListener('click', () => { p.tab = 'staff'; renderPanel(); }); box.append(go); }
     if (b.type === 'townhall') { const staffBtn = el('button', 'btn fresh', `Hire town staff · mood ${mood.value}%`); staffBtn.addEventListener('click', () => openMood('staff')); box.append(staffBtn); }
+    if (focusBuilt(b) && live(b)) { const nb = el('button', 'link', b.label ? `Named "${b.label}" · rename` : 'Name it after your task'); nb.addEventListener('click', () => nameBuilding(b)); box.append(nb); } // 11.01
     if (myJob && !isMine) { const w = actionBtn('Make this my job', jobLine(myJob), 'fresh', () => { state.job = b.id; save(); toast(`When ${state.builder} is done, you ${myJob.verb.toLowerCase()} ${myJob.at}.`); renderAll(); }); box.append(w); }
     else if (isMine) box.append(el('p', 'tiny muted', `Your job: ${myJob.verb.toLowerCase()} · ${jobLine(myJob)}.`));
     if (reqs.length) { const nudge = el('button', 'link', `${reqs[0].from === 'Town council' ? 'The town council' : reqs[0].from} asks something here · see Details`); nudge.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); box.append(nudge); }
@@ -9331,6 +9400,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const t = T(b), q = jobFor(b.id);
     for (const rq of reqs) box.append(reqBox(rq));
     box.append(el('p', 'rp-story', storyOf(b.type, b.level) || String(t.blurb || '').split('. ')[0].replace(/\.$/, '') + '.'));
+    if (b.plaque) { const pq = el('div', 'plaque'); pq.append(el('b', '', b.plaque.name), el('small', '', plaqueText(b.plaque))); box.append(pq); } // 11.01
     if (b.site) { box.append(el('p', 'small', `${q && bigQ(q) ? `A focus project: ${state.builder} builds it while you focus.` : 'The crew builds it, all the time (even with the app closed).'} ${q && q.done > 0 ? `${Math.round(q.done / q.work * 100)}% done.` : 'Not started yet.'}`)); return; }
     if (b.burnt) { const p0 = el('p', 'small'); p0.append(colorize(`${b.burnt.health ? `Badly burned (${b.burnt.health}% left), so it is closed.` : 'Burned down to the ground.'}${b.resident ? ` ${b.resident} is staying with friends until it is fixed.` : ''} The repair costs ${burnRepairCost(b)} gold (more the worse the damage).`)); box.append(p0); return; }
     if (b.ruin) { box.append(el('p', 'small', `Broken and empty.${b.resident ? ` ${b.resident} is waiting to move back in.` : ''}`)); return; }
@@ -9654,6 +9724,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     shed: 'Home of the gardeners.', gardencenter: 'A garden center with a greenhouse.', parksdept: 'The parks department, looking after every green corner.',
     bank: 'A small bank office.', citybank: 'The bank, with a big safe.', centralbank: 'The central bank, with columns and a vault.',
     factory: 'A factory, with a chimney and many hands.', induspark: 'The industrial park: the town\'s biggest employer.',
+    monument: 'A monument of the projects you finished, one stone each.',
     prison: 'A small jail where the thieves the Courthouse sentences serve their time.', prison2: 'A prison with a fenced yard.', maxprison: 'A high-security prison with walls and watchtowers.'
   };
   const storyOf = (type) => BLD_STORY[type];
@@ -9899,7 +9970,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
       b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works' && b.type !== 'fallen').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0) | (b.small === 1 ? 4 : b.small === 2 ? 8 : 0), b.rot ? 1 : 0]),
-      staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])) };
+      staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])), monu: monuSnap() };
   }
   function boardSoon() { if (!board.db || !state.board.joined) return; clearTimeout(board.timer); board.timer = setTimeout(boardPush, 1500); }
   async function boardPush() {
@@ -9988,6 +10059,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     for (const b of vs.buildings) { delete b.small; if (b.type === 'hospital' && b.level > 3) b.level = 3; }
     if (!vs.buildings.some((b) => b.type === 'townhall')) vs.buildings.unshift({ id: nid++, type: 'townhall', c: 5, r: 5, level: 1 });
     for (const b of vs.buildings) if (TYPES[b.type].cat === 'home') b.resident = NAMES[b.id % NAMES.length];
+    { const mo = snap.monu; if (mo && typeof mo === 'object') vs.monument = { show: ['names', 'totals', 'none'].includes(mo.show) ? mo.show : 'none', n: mo.n | 0, totals: mo.show === 'totals' ? { n: mo.n | 0, min: mo.min | 0 } : null, stones: Array.isArray(mo.s) ? mo.s.filter(Array.isArray).map((x) => ({ name: String(x[0] || '').slice(0, 40), planned: x[1] | 0, laps: x[2] | 0, focus: x[3] | 0, date: x[4] | 0 })) : [] }; } // 11.01
     closeSheet(); closePanel(true); setHolding(null);
     ui.visit = { real: state, who: who || '', id: id || null };
     state = normalize(vs);
@@ -10014,6 +10086,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     cb.hidden = !can; cb.disabled = can && cheeredToday(v.id); cb.textContent = cb.disabled ? 'Cheered ✓' : 'Cheer';
   }
   function renderVisitInfo(box, b) {
+    if (b.type === 'monument') { renderMonumentPanel(box, b, true); return; } // 11.01
     const t = T(b), inf = city().info.get(b.id) || {}, mood = econ().mood, chips = [];
     if (t.cat !== 'decor' && !special(t) && t.cat !== 'landmark') chips.push(pill(`Level ${b.level}`));
     if (t.cat === 'landmark') chips.push(pill('Landmark', 'gold'));
@@ -11382,11 +11455,235 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
   }
+  /* ---------- 11.01 (roadmap part 5, Navid): focus that produces results ----------
+     Name what you build after your real task ("Lighthouse · Thesis chapter 2"), a small step for each lap, an if-then
+     for the first lap, an optional "what might stop you?", a check-in after each lap, a plaque when it is done and a
+     Monument of finished projects. All of it is optional and offline, and none of it takes more than 30 seconds.
+     Ticks pay no gold: only measured focus minutes pay (ticks can't be checked). A task can carry on over several
+     buildings until you say it is finished, so "planned 4 laps, took 6" teaches you to estimate time. */
+  const WORK_KINDS = [['writing', 'Writing'], ['studying', 'Studying'], ['coding', 'Coding'], ['admin', 'Admin & email'], ['cleaning', 'Cleaning'], ['creative', 'Creative'], ['other', 'Other']];
+  const STEP_TPL = {
+    writing: { first: 'Outline and notes', mid: (k) => `Draft part ${k}`, end: ['Edit', 'References'] },
+    studying: { first: 'Skim it and list the topics', mid: (k) => `Study topic ${k}`, end: ['Practice questions', 'Review what was hard'] },
+    coding: { first: 'Plan the change', mid: (k) => `Build part ${k}`, end: ['Test it', 'Clean up and commit'] },
+    admin: { first: 'Sort the inbox', mid: (k) => (k === 1 ? 'Answer the urgent ones' : `Batch ${k} of replies and forms`), end: ['Bills and forms', 'Plan tomorrow'] },
+    cleaning: { first: 'Clear the surfaces', mid: (k) => `Area ${k}`, end: ['Floors', 'Take out the trash'] },
+    creative: { first: 'Gather ideas', mid: (k) => (k === 1 ? 'A rough version' : `Work on part ${k}`), end: ['Polish', 'Save and share'] },
+    other: { first: 'Get set up', mid: (k) => `Part ${k}`, end: ['Wrap up'] }
+  };
+  const OPEN_WITH = { writing: 'I open the file and start', studying: 'I open my notes and start', coding: 'I open the editor and start', admin: 'I open my inbox and start', cleaning: 'I pick up the first thing and start', creative: 'I open my sketchbook and start', other: 'I start' };
+  const OBSTACLES = [['phone', 'My phone', 'If I reach for my phone, I write the thought on paper instead.'], ['tired', 'Tiredness', 'If I feel tired, I stand up, drink some water and do the smallest next bit.'],
+    ['noise', 'Noise', 'If it gets noisy, I put on headphones with rain sounds.'], ['stuck', 'Getting stuck', 'If I get stuck, I write the question down and go on with the next part.']];
+  const lowFirst = (x) => (x ? x.charAt(0).toLowerCase() + x.slice(1) : '');
+  function stepsFor(kind, n) {
+    const t = STEP_TPL[kind] || STEP_TPL.other; n = Math.max(1, n | 0);
+    if (n === 1) return [t.first];
+    const end = t.end.slice(0, clamp(n - 2, 0, t.end.length)), mids = n - 1 - end.length, out = [t.first];
+    for (let k = 1; k <= mids; k++) out.push(t.mid(k));
+    return out.concat(end);
+  }
+  const ifThenFor = (kind, step) => `When the countdown ends, ${OPEN_WITH[kind] || OPEN_WITH.other}: ${lowFirst(step || 'the first small step')}.`;
+  // Laps a project still needs at this lap length.
+  const lapsLeftOf = (q, len) => Math.max(1, Math.ceil(Math.max(0, q.work - q.done) / lapFocus(len || ROUND) - 1e-9));
+  const taskStep = (t) => (t ? t.steps[t.cur] || `Keep going: ${t.name}` : '');
+  // The project a session works on that has a task (the first one in its plan with work left).
+  function taskQ(s) { const Q = s ? sessionQueue(s) : focusJobs(); return Q.find((q) => q.task && q.work - q.done > 0.01) || null; }
+  function newTask(name, kind, n) {
+    const steps = stepsFor(kind, n);
+    return { id: state.nextId++, name: String(name).trim().slice(0, 40), kind, steps, cur: 0, res: [], ifThen: ifThenFor(kind, steps[0]), obstacle: null, planned: n, laps: 0, focus: 0, start: Date.now(), edited: false, moved: 0, parts: [] };
+  }
+  const monu = () => { const M = state.monument || (state.monument = { stones: [], show: 'names' }); if (!Array.isArray(M.stones)) M.stones = []; if (!['names', 'totals', 'none'].includes(M.show)) M.show = 'names'; return M; };
+  const MONU_STAGES = [0, 5, 10, 25, 50, 100];
+  const monuStage = (n) => MONU_STAGES.reduce((a, v, i) => (n >= v ? i : a), 0);
+  // A check-in: yes or partly moves on to the next step; "move it" keeps the step for the next lap (never a failure).
+  function answerStep(t, res, bid) {
+    if (!t) return;
+    t.res.push({ step: taskStep(t), res, at: Date.now() });
+    if (res === 'move') t.moved = (t.moved || 0) + 1; else t.cur += 1;
+    anaEvent('step', { res, kind: t.kind, cur: t.cur });
+    const b = bid != null ? byId(bid) : null;
+    if (b && res !== 'move' && ui.screen === 'play') { const p = centerOf(b); burst(p.x, p.y - 20, 12); floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: performance.now(), text: res === 'yes' ? 'Step done!' : 'Step partly done', soft: true }); }
+    if (res !== 'move') { try { sfx.chime(); } catch (e) { /* quiet */ } } else { try { sfx.pop(); } catch (e) { /* quiet */ } }
+    save();
+  }
+  // Finished: a plaque on the building, and a stone on the Monument (the first one brings the Monument itself).
+  function finishTask(t, bid) {
+    if (!t || t.finished) return null;
+    t.finished = Date.now();
+    const b = bid != null ? byId(bid) : null, M = monu(), stage0 = monuStage(M.stones.length);
+    const stone = { id: t.id, name: t.name, kind: t.kind, planned: t.planned, laps: t.laps, focus: Math.round(t.focus), steps: t.res.filter((x) => x.res !== 'move').length, date: Date.now(), type: b ? b.type : null };
+    M.stones.push(stone);
+    if (b) { b.label = t.name; b.plaque = Object.assign({}, stone); }
+    if (state.carryTask && state.carryTask.id === t.id) state.carryTask = null;
+    const hasMonu = state.buildings.some((x) => x.type === 'monument') || state.tray.some((x) => x.type === 'monument');
+    if (!hasMonu) { state.tray.push({ id: state.nextId++, type: 'monument', origin: 'gift' }); setTimeout(() => toast(`Your first finished project! The town carved "${t.name}" into a stone and built you a Monument (in Build → Decor, free). Every project you finish adds a stone.`), 1400); }
+    else if (monuStage(M.stones.length) > stage0) setTimeout(() => toast(`The Monument grew taller: ${M.stones.length} stones!`), 1400);
+    anaEvent('project', { laps: t.laps, planned: t.planned, kind: t.kind });
+    touch(); save();
+    return stone;
+  }
+  const plaqueText = (p) => `${p.name} · planned ${p.planned} lap${p.planned === 1 ? '' : 's'}, took ${p.laps} · ${fmtMin(Math.max(1, p.focus))} of focus · ${new Date(p.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  // The card under the laps on the start sheet: what will you work on, a step for each lap, the if-then, the obstacle.
+  function taskCardEl(q, len) {
+    const box = el('div', 'taskcard'), n = lapsLeftOf(q, len);
+    if (!q.task && state.carryTask && !state.carryTask.finished && !q.taskSkip) {
+      // a task that went on after its last building finished: it carries on here
+      const t = state.carryTask; q.task = t; state.carryTask = null; t.parts = t.parts || []; save();
+      toast(`"${t.name}" carries on with ${jobName(q)}.`);
+    }
+    const t = q.task;
+    if (!t) {
+      const blk = blockNow(), pre = blk && blk.label && blk.label !== 'Test block' ? blk.label : '';
+      box.append(el('b', 'tk-q', 'What will you work on?'), el('span', 'tk-sub', `Name ${jobName(q)} after your real task, and get a small step for each lap. Optional.`));
+      const inp = el('input', 'tk-name'); inp.type = 'text'; inp.maxLength = 40; inp.placeholder = 'Thesis chapter 2, tax forms, the kitchen…'; inp.value = startPick.taskName || pre; inp.setAttribute('aria-label', 'What will you work on?');
+      inp.addEventListener('input', () => { startPick.taskName = inp.value; });
+      const kinds = el('div', 'tk-kinds'); kinds.setAttribute('role', 'radiogroup'); kinds.setAttribute('aria-label', 'Kind of work');
+      const curK = startPick.taskKind || 'writing';
+      for (const [k, label] of WORK_KINDS) { const b = el('button', 'tk-kind', label); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(k === curK)); b.addEventListener('click', () => { startPick.taskKind = k; for (const x of kinds.children) x.setAttribute('aria-checked', String(x === b)); }); kinds.append(b); }
+      const row = el('div', 'tk-row');
+      const go = el('button', 'btn sm primary', 'Plan it'); go.type = 'button';
+      go.addEventListener('click', () => { const nm = (inp.value || '').trim(); if (!nm) { toast('Type a word or two first, or skip it.'); inp.focus(); return; } q.task = newTask(nm, startPick.taskKind || 'writing', n); startPick.taskName = ''; startPick.taskOpen = true; anaEvent('task', { kind: q.task.kind, laps: n }); save(); sfx.pop(); renderStart(); });
+      const sk = el('button', 'btn sm ghost', 'Skip'); sk.type = 'button'; sk.addEventListener('click', () => { q.taskSkip = true; save(); renderStart(); });
+      row.append(go, sk); box.append(inp, kinds, row);
+      return box;
+    }
+    // re-split the steps when the lap length changes, until you edit them yourself
+    if (!t.edited && t.cur === 0 && !t.laps && t.planned !== n) { t.steps = stepsFor(t.kind, n); t.planned = n; t.ifThen = ifThenFor(t.kind, t.steps[0]); }
+    const head = el('div', 'tk-head');
+    head.append(el('b', 'tk-title', `${TYPES[q.type].name} · ${t.name}`), el('span', 'tk-sub', `${t.laps ? `${t.laps} lap${t.laps === 1 ? '' : 's'} done · ` : ''}next: ${taskStep(t)}`));
+    box.append(head);
+    if (!startPick.taskOpen) {
+      const ed = el('button', 'link', 'Edit the plan'); ed.type = 'button'; ed.addEventListener('click', () => { startPick.taskOpen = true; renderStart(); }); box.append(ed);
+      return box;
+    }
+    const ul = el('div', 'tk-steps');
+    const shown = Math.min(8, Math.max(n, 1));
+    for (let i = 0; i < shown; i++) {
+      const idx = t.cur + i, row = el('label', 'tk-step');
+      row.append(el('span', 'tk-lap', `Lap ${i + 1}`));
+      const inp = el('input'); inp.type = 'text'; inp.maxLength = 60; inp.value = t.steps[idx] || ''; inp.placeholder = `Keep going: ${t.name}`;
+      inp.addEventListener('change', () => { t.steps[idx] = inp.value.trim(); for (let j = 0; j < idx; j++) if (t.steps[j] == null) t.steps[j] = ''; t.edited = true; if (idx === 0 && !t.ifEdited) { t.ifThen = ifThenFor(t.kind, t.steps[0]); const it = box.querySelector('.tk-if'); if (it) it.value = t.ifThen; } save(); });
+      row.append(inp); ul.append(row);
+    }
+    box.append(el('span', 'tk-lbl', 'A small step for each lap'), ul);
+    if (t.cur === 0 && !t.laps) {
+      const it = el('textarea', 'tk-if'); it.rows = 2; it.maxLength = 120; it.value = t.ifThen; it.setAttribute('aria-label', 'Your if-then for the first lap');
+      it.addEventListener('change', () => { t.ifThen = it.value.trim() || ifThenFor(t.kind, t.steps[0]); t.ifEdited = true; save(); });
+      box.append(el('span', 'tk-lbl', 'Your start for the first lap'), it);
+    }
+    const ob = el('div', 'tk-ob');
+    ob.append(el('span', 'tk-lbl', t.obstacle ? 'If something gets in the way' : 'What might stop you? (optional)'));
+    const chips = el('div', 'tk-kinds');
+    for (const [k, label, plan] of OBSTACLES) { const b = el('button', 'tk-kind', label); b.type = 'button'; b.setAttribute('aria-pressed', String(!!t.obstacle && t.obstacle.k === k)); b.addEventListener('click', () => { t.obstacle = t.obstacle && t.obstacle.k === k ? null : { k, plan }; save(); renderStart(); }); chips.append(b); }
+    ob.append(chips);
+    if (t.obstacle) { const pi = el('textarea', 'tk-if'); pi.rows = 2; pi.maxLength = 120; pi.value = t.obstacle.plan; pi.setAttribute('aria-label', 'Your plan'); pi.addEventListener('change', () => { t.obstacle.plan = pi.value.trim() || t.obstacle.plan; save(); }); ob.append(pi); }
+    box.append(ob);
+    const row = el('div', 'tk-row');
+    const ok = el('button', 'btn sm primary', 'Looks good'); ok.type = 'button'; ok.addEventListener('click', () => { startPick.taskOpen = false; save(); renderStart(); });
+    const rm = el('button', 'btn sm ghost', 'No task for this one'); rm.type = 'button'; rm.addEventListener('click', () => { if (t.laps) state.carryTask = t; delete q.task; q.taskSkip = true; save(); renderStart(); });
+    row.append(ok, rm); box.append(row);
+    if (state.carryTask && state.carryTask !== t) box.append(el('span', 'tk-sub', `"${state.carryTask.name}" is waiting for its next building.`));
+    return box;
+  }
+  // The check-in after a lap: "Did you finish the outline?" Yes / Partly / Move it to the next lap.
+  function checkinEl(t, onAnswer, title) {
+    const box = el('div', 'checkin');
+    box.append(el('b', '', title || `Did you finish: ${lowFirst(taskStep(t))}?`));
+    const row = el('div', 'ck-row');
+    for (const [res, label] of [['yes', 'Yes'], ['partly', 'Partly'], ['move', 'Move it to the next lap']]) { const b = el('button', 'ck-btn ck-' + res, label); b.type = 'button'; b.addEventListener('click', (e) => { e.stopPropagation(); onAnswer(res); }); row.append(b); }
+    box.append(row);
+    return box;
+  }
+  // How many finished laps of this session touched the task's project (Sam works the plan in order).
+  function taskLapsIn(s, q, k, lenF) {
+    const Q = sessionQueue(s), i = Q.indexOf(q); if (i < 0) return 0;
+    const sd = (x) => ((s.startDone && s.startDone[x.id]) || 0);
+    const before = Q.slice(0, i).reduce((a, x) => a + Math.max(0, x.work - sd(x)), 0), need = Math.max(0, q.work - sd(q));
+    return Math.max(0, Math.min(k, Math.ceil((before + need) / lenF - 1e-6)) - Math.floor(before / lenF + 1e-6));
+  }
+  // The celebration's check-ins, one at a time, then "is it finished?" when its building is done.
+  function celeCheck(r) {
+    const box = $('cele-check'); box.replaceChildren();
+    const T0 = r && r.task; if (!T0 || T0.closed) { box.hidden = true; return; }
+    const t = T0.t;
+    if (T0.n > 0) {
+      box.append(checkinEl(t, (res) => { answerStep(t, res, T0.bid); T0.n -= 1; celeCheck(r); }, `${t.name} · did you finish: ${lowFirst(taskStep(t))}?`));
+      box.hidden = false; return;
+    }
+    if (T0.done && !t.finished) {
+      if (t.cur >= t.steps.length) { const st = finishTask(t, T0.bid); T0.closed = true; box.append(el('div', 'ck-done', `🪨 Finished! "${t.name}" · planned ${st.planned} laps, took ${st.laps}. A new stone for the Monument.`)); box.hidden = false; return; }
+      const q = el('div', 'checkin'); q.append(el('b', '', `${TYPES[T0.type].name} is built. Is "${t.name}" finished?`));
+      const row = el('div', 'ck-row');
+      const y = el('button', 'ck-btn ck-yes', 'Yes, it\'s done'); y.type = 'button'; y.addEventListener('click', () => { const st = finishTask(t, T0.bid); T0.closed = true; box.replaceChildren(el('div', 'ck-done', `🪨 Finished! Planned ${st.planned} laps, took ${st.laps}. A new stone for the Monument.`)); });
+      const nn = el('button', 'ck-btn ck-move', 'Not yet: it carries on'); nn.type = 'button'; nn.addEventListener('click', () => { state.carryTask = t; T0.closed = true; save(); box.replaceChildren(el('div', 'ck-done', `"${t.name}" carries on with your next focus project.`)); });
+      row.append(y, nn); q.append(row); box.append(q); box.hidden = false; return;
+    }
+    box.hidden = true;
+  }
+  // Dismissed without answering: an unfinished task carries on with the next project (nothing is lost).
+  function celeCheckLeave(r) {
+    const T0 = r && r.task; if (!T0 || T0.closed) return;
+    T0.closed = true;
+    if (T0.done && !T0.t.finished) { if (T0.t.cur >= T0.t.steps.length) finishTask(T0.t, T0.bid); else { state.carryTask = T0.t; save(); } }
+  }
+  // Rename any focus building, like a file. Private by default: visitors see only its type.
+  function nameBuilding(b) {
+    const wrap = el('div', 'list');
+    wrap.append(el('p', 'small muted', `Name the ${nameOf(b).toLowerCase()} after what you worked on. Only you see it: visitors see "${nameOf(b)}".`));
+    const inp = el('input', 'tk-name'); inp.type = 'text'; inp.maxLength = 40; inp.value = b.label || ''; inp.placeholder = 'Thesis chapter 2';
+    const row = el('div', 'tk-row');
+    const sv = el('button', 'btn primary', 'Save'); sv.addEventListener('click', () => { const v = inp.value.trim(); if (v) b.label = v.slice(0, 40); else delete b.label; save(); closeSheet(); renderAll(); toast(v ? `Named: ${nameOf(b)} · ${b.label}` : 'Name removed.'); });
+    row.append(sv); if (b.label) { const rm = el('button', 'btn ghost', 'Remove the name'); rm.addEventListener('click', () => { delete b.label; save(); closeSheet(); renderAll(); }); row.append(rm); }
+    wrap.append(inp, row);
+    openSheet('Name it', wrap);
+    setTimeout(() => inp.focus(), 60);
+  }
+  const focusBuilt = (b) => !!b && (b.label || b.plaque || jobMode('build', b.type) === 'focus' || jobMode('upgrade', b.type) === 'focus') && T(b).cat !== 'decor' && !special(T(b));
+  // The Monument: a stone for every finished project; taller at 5, 10, 25, 50 and 100 stones. Gold can't buy it.
+  function renderMonumentPanel(box, b, visiting) {
+    const M = monu(), stones = M.stones.filter((s) => !s.hidden || !visiting), stage = monuStage(M.stones.length);
+    const chips = [pill(`${M.stones.length} stone${M.stones.length === 1 ? '' : 's'}`, 'gold')];
+    const nx = MONU_STAGES.find((v) => v > M.stones.length); if (nx && !visiting) chips.push(pill(`taller at ${nx}`));
+    box.append(panelHead('monument', 1, {}, 'Monument', chips));
+    if (visiting) {
+      if (M.show === 'none' || (!stones.length && !M.totals)) { box.append(el('p', 'small', 'A monument of finished projects. Its stones are private.')); return; }
+      if (M.show === 'totals' || M.totals) { const tot = M.totals || { n: M.stones.length, min: M.stones.reduce((a, s) => a + (s.focus || 0), 0) }; box.append(el('p', 'small', `${tot.n} project${tot.n === 1 ? '' : 's'} · ${fmtMin(tot.min)} of focus`)); return; }
+    } else box.append(el('p', 'small', 'Every project you name and finish adds a stone carved with its name, its laps and its focus time. It grows taller at 5, 10, 25, 50 and 100 stones. Gold can\'t buy it, and it never appears on a leaderboard.'));
+    const ul = el('ul', 'monu-list');
+    for (const s of stones.slice().reverse()) {
+      const li = el('li', 'monu-stone' + (s.hidden ? ' off' : ''));
+      li.append(el('b', '', s.name), el('small', '', `planned ${s.planned} lap${s.planned === 1 ? '' : 's'}, took ${s.laps} · ${fmtMin(Math.max(1, s.focus || 0))} · ${new Date(s.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`));
+      if (!visiting) { const hb = el('button', 'link', s.hidden ? 'Hidden from visitors · show' : 'Hide from visitors'); hb.addEventListener('click', () => { s.hidden = !s.hidden; save(); renderPanel(); }); li.append(hb); }
+      ul.append(li);
+    }
+    if (!stones.length) box.append(el('p', 'small muted', 'No stones yet.')); else box.append(ul);
+    if (visiting) return;
+    const sec = el('div', 'menu-sec pol-card'); sec.append(el('h3', '', 'What visitors see'));
+    const opts = el('div', 'pol-opts');
+    for (const [k, label, sub] of [['names', 'All the names', 'except hidden ones'], ['totals', 'Only totals', `${M.stones.length} projects · ${fmtMin(M.stones.reduce((a, s) => a + (s.focus || 0), 0))}`], ['none', 'Nothing', 'just the monument']]) {
+      const ob = el('button', 'pol-opt'); ob.type = 'button'; ob.setAttribute('role', 'radio'); ob.setAttribute('aria-checked', String(M.show === k)); ob.append(el('b', '', label), el('small', '', sub));
+      ob.addEventListener('click', () => { M.show = k; save(); boardSoon(); renderPanel(); }); opts.append(ob);
+    }
+    sec.append(opts); box.append(sec);
+    const row = el('div', 'acts3 two');
+    row.append(actionBtn('Move', state.freeMoves ? `free move · ${state.freeMoves} left` : `${moveCost(b)} gold`, '', () => { ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); renderAll(); }));
+    row.append(actionBtn('Close', null, '', () => closePanel()));
+    box.append(row);
+    void stage;
+  }
+  // What a town shares about its Monument with visitors (Navid: visitors see what you choose).
+  function monuSnap() {
+    const M = state.monument; if (!M || !M.stones || !M.stones.length) return null;
+    if (M.show === 'none') return { show: 'none', n: M.stones.length };
+    if (M.show === 'totals') return { show: 'totals', n: M.stones.length, min: M.stones.reduce((a, s) => a + (s.focus || 0), 0) };
+    return { show: 'names', n: M.stones.length, s: M.stones.filter((s) => !s.hidden).slice(-30).map((s) => [String(s.name).slice(0, 40), s.planned | 0, s.laps | 0, s.focus | 0, s.date | 0]) };
+  }
   function renderStart() {
     const wrap = el('div', 'startsheet');
     const rq = roundJobs(), hasRounds = rq.length > 0, isLaps = startPick.mode === 'laps';
     const singles = focusJobs().filter((q) => !roundsQ(q)), planned = focusJobs().length > 0;
     wrap.append(lapCardEl(isLaps));
+    if (isLaps && hasRounds && lapFocus(startPick.lapLen) >= 25 - 1e-9 && (rq[0].work >= 2 * ROUND_FOCUS - 1e-6 || rq[0].task)) wrap.append(taskCardEl(rq[0], startPick.lapLen)); // 11.01: not on sessions under 25 minutes
     // The eight set lengths (10.13: always the same eight).
     const opts = FIXED.slice();
     if (!opts.includes(startPick.duration)) { opts[opts.length - 1] = startPick.duration; opts.sort((a, b) => a - b); }
@@ -11967,8 +12264,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (L) $('focus-of').replaceChildren(el('b', 'ready-len', s.lapP ? `Lap ${L.lap} of ${L.of}` : `Lap ${L.lap}`), el('span', 'ready-sub', `${fmtHalf(L.lf)} minutes of focus, then a ${fmtHalf(lapBreakOf(L.len))}-minute break · cancel for free until then`));
       else $('focus-of').replaceChildren(el('b', 'ready-len', fmtMin(s.duration)), el('span', 'ready-sub', `of focus is about to start${sessionQueue(s).some(roundsQ) ? ' · progress saved every 30 minutes' : ''} · cancel for free until then`));
       $('focus-meter').style.width = '0%';
-      $('focus-task').textContent = 'Put your phone face down and take a breath.';
+      const tq = taskQ(s), tk = tq && tq.task; // 11.01: the if-then for the first lap, then the lap's step
+      $('focus-task').textContent = tk ? (tk.cur === 0 && !tk.laps ? tk.ifThen : `This lap: ${taskStep(tk)}`) : 'Put your phone face down and take a breath.';
       $('focus-combo').hidden = true; $('focus-list').replaceChildren(); $('focus-lapdone').hidden = true;
+      if (tk && tk.obstacle) $('focus-list').append(el('li', 'step', tk.obstacle.plan));
       return;
     }
     if (L) { renderLapFocus(f, L); return; }
@@ -11986,6 +12285,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     else { $('focus-eyebrow').textContent = sim.items.length ? 'Plan finished' : 'At work'; $('focus-task').textContent = `You: ${job.verb.toLowerCase()} ${job.at} · +${fmtGold(sim.leftover * job.gold)} gold so far`; }
     for (const it of sim.items) list.append(el('li', it.finished ? 'done' : '', `${it.finished ? '✓ ' : ''}${jobLabel(it.q)}`));
+    { const tq = taskQ(s); if (tq && cur && cur.q === tq) list.prepend(el('li', 'step', `${tq.task.name} · ${taskStep(tq.task)}`)); } // 11.01
   }
   // 10.13 (Navid): the laps of this session, as soon as the countdown starts: (25+5) + (25+5) + (25). The lap you are
   // on is lit, finished ones are gold.
@@ -12009,6 +12309,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const left = Math.max(0, sessionQueue(s).reduce((a, q) => a + q.work - q.done, 0) - L.m);
     const what = cur ? `${state.builder} is working on: ${jobLabel(cur.q).toLowerCase()} · ${Math.floor(cur.done / cur.q.work * 100)}%` : `${state.builder}'s plan is done. You: ${job.verb.toLowerCase()} ${job.at} · +${fmtGold(sim.leftover * (1 + longBonus(L.m)) * job.gold)} gold so far`;
     $('focus-task').textContent = what;
+    { const tq = taskQ(s); if (tq && cur && cur.q === tq && !L.win) list.append(el('li', 'step', `This lap: ${taskStep(tq.task)}`)); } // 11.01
     if (cur && left >= 0.5) list.append(el('li', '', `${workText(left, 99)} to go`));
     for (const it of sim.items) if (it.finished) list.append(el('li', 'done', `✓ ${jobLabel(it.q)}`));
     const box = $('focus-lapdone');
@@ -12022,6 +12323,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       $('lapdone-text').textContent = `Take your ${fmtHalf(lapBreakOf(L.len))}-minute break now: every minute you focused counts. Or skip it and the next lap just goes on. ${fmtClock(L.winLeft * 60)} left to choose.`;
       $('lap-break').textContent = `Take my ${fmtHalf(lapBreakOf(L.len))}-minute break`;
       box.hidden = false; $('focus-actions').hidden = true; $('focus-confirm').hidden = true;
+      { const tq = taskQ(s), ck = $('lapdone-check'), on = tq ? taskLapsIn(s, tq, L.k, lapFocus(L.len)) : 0; // 11.01: the check-in after a lap
+        if (tq && (s.chk || 0) < on) { const key = `${L.k}:${s.chk || 0}:${tq.task.cur}`; if (ck.dataset.key !== key) { ck.dataset.key = key; ck.replaceChildren(checkinEl(tq.task, (res) => { answerStep(tq.task, res, tq.bid); s.chk = (s.chk || 0) + 1; save(); ck.dataset.key = ''; renderFocus(Date.now()); })); } ck.hidden = false; }
+        else { ck.hidden = true; ck.dataset.key = ''; } }
       return;
     }
     box.hidden = true;
@@ -12141,6 +12445,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       setTimeout(() => { if (cele.active) sfx.medal(); }, reduced ? 0 : 800);
     } else cb.hidden = true;
     $('cele-go').textContent = r.chest ? 'Open your chest' : 'See what you earned';
+    celeCheck(r); // 11.01: check-ins and "is it finished?"
     // count the minutes up
     const minEl = $('cele-min'), t0 = performance.now(), dur = reduced ? 0 : 900;
     const step = (now) => { const k = dur ? clamp((now - t0) / dur, 0, 1) : 1; minEl.textContent = String(Math.round(m * (1 - Math.pow(1 - k, 3)))); if (k < 1 && cele.active) requestAnimationFrame(step); };
@@ -12840,7 +13145,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   });
   $('lap-break').addEventListener('click', () => { if (state.session && state.session.laps) finishSession('lap'); });
   $('lap-skip').addEventListener('click', () => { const s = state.session; if (!s || !s.laps) return; const L = lapInfo(s, Date.now()); s.skip = L.k; save(); sfx.pop(); toast(`Break skipped. Lap ${L.done + 1} is on: ${fmtClock(L.left * 60)} to go.`); renderFocus(Date.now()); });
-  $('cele-go').addEventListener('click', () => { const r = ui.lastResult; hideCelebration(); if (r && r.chest && !r.chestShown) { r.chestShown = true; showChest(r); } else showResult(r); });
+  $('cele-go').addEventListener('click', () => { const r = ui.lastResult; celeCheckLeave(r); hideCelebration(); if (r && r.chest && !r.chestShown) { r.chestShown = true; showChest(r); } else showResult(r); });
   $('chest-go').addEventListener('click', openChest);
   $('chest-hit').addEventListener('click', openChest);
   $('result-home').addEventListener('click', () => { hideResult(); renderAll(); });
@@ -13101,6 +13406,15 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     boatAt: (a) => { ui.boatA = a; },
     boatShot: (dir, t) => { const cv = document.createElement('canvas'); cv.width = 720; cv.height = 420; const c = cv.getContext('2d'); c.fillStyle = css(skyNow().sea); c.fillRect(0, 0, 720, 420); c.setTransform(3, 0, 0, 3, 0, 0); drawBoat(c, 120, 100, dir || 1, t == null ? performance.now() : t, skyNow()); return cv.toDataURL('image/png'); },
     personShot: (arms, rain) => { const cv = document.createElement('canvas'); cv.width = 600; cv.height = 300; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, 600, 300); c.setTransform(5, 0, 0, 5, 0, 0); [0, 0.25, 0.5, 0.75, 1].forEach((sw, i) => { const hand = person(c, 12 + i * 22, 50, 1, BUILDER_LOOK, { arms: arms || 'hammer', tool: arms === 'umbrella' ? null : 'hammer', swing: sw, facing: i % 2 ? -1 : 1, walk: rain ? i : undefined }); if (arms === 'umbrella') umbrella(c, hand, 1, i % 2 ? -1 : 1, '#E5482F', 0); }); return cv.toDataURL('image/png'); },
+    // 11.01: named projects and the Monument
+    tasks: () => focusJobs().map((q) => ({ id: q.id, type: q.type, work: q.work, done: q.done, task: q.task ? JSON.parse(JSON.stringify(q.task)) : null })),
+    monument: () => ({ m: JSON.parse(JSON.stringify(state.monument || null)), tray: state.tray.map((x) => x.type), carry: state.carryTask ? state.carryTask.name : null, labels: state.buildings.filter((b) => b.label).map((b) => [b.type, b.label, !!b.plaque]) }),
+    snapMonu: () => townSnap().monu,
+    // 11.01: a sheet of building drawings, for checking new art. items: [[type, level, rot, opts], ...]
+    artShot: (items, cols) => { cols = cols || 4; const W = 160, H = 170, Z = 2, rows = Math.ceil(items.length / cols), cv = document.createElement('canvas'); cv.width = cols * W * Z; cv.height = rows * H * Z; const c = cv.getContext('2d'); c.fillStyle = '#9CC46E'; c.fillRect(0, 0, cv.width, cv.height);
+      items.forEach(([type, level, rot, o], i) => { const s = Math.max(1, TYPES[type].size || 1), hw = HW * s * 0.9, hh = HH * s * 0.9, x = (i % cols) * W + W / 2, y = Math.floor(i / cols) * H + H * 0.72; c.setTransform(Z, 0, 0, Z, 0, 0); diamond(c, x, y, hw, hh, '#8AB85E'); try { drawBuilding(c, type, level || 1, x, y, hw, hh, Object.assign({ time: performance.now(), rot: rot || 0 }, o || {})); } catch (e) { c.fillStyle = 'red'; c.fillText(String(e).slice(0, 30), x - 60, y); } c.fillStyle = '#1E2A28'; c.font = '11px sans-serif'; c.fillText(`${type} ${level || 1}`, x - 60, Math.floor(i / cols) * H + 14); });
+      return cv.toDataURL('image/png'); },
+    setMonu: (n) => { state.monument = { stones: Array.from({ length: n }, (_, i) => ({ id: i, name: `Project ${i + 1}`, planned: 2, laps: 3, focus: 75, date: Date.now() })), show: 'names' }; renderAll(); return monuCount(); },
     freeSpot: (c, r) => { for (let d = 0; d < 8; d++) for (let dc = -d; dc <= d; dc++) for (let dr = -d; dr <= d; dr++) { if (Math.max(Math.abs(dc), Math.abs(dr)) !== d) continue; if (freeTile(c + dc, r + dr)) return { c: c + dc, r: r + dr }; } return null; }
   });
 })();
