@@ -5,4 +5,5 @@ export type FocusEvent = { t: number; e: FocusEventName };
 
 export type FocusGuardModuleEvents = {
   onEvent: (event: FocusEvent) => void;
+  onShake: (event: { t: number }) => void;
 };

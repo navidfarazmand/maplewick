@@ -76,7 +76,8 @@ function Game() {
   useEffect(() => {
     if (!FocusGuard) return;
     const sub = FocusGuard.addListener('onEvent', (ev) => send({ t: 'ev', at: ev.t, e: ev.e }));
-    return () => sub.remove();
+    const shake = FocusGuard.addListener('onShake', () => send({ t: 'shake' })); // opens "Report a problem"
+    return () => { sub.remove(); shake.remove(); };
   }, [send]);
 
   // The app going to the back or coming to the front

@@ -38,6 +38,10 @@ service cloud.firestore {
     match /push/{uid} {
       allow read, write: if false;
     }
+    // Problem reports from the game: written by the server, read in the Firebase console.
+    match /reports/{id} {
+      allow read, write: if false;
+    }
     match /leagueWeeks/{w} {
       allow read, write: if false;
     }

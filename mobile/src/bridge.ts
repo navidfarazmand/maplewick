@@ -32,8 +32,12 @@ export function bridgeScript(info: BridgeInfo): string {
     // document.hidden, this does it and fires the visibilitychange event the game listens for.
     _fake: null,
     _dark: null,
+    _seq: 0,
     setHidden: function (h) {
+      // Only the latest call counts: a late "hidden" (its timer is longer) must not win over "back in front".
+      var seq = ++A._seq;
       setTimeout(function () {
+        if (seq !== A._seq) return;
         if (A._fake === null && document.hidden === h) return;
         if (A._fake === h) return;
         A._fake = h;
@@ -45,6 +49,8 @@ export function bridgeScript(info: BridgeInfo): string {
       }, h ? 600 : 300);
     }
   };
+  // A tap means the app is in front: if the page still thinks it's hidden, wake it up.
+  document.addEventListener('pointerdown', function () { if (A._fake === true) A.setHidden(false); }, true);
   // The status bar icons follow the game's theme (its own setting, or the phone's).
   function theme() {
     var t = document.documentElement.getAttribute('data-theme');

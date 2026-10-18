@@ -7,6 +7,8 @@ The game works without it. When it's live, two things change:
 
 - **Friends' messages reach the phone.** When a player sends a friend something (an invitation to focus together, a gift, a trade, a loan request or loan) or adds them as a friend, the friend's Android app gets a notification, even with Maplewick closed.
 
+- **Problem reports.** Shake the phone (Android app) or Menu → Report a problem: the report is saved in `reports/` with a short id like R-4F2K. Read them in the Firebase console → Firestore → reports.
+
 If the server isn't deployed, or is down, the game carries on exactly as in 11.x.
 
 | | |
@@ -28,6 +30,7 @@ GitHub runs all the tests on every change (Actions → Server tests).
 | `leagueResults/{uid}` | Your league now and last week's result | the player |
 | `leagueTables/{week}_{league}_{group}` | Last week's final tables | anyone signed in |
 | `push/{uid}` | The player's phones' push tokens | nobody (server only) |
+| `reports/{id}` | Problem reports: the note, version, phone, what was on screen, recent errors and taps, a small picture | the Firebase console only |
 | `config/server` | `{ on: true, tz, appOnly }` | anyone |
 
 `appOnly: true` (set it by hand in the Firebase console, in `config/server`) makes the leagues count only minutes focused in the Android app, where the phone-pickup check runs. Off by default, so web and iPhone players still take part.

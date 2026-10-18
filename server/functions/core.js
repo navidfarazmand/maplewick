@@ -132,4 +132,25 @@ function friendPushes(before, after, now) {
   return out.slice(0, 10);
 }
 
-module.exports = { TZ, focusStart, focusEnd, runWeek, boardExtra, tierFor, registerPush, friendPushes };
+// ---- Bug reports (shake the phone, or Menu → Report a problem) ----
+
+const REPORT_MAX = 700000; // characters of JSON; a Firestore document holds at most about 1 MB
+const CODE = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const reportId = () => 'R-' + Array.from({ length: 4 }, () => CODE[Math.floor(Math.random() * CODE.length)]).join('');
+async function bugReport(db, uid, data, now) {
+  if (!data || typeof data !== 'object') throw bad('report');
+  const r = Object.assign({}, data);
+  if (typeof r.shot !== 'string' || !/^data:image\/(jpeg|png|webp);base64,/.test(r.shot) || r.shot.length > 400000) delete r.shot;
+  let json = JSON.stringify(r);
+  if (json.length > REPORT_MAX) { delete r.shot; json = JSON.stringify(r); }
+  if (json.length > REPORT_MAX) throw bad('report too big');
+  for (let i = 0; i < 5; i++) {
+    const id = reportId(), ref = db.collection('reports').doc(id);
+    if ((await ref.get()).exists) continue;
+    await ref.set(Object.assign({ at: now, iso: new Date(now).toISOString(), uid: uid || null }, JSON.parse(json)));
+    return { id };
+  }
+  throw bad('no id');
+}
+
+module.exports = { TZ, focusStart, focusEnd, runWeek, boardExtra, tierFor, registerPush, friendPushes, bugReport };

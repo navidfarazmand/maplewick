@@ -118,3 +118,15 @@ test('friend notifications: only new, fresh messages, to the friend they are for
   assert.deepStrictEqual(friendPushes(null, after, now).map((x) => x.kind), ['gift', 'inv', 'lreq']); // a new entry: messages, but not "added you"
   assert.deepStrictEqual(friendPushes(before, null, now), []);
 });
+
+const { bugReport } = require('../core');
+test('bug reports: saved with a short id, a picture only if it is a small image', async () => {
+  const db = fakeDb();
+  const r = await bugReport(db, null, { note: 'it froze', ver: '12.04', shot: 'data:image/jpeg;base64,AAAA', state: { screen: 'play' } }, T0);
+  assert.match(r.id, /^R-[A-Z2-9]{4}$/);
+  const d = db.data.get('reports/' + r.id);
+  assert.strictEqual(d.note, 'it froze'); assert.strictEqual(d.shot, 'data:image/jpeg;base64,AAAA'); assert.strictEqual(d.uid, null);
+  const r2 = await bugReport(db, 'u1', { note: 'x', shot: 'javascript:alert(1)' }, T0);
+  assert.strictEqual(db.data.get('reports/' + r2.id).shot, undefined);
+  await assert.rejects(bugReport(db, null, { note: 'x'.repeat(800000) }, T0), /too big/);
+});

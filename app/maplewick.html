@@ -1498,7 +1498,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.03'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.04'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -4957,6 +4957,9 @@
     if (!APP.on) return;
     try { window.MaplewickApp.on(appRecv); } catch (e) { APP.on = false; return; }
     appPost({ t: 'hello', version: APP_VERSION });
+    // 12.04: a tap means the app is in front. If the page still thinks it's hidden (a late "hidden" from the app after
+    // coming back), wake it up, or the town stops drawing and only the bottom bar answers.
+    document.addEventListener('pointerdown', () => { if (document.hidden) { try { window.MaplewickApp.setHidden(false); } catch (e) { /* older app */ } } }, true);
     if (state.session) { APP.hold = Date.now() + 4000; appFocus(state.session, true); appPost({ t: 'log?' }); } // reopened mid-session: wait for the log
   }
   // A session starts (fresh log) or goes on after the app was reopened; null when it ends.
@@ -5063,6 +5066,7 @@
     if (m.t === 'log') { appEvents(m.events); APP.hold = 0; if (state.session) tick(); }
     else if (m.t === 'ev') { appEvents([{ t: m.at, e: m.e }]); }
     else if (m.t === 'pushToken' && typeof m.token === 'string') { APP.pushTok = m.token; srvPushToken(); } // 12.03
+    else if (m.t === 'shake') { if (!(ui.overlay === 'report' || ($('sheet').dataset.kind === 'report' && !$('scrim').hidden))) openReport(); } // 12.04
     else if (m.t === 'back') { appPost({ t: 'back', handled: appBackButton() }); }
     else if (m.t === 'google') {
       if (m.tok) googleWithToken(m.tok);
@@ -5098,6 +5102,75 @@
     const api = srvApi(), tok = APP.pushTok; if (!api || !tok) return;
     const key = FB.user.uid + '|' + tok; if (state.pushSent && state.pushSent.k === key && Date.now() - state.pushSent.at < 86400000) return;
     api.call('registerPush', { token: tok, platform: 'android' }).then(() => { state.pushSent = { k: key, at: Date.now() }; save(); }).catch(() => {});
+  }
+  /* ---------- 12.04: problem reports. Shake the phone (Android app) or Menu → Report a problem. The report goes to the
+     server (reports/ in Firestore) with a short id the player can pass on ("R-4F2K"); without the server it can be
+     copied instead. It holds what was on screen, recent errors and taps, and a small picture of the town. ---------- */
+  const ERRS = [];
+  { const keep = (kind, msg) => { try { ERRS.push({ t: Date.now(), kind, msg: String(msg).slice(0, 400) }); if (ERRS.length > 40) ERRS.shift(); } catch (e) { /* ignore */ } };
+    window.addEventListener('error', (e) => keep('error', (e.message || 'error') + (e.filename ? ` @ ${String(e.filename).split('/').pop()}:${e.lineno}:${e.colno}` : '') + (e.error && e.error.stack ? ' | ' + String(e.error.stack).split('\n').slice(0, 4).join(' / ') : '')));
+    window.addEventListener('unhandledrejection', (e) => keep('promise', (e.reason && (e.reason.stack || e.reason.message || e.reason.code)) || e.reason));
+    for (const k of ['error', 'warn']) { const orig = console[k]; console[k] = function () { keep(k, Array.from(arguments).map((a) => (a && a.stack) || (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); return orig.apply(console, arguments); }; } }
+  const describeEl = (n) => { if (!n) return null; let s = n.tagName ? n.tagName.toLowerCase() : '?'; if (n.id) s += '#' + n.id; if (n.className && typeof n.className === 'string') s += '.' + n.className.trim().split(/\s+/).slice(0, 3).join('.'); return s; };
+  function reportShot() {
+    try {
+      const src = !$('focus').hidden ? $('focus-scene') : canvas; if (!src || !src.width) return null;
+      const w = Math.min(420, src.width), h = Math.round(src.height * w / src.width), c = document.createElement('canvas');
+      c.width = w; c.height = h; c.getContext('2d').drawImage(src, 0, 0, w, h);
+      const d = c.toDataURL('image/jpeg', 0.6); return d.length < 380000 ? d : null;
+    } catch (e) { return null; }
+  }
+  function reportData(note, withShot) {
+    const W = innerWidth, H = innerHeight, pts = [[W / 2, 60], [W / 2, H / 2], [W / 2, H - 60], [30, H / 2], [W - 30, H / 2]];
+    let safe = null; try { const p = document.createElement('div'); p.style.cssText = 'position:fixed;top:env(safe-area-inset-top);bottom:env(safe-area-inset-bottom);left:0;width:1px;visibility:hidden'; document.body.append(p); const r = p.getBoundingClientRect(); safe = { top: Math.round(r.top), bottom: Math.round(H - r.bottom) }; p.remove(); } catch (e) { /* ignore */ }
+    let events = []; try { events = (anaLoad().events || []).slice(-40); } catch (e) { /* ignore */ }
+    const visible = ['welcome', 'scrim', 'tour', 'focus', 'alarm', 'celebrate', 'chest', 'result', 'recharge', 'toast'].filter((id) => $(id) && !$(id).hidden);
+    const s = state.session;
+    return {
+      note: String(note || '').slice(0, 2000), ver: APP_VERSION, app: APP.on ? (window.MaplewickApp.appVersion || 'android') : null,
+      ua: navigator.userAgent.slice(0, 300), screen: { w: W, h: H, dpr: devicePixelRatio, safe }, lang: navigator.language, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      state: { screen: ui.screen, overlay: ui.overlay || null, sheet: $('scrim').hidden ? null : ($('sheet').dataset.kind || $('sheet-title').textContent), visible, hidden: document.hidden, fakeHidden: APP.on ? window.MaplewickApp._fake : null,
+        tour: tour.steps ? tour.i : -1, session: s ? { min: Math.round(sessionMinutes(s, Date.now()) * 10) / 10, of: s.duration, laps: !!s.laps } : null,
+        playSec: Math.round(state.playSec), town: state.town, hall: hallLevel(), residents: city().residents, gold: Math.round(state.gold), buildings: state.buildings.length,
+        board: board.kind || null, signedIn: !!(FB.user), srvAt: state.srvAt || null },
+      atPoints: pts.map(([x, y]) => describeEl(document.elementFromPoint(x, y))),
+      errors: ERRS.slice(), events, focusLog: APP.ev.slice(-60),
+      shot: withShot ? reportShot() : null, uidHint: board.me || null,
+    };
+  }
+  function openReport() {
+    if (ui.visit) return;
+    const wrap = el('div', 'list');
+    wrap.append(el('p', 'small', 'What happened? A few words help: what you tapped, what you expected, what you saw. Everything else (version, phone, what was on screen, recent errors) is added for you.'));
+    const ta = document.createElement('textarea'); ta.rows = 4; ta.maxLength = 2000; ta.placeholder = 'For example: I came back to the app and the town stopped moving.'; ta.className = 'reptext';
+    ta.style.cssText = 'width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:12px;border:1.5px solid var(--line, #ccc);background:var(--card, #fff);color:inherit;user-select:text;-webkit-user-select:text';
+    const shotRow = el('label', 'small'); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true; shotRow.append(cb, document.createTextNode(' Include a small picture of the town'));
+    const out = el('div', 'small');
+    const send = el('button', 'btn primary full', 'Send report');
+    const shot0 = reportShot(); // the picture as it was when the report opened
+    send.addEventListener('click', async () => {
+      send.disabled = true; send.textContent = 'Sending…';
+      const data = reportData(ta.value, false); if (cb.checked) data.shot = shot0;
+      const cfg = FB.cfg;
+      try {
+        if (!cfg || !cfg.projectId) throw new Error('no server');
+        const res = await withTimeout(fetch(`https://us-central1-${cfg.projectId}.cloudfunctions.net/bugReport`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data }) }).then((r) => r.json()), 20000, 'offline');
+        const id = res && res.result && res.result.id; if (!id) throw new Error('no id');
+        anaEvent('report', { id });
+        out.replaceChildren(el('b', '', `Thank you! Report ${id} is sent.`), el('p', 'small muted', `Tell Claude "${id}" and it can read the whole report.`));
+        send.textContent = 'Close'; send.disabled = false; send.onclick = () => closeSheet();
+        const cp = el('button', 'btn sm ghost', `Copy ${id}`); cp.addEventListener('click', () => { try { navigator.clipboard.writeText(id); toast('Copied.'); } catch (e) { /* ignore */ } }); out.append(cp);
+      } catch (e) {
+        send.disabled = false; send.textContent = 'Try again';
+        const txt = JSON.stringify(Object.assign({}, data, { shot: undefined }));
+        const cp = el('button', 'btn sm', 'Copy the report instead'); cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(txt); toast('Copied. Paste it to Claude.'); } catch (e2) { toast('This phone can\'t copy here.'); } });
+        out.replaceChildren(el('p', 'small', 'Could not send it right now (no internet, or the server is off).'), cp);
+      }
+    });
+    wrap.append(ta, shotRow, send, out);
+    openSheet('Report a problem', wrap);
+    $('sheet').dataset.kind = 'report';
+    setTimeout(() => { try { ta.focus(); } catch (e) { /* ignore */ } }, 300);
   }
   // Last week's result from the server (at most every 5 minutes)
   function srvResult(now) {
@@ -13651,6 +13724,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
 
   /* ---------- The menu: a list of sections; each opens full-screen, with a back arrow to the list ---------- */
   const MENU_ICONS = {
+    report: '<path fill="currentColor" d="M9 3h6v2.1a5 5 0 0 1 2.6 2.4H20v2h-2v2h2v2h-2v1a6 6 0 0 1-12 0v-1H4v-2h2v-2H4v-2h2.4A5 5 0 0 1 9 5.1zm2 7v2h2v-2zm0 4v2h2v-2z"/>',
     music: '<path fill="currentColor" d="M9 4.5 20 2.5v12.7a3 3 0 1 1-2-2.8V6.6l-7 1.3v9.4a3 3 0 1 1-2-2.8z"/>',
     progress: '<path fill="currentColor" d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/>',
     friends: '<path fill="currentColor" d="M6 3h12v3a6 6 0 0 1-4.5 5.8V15H16v3H8v-3h2.5v-3.2A6 6 0 0 1 6 6zM3 5h2v2.5A3 3 0 0 1 3 7zm16 0h2v2a3 3 0 0 1-2 .5zM7 20h10v2H7z"/>',
@@ -13684,6 +13758,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       { k: 'festival', title: SEASONS[curSeason()].fest, sub: `${Math.floor(seasonProgress().min)} of ${SEASON_GOAL[0]} minutes for its prize`, open: openSeason },
       { k: 'settings', title: 'Settings', sub: 'Names, sounds, focus alarm, days, lock-screen timer', page: settingsPage },
       { k: 'help', title: 'Help', sub: 'Why this app, play-time limits, the quick tour', page: helpPage },
+      { k: 'report', title: 'Report a problem', sub: APP.on ? 'Or shake your phone · sends what went wrong, so it can be fixed' : 'Sends what went wrong, so it can be fixed', open: () => openReport() }, // 12.04
       { k: 'about', title: 'About', sub: `Version ${APP_VERSION} · music credits · rate us`, page: aboutPage },
       { k: 'testing', title: 'Testing', sub: 'Test speed, extra play time and gold, restart', page: testPage }
     ].filter((m) => m && (m.k !== 'testing' || devOn()));

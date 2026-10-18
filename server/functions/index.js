@@ -5,6 +5,8 @@
 //   registerPush            the Android app's push token, so friends' messages can reach the phone.
 //   friendNotify            when a player's board entry changes: a notification to each friend they just sent
 //                           something (an invitation to focus together, a gift, a trade, a loan) or added.
+//   bugReport               a problem report from the game (shake the phone): saved in reports/{id}, the id is
+//                           shown to the player ("R-4F2K") so they can say which one.
 //   weeklyLeagues           every Monday just after midnight (Toronto time): last week's tables from those minutes,
 //                           robots filling every group up to 30, who moves up or down, and the top 3.
 //
@@ -25,7 +27,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentWritten } = require('firebase-functions/v2/firestore');
 const L = require('./leagues');
-const { TZ, focusStart, focusEnd, runWeek, registerPush, friendPushes } = require('./core');
+const { TZ, focusStart, focusEnd, runWeek, registerPush, friendPushes, bugReport } = require('./core');
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
 initializeApp();
@@ -71,3 +73,5 @@ exports.friendNotify = onDocumentWritten('board/{uid}', async (event) => {
     if (dead.length) await ref.set({ tokens: tokens.filter((t) => !dead.includes(t)) }, { merge: true });
   }
 });
+
+exports.bugReport = onCall({ cors: true }, (req) => wrap(() => bugReport(getFirestore(), req.auth ? req.auth.uid : null, req.data, nowMs())));
