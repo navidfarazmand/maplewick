@@ -1498,7 +1498,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.11'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.12'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -11915,15 +11915,19 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     { el: '#stage', text: () => `This is your town. Play time is your break: in it you build, decorate and run the town, and ${state.builder} builds small things right away. Step in now.`, next: 'Go to town', onNext: () => { if (ui.screen !== 'play') enterPlay(); } }
   ];
   const TOUR_FULL = TOUR_START.concat([
-    { el: '#stage', pass: true, place: 'top', text: 'A family wants to move in! Tap any empty spot, then Place here for Lina\'s cottage.', wait: () => state.buildings.some((b) => b.origin === 'gift'), skipIf: () => !state.tray.some((x) => x.origin === 'gift') },
-    { rect: () => buildingRect(byId(tour.ruin) || state.buildings.find((b) => b.ruin)), pass: true, place: 'top', text: () => `This cottage is broken. Tap it, then Repair. Small jobs like this, ${state.builder} does right away while you play.`,
+    // 12.00: the highlight follows each step of placing it: an empty spot, the free cottage card, then Place it here
+    { rect: () => { const b = visBtn(/^Place it here/); return b ? b.getBoundingClientRect() : elRect('.bgrid .bcard.free:not(.off)') || elRect('#stage'); }, pass: true, place: 'top',
+      text: () => { const who = (state.tray.find((x) => x.origin === 'gift') || {}).resident; return visBtn(/^Place it here/) ? 'Tap Place it here. (Tap another spot on the map first if you like it better.)' : elRect('.bgrid .bcard.free:not(.off)') ? `Tap the free cottage for ${who || 'the family'}.` : `A family wants to move in! Tap any empty spot, then the free cottage for ${who || 'them'}.`; },
+      wait: () => state.buildings.some((b) => b.origin === 'gift'), skipIf: () => !state.tray.some((x) => x.origin === 'gift') },
+    { rect: () => { const b = visBtn(/^Repair/); return b ? b.getBoundingClientRect() : buildingRect(byId(tour.ruin) || state.buildings.find((x) => x.ruin)); }, pass: true, place: 'top', // 12.00: then the Repair button
+      text: () => (visBtn(/^Repair/) ? `Tap Repair. Small jobs like this, ${state.builder} does right away while you play.` : `This cottage is broken. Tap it, then Repair. Small jobs like this, ${state.builder} does right away while you play.`),
       onEnter: () => { closePanel(true); const b = state.buildings.find((x) => x.ruin); tour.ruin = b ? b.id : null; if (b) { const p = centerOf(b), z = Math.max(cam.z, playZoom()); animateCam({ x: p.x, y: p.y - (geo.h * 0.25 - geo.h / 2) / z, z }, 500); } renderAll(); },
       wait: () => { const b = byId(tour.ruin); return !b || !b.ruin || !!jobFor(b.id); }, skipIf: () => !state.buildings.some((b) => b.ruin) || ui.screen !== 'play' },
-    { el: '#play-focus', pass: true, place: 'top', text: () => `Focus is what earns play time, and ${state.builder} needs it for big projects like the town hall. Try one now: your first focus runs 10× faster.`,
+    { rect: () => (startSheetOpen() ? elRect('.startsheet .btn.primary.full') : elRect('#play-focus')), pass: true, place: 'top', text: () => `Focus is what earns play time, and ${state.builder} needs it for big projects like the town hall. Try one now: your first focus runs 10× faster.`,
       onEnter: () => { ui.tourSpeed = 10; openBar(); }, wait: () => !!state.session, skipIf: () => ui.screen !== 'play' && !state.session },
     { el: '#focus-scene', text: () => 'While you focus, you earn play time, gold and XP. In real life you put your phone away now. This one runs 10× faster.', wait: () => !state.session, skipIf: () => !state.session },
     { el: '#cele-go', pass: true, place: 'top', text: 'Done! Every finished session ends with a celebration and a chest. Open it.', wait: () => ui.overlay === 'chest' || ui.overlay === 'result', skipIf: () => ui.overlay !== 'celebrate' },
-    { el: '#chest-hit', pass: true, place: 'top', text: 'Tap the chest! Longer sessions find better ones.', wait: () => ui.overlay === 'result', skipIf: () => ui.overlay !== 'chest' },
+    { rect: () => elRect(CH.phase === 'done' ? '#chest-go' : '#chest-hit'), pass: true, place: 'top', text: () => (CH.phase === 'done' ? 'Now tap See what you earned.' : 'Tap the chest! Longer sessions find better ones.'), wait: () => ui.overlay === 'result', skipIf: () => ui.overlay !== 'chest' }, // 12.00: the highlight follows the chest
     { el: '#tally', pass: true, text: 'Everything you earned adds up here: gold, XP and play time. Back-to-back sessions build a combo that multiplies it all.', skipIf: () => ui.overlay !== 'result' },
     { text: "That's the loop: focus builds your town, play is your break. Plan your day, keep your streak, open chests. Have fun, Mayor!", next: 'Start playing', onNext: () => { ui.tourSpeed = 0; } }
   ]);
@@ -11933,6 +11937,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     { text: "That's it. Plan your day, keep your streak, open chests. Have fun, Mayor!", next: 'Done' }
   ]);
   const tour = { steps: null, i: 0, raf: 0, ruin: null };
+  const visBtn = (re) => [...document.querySelectorAll('button')].find((b) => b.offsetParent !== null && re.test(b.textContent.trim())) || null;
+  const startSheetOpen = () => !$('scrim').hidden && !!document.querySelector('.startsheet .btn.primary.full');
   function startTour(replay) {
     closeSheet();
     if (!replay && ui.screen === 'play') leavePlay(false, true);
@@ -11971,7 +11977,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (!tour.steps) return;
     const st = tour.steps[tour.i];
     if (st && st.wait && st.wait()) tourGo(tour.i + 1);
-    else tourPlace();
+    else { if (typeof st.text === 'function') { const t = st.text(); if ($('tour-text').textContent !== t) $('tour-text').textContent = t; } tourPlace(); }
     tour.raf = requestAnimationFrame(tourLoop);
   }
   function endTour() {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, BackHandler, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, useColorScheme, BackHandler, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
@@ -15,7 +15,7 @@ import { bridgeScript } from './src/bridge';
 const GAME_URL: string = (Constants.expoConfig?.extra?.gameUrl as string) || 'https://navidfarazmand.github.io/maplewick/';
 const GAME_ORIGIN = new URL(GAME_URL).origin;
 const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
-const BG = '#E6ECE1';
+const BG_DARK = '#101719', BG_LIGHT = '#E6ECE1'; // the game's two backgrounds
 
 // Hosts the game itself talks to (Firebase, fonts). Any other page opens in the phone's browser.
 const INSIDE_HOSTS = [/\.firebaseapp\.com$/, /\.googleapis\.com$/, /\.gstatic\.com$/, /\.web\.app$/];
@@ -30,7 +30,8 @@ type PageMsg =
   | { t: 'notif?' }
   | { t: 'notify'; title: string; body: string; tag: string }
   | { t: 'google'; clientId: string }
-  | { t: 'back'; handled: boolean };
+  | { t: 'back'; handled: boolean }
+  | { t: 'theme'; dark: boolean };
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }),
@@ -46,6 +47,8 @@ export default function App() {
 
 function Game() {
   const insets = useSafeAreaInsets();
+  const [dark, setDark] = useState(useColorScheme() !== 'light');
+  const BG = dark ? BG_DARK : BG_LIGHT;
   const web = useRef<WebView<{}>>(null); // <{}>: the library's default type parameter makes every prop 'never'
   const [perm, setPerm] = useState<'granted' | 'denied' | 'default' | null>(null);
   const [failed, setFailed] = useState(false);
@@ -142,6 +145,9 @@ function Game() {
       case 'google':
         send(await googleSignIn(m.clientId));
         break;
+      case 'theme':
+        setDark(!!m.dark);
+        break;
       case 'back':
         if (m.handled) break;
         if (FocusGuard) FocusGuard.moveToBack(); else BackHandler.exitApp();
@@ -184,10 +190,12 @@ function Game() {
   if (perm === null) return <View style={[styles.fill, { backgroundColor: BG }]} />;
 
   return (
-    <View style={[styles.fill, { backgroundColor: BG, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <StatusBar style="dark" />
+    // The game draws edge to edge and keeps clear of the status and navigation bars itself (CSS env(safe-area-inset-*),
+    // which Android's WebView reports), so only the offline screen needs the insets.
+    <View style={[styles.fill, { backgroundColor: BG }]}>
+      <StatusBar style={dark ? 'light' : 'dark'} />
       {failed ? (
-        <View style={styles.center}>
+        <View style={[styles.center, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
           <Text style={styles.title}>Maplewick needs the internet the first time</Text>
           <Text style={styles.text}>After that it works offline. Check your connection and try again.</Text>
           <Pressable style={styles.btn} onPress={() => { setFailed(false); setKey((k) => k + 1); }}>
@@ -271,8 +279,8 @@ async function googleSignIn(clientId: string): Promise<{ t: 'google'; tok?: stri
 const styles = StyleSheet.create({
   fill: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
-  title: { fontSize: 20, fontWeight: '700', color: '#2b2440', textAlign: 'center', marginBottom: 8 },
-  text: { fontSize: 15, color: '#4a4560', textAlign: 'center', marginBottom: 20 },
+  title: { fontSize: 20, fontWeight: '700', color: '#8A80A8', textAlign: 'center', marginBottom: 8 },
+  text: { fontSize: 15, color: '#8A86A0', textAlign: 'center', marginBottom: 20 },
   btn: { backgroundColor: '#5b3bc4', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

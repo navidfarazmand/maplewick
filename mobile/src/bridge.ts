@@ -31,6 +31,7 @@ export function bridgeScript(info: BridgeInfo): string {
     // The app tells the page when it goes to the back or comes to the front. If the WebView didn't already change
     // document.hidden, this does it and fires the visibilitychange event the game listens for.
     _fake: null,
+    _dark: null,
     setHidden: function (h) {
       setTimeout(function () {
         if (A._fake === null && document.hidden === h) return;
@@ -44,6 +45,17 @@ export function bridgeScript(info: BridgeInfo): string {
       }, h ? 600 : 300);
     }
   };
+  // The status bar icons follow the game's theme (its own setting, or the phone's).
+  function theme() {
+    var t = document.documentElement.getAttribute('data-theme');
+    var dark = t === 'dark' || (t !== 'light' && !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    if (dark !== A._dark) { A._dark = dark; A.post({ t: 'theme', dark: dark }); }
+  }
+  try {
+    new MutationObserver(theme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', theme);
+    document.addEventListener('DOMContentLoaded', theme);
+  } catch (e) {}
   // Notifications: shown by the app.
   function N(title, opts) { A.post({ t: 'notify', title: String(title || ''), body: String((opts && opts.body) || ''), tag: String((opts && opts.tag) || '') }); }
   N.permission = ${JSON.stringify(info.notifPermission)};
