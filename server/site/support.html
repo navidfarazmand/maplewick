@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maplewick Support</title>
+<meta name="description" content="Help with Maplewick: saves, moving to a new phone, play-time limits and how to reach us.">
+<link rel="icon" href="img/icon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Figtree:wght@400;600;700&family=Martian+Mono:wght@600&display=swap">
+<style>
+  :root { --ink: #1B2A29; --ink-2: #4F605D; --paper: #F4F8F6; --card: #FFFFFF; --line: rgba(27, 42, 41, .13); --focus: #5B2DB8;
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif; --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Martian Mono", ui-monospace, Menlo, monospace; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #EAF3F0; --ink-2: #A9BDB8; --paper: #0B1517; --card: #111E21; --line: rgba(234, 243, 240, .13); --focus: #9876FF; color-scheme: dark; } }
+  :root[data-theme="dark"] { --ink: #EAF3F0; --ink-2: #A9BDB8; --paper: #0B1517; --card: #111E21; --line: rgba(234, 243, 240, .13); --focus: #9876FF; color-scheme: dark; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.05rem/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 44rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1.5rem 3rem; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .5rem 2.5rem; }
+  .brand { display: inline-flex; align-items: center; gap: .5rem; font: 800 1.3rem/1 var(--display); text-decoration: none; color: inherit; }
+  .brand svg { width: 1.5rem; height: 1.5rem; }
+  header nav { display: flex; gap: 1.1rem; font-weight: 600; font-size: .95rem; }
+  a { color: var(--focus); }
+  header nav a { color: var(--ink-2); text-decoration: none; }
+  .eyebrow { font: 600 .7rem/1.3 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--focus); margin: 0 0 .6rem; }
+  h1 { font: 800 clamp(2.4rem, 6vw, 3.6rem)/1 var(--display); margin: 0 0 1rem; letter-spacing: -.02em; text-wrap: balance; }
+  .lede { font-size: 1.15rem; color: var(--ink-2); max-width: 40em; }
+  .contact { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 1.2rem 1.3rem; margin: 1.6rem 0 2.2rem; display: grid; gap: .5rem; }
+  .contact p { margin: 0; }
+  .copy { display: inline-flex; align-items: center; gap: .6rem; flex-wrap: wrap; font-size: 1.15rem; }
+  .copy button { font: 700 .85rem/1 var(--body); border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: .45rem .8rem; cursor: pointer; }
+  .faq { display: grid; gap: .6rem; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: .2rem 1.1rem; }
+  summary { cursor: pointer; font: 700 1.12rem/1.3 var(--display); padding: .8rem 0; list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font: 600 1.2rem/1 var(--mono); color: var(--focus); }
+  details[open] summary::after { content: "−"; }
+  details p { margin: 0 0 1rem; color: var(--ink-2); max-width: 40em; }
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); color: var(--ink-2); font-size: .92rem; display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#7DB65A" d="M16 18 30 25 16 32 2 25z"/><path fill="#F4E7CF" d="M6 14v9l10 5V19z"/><path fill="#DCCBAA" d="M26 14v9l-10 5V19z"/><path fill="#C8553D" d="M4 14 15 3l2 1 11 10-12 6z"/><path fill="#5A3A22" d="M9 18.5v6l3 1.5v-6z"/></svg>Maplewick</a>
+    <nav aria-label="Site"><a href="index.html">Home</a><a href="privacy.html">Privacy</a></nav>
+  </header>
+  <main>
+    <p class="eyebrow">Support</p>
+    <h1>How can we help?</h1>
+    <p class="lede">Most answers are below. If yours isn't, write to us and a real person (the one who made the game) will reply.</p>
+
+    <div class="contact">
+      <p class="copy"><b id="mail">hello@khoreh.com</b> <button type="button" id="copy">Copy address</button></p>
+      <p>Tell us your phone or computer and what happened. A screenshot helps a lot.</p>
+    </div>
+
+    <div class="faq">
+      <details open><summary>Is Maplewick free?</summary><p>Yes. It is free during early access, with no ads.</p></details>
+      <details><summary>Where is my town saved?</summary><p>On the device you play on, in your browser's storage. To keep a backup, open the menu, go to Settings, choose <b>Move your town to another device</b> and copy your save code.</p></details>
+      <details><summary>How do I move my town to a new phone?</summary><p>On the old phone, open the menu, go to Settings, choose <b>Move your town to another device</b> and tap <b>Copy my save code</b>. On the new phone, open the same place, paste the code and tap <b>Load a save code</b>. Keep the code somewhere safe until the town shows up.</p></details>
+      <details><summary>Why can't I play more right now?</summary><p>Play time is the break, so it has edges: you can bank at most 45 minutes, and earn up to 2 hours a day. A focus session of 5 minutes or more always earns more.</p></details>
+      <details><summary>Does it keep counting if my screen turns off?</summary><p>Yes. The timer keeps running with the screen off. Put the phone face down and come back when it buzzes.</p></details>
+      <details><summary>Can I use it like an app on my iPhone?</summary><p>Open the game in Safari, tap Share, then Add to Home Screen. It opens full screen from your home screen, like any other app. An App Store version is on the way.</p></details>
+      <details><summary>How do I leave the leaderboard?</summary><p>Open the menu, go to Friends &amp; leaderboard and tap <b>Leave</b> next to your name. Your entry is deleted and you are signed out. The <a href="privacy.html">privacy page</a> lists exactly what the entry holds.</p></details>
+    </div>
+  </main>
+  <footer><span>© 2026 khoreh.com</span><a href="privacy.html">Privacy</a><a href="index.html">Maplewick</a></footer>
+</div>
+<script>
+  document.getElementById('copy').addEventListener('click', async (e) => {
+    const t = document.getElementById('mail').textContent;
+    try { await navigator.clipboard.writeText(t); e.target.textContent = 'Copied'; }
+    catch (err) { const r = document.createRange(); r.selectNodeContents(document.getElementById('mail')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); e.target.textContent = 'Selected: press copy'; }
+  });
+</script>
+</body>
+</html>

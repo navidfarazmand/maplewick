@@ -33,6 +33,7 @@ with sync_playwright() as p:
         return pg
     def start(pg):
         pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(900)
+        if pg.is_visible('.set-tog.card'): pg.click('.set-tog.card'); pg.wait_for_timeout(300)  # 12.06: the sheet opens on laps
         pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300); D(pg, 'skipReady()'); pg.wait_for_timeout(400)
 
     # 1. a session is reported, start and end

@@ -11,6 +11,11 @@
       "ignore": ["node_modules", "test", ".git", "*.log"]
     }
   ],
+  "hosting": {
+    "public": "site",
+    "ignore": ["**/.*"],
+    "headers": [{ "source": "**/*.@(webp|png)", "headers": [{ "key": "Cache-Control", "value": "max-age=86400" }] }]
+  },
   "emulators": {
     "firestore": { "port": 8080 },
     "functions": { "port": 5001 },

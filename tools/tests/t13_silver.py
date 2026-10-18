@@ -17,6 +17,7 @@ with sync_playwright() as p:
     pg.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('maplewick-town-v7', "+json.dumps(json.dumps(st))+"); sessionStorage.setItem('seeded','1'); }")
     pg.goto(URL); pg.wait_for_timeout(900)
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(400)
+    (pg.click('.set-tog.card') if pg.is_visible('.set-tog.card') else None); pg.wait_for_timeout(250)
     pg.click('.durations button:nth-child(3)'); pg.wait_for_timeout(200)  # 15m
     pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300)
     print('sess', bool(D(pg,'state()')['session']))
@@ -26,6 +27,7 @@ with sync_playwright() as p:
     print('home chip:', pg.inner_text('#silver-home'), pg.is_visible('#silver-home'))
     pg.screenshot(path=SH+'silver1_progress.png')
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(400)
+    (pg.click('.set-tog.card') if pg.is_visible('.set-tog.card') else None); pg.wait_for_timeout(250)
     pg.click('.durations button:nth-child(3)'); pg.wait_for_timeout(200)
     pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300)
     D(pg,'skipReady()'); D(pg,'jumpFocus(16)'); pg.wait_for_timeout(1200)

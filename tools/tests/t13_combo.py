@@ -17,6 +17,7 @@ with sync_playwright() as p:
     pg.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('maplewick-town-v7', "+json.dumps(json.dumps(st))+"); sessionStorage.setItem('seeded','1'); }")
     pg.goto(URL); pg.wait_for_timeout(900)
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(500)
+    if pg.is_visible('.set-tog.card'): pg.click('.set-tog.card'); pg.wait_for_timeout(300)
     print(pg.eval_on_selector_all('.durations button','els => els.map(e => [e.querySelector("b").textContent, e.querySelector(".gold").textContent, (e.querySelector(".note")||{}).textContent||"", getComputedStyle(e).backgroundColor])'))
     el=pg.query_selector('.durations'); el.screenshot(path=SH+'combo_now.png')
     b.close()

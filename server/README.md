@@ -9,6 +9,8 @@ The game works without it. When it's live, two things change:
 
 - **Problem reports.** Shake the phone (Android app) or Menu → Report a problem: the report is saved in `reports/` with a short id like R-4F2K. Read them in the Firebase console → Firestore → reports.
 
+- **A copy of the website** (`site/`, the same pages as khoreh.com) is served by Firebase Hosting at https://maplewick-eb4df.web.app. Google's sign-in screen needs a home page and privacy page on a domain Google knows belongs to the project; this is it, so the sign-in screen can say "Maplewick".
+
 If the server isn't deployed, or is down, the game carries on exactly as in 11.x.
 
 | | |

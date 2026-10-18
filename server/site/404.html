@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maplewick</title>
+<meta name="description" content="Maplewick is a cozy island town that only grows while you focus. A free focus game made for ADHD minds.">
+<meta name="theme-color" content="#5B2DB8">
+<link rel="icon" href="img/icon-64.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Maplewick: your focus builds a town">
+<meta property="og:description" content="A cozy island town that only grows while you focus. Free, no ads, made for ADHD minds.">
+<meta property="og:url" content="https://khoreh.com/">
+<meta property="og:image" content="https://khoreh.com/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=Martian+Mono:wght@400;600&display=swap">
+<style>
+  /* Layout: one fixed island canvas that builds itself as you scroll (the page is a 25-minute focus session);
+     the chapters scroll over it on frosted cards: a left column on wide screens, cards under the island on phones. */
+  :root {
+    --ink: #1B2A29; --ink-2: #4F605D; --paper: #EEF5F2; --card: rgba(250, 253, 251, .86); --line: rgba(27, 42, 41, .13);
+    --focus: #5B2DB8; --focus-2: #3F1D8C; --on-focus: #FFFFFF; --leaf: #3F7F2E; --bezel: #12191B;
+    --coin-hi: #FFE48F; --coin: #E8A93A; --coin-lo: #A96D12; --coin-ink: #5A3900;
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --lift: 0 1px 0 rgba(255, 255, 255, .7) inset, 0 22px 50px -24px rgba(16, 38, 36, .45);
+    --glow: rgba(91, 45, 184, .45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #EAF3F0; --ink-2: #A9BDB8; --paper: #0B1517; --card: rgba(13, 24, 27, .8); --line: rgba(234, 243, 240, .13);
+      --focus: #9876FF; --focus-2: #5F3BD6; --on-focus: #FFFFFF; --leaf: #8FD06C; --bezel: #050808;
+      --lift: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 22px 50px -24px rgba(0, 0, 0, .7); --glow: rgba(152, 118, 255, .45);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #EAF3F0; --ink-2: #A9BDB8; --paper: #0B1517; --card: rgba(13, 24, 27, .8); --line: rgba(234, 243, 240, .13);
+    --focus: #9876FF; --focus-2: #5F3BD6; --on-focus: #FFFFFF; --leaf: #8FD06C; --bezel: #050808;
+    --lift: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 22px 50px -24px rgba(0, 0, 0, .7); --glow: rgba(152, 118, 255, .45);
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { background: var(--paper); color: var(--ink); font: 400 1.0625rem/1.62 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 12px; }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+  /* header */
+  .top { position: fixed; top: 0; left: 0; right: 0; z-index: 6; padding-top: calc(12px + env(safe-area-inset-top, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; }
+  .bar { pointer-events: auto; max-width: 74rem; margin: 0 auto; display: flex; align-items: center; gap: 1rem; padding: .45rem .5rem .45rem 1rem; background: var(--card); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--lift); }
+  .brand { display: inline-flex; align-items: center; gap: .55rem; font: 800 1.35rem/1 var(--display); text-decoration: none; letter-spacing: -.01em; padding-top: .15rem; }
+  .brand svg { width: 1.6rem; height: 1.6rem; margin-top: -.2rem; }
+  .nav { display: flex; gap: 1.4rem; margin-left: auto; font-weight: 600; font-size: .95rem; }
+  .nav a { text-decoration: none; color: var(--ink-2); }
+  .nav a:hover { color: var(--ink); }
+  @media (max-width: 760px) { .nav { display: none; } .bar .btn { margin-left: auto; } }
+
+  /* the focus timer: scrolling the page runs the session */
+  .hud { position: fixed; z-index: 5; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(5.2rem + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: .65rem; padding: .5rem 1rem .5rem .55rem; background: var(--card); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--lift); font-variant-numeric: tabular-nums; }
+  .hud svg { width: 2.4rem; height: 2.4rem; transform: rotate(-90deg); }
+  .hud .rb { fill: none; stroke: var(--line); stroke-width: 4; }
+  .hud .rf { fill: none; stroke: var(--focus); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+  .hud b { display: block; font: 600 1.05rem/1.1 var(--mono); letter-spacing: -.02em; }
+  .hud span { display: block; font-size: .78rem; color: var(--ink-2); font-weight: 600; }
+  .hud .gold { color: var(--coin-lo); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hud .gold { color: var(--coin-hi); } }
+  :root[data-theme="dark"] .hud .gold { color: var(--coin-hi); }
+  .hud.done { box-shadow: var(--lift), 0 0 0 3px var(--coin), 0 0 34px var(--coin); }
+
+  /* chapters */
+  main { position: relative; z-index: 1; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .ch { min-height: 118vh; min-height: 118svh; display: flex; align-items: center; padding-block: 14vh; max-width: 74rem; margin: 0 auto; }
+  .card { width: min(34rem, 100%); background: var(--card); -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25); border: 1px solid var(--line); border-radius: 30px; padding: clamp(1.35rem, 3vw, 2.4rem); box-shadow: var(--lift); display: grid; gap: 1rem; min-width: 0; }
+  .card > * { margin: 0; min-width: 0; }
+  @media (min-width: 960px) { .card { width: min(34rem, 43vw); } }
+  @media (max-width: 959px) {
+    .ch { align-items: flex-end; min-height: 125vh; min-height: 125svh; padding-block: 62vh 4vh; padding-block: 62svh 4svh; }
+    .card { border-radius: 24px; }
+  }
+  .hero { min-height: 100vh; min-height: 100svh; padding-block: 8rem 6rem; flex-direction: column; justify-content: center; align-items: flex-start; gap: 1.25rem; }
+  @media (max-width: 959px) { .hero { justify-content: flex-start; padding-block: max(37svh, 14rem) 1.25rem; gap: .9rem; } .hero .card { gap: .8rem; } .hero .lede { font-size: 1rem; line-height: 1.5; } }
+  .eyebrow { font: 600 .7rem/1.3 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--focus); }
+  h1 { font: 800 clamp(3.1rem, 7.2vw, 6.3rem)/.94 var(--display); letter-spacing: -.025em; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--focus); }
+  h1 .drop { display: inline-block; white-space: nowrap; }
+  h1 .drop span { display: inline-block; }
+  .js h1 .drop span { animation: land .8s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: calc(.55s + var(--i) * 90ms); }
+  @keyframes land { from { transform: translateY(-.9em) scaleY(1.08); } 70% { transform: translateY(.04em) scaleY(.92); } to { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .js h1 .drop span { animation: none; } }
+  h2 { font: 800 clamp(2.05rem, 4.2vw, 3.3rem)/1 var(--display); letter-spacing: -.02em; text-wrap: balance; }
+  h3 { font: 700 1.22rem/1.15 var(--display); margin: 0 0 .25rem; }
+  p { max-width: 36em; }
+  .lede { font-size: clamp(1.06rem, 1.35vw, 1.24rem); color: var(--ink-2); }
+  .fine { font-size: .86rem; color: var(--ink-2); }
+  .hint { display: flex; align-items: center; gap: .6rem; font: 600 .74rem/1.4 var(--mono); letter-spacing: .06em; color: var(--ink); background: var(--card); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line); padding: .55rem .9rem; border-radius: 999px; }
+  .hint i { width: .55rem; height: .55rem; border-radius: 50%; background: var(--focus); box-shadow: 0 0 0 0 var(--glow); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 .6rem transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  @media (prefers-reduced-motion: reduce) { .hint i { animation: none; } }
+
+  .ctas { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; background: var(--focus); color: var(--on-focus); font: 700 1rem/1 var(--body); padding: 1rem 1.4rem .95rem; border-radius: 999px; text-decoration: none; box-shadow: 0 5px 0 var(--focus-2), 0 16px 26px -12px var(--glow); transition: transform .12s ease, box-shadow .12s ease; white-space: nowrap; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 0 var(--focus-2), 0 20px 30px -12px var(--glow); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--focus-2), 0 8px 16px -10px var(--glow); }
+  .btn svg { width: 1.05rem; height: 1.05rem; }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+  .btn.ghost:active { transform: translateY(2px); }
+  .btn.sm { padding: .72rem 1.05rem .68rem; font-size: .92rem; box-shadow: 0 4px 0 var(--focus-2); }
+  .btn.big { font-size: 1.12rem; padding: 1.15rem 1.7rem 1.1rem; }
+
+  .steps { list-style: none; counter-reset: s; display: grid; gap: 1rem; padding: 0; margin: 0; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 2.3rem minmax(0, 1fr); gap: .85rem; align-items: start; }
+  .steps li::before { content: counter(s); width: 2.3rem; height: 2.3rem; border-radius: 50%; background: radial-gradient(circle at 34% 30%, var(--coin-hi), var(--coin) 58%, var(--coin-lo)); color: var(--coin-ink); font: 800 1.1rem/2.45rem var(--display); text-align: center; box-shadow: 0 2px 0 var(--coin-lo); }
+  .steps b { font-weight: 700; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); gap: 1.1rem 1.4rem; }
+  .feat { border-top: 2px solid var(--line); padding-top: .8rem; min-width: 0; }
+  .feat p { margin: 0; color: var(--ink-2); font-size: .98rem; }
+
+  .wide { flex-direction: column; align-items: stretch; gap: 1.5rem; }
+  .phones { display: flex; gap: clamp(1rem, 3vw, 2.6rem); justify-content: center; align-items: flex-end; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2.6rem .5rem 1rem; scrollbar-width: none; }
+  .phones::-webkit-scrollbar { display: none; }
+  .phone { flex: 0 0 auto; width: clamp(12rem, 21vw, 15.5rem); scroll-snap-align: center; margin: 0; display: grid; gap: .8rem; justify-items: center; }
+  .phone img { width: 100%; max-width: 100%; height: auto; aspect-ratio: 585 / 1266; border-radius: 2.1rem; border: 7px solid var(--bezel); background: var(--bezel); box-shadow: 0 30px 60px -28px rgba(0, 0, 0, .55), 0 0 0 1px var(--line); display: block; }
+  .phone:nth-child(2) { transform: translateY(-2.2rem); }
+  .phone figcaption { font: 700 .95rem/1.3 var(--display); text-align: center; background: var(--card); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line); padding: .45rem .9rem .35rem; border-radius: 999px; }
+  @media (max-width: 959px) { .phones { justify-content: flex-start; } .phone:nth-child(2) { transform: none; } }
+
+  .nums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem 1.6rem; margin: 0; }
+  .nums div { min-width: 0; }
+  .nums dt { font: 800 clamp(2.1rem, 4vw, 3.1rem)/1 var(--display); color: var(--focus); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .nums dd { margin: .3rem 0 0; color: var(--ink-2); font-size: .95rem; line-height: 1.4; }
+
+  .end .card { width: min(38rem, 100%); }
+  @media (min-width: 960px) { .end .card { width: min(38rem, 46vw); } }
+
+  footer { position: relative; z-index: 1; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 2rem; }
+  .foot { max-width: 74rem; margin: 0 auto; display: flex; flex-wrap: wrap; gap: .8rem 1.6rem; align-items: center; background: var(--card); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 22px; padding: 1rem 1.3rem; font-size: .92rem; color: var(--ink-2); }
+  .foot b { color: var(--ink); font: 800 1.1rem/1 var(--display); }
+  .foot nav { display: flex; gap: 1.2rem; margin-left: auto; flex-wrap: wrap; }
+  .foot a { text-decoration: none; font-weight: 600; color: var(--ink); }
+  .foot a:hover { text-decoration: underline; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="#top" aria-label="Maplewick, back to the top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#7DB65A" d="M16 18 30 25 16 32 2 25z"/><path fill="#F4E7CF" d="M6 14v9l10 5V19z"/><path fill="#DCCBAA" d="M26 14v9l-10 5V19z"/><path fill="#C8553D" d="M4 14 15 3l2 1 11 10-12 6z"/><path fill="#A63F2C" d="m16 20 12-6L17 4h-1z" opacity=".55"/><path fill="#5A3A22" d="M9 18.5v6l3 1.5v-6z"/></svg>
+      Maplewick
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#adhd">For ADHD</a>
+      <a href="#town">The town</a>
+      <a href="#friends">Friends</a>
+    </nav>
+    <a class="btn sm" href="https://navidfarazmand.github.io/maplewick/">Play free</a>
+  </div>
+</header>
+
+<aside class="hud" id="hud" aria-label="This page as a focus session">
+  <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rb" cx="18" cy="18" r="15.9"/><circle class="rf" id="ring" cx="18" cy="18" r="15.9" pathLength="100"/></svg>
+  <div><b id="hud-time">25:00</b><span id="hud-sub">Scroll to focus</span></div>
+</aside>
+
+<main id="top">
+  <section class="ch hero" aria-labelledby="h-hero">
+    <div class="card">
+      <p class="eyebrow">A focus game for ADHD minds</p>
+      <h1 id="h-hero">Your <em>focus</em> builds a <span class="drop">town.</span></h1>
+      <p class="lede">Maplewick is a little island town that only grows while you focus. Start a session, put your phone down, and come back to new streets, happy neighbours and a chest of gold.</p>
+      <div class="ctas">
+        <a class="btn" href="https://navidfarazmand.github.io/maplewick/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l10.5-6.5z"/></svg>Play in your browser</a>
+        <a class="btn ghost" href="#how">How it works</a>
+      </div>
+      <p class="fine">Free during early access. No ads. iPhone and Android apps are on the way.</p>
+    </div>
+    <p class="hint"><i aria-hidden="true"></i>This page is a 25-minute focus session. Scroll, and watch the town.</p>
+  </section>
+
+  <section class="ch" id="how" aria-labelledby="h-how">
+    <div class="card">
+      <p class="eyebrow">The loop</p>
+      <h2 id="h-how">Focus is the gate. Play is the break.</h2>
+      <ol class="steps">
+        <li><span><b>Pick a length.</b> Anything from 5 minutes to 2 hours. A 10-second countdown lets you settle in, and you can still back out for free.</span></li>
+        <li><span><b>Put the phone away.</b> Sam the builder works on the town while you work on your thing.</span></li>
+        <li><span><b>Collect.</b> Every session pays play time, gold and XP, and ends with a chest: wooden, silver, gold or royal.</span></li>
+        <li><span><b>Take your break.</b> Spend the play time building and looking after the town. When it runs out, the break is over.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="ch" id="adhd" aria-labelledby="h-adhd">
+    <div class="card">
+      <p class="eyebrow">Made for wandering minds</p>
+      <h2 id="h-adhd">Small starts. Breaks with edges.</h2>
+      <div class="grid2">
+        <div class="feat"><h3>Five minutes counts</h3><p>Short sessions earn their share. Start again within 20 minutes and a combo builds, up to double rewards.</p></div>
+        <div class="feat"><h3>A break that ends</h3><p>You can bank at most 45 minutes of play and earn 2 hours a day, so the game never swallows the evening.</p></div>
+        <div class="feat"><h3>Every problem is a button</h3><p>Trash on the street, a fire, a sick neighbour: tap it and the fix is right there.</p></div>
+        <div class="feat"><h3>Quiet while you work</h3><p>Fires, break-ins and storms only happen while you play. Nothing goes wrong in town while you focus.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ch wide" id="town" aria-labelledby="h-town">
+    <div class="card">
+      <p class="eyebrow">The town</p>
+      <h2 id="h-town">A town that keeps living.</h2>
+      <p>Days last 24 minutes, with weather and seasons. Firefighters, police, nurses, sweepers and gardeners each work from their own building and only reach so far, so where you build matters.</p>
+    </div>
+    <div class="phones" role="list">
+      <figure class="phone" role="listitem"><img src="img/play.webp" alt="The Maplewick map in daytime: cottages, a castle, a hospital and an amusement park on a green island" width="585" height="1266" loading="lazy" decoding="async"><figcaption>Build in your breaks</figcaption></figure>
+      <figure class="phone" role="listitem"><img src="img/focus.webp" alt="A focus session with 24 minutes 54 seconds left and the town hall at night" width="585" height="1266" loading="lazy" decoding="async"><figcaption>Focus with the phone away</figcaption></figure>
+      <figure class="phone" role="listitem"><img src="img/chest.webp" alt="A royal chest opened after a 50-minute session, with gold, play time and a golden statue" width="585" height="1266" loading="lazy" decoding="async"><figcaption>A chest after every session</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="ch" id="numbers" aria-labelledby="h-num">
+    <div class="card">
+      <p class="eyebrow">Town rules</p>
+      <h2 id="h-num" class="sr">Maplewick in numbers</h2>
+      <dl class="nums">
+        <div><dt>1 min</dt><dd>of real time is one hour in town</dd></div>
+        <div><dt>×2</dt><dd>the most a focus combo can pay</dd></div>
+        <div><dt>45 min</dt><dd>the most play time you can bank</dd></div>
+        <div><dt>18 × 18</dt><dd>tiles of island to fill</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="ch" id="friends" aria-labelledby="h-fr">
+    <div class="card">
+      <p class="eyebrow">Friends</p>
+      <h2 id="h-fr">Friends, not feeds.</h2>
+      <p>The leaderboard counts one thing: real minutes of focus. Visit your friends' towns, look around, and cheer them on once a day.</p>
+      <p class="fine">Signing in with Google is optional. Your town works without an account.</p>
+    </div>
+  </section>
+
+  <section class="ch end" id="play" aria-labelledby="h-end">
+    <div class="card">
+      <p class="eyebrow" id="end-eyebrow">Session complete</p>
+      <h2 id="h-end">Start with five minutes.</h2>
+      <p>Maplewick runs in the browser on any phone or computer. On an iPhone, tap Share, then Add to Home Screen, and it opens like an app.</p>
+      <div class="ctas"><a class="btn big" href="https://navidfarazmand.github.io/maplewick/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l10.5-6.5z"/></svg>Play Maplewick</a></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <b>Maplewick</b>
+    <span>© 2026 khoreh.com</span>
+    <nav aria-label="About">
+      <a href="support.html">Support</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://navidfarazmand.github.io/maplewick/">Play</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(() => {
+  document.documentElement.classList.add('js');
+  // the dropping letters in the headline, like buildings landing
+  const dr = document.querySelector('h1 .drop');
+  if (dr) { const t = dr.textContent; dr.textContent = ''; [...t].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch; s.style.setProperty('--i', i); dr.append(s); }); }
+
+  const cv = document.getElementById('scene'), main = cv.getContext('2d');
+  const wc = document.createElement('canvas'), wctx = wc.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)');
+  let ctx = wctx;
+  let W = 0, H = 0, DPR = 1, TW = 0, TH = 0, U = 1, OX = 0, OY = 0, HZ = 0, wide = false;
+  const G = 8;
+  function size() {
+    W = innerWidth; H = innerHeight; DPR = Math.min(2, devicePixelRatio || 1);
+    for (const c of [cv, wc]) { c.width = Math.round(W * DPR); c.height = Math.round(H * DPR); }
+    wide = W >= 960;
+    const span = wide ? Math.min(W * 0.5, H * 1.02) : Math.min(W * 1.02, H * 0.58);
+    TW = span / (G + 1.4); TH = TW / 2; U = TW / 64;
+    const ccx = wide ? W * 0.67 : W * 0.5, ccy = wide ? H * 0.58 : Math.max(H * 0.31, 150 + G * TH * 0.5);
+    OX = ccx; OY = ccy - G * TH / 2;
+    HZ = Math.min(OY - TH * 1.4, wide ? H * 0.44 : H * 0.2);
+  }
+  const iso = (x, y, z = 0) => [OX + (x - y) * TW / 2, OY + (x + y) * TH / 2 - z * U];
+
+  // ---- colour helpers
+  const rgb = (h) => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const mix = (a, b, t) => { const A = rgb(a), B = rgb(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+  const sh = (h, k) => { const A = rgb(h); return `rgb(${A.map((v) => Math.round(k > 1 ? v + (255 - v) * (k - 1) : v * k)).join(',')})`; };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const ease = (t) => t * t * (3 - 2 * t);
+  function bounce(t) { const n = 7.5625, d = 2.75; if (t < 1 / d) return n * t * t; if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75; if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375; return n * (t -= 2.625 / d) * t + 0.984375; }
+
+  // ---- drawing primitives (in the current ctx)
+  function poly(pts, fill) { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); }
+  function prism(x0, y0, x1, y1, z, h, top, left, right) {
+    poly([iso(x0, y1, z), iso(x1, y1, z), iso(x1, y1, z + h), iso(x0, y1, z + h)], left);
+    poly([iso(x1, y1, z), iso(x1, y0, z), iso(x1, y0, z + h), iso(x1, y1, z + h)], right);
+    if (top) poly([iso(x0, y0, z + h), iso(x1, y0, z + h), iso(x1, y1, z + h), iso(x0, y1, z + h)], top);
+  }
+  const walls = (x0, y0, x1, y1, z, h, c, top) => prism(x0, y0, x1, y1, z, h, top || sh(c, 1.06), sh(c, 1), sh(c, 0.8));
+  function gableX(x0, y0, x1, y1, z, rh, roof, wall) {
+    const ym = (y0 + y1) / 2, o = 0.07;
+    poly([iso(x0 - o, y0 - o, z), iso(x1 + o, y0 - o, z), iso(x1 + o, ym, z + rh), iso(x0 - o, ym, z + rh)], sh(roof, 0.8));
+    poly([iso(x1, y1, z), iso(x1, y0, z), iso(x1, ym, z + rh)], sh(wall, 0.8));
+    poly([iso(x0 - o, y1 + o, z), iso(x1 + o, y1 + o, z), iso(x1 + o, ym, z + rh), iso(x0 - o, ym, z + rh)], roof);
+    ctx.strokeStyle = sh(roof, 1.25); ctx.lineWidth = 1.2 * U; ctx.beginPath(); const a = iso(x0 - o, ym, z + rh), b = iso(x1 + o, ym, z + rh); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  }
+  function gableY(x0, y0, x1, y1, z, rh, roof, wall) {
+    const xm = (x0 + x1) / 2, o = 0.07;
+    poly([iso(x0 - o, y0 - o, z), iso(x0 - o, y1 + o, z), iso(xm, y1 + o, z + rh), iso(xm, y0 - o, z + rh)], roof);
+    poly([iso(x0, y1, z), iso(x1, y1, z), iso(xm, y1, z + rh)], sh(wall, 1));
+    poly([iso(x1 + o, y0 - o, z), iso(x1 + o, y1 + o, z), iso(xm, y1 + o, z + rh), iso(xm, y0 - o, z + rh)], sh(roof, 0.78));
+  }
+  // windows: on the left face (y fixed) or the right face (x fixed). Each one also lights up at night.
+  let lights = [];
+  function winL(xc, y, z, w, h, frame) {
+    const p = [iso(xc - w / 2, y, z), iso(xc + w / 2, y, z), iso(xc + w / 2, y, z + h), iso(xc - w / 2, y, z + h)];
+    if (frame) poly([iso(xc - w / 2 - .03, y, z - 1), iso(xc + w / 2 + .03, y, z - 1), iso(xc + w / 2 + .03, y, z + h + 1), iso(xc - w / 2 - .03, y, z + h + 1)], frame);
+    poly(p, '#86B4D4'); poly([p[0], p[1], [p[2][0], (p[1][1] + p[2][1]) / 2], [p[3][0], (p[0][1] + p[3][1]) / 2]], 'rgba(255,255,255,.18)');
+    lights.push(p);
+  }
+  function winR(x, yc, z, w, h, frame) {
+    const p = [iso(x, yc + w / 2, z), iso(x, yc - w / 2, z), iso(x, yc - w / 2, z + h), iso(x, yc + w / 2, z + h)];
+    if (frame) poly([iso(x, yc + w / 2 + .03, z - 1), iso(x, yc - w / 2 - .03, z - 1), iso(x, yc - w / 2 - .03, z + h + 1), iso(x, yc + w / 2 + .03, z + h + 1)], frame);
+    poly(p, '#6E9CBE'); lights.push(p);
+  }
+  const doorL = (xc, y, z, w, h, c) => poly([iso(xc - w / 2, y, z), iso(xc + w / 2, y, z), iso(xc + w / 2, y, z + h), iso(xc - w / 2, y, z + h)], c);
+  function circle(x, y, r, c) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = c; ctx.fill(); }
+  function ell(x, y, rx, ry, c) { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fillStyle = c; ctx.fill(); }
+  function shadowTile(x0, y0, x1, y1, k) { poly([iso(x0 + .06, y0 + .1), iso(x1 + .22, y0 + .1), iso(x1 + .22, y1 + .2), iso(x0 + .06, y1 + .2)], `rgba(20,50,30,${0.2 * k})`); }
+
+  // ---- the town: what appears at which point of the session (p = how far down the page you are)
+  const T = [
+    ['hall', 4, 1, 2, 2, 0], ['tree', 7, 0, 1, 1, 0], ['tree', 0, 7, 1, 1, 0], ['cottage', 1, 5, 1, 1, 0], ['tree', 2, 3, 1, 1, 0.02],
+    ['cottage', 0, 2, 1, 1, 0.07], ['cottage', 6, 0, 1, 1, 0.11], ['park', 2, 6, 1, 1, 0.15], ['cafe', 5, 5, 1, 1, 0.19], ['cottage', 6, 2, 1, 1, 0.23],
+    ['market', 2, 0, 1, 1, 0.27], ['fire', 6, 3, 1, 1, 0.31], ['house', 0, 6, 2, 1, 0.36], ['clinic', 7, 3, 1, 1, 0.40], ['school', 4, 6, 1, 1, 0.45],
+    ['wheel', 0, 0, 2, 2, 0.50], ['light', 7, 7, 1, 1, 0.55], ['hospital', 6, 5, 2, 2, 0.61], ['bakery', 5, 6, 1, 1, 0.65], ['fountain', 1, 3, 1, 1, 0.69],
+    ['tree', 4, 5, 1, 1, 0.72], ['cherry', 0, 3, 1, 1, 0.74], ['tree', 7, 1, 1, 1, 0.76], ['flowers', 4, 0, 1, 1, 0.78], ['tree', 5, 0, 1, 1, 0.8], ['flowers', 1, 7, 1, 1, 0.82], ['cherry', 6, 7, 1, 1, 0.84]
+  ].map(([k, c, r, w, d, p], i) => ({ k, c, r, w, d, p, i, on: false, t0: -1e9, landed: false, off: -1e9 }));
+  const VALUE = { hall: 0, cottage: 9, house: 16, cafe: 12, market: 10, bakery: 12, park: 6, fire: 8, clinic: 8, school: 8, wheel: 22, light: 14, hospital: 18, fountain: 6, tree: 2, cherry: 3, flowers: 2 };
+  const LAMPS = [[3, 1.2], [3, 6.2], [1.2, 4], [6.2, 4], [3, 3.2]];
+  const isRoad = (c, r) => c === 3 || r === 4;
+
+  // ---- the sky over the session: dawn, day, golden hour, dusk, night
+  const KEYS = [
+    [0.00, '#F5BF9C', '#FFEAD6', '#78BDD0', 0, 0.10],
+    [0.14, '#8ED2F1', '#E2F5FA', '#3FA5C2', 0, 0],
+    [0.50, '#74C1EA', '#D9F0F9', '#2F93B3', 0, 0],
+    [0.64, '#F09A68', '#FFDCAE', '#3E86A1', 0.06, 0.22],
+    [0.75, '#56478F', '#E08F82', '#2D5D85', 0.42, 0.18],
+    [0.86, '#0A1535', '#243064', '#11274A', 0.86, 0],
+    [1.00, '#08122E', '#212E68', '#0F223D', 1, 0]
+  ];
+  function skyAt(p) {
+    let a = KEYS[0], b = KEYS[KEYS.length - 1];
+    for (let i = 0; i < KEYS.length - 1; i++) if (p >= KEYS[i][0] && p <= KEYS[i + 1][0]) { a = KEYS[i]; b = KEYS[i + 1]; break; }
+    const t = ease(clamp((p - a[0]) / (b[0] - a[0] || 1), 0, 1));
+    return { top: mix(a[1], b[1], t), bot: mix(a[2], b[2], t), sea: mix(a[3], b[3], t), night: a[4] + (b[4] - a[4]) * t, warm: a[5] + (b[5] - a[5]) * t };
+  }
+  const STARS = Array.from({ length: 90 }, (_, i) => [((i * 7919) % 1000) / 1000, ((i * 104729) % 997) / 997, 0.4 + ((i * 31) % 10) / 12, i]);
+  const CLOUDS = [[0.1, 0.12, 1.1, 9], [0.55, 0.07, 0.8, 6], [0.8, 0.2, 1.3, 11], [0.32, 0.26, 0.7, 5]];
+  const WAVES = Array.from({ length: 70 }, (_, i) => [((i * 6151) % 1000) / 1000, ((i * 3571) % 1000) / 1000, i]);
+
+  // ---- people and a car on the two streets
+  const PEEPS = Array.from({ length: 14 }, (_, i) => ({ axis: i % 2 ? 'h' : 'v', pos: ((i * 37) % 100) / 100, dir: i % 3 ? 1 : -1, sp: 0.018 + (i % 5) * 0.004, lane: i % 2 ? -0.2 : 0.2, shirt: ['#E5482F', '#3B7DD8', '#F3C64B', '#8E5BB5', '#2E8F7A', '#E46B8A', '#F28C38'][i % 7], skin: ['#F5D5B8', '#E0AC7E', '#B57A4F', '#8A5A3A'][i % 4], at: i }));
+
+  // ---- one building
+  function drawB(b, z, now) {
+    const { c, r, w, d } = b;
+    const smoke = (x, y, zz) => { if (RM.matches) return; for (let i = 0; i < 3; i++) { const k = ((now / 2600) + i / 3) % 1, p = iso(x, y, zz + k * 26); circle(p[0] + Math.sin(k * 5 + i) * 3 * U, p[1], (2.5 + k * 4) * U, `rgba(255,255,255,${0.45 * (1 - k)})`); } };
+    switch (b.k) {
+      case 'cottage': {
+        const x0 = c + .17, y0 = r + .22, x1 = c + .83, y1 = r + .84, h = 24;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#F4E6CB');
+        doorL(c + .36, y1, z, .15, 13, '#7A4B2C'); winL(c + .65, y1, z + 9, .17, 8, '#FFFFFF'); winR(x1, r + .53, z + 9, .2, 8, '#FFFFFF');
+        gableX(x0, y0, x1, y1, z + h, 15, '#CC553D', '#F4E6CB');
+        prism(c + .58, r + .36, c + .68, r + .46, z + h + 6, 13, '#8E4B39', '#A85A45', '#7E3F2F'); smoke(c + .63, r + .41, z + h + 21);
+        break;
+      }
+      case 'house': {
+        const x0 = c + .12, y0 = r + .2, x1 = c + w - .12, y1 = r + .86, h = 34;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#E9DEF2');
+        prism(x0, y1 - .01, x1, y1 + .01, z + 15, 2.2, null, '#C9B8DA', '#B6A3CA');
+        for (const xc of [c + .45, c + 1.1, c + 1.55]) winL(xc, y1, z + 19, .2, 9, '#FFFFFF');
+        doorL(c + .45, y1, z, .17, 13, '#5B3B78'); winL(c + 1.1, y1, z + 4, .22, 8, '#FFFFFF'); winL(c + 1.55, y1, z + 4, .22, 8, '#FFFFFF');
+        winR(x1, r + .53, z + 19, .2, 9, '#FFFFFF');
+        gableX(x0, y0, x1, y1, z + h, 17, '#6E4C9F', '#E9DEF2');
+        prism(c + 1.5, r + .34, c + 1.62, r + .46, z + h + 7, 12, '#8A6E9E', '#9C7FB1', '#76598C');
+        break;
+      }
+      case 'hall': {
+        const x0 = c + .14, y0 = r + .14, x1 = c + 1.86, y1 = r + 1.86, h = 34;
+        shadowTile(x0, y0, x1, y1, 1.2);
+        walls(x0, y0, x1, y1, z, h, '#ECE6DA');
+        for (const xc of [c + .45, c + .8, c + 1.2, c + 1.55]) { winL(xc, y1, z + 7, .16, 9, '#FFFFFF'); winL(xc, y1, z + 21, .16, 8, '#FFFFFF'); }
+        for (const yc of [r + .45, r + .8, r + 1.2, r + 1.55]) { winR(x1, yc, z + 7, .16, 9, '#FFFFFF'); winR(x1, yc, z + 21, .16, 8, '#FFFFFF'); }
+        poly([iso(c + .85, y1 + .12, z), iso(c + 1.15, y1 + .12, z), iso(c + 1.15, y1 + .12, z + 4), iso(c + .85, y1 + .12, z + 4)], '#D9D1C2');
+        doorL(c + 1, y1, z + 1, .22, 15, '#6A4428');
+        gableX(x0, y0, x1, y1, z + h, 20, '#4B679C', '#ECE6DA');
+        // the clock tower
+        const tz = z + h + 6;
+        walls(c + .82, r + .82, c + 1.18, r + 1.18, tz, 26, '#F1ECE2');
+        const cp = iso(c + 1, r + 1.18, tz + 15); circle(cp[0], cp[1], 5.4 * U, '#FFFFFF'); ctx.strokeStyle = '#3A3530'; ctx.lineWidth = 1 * U; ctx.beginPath(); ctx.arc(cp[0], cp[1], 5.4 * U, 0, Math.PI * 2); ctx.stroke();
+        const ang = (now / 6000) % (Math.PI * 2); ctx.beginPath(); ctx.moveTo(cp[0], cp[1]); ctx.lineTo(cp[0] + Math.cos(ang) * 4 * U, cp[1] + Math.sin(ang) * 4 * U); ctx.moveTo(cp[0], cp[1]); ctx.lineTo(cp[0], cp[1] - 3 * U); ctx.stroke();
+        const a = iso(c + .78, r + .78, tz + 26), b2 = iso(c + 1.22, r + .78, tz + 26), c2 = iso(c + 1.22, r + 1.22, tz + 26), d2 = iso(c + .78, r + 1.22, tz + 26), tp = iso(c + 1, r + 1, tz + 44);
+        poly([d2, c2, tp], '#3E5A8C'); poly([c2, b2, tp], '#2F4874'); poly([a, d2, tp], '#4E6CA4');
+        // the flag
+        ctx.strokeStyle = '#5B5048'; ctx.lineWidth = 1.2 * U; ctx.beginPath(); ctx.moveTo(tp[0], tp[1]); ctx.lineTo(tp[0], tp[1] - 16 * U); ctx.stroke();
+        const wv = RM.matches ? 0 : Math.sin(now / 260) * 2 * U;
+        poly([[tp[0], tp[1] - 16 * U], [tp[0] + 12 * U, tp[1] - 13 * U + wv], [tp[0], tp[1] - 9 * U]], '#E8A93A');
+        break;
+      }
+      case 'cafe': {
+        const x0 = c + .16, y0 = r + .2, x1 = c + .84, y1 = r + .8, h = 23;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#FFF1DA', '#E6D4B4');
+        prism(x0 - .03, y0 - .03, x1 + .03, y1 + .03, z + h, 3, '#D9C29B', '#C9AE84', '#B0946A');
+        doorL(c + .32, y1, z, .14, 12, '#6B3E2A'); winL(c + .62, y1, z + 4, .26, 10, '#FFFFFF'); winR(x1, r + .5, z + 7, .26, 9, '#FFFFFF');
+        for (let i = 0; i < 5; i++) { const xa = x0 + (x1 - x0) * i / 5, xb = x0 + (x1 - x0) * (i + 1) / 5; poly([iso(xa, y1, z + 18), iso(xb, y1, z + 18), iso(xb, y1 + .17, z + 12), iso(xa, y1 + .17, z + 12)], i % 2 ? '#FFFFFF' : '#D9443A'); }
+        const sp = iso(c + .5, r + .5, z + h + 8); ell(sp[0], sp[1], 9 * U, 4 * U, '#5A3A22'); ctx.fillStyle = '#FFF1DA'; ctx.font = `800 ${5.2 * U}px Figtree, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('CAFÉ', sp[0], sp[1] + .3 * U);
+        break;
+      }
+      case 'bakery': {
+        const x0 = c + .17, y0 = r + .2, x1 = c + .83, y1 = r + .82, h = 23;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#F5D7B0');
+        doorL(c + .35, y1, z, .14, 12, '#6B3E2A'); winL(c + .64, y1, z + 4, .22, 10, '#FFFFFF'); winR(x1, r + .5, z + 8, .22, 8, '#FFFFFF');
+        gableY(x0, y0, x1, y1, z + h, 15, '#8D5B3B', '#F5D7B0');
+        const sp = iso(c + .5, y1 + .02, z + h + 6); circle(sp[0], sp[1], 4.2 * U, '#E8A93A'); circle(sp[0], sp[1], 2 * U, '#8D5B3B');
+        prism(c + .25, r + .3, c + .35, r + .4, z + h + 5, 12, '#9A9086', '#AEA59B', '#857B71'); smoke(c + .3, r + .35, z + h + 18);
+        break;
+      }
+      case 'market': {
+        shadowTile(c + .15, r + .2, c + .85, r + .85, .7);
+        for (const [px, py] of [[.2, .25], [.8, .25], [.2, .8], [.8, .8]]) prism(c + px - .02, r + py - .02, c + px + .02, r + py + .02, z, 20, null, '#8A6848', '#6E5236');
+        prism(c + .2, r + .45, c + .8, r + .8, z, 9, '#A47A50', '#B98C5E', '#946B44');
+        const fruit = ['#E5482F', '#F28C38', '#8BC34A', '#F3C64B', '#E5482F', '#8BC34A'];
+        for (let i = 0; i < 6; i++) { const p = iso(c + .28 + (i % 3) * .2, r + .55 + Math.floor(i / 3) * .15, z + 11); circle(p[0], p[1], 2.4 * U, fruit[i]); }
+        const ym = r + .52, o = .1;
+        for (let i = 0; i < 4; i++) { const xa = c + .2 - o + (.6 + 2 * o) * i / 4, xb = c + .2 - o + (.6 + 2 * o) * (i + 1) / 4; const col = i % 2 ? '#FFFFFF' : '#3E9A5A'; poly([iso(xa, r + .25 - o, z + 20), iso(xb, r + .25 - o, z + 20), iso(xb, ym, z + 28), iso(xa, ym, z + 28)], sh(col, .82)); poly([iso(xa, r + .8 + o, z + 20), iso(xb, r + .8 + o, z + 20), iso(xb, ym, z + 28), iso(xa, ym, z + 28)], col); }
+        break;
+      }
+      case 'park': {
+        poly([iso(c + .06, r + .06, z + .5), iso(c + .94, r + .06, z + .5), iso(c + .94, r + .94, z + .5), iso(c + .06, r + .94, z + .5)], '#6FB14E');
+        poly([iso(c + .45, r + .06, z + 1), iso(c + .58, r + .06, z + 1), iso(c + .58, r + .94, z + 1), iso(c + .45, r + .94, z + 1)], '#E8DDBF');
+        const fl = ['#F28DB8', '#FFFFFF', '#F3C64B', '#E5482F'];
+        for (let i = 0; i < 10; i++) { const p = iso(c + .14 + ((i * 37) % 30) / 100, r + .14 + ((i * 53) % 70) / 100, z + 2); circle(p[0], p[1], 1.6 * U, fl[i % 4]); }
+        prism(c + .66, r + .3, c + .86, r + .38, z + 4, 2, '#A57A50', '#B88A5C', '#8E6640'); prism(c + .66, r + .3, c + .86, r + .31, z + 6, 5, null, '#A57A50', '#8E6640');
+        tree(c + .78, r + .74, z, '#4F9A3E', .75);
+        break;
+      }
+      case 'fire': {
+        const x0 = c + .15, y0 = r + .18, x1 = c + .85, y1 = r + .85, h = 28;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#D9503E', '#9E3326');
+        prism(x0 - .03, y0 - .03, x1 + .03, y1 + .03, z + h, 3, '#7C2A22', '#8E3329', '#6E241C');
+        poly([iso(c + .24, y1, z), iso(c + .62, y1, z), iso(c + .62, y1, z + 17), iso(c + .24, y1, z + 17)], '#F4F1EA');
+        for (let i = 1; i < 4; i++) poly([iso(c + .24, y1, z + i * 4.2), iso(c + .62, y1, z + i * 4.2), iso(c + .62, y1, z + i * 4.2 + .8), iso(c + .24, y1, z + i * 4.2 + .8)], '#C9C2B4');
+        winL(c + .74, y1, z + 18, .12, 6, '#FFFFFF'); winR(x1, r + .5, z + 17, .22, 7, '#FFFFFF');
+        walls(c + .2, r + .22, c + .42, r + .44, z + h + 3, 14, '#C9483A');
+        const sl = iso(c + .31, r + .33, z + h + 20); circle(sl[0], sl[1], 2.6 * U, '#FFD34D'); b.siren = sl;
+        break;
+      }
+      case 'clinic': {
+        const x0 = c + .16, y0 = r + .2, x1 = c + .84, y1 = r + .84, h = 25;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#F6F8F8');
+        doorL(c + .38, y1, z, .16, 13, '#7FA9C9'); winL(c + .68, y1, z + 9, .16, 8, '#C8473D');
+        winR(x1, r + .38, z + 10, .14, 8); winR(x1, r + .7, z + 10, .14, 8);
+        gableX(x0, y0, x1, y1, z + h, 13, '#C8473D', '#F6F8F8');
+        const cp = iso(x1, r + .52, z + 3); poly([[cp[0] - 1.2 * U, cp[1] - 6 * U], [cp[0] + 1.2 * U, cp[1] - 7 * U], [cp[0] + 1.2 * U, cp[1] - 1 * U], [cp[0] - 1.2 * U, cp[1]]], '#D9443A');
+        break;
+      }
+      case 'school': {
+        const x0 = c + .14, y0 = r + .2, x1 = c + .86, y1 = r + .84, h = 26;
+        shadowTile(x0, y0, x1, y1, 1);
+        walls(x0, y0, x1, y1, z, h, '#F2C14E', '#D9A43A');
+        prism(x0 - .03, y0 - .03, x1 + .03, y1 + .03, z + h, 3, '#C08B2B', '#D49B35', '#A97B24');
+        for (const xc of [c + .3, c + .52, c + .74]) winL(xc, y1, z + 12, .13, 9, '#FFFFFF');
+        doorL(c + .52, y1, z, .14, 10, '#7A4B2C'); winR(x1, r + .4, z + 12, .14, 9, '#FFFFFF'); winR(x1, r + .68, z + 12, .14, 9, '#FFFFFF');
+        walls(c + .42, r + .4, c + .6, r + .58, z + h + 3, 10, '#F7D57A');
+        gableX(c + .42, r + .4, c + .6, r + .58, z + h + 13, 7, '#C8553D', '#F7D57A');
+        const cp = iso(c + .51, r + .58, z + h + 8); circle(cp[0], cp[1], 2.8 * U, '#FFFFFF');
+        break;
+      }
+      case 'hospital': {
+        const x0 = c + .14, y0 = r + .14, x1 = c + 1.86, y1 = r + 1.86, h = 52;
+        shadowTile(x0, y0, x1, y1, 1.3);
+        walls(x0, y0, x1, y1, z, h, '#F3F5F6', '#DDE2E5');
+        prism(x0, y1 - .005, x1, y1 + .005, z + h - 7, 4, null, '#D9443A', '#B8362D');
+        prism(x1 - .005, y0, x1 + .005, y1, z + h - 7, 4, null, '#D9443A', '#B8362D');
+        for (let row = 0; row < 3; row++) for (let i = 0; i < 5; i++) { winL(c + .38 + i * .3, y1, z + 9 + row * 12, .16, 7); winR(x1, r + .38 + i * .3, z + 9 + row * 12, .16, 7); }
+        poly([iso(c + .7, y1 + .25, z + 14), iso(c + 1.3, y1 + .25, z + 14), iso(c + 1.3, y1, z + 15), iso(c + .7, y1, z + 15)], '#C9D2D8');
+        const hp = iso(c + 1, r + 1, z + h); ell(hp[0], hp[1], 16 * U, 8 * U, '#4A5560'); ell(hp[0], hp[1], 13 * U, 6.5 * U, '#5C6873');
+        ctx.fillStyle = '#F3C64B'; ctx.font = `900 ${8 * U}px Figtree, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('H', hp[0], hp[1] + .5 * U);
+        break;
+      }
+      case 'wheel': {
+        poly([iso(c + .06, r + .06, z + .6), iso(c + 1.94, r + .06, z + .6), iso(c + 1.94, r + 1.94, z + .6), iso(c + .06, r + 1.94, z + .6)], '#E8D9A6');
+        // carousel
+        const cc = iso(c + .55, r + 1.45, z);
+        ell(cc[0], cc[1], 15 * U, 7.5 * U, '#B98C5E'); ell(cc[0], cc[1] - 3 * U, 15 * U, 7.5 * U, '#F6E7C9');
+        for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + (RM.matches ? 0 : now / 1400); const hx = cc[0] + Math.cos(a) * 11 * U, hy = cc[1] - 3 * U + Math.sin(a) * 5.5 * U; ctx.fillStyle = ['#E5482F', '#3B7DD8', '#F3C64B'][i % 3]; ctx.fillRect(hx - 1.5 * U, hy - 7 * U, 3 * U, 5 * U); ctx.fillStyle = '#C9B48A'; ctx.fillRect(hx - .3 * U, hy - 16 * U, .6 * U, 16 * U); }
+        poly([[cc[0] - 17 * U, cc[1] - 16 * U], [cc[0] + 17 * U, cc[1] - 16 * U], [cc[0], cc[1] - 30 * U]], '#E5482F'); poly([[cc[0] - 6 * U, cc[1] - 16 * U], [cc[0] + 6 * U, cc[1] - 16 * U], [cc[0], cc[1] - 30 * U]], '#FFFFFF');
+        ell(cc[0], cc[1] - 16 * U, 17 * U, 3.5 * U, '#C2392E');
+        // the Ferris wheel
+        const wc0 = iso(c + 1.3, r + .7, z + 50), R = 36 * U, rot = RM.matches ? 0 : now / 5200;
+        const footA = iso(c + 1.0, r + .85, z), footB = iso(c + 1.6, r + .55, z);
+        ctx.strokeStyle = '#9AA4AE'; ctx.lineWidth = 2.4 * U; ctx.beginPath(); ctx.moveTo(footA[0], footA[1]); ctx.lineTo(wc0[0], wc0[1]); ctx.lineTo(footB[0], footB[1]); ctx.stroke();
+        ctx.strokeStyle = '#D3D8DD'; ctx.lineWidth = 1 * U; ctx.beginPath();
+        for (let i = 0; i < 12; i++) { const a = rot + i / 12 * Math.PI * 2; ctx.moveTo(wc0[0], wc0[1]); ctx.lineTo(wc0[0] + Math.cos(a) * R, wc0[1] + Math.sin(a) * R); } ctx.stroke();
+        ctx.strokeStyle = '#E5482F'; ctx.lineWidth = 2.6 * U; ctx.beginPath(); ctx.arc(wc0[0], wc0[1], R, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#F3C64B'; ctx.lineWidth = 1.2 * U; ctx.beginPath(); ctx.arc(wc0[0], wc0[1], R * .55, 0, Math.PI * 2); ctx.stroke();
+        const gc = ['#3B7DD8', '#F3C64B', '#2E8F7A', '#E46B8A', '#8E5BB5', '#F28C38'];
+        b.rim = [];
+        for (let i = 0; i < 12; i++) { const a = rot + i / 12 * Math.PI * 2, gx = wc0[0] + Math.cos(a) * R, gy = wc0[1] + Math.sin(a) * R; b.rim.push([gx, gy]); if (i % 2) continue; ctx.fillStyle = gc[(i / 2) % gc.length]; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(gx - 3.4 * U, gy, 6.8 * U, 6 * U, 1.6 * U) : ctx.rect(gx - 3.4 * U, gy, 6.8 * U, 6 * U); ctx.fill(); }
+        circle(wc0[0], wc0[1], 3 * U, '#5B6670');
+        break;
+      }
+      case 'light': {
+        const base = iso(c + .5, r + .5, z), hgt = 70 * U;
+        ell(base[0], base[1], 15 * U, 7.5 * U, '#B9B2A4'); ell(base[0], base[1] - 3 * U, 15 * U, 7.5 * U, '#D7D1C4');
+        for (let i = 0; i < 5; i++) { const ya = base[1] - 3 * U - i * hgt / 5, yb = ya - hgt / 5, wa = 10 * U - i * 1 * U, wb = wa - 1 * U; poly([[base[0] - wa, ya], [base[0] + wa, ya], [base[0] + wb, yb], [base[0] - wb, yb]], i % 2 ? '#FFFFFF' : '#D9443A'); poly([[base[0] + wa * .25, ya], [base[0] + wa, ya], [base[0] + wb, yb], [base[0] + wb * .25, yb]], 'rgba(0,0,0,.12)'); }
+        const top = base[1] - 3 * U - hgt;
+        ell(base[0], top, 8 * U, 3 * U, '#4A4F55'); ctx.fillStyle = '#FFF4C2'; ctx.fillRect(base[0] - 4.5 * U, top - 9 * U, 9 * U, 9 * U);
+        poly([[base[0] - 6 * U, top - 9 * U], [base[0] + 6 * U, top - 9 * U], [base[0], top - 17 * U]], '#D9443A');
+        b.lamp = [base[0], top - 4.5 * U];
+        break;
+      }
+      case 'fountain': {
+        const p = iso(c + .5, r + .5, z);
+        ell(p[0], p[1] + 1 * U, 21 * U, 10.5 * U, '#B4AC9E'); ell(p[0], p[1] - 2 * U, 21 * U, 10.5 * U, '#D8D1C3'); ell(p[0], p[1] - 2.5 * U, 17 * U, 8.5 * U, '#7CC8E8');
+        ctx.fillStyle = '#D8D1C3'; ctx.fillRect(p[0] - 2 * U, p[1] - 14 * U, 4 * U, 12 * U);
+        if (!RM.matches) for (let i = 0; i < 10; i++) { const k = ((now / 900) + i / 10) % 1, a = i / 10 * Math.PI * 2; circle(p[0] + Math.cos(a) * k * 13 * U, p[1] - 14 * U - Math.sin(k * Math.PI) * 9 * U + k * 10 * U + Math.sin(a) * k * 5 * U, 1.3 * U, 'rgba(225,245,255,.9)'); }
+        break;
+      }
+      case 'tree': tree(c + .5, r + .5, z, '#4E9A3C', 1); break;
+      case 'cherry': tree(c + .5, r + .5, z, '#EFA2C0', 1); break;
+      case 'flowers': {
+        const fl = ['#F28DB8', '#F3C64B', '#FFFFFF', '#E5482F', '#8E5BB5'];
+        for (let i = 0; i < 14; i++) { const p = iso(c + .15 + ((i * 41) % 70) / 100, r + .15 + ((i * 67) % 70) / 100, z + 2); ell(p[0], p[1] + 1.5 * U, 2.2 * U, 1.1 * U, '#4E8F3A'); circle(p[0], p[1], 1.8 * U, fl[i % 5]); }
+        break;
+      }
+    }
+  }
+  function tree(x, y, z, col, s) {
+    const g = iso(x, y, z); ell(g[0] + 4 * U, g[1] + 1 * U, 11 * U * s, 5 * U * s, 'rgba(20,50,30,.18)');
+    ctx.fillStyle = '#7A5636'; ctx.fillRect(g[0] - 1.6 * U * s, g[1] - 13 * U * s, 3.2 * U * s, 13 * U * s);
+    const t = iso(x, y, z + 22 * s);
+    circle(t[0] - 4 * U * s, t[1] + 2 * U * s, 8.5 * U * s, sh(col, .82)); circle(t[0] + 4.5 * U * s, t[1] + 1 * U * s, 8 * U * s, sh(col, .74)); circle(t[0], t[1] - 4 * U * s, 9.5 * U * s, col); circle(t[0] - 2.5 * U * s, t[1] - 7 * U * s, 4 * U * s, sh(col, 1.18));
+  }
+  function person(pp, now, k) {
+    const [x, y] = iso(pp.x, pp.y, 0), sw = RM.matches ? 0 : Math.sin(now / 130 + pp.at) * 1.6 * U, s = U * 1.05;
+    ell(x, y, 3.4 * s, 1.4 * s, 'rgba(0,0,0,.18)');
+    ctx.strokeStyle = '#33404A'; ctx.lineWidth = 1.6 * s; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x - 1 * s, y - 4 * s); ctx.lineTo(x - 1 * s + sw, y); ctx.moveTo(x + 1 * s, y - 4 * s); ctx.lineTo(x + 1 * s - sw, y); ctx.stroke();
+    ctx.fillStyle = pp.shirt; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 2.6 * s, y - 10.5 * s, 5.2 * s, 7 * s, 1.6 * s) : ctx.rect(x - 2.6 * s, y - 10.5 * s, 5.2 * s, 7 * s); ctx.fill();
+    circle(x, y - 13 * s, 2.6 * s, pp.skin);
+  }
+  function car(x, y, dir, now) {
+    const z = 0, l = .32, w = .17, col = '#F3C64B';
+    const x0 = x - l / 2, x1 = x + l / 2, y0 = y - w / 2, y1 = y + w / 2;
+    ell(...iso(x, y + .05, 0), 14 * U, 5 * U, 'rgba(0,0,0,.18)');
+    prism(x0, y0, x1, y1, z + 3, 7, sh(col, 1.08), col, sh(col, .78));
+    prism(x0 + .07, y0 + .02, x1 - .1, y1 - .02, z + 10, 5, '#E9F2F7', '#9CC1D8', '#7FA6BF');
+    for (const wx of [x0 + .07, x1 - .07]) { const p = iso(wx, y1, 3); ell(p[0], p[1], 2.4 * U, 2.4 * U, '#222'); }
+    const hl = dir > 0 ? iso(x1, y, 7) : iso(x0, y, 7); return hl;
+  }
+
+  // ---- floating coins when a building lands
+  const pops = [];
+  function popCoin(b, now) { const p = iso(b.c + b.w / 2, b.r + b.d / 2, 40); pops.push({ x: p[0], y: p[1], t0: now, v: VALUE[b.k] || 0 }); }
+
+  let prog = 0, shown = 0, gold = 0, loadT = performance.now();
+  function progress() { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); return clamp(scrollY / max, 0, 1); }
+
+  function frame(now) {
+    const p = progress();
+    prog += (p - prog) * (RM.matches ? 1 : 0.12);
+    const S = skyAt(prog), night = S.night;
+    const tm = RM.matches ? 0 : now;
+    // which buildings are up
+    shown = 0; gold = 0;
+    for (const b of T) {
+      const want = p >= b.p;
+      if (want && !b.on) { b.on = true; b.landed = RM.matches; b.t0 = RM.matches ? now : Math.max(now, loadT + 250 + (b.p === 0 ? b.i * 140 : 0)); }
+      else if (!want && b.on) { b.on = false; b.off = now; }
+      if (b.on) { shown++; gold += VALUE[b.k] || 0; }
+    }
+    gold = Math.round(gold * 4 + p * 60);
+    main.setTransform(DPR, 0, 0, DPR, 0, 0); wctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    // sky
+    const g = main.createLinearGradient(0, 0, 0, HZ); g.addColorStop(0, S.top); g.addColorStop(1, S.bot);
+    main.fillStyle = g; main.fillRect(0, 0, W, HZ + 2);
+    ctx = main;
+    if (night > 0.05) for (const [sx, sy, sz, i] of STARS) { const tw = RM.matches ? 1 : 0.6 + 0.4 * Math.sin(now / 700 + i); circle(sx * W, sy * HZ * 0.95, sz * 1.2, `rgba(255,255,240,${night * tw * 0.9})`); }
+    // sun and moon
+    const sp = clamp(prog / 0.74, 0, 1), sunX = W * (wide ? 0.2 : 0.12) + sp * W * (wide ? 0.62 : 0.76), sunY = HZ - Math.sin(Math.PI * (0.12 + sp * 0.8)) * HZ * 0.72;
+    if (prog < 0.8) { const sg = main.createRadialGradient(sunX, sunY, 2, sunX, sunY, 70 * U + 30); sg.addColorStop(0, 'rgba(255,240,200,.85)'); sg.addColorStop(1, 'rgba(255,220,160,0)'); main.fillStyle = sg; main.fillRect(sunX - 120, sunY - 120, 240, 240); circle(sunX, sunY, 14 + 8 * U, mix('#FFF3C4', '#FFB36B', clamp((prog - 0.5) / 0.25, 0, 1))); }
+    const moonX = W * (wide ? 0.47 : 0.2);
+    if (prog > 0.7) { const mk = clamp((prog - 0.7) / 0.18, 0, 1), my = HZ * (0.92 - 0.6 * mk); main.save(); main.beginPath(); main.rect(0, 0, W, HZ); main.clip(); circle(moonX, my, 12 + 6 * U, `rgba(250,246,226,${mk})`); circle(moonX + 6 + 2 * U, my - 4, 11 + 5 * U, mix(S.top, S.bot, clamp(my / HZ, 0, 1))); main.restore(); }
+    // clouds
+    for (const [cx0, cy0, cs, sp2] of CLOUDS) { const x = ((cx0 * (W + 400) + tm * 0.004 * sp2) % (W + 400)) - 200, y = cy0 * HZ * 1.6 + 30, s = cs * (wide ? 1.2 : 0.8); const cc = mix('#FFFFFF', '#3D4A7E', night * 0.85); main.globalAlpha = 0.8 - night * 0.35; for (const [ox, oy, rr] of [[0, 0, 26], [28, -10, 22], [52, 2, 20], [-24, 6, 16], [76, 8, 14]]) circle(x + ox * s, y + oy * s, rr * s, cc); main.globalAlpha = 1; }
+    // sea
+    const sg2 = main.createLinearGradient(0, HZ, 0, H); sg2.addColorStop(0, mix(S.sea, S.bot, 0.45)); sg2.addColorStop(1, S.sea);
+    main.fillStyle = sg2; main.fillRect(0, HZ, W, H - HZ);
+    main.fillStyle = `rgba(255,255,255,${0.35 - night * 0.2})`; main.fillRect(0, HZ, W, 1.5);
+    for (const [wx, wy, i] of WAVES) { const y = HZ + 8 + wy * (H - HZ), x = ((wx * W + tm * 0.008 * (1 + (i % 3))) % (W + 40)) - 20, len = (6 + (i % 4) * 3) * (0.5 + (y - HZ) / (H - HZ)); main.strokeStyle = `rgba(255,255,255,${(0.28 - night * 0.12) * (RM.matches ? 1 : 0.6 + 0.4 * Math.sin(now / 600 + i))})`; main.lineWidth = 1.4; main.beginPath(); main.moveTo(x, y); main.lineTo(x + len, y); main.stroke(); }
+    if (night > 0.3) { const mx = moonX; main.fillStyle = `rgba(250,246,226,${(night - 0.3) * 0.18})`; for (let i = 0; i < 9; i++) main.fillRect(mx - 30 + Math.sin(i * 7 + tm / 900) * 12, HZ + 10 + i * 9, 60 - i * 5, 2); }
+
+    // ---- the island and everything on it, in its own layer so dusk and night can tint it
+    ctx = wctx; lights = [];
+    wctx.clearRect(0, 0, W, H);
+    const m = 0.42;
+    poly([iso(-m - .5, -m - .5, -16), iso(G + m + .5, -m - .5, -16), iso(G + m + .5, G + m + .5, -16), iso(-m - .5, G + m + .5, -16)], 'rgba(255,255,255,.35)');
+    poly([iso(-m, G + m, 0), iso(G + m, G + m, 0), iso(G + m, G + m, -15), iso(-m, G + m, -15)], '#B98A57');
+    poly([iso(G + m, G + m, 0), iso(G + m, -m, 0), iso(G + m, -m, -15), iso(G + m, G + m, -15)], '#916A41');
+    poly([iso(-m, G + m, -9), iso(G + m, G + m, -9), iso(G + m, G + m, -15), iso(-m, G + m, -15)], '#9A7148');
+    poly([iso(-m, -m), iso(G + m, -m), iso(G + m, G + m), iso(-m, G + m)], '#EBD6A2');
+    for (let r = 0; r < G; r++) for (let c = 0; c < G; c++) {
+      const road = isRoad(c, r);
+      poly([iso(c, r), iso(c + 1, r), iso(c + 1, r + 1), iso(c, r + 1)], road ? ((c + r) % 2 ? '#E2D6BC' : '#DCCFB3') : ((c + r) % 2 ? '#8CC665' : '#83BE5D'));
+      if (road) { const a = iso(c + .5, r + .5); circle(a[0], a[1], 1 * U, 'rgba(120,100,70,.25)'); }
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,.1)'; ctx.lineWidth = 1;
+    ctx.beginPath(); for (let i = 0; i <= G; i++) { let a = iso(i, 0), b = iso(i, G); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); a = iso(0, i); b = iso(G, i); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); } ctx.stroke();
+    // people on the streets, more as the town grows; fewer late at night
+    const crowd = Math.round(2 + (shown / T.length) * 12 * (1 - night * 0.55));
+    const items = [];
+    for (const b of T) {
+      let z = 0, alpha = 1;
+      if (b.on) { const a = RM.matches ? 1 : clamp((now - b.t0) / 700, 0, 1); if (now < b.t0) continue; z = (1 - bounce(a)) * 150; alpha = clamp(a * 4, 0, 1); if (a >= 1 && !b.landed) { b.landed = true; if (b.p > 0) popCoin(b, now); } }
+      else { const a = clamp((now - b.off) / 260, 0, 1); if (a >= 1) continue; alpha = 1 - a; z = a * 30; }
+      items.push({ depth: b.c + b.w / 2 + b.r + b.d / 2, draw: () => { wctx.globalAlpha = alpha; drawB(b, z, now); wctx.globalAlpha = 1; } });
+    }
+    for (let i = 0; i < crowd; i++) {
+      const pp = PEEPS[i]; if (!RM.matches) pp.pos = (pp.pos + pp.dir * pp.sp / 60 + 1) % 1;
+      const t = pp.pos * (G - 0.4) + 0.2; pp.x = pp.axis === 'h' ? t : 3.5 + pp.lane; pp.y = pp.axis === 'h' ? 4.5 + pp.lane : t;
+      items.push({ depth: pp.x + pp.y, draw: () => person(pp, now) });
+    }
+    let headlight = null;
+    if (p > 0.3) { const k = RM.matches ? 0.4 : (now / 9000) % 1, dir = Math.floor(now / 9000) % 2 ? 1 : -1, x = dir > 0 ? -0.2 + k * (G + 0.4) : G + 0.2 - k * (G + 0.4); items.push({ depth: x + 4.5, draw: () => { headlight = car(x, 4.5, dir, now); } }); }
+    for (const [lx, ly] of LAMPS) items.push({ depth: lx + ly, draw: () => { const a = iso(lx + .5, ly + .5, 0), b2 = iso(lx + .5, ly + .5, 24); ctx.strokeStyle = '#3E4650'; ctx.lineWidth = 1.4 * U; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b2[0], b2[1]); ctx.stroke(); circle(b2[0], b2[1], 2.4 * U, '#FFF2C0'); lights.push({ lamp: b2 }); } });
+    items.sort((a, b) => a.depth - b.depth);
+    for (const it of items) it.draw();
+    // dusk and night: tint the town (only where it is drawn)
+    wctx.globalCompositeOperation = 'source-atop';
+    if (S.warm > 0.01) { wctx.fillStyle = `rgba(255,150,80,${S.warm * 0.5})`; wctx.fillRect(0, 0, W, H); }
+    if (night > 0.01) { wctx.fillStyle = `rgba(16,26,70,${night * 0.62})`; wctx.fillRect(0, 0, W, H); }
+    wctx.globalCompositeOperation = 'source-over';
+    main.setTransform(1, 0, 0, 1, 0, 0); main.drawImage(wc, 0, 0); main.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    // ---- lights after dark: windows, street lamps, the lighthouse, the wheel, the car
+    ctx = main;
+    if (night > 0.2) {
+      const k = clamp((night - 0.2) / 0.5, 0, 1);
+      main.save(); main.globalCompositeOperation = 'lighter';
+      for (const L of lights) {
+        if (L.lamp) { const [x, y] = L.lamp, gr = main.createRadialGradient(x, y, 1, x, y, 26 * U); gr.addColorStop(0, `rgba(255,214,140,${0.75 * k})`); gr.addColorStop(1, 'rgba(255,190,110,0)'); main.fillStyle = gr; main.beginPath(); main.arc(x, y, 26 * U, 0, Math.PI * 2); main.fill(); continue; }
+        const on = ((Math.round(L[0][0] * 7 + L[0][1] * 3)) % 5) !== 0; if (!on) continue;
+        main.globalAlpha = k * 0.95; poly(L, '#FFC864'); main.globalAlpha = 1;
+      }
+      for (const b of T) {
+        if (!b.on || !b.landed) continue;
+        if (b.k === 'light' && b.lamp) { const a = RM.matches ? 0.6 : (now / 2200) % (Math.PI * 2), [x, y] = b.lamp, Lb = Math.max(W, H) * 0.7; main.fillStyle = `rgba(255,244,190,${0.22 * k})`; main.beginPath(); main.moveTo(x, y); main.lineTo(x + Math.cos(a - 0.09) * Lb, y + Math.sin(a - 0.09) * Lb * 0.35); main.lineTo(x + Math.cos(a + 0.09) * Lb, y + Math.sin(a + 0.09) * Lb * 0.35); main.closePath(); main.fill(); const gr = main.createRadialGradient(x, y, 1, x, y, 24 * U); gr.addColorStop(0, `rgba(255,248,210,${k})`); gr.addColorStop(1, 'rgba(255,240,180,0)'); main.fillStyle = gr; main.beginPath(); main.arc(x, y, 24 * U, 0, Math.PI * 2); main.fill(); }
+        if (b.k === 'wheel' && b.rim) b.rim.forEach(([x, y], i) => circle(x, y, 1.9 * U, ['rgba(255,90,90,', 'rgba(255,220,90,', 'rgba(110,200,255,'][i % 3] + (0.9 * k) + ')'));
+        if (b.k === 'fire' && b.siren) { const gr = main.createRadialGradient(b.siren[0], b.siren[1], 1, b.siren[0], b.siren[1], 9 * U); gr.addColorStop(0, `rgba(255,220,120,${0.6 * k})`); gr.addColorStop(1, 'rgba(255,200,100,0)'); main.fillStyle = gr; main.beginPath(); main.arc(b.siren[0], b.siren[1], 9 * U, 0, Math.PI * 2); main.fill(); }
+      }
+      if (headlight) { const gr = main.createRadialGradient(headlight[0], headlight[1], 1, headlight[0], headlight[1], 18 * U); gr.addColorStop(0, `rgba(255,250,210,${0.8 * k})`); gr.addColorStop(1, 'rgba(255,240,180,0)'); main.fillStyle = gr; main.beginPath(); main.arc(headlight[0], headlight[1], 18 * U, 0, Math.PI * 2); main.fill(); }
+      if (!RM.matches) for (let i = 0; i < 14; i++) { const fx = iso(((i * 3.7) % G) + Math.sin(now / 1700 + i) * .4, ((i * 2.3) % G) + Math.cos(now / 1900 + i) * .4, 10 + Math.sin(now / 800 + i) * 6); circle(fx[0], fx[1], 1.4 * U, `rgba(220,255,140,${k * (0.4 + 0.4 * Math.sin(now / 300 + i * 2))})`); }
+      main.restore();
+    }
+    // the chest at the end of the session
+    if (p > 0.965) {
+      const hp = iso(5, 2, 120), a = RM.matches ? 1 : clamp((now - (frame.chestAt || (frame.chestAt = now))) / 900, 0, 1), s = U * (0.6 + 0.4 * bounce(a));
+      main.save(); main.translate(hp[0], hp[1] - (1 - bounce(a)) * 40);
+      if (!RM.matches) { main.rotate(now / 3000); for (let i = 0; i < 12; i++) { main.rotate(Math.PI / 6); main.fillStyle = 'rgba(255,220,120,.22)'; main.beginPath(); main.moveTo(0, 0); main.lineTo(-7 * s, -70 * s); main.lineTo(7 * s, -70 * s); main.closePath(); main.fill(); } main.rotate(-now / 3000); }
+      main.fillStyle = '#8E5BB5'; main.fillRect(-20 * s, -6 * s, 40 * s, 22 * s); main.fillStyle = '#A97BD0'; main.beginPath(); main.ellipse(0, -6 * s, 20 * s, 10 * s, 0, Math.PI, 0); main.fill();
+      main.fillStyle = '#F3C64B'; main.fillRect(-20 * s, 2 * s, 40 * s, 3.5 * s); main.fillRect(-3.5 * s, -14 * s, 7 * s, 30 * s); circle(0, 4 * s, 3.4 * s, '#FFE48F');
+      main.restore();
+    } else frame.chestAt = 0;
+    // coins rising from new buildings
+    for (let i = pops.length - 1; i >= 0; i--) {
+      const q = pops[i], k = (now - q.t0) / 1300; if (k >= 1) { pops.splice(i, 1); continue; }
+      const y = q.y - k * 34 * U - 10, al = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25;
+      main.globalAlpha = al; circle(q.x, y, 7.5 * U, '#A96D12'); circle(q.x, y - .8 * U, 7 * U, '#F3C64B'); circle(q.x - 2 * U, y - 3 * U, 2.2 * U, '#FFE9A6');
+      main.fillStyle = '#7A4A00'; main.font = `900 ${9 * U}px Figtree, sans-serif`; main.textAlign = 'center'; main.textBaseline = 'middle'; main.fillText('+', q.x, y);
+      if (q.v) { main.fillStyle = '#FFFFFF'; main.strokeStyle = 'rgba(60,40,0,.55)'; main.lineWidth = 3; main.font = `800 ${10 * U + 3}px Figtree, sans-serif`; main.strokeText(`+${q.v * 4}`, q.x + 18 * U, y); main.fillText(`+${q.v * 4}`, q.x + 18 * U, y); }
+      main.globalAlpha = 1;
+    }
+    hud(p);
+  }
+  // the timer: 25 minutes, run by the scroll bar
+  const $t = document.getElementById('hud-time'), $s = document.getElementById('hud-sub'), $r = document.getElementById('ring'), $h = document.getElementById('hud'), $e = document.getElementById('end-eyebrow');
+  let lastHud = '';
+  function hud(p) {
+    const left = Math.round(25 * 60 * (1 - p)), done = p > 0.965;
+    const t = done ? 'Done!' : `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`;
+    const s = done ? `Royal chest · +${gold} gold` : p < 0.01 ? 'Scroll to focus' : `+${gold} gold · ${shown} built`;
+    const key = t + s; if (key === lastHud) return; lastHud = key;
+    $t.textContent = t; $s.innerHTML = done ? `Royal chest · <span class="gold">+${gold} gold</span>` : p < 0.01 ? s : `<span class="gold">+${gold} gold</span> · ${shown} built`;
+    $r.style.strokeDashoffset = String(100 - p * 100); $h.classList.toggle('done', done);
+    if ($e) $e.textContent = done ? `Session complete · +${gold} gold` : 'Almost there';
+  }
+  let raf = 0;
+  function loop(now) { frame(now); raf = RM.matches ? 0 : requestAnimationFrame(loop); }
+  function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+  addEventListener('resize', () => { size(); kick(); });
+  addEventListener('scroll', kick, { passive: true });
+  RM.addEventListener && RM.addEventListener('change', kick);
+  size();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(kick);
+  kick();
+})();
+</script>
+
+</body>
+</html>

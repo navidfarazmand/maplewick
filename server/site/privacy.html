@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maplewick Privacy</title>
+<meta name="description" content="What Maplewick stores, where, and how to delete it.">
+<link rel="icon" href="img/icon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Figtree:wght@400;600;700&family=Martian+Mono:wght@600&display=swap">
+<style>
+  :root { --ink: #1B2A29; --ink-2: #4F605D; --paper: #F4F8F6; --card: #FFFFFF; --line: rgba(27, 42, 41, .13); --focus: #5B2DB8; --grass: #8CC665;
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif; --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Martian Mono", ui-monospace, Menlo, monospace; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #EAF3F0; --ink-2: #A9BDB8; --paper: #0B1517; --card: #111E21; --line: rgba(234, 243, 240, .13); --focus: #9876FF; --grass: #5E9A45; color-scheme: dark; } }
+  :root[data-theme="dark"] { --ink: #EAF3F0; --ink-2: #A9BDB8; --paper: #0B1517; --card: #111E21; --line: rgba(234, 243, 240, .13); --focus: #9876FF; --grass: #5E9A45; color-scheme: dark; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.05rem/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 44rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1.5rem 3rem; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .5rem 2.5rem; }
+  .brand { display: inline-flex; align-items: center; gap: .5rem; font: 800 1.3rem/1 var(--display); text-decoration: none; color: inherit; }
+  .brand svg { width: 1.5rem; height: 1.5rem; }
+  header nav { display: flex; gap: 1.1rem; font-weight: 600; font-size: .95rem; }
+  a { color: var(--focus); }
+  header nav a { color: var(--ink-2); text-decoration: none; }
+  .eyebrow { font: 600 .7rem/1.3 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--focus); margin: 0 0 .6rem; }
+  h1 { font: 800 clamp(2.4rem, 6vw, 3.6rem)/1 var(--display); margin: 0 0 1rem; letter-spacing: -.02em; text-wrap: balance; }
+  h2 { font: 800 1.55rem/1.15 var(--display); margin: 2.4rem 0 .6rem; text-wrap: balance; }
+  p, li { max-width: 40em; }
+  .lede { font-size: 1.15rem; color: var(--ink-2); }
+  .box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 1.1rem 1.3rem; margin-top: 1.5rem; }
+  .box p { margin: .3rem 0; }
+  ul { padding-left: 1.2rem; }
+  li { margin: .35rem 0; }
+  code { font: 600 .85em/1 var(--mono); }
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); color: var(--ink-2); font-size: .92rem; display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; }
+  .copy { display: inline-flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .copy button { font: 700 .85rem/1 var(--body); border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: .45rem .8rem; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#7DB65A" d="M16 18 30 25 16 32 2 25z"/><path fill="#F4E7CF" d="M6 14v9l10 5V19z"/><path fill="#DCCBAA" d="M26 14v9l-10 5V19z"/><path fill="#C8553D" d="M4 14 15 3l2 1 11 10-12 6z"/><path fill="#5A3A22" d="M9 18.5v6l3 1.5v-6z"/></svg>Maplewick</a>
+    <nav aria-label="Site"><a href="index.html">Home</a><a href="support.html">Support</a></nav>
+  </header>
+  <main>
+    <p class="eyebrow">Privacy policy · updated 18 October 2026</p>
+    <h1>Your town is yours.</h1>
+    <p class="lede">Maplewick is a focus game. It needs very little about you to work, and it keeps most of that on your own device. Here is all of it, in plain words.</p>
+
+    <div class="box">
+      <p><b>In short:</b> no ads, no tracking, no selling of data. Your town lives on your device. If you join the leaderboard, a small public card about your town is shared with other players, and you can remove it at any time.</p>
+    </div>
+
+    <h2>What stays on your device</h2>
+    <p>Your town, your settings, your focus history, your chests and your streak are saved in your browser's storage on the phone or computer you play on. They are not sent to us. If you clear your browser data or uninstall the app, they are gone, unless you saved a save code first (menu, Settings, Move your town to another device).</p>
+    <p>The game also keeps a record of your own sessions and taps (Menu, Your data) on your device, so you can see how your focus goes. It is not sent anywhere unless you copy or download it yourself.</p>
+
+    <h2>The Android app</h2>
+    <p>The Android app shows the same game and adds a few things a web page can't do. All of them work on your phone:</p>
+    <ul>
+      <li><b>The phone-pickup check.</b> While a focus session runs, the app notes when the screen goes off or on, when the phone is unlocked, and when Maplewick goes to the back or comes to the front, with the time. That is how the game knows whether you picked up the phone. It does not see which other app you opened, and the record stays on your phone; it is cleared when the next session starts.</li>
+      <li><b>Notifications.</b> Lap bells, the end of a session, your focus plan and set times with friends are scheduled on your phone. The time left can show on the lock screen.</li>
+      <li><b>Google sign-in</b>, for the leaderboard, uses Google's sign-in on your phone. It works as described below.</li>
+    </ul>
+
+<h2>If you join the leaderboard</h2>
+    <p>The leaderboard is optional. To join, you sign in with Google. Sign-in is handled by Google Firebase Authentication, so Google tells us an account ID for you, and Firebase keeps your sign-in details (such as your email address) in its account system. We do not show your email address to anyone.</p>
+    <p>While you are on the leaderboard, we store one entry for you in Google Cloud Firestore. Other signed-in players can see it. It holds:</p>
+    <ul>
+      <li>the name you chose for the leaderboard, your town's name and your builder's name;</li>
+      <li>your focus minutes today, this week and in total;</li>
+      <li>your level, streak, number of badges, town hall level, number of residents and town mood;</li>
+      <li>a compact copy of your town's layout and staff, so friends can visit your town;</li>
+      <li>the cheers you have given other towns, and when the entry was last updated;</li>
+      <li>your league and this week's league minutes, and the Monument stones you chose to show (names, or only totals, or nothing);</li>
+      <li>if you use friends: your friends list, gifts, trade offers and loan requests you sent them and their answers, focus-together invitations and set times.</li>
+    </ul>
+    <p>It does not hold your gold or anything else from your save. A loan between friends shows the friend who lent it how much has been paid back.</p>
+    <p><b>Focus minutes for the leagues.</b> While you are signed in, the game tells our server (Google Cloud Functions) when each focus session starts and ends, and how many minutes it counts. The server keeps your weekly totals for the last eight weeks and only you can read them. Once a week it works out the league tables: other players in your league group see your leaderboard name, your town's name and your minutes for that week.</p>
+
+    <h2>Removing your data</h2>
+    <p>In the game, open the menu, go to <b>Friends &amp; leaderboard</b> and tap <b>Leave</b> next to your name. That deletes your entry and signs you out. Your weekly focus totals and league results on the server are deleted when you ask us (below). To delete your sign-in record as well, or if you can't reach the game, write to us at the address below and we will delete it within 30 days.</p>
+
+    <h2>Other services the game uses</h2>
+    <ul>
+      <li><b>Google Fonts</b> serves the game's typefaces, so your device asks Google's servers for them.</li>
+      <li><b>The Internet Archive</b> (archive.org) streams the background music when music is on.</li>
+      <li><b>GitHub Pages</b> hosts the game and this website, and keeps standard server logs. The Android app loads the game from there too.</li>
+      <li><b>Google Firebase</b> (Authentication, Cloud Firestore and Cloud Functions) runs the leaderboard, friends and leagues, as described above.</li>
+    </ul>
+    <p>Each of these sees the network address of the device that asks, as any website does. We don't add trackers, analytics or advertising to the game.</p>
+
+    <h2>Children</h2>
+    <p>Maplewick is not made for children under 13, and we don't knowingly collect their information. If you think a child has joined the leaderboard, tell us and we will remove the entry.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, we will update this page and the date at the top. If a change affects what we store about you, the game will tell you.</p>
+
+    <h2>Contact</h2>
+    <p class="copy">Questions or requests: <b id="mail">hello@khoreh.com</b> <button type="button" id="copy">Copy address</button></p>
+  </main>
+  <footer><span>© 2026 khoreh.com</span><a href="support.html">Support</a><a href="index.html">Maplewick</a></footer>
+</div>
+<script>
+  document.getElementById('copy').addEventListener('click', async (e) => {
+    const t = document.getElementById('mail').textContent;
+    try { await navigator.clipboard.writeText(t); e.target.textContent = 'Copied'; }
+    catch (err) { const r = document.createRange(); r.selectNodeContents(document.getElementById('mail')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); e.target.textContent = 'Selected: press copy'; }
+  });
+</script>
+</body>
+</html>

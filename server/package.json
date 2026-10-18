@@ -5,8 +5,7 @@
   "scripts": {
     "test": "cd functions && npm test",
     "test:emulator": "firebase emulators:exec --only firestore,functions,auth --project demo-maplewick \"node --test test/*.test.mjs\"",
-    "deploy": "firebase deploy --only firestore:rules,functions --project maplewick-eb4df"
-  },
+    "deploy": "firebase deploy --only firestore:rules,functions,hosting --project maplewick-eb4df"  },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^6.0.0",
     "firebase": "^13.0.0",
