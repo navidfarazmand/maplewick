@@ -1477,7 +1477,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.05'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.06'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1807,6 +1807,9 @@
       up: [null, null, [900, 40], [1800, 70]], blurb: 'Fishing boats bring in a second source of food, the same in every season. More boats bring more food, but pirates notice.',
       needs: [['The old harbour', () => hasLandmark('harbour')]] }
   });
+  // 11.06: the Barracks (town hall 6)
+  TYPES.barracks = { name: 'Barracks', cat: 'service', size: 2, unlock: 6, cost: 3000, work: 60, max: 3, color: '#A9A294', roof: '#5C5F66', limit: [0, 0, 0, 0, 0, 0, 1],
+    up: [null, null, [3500, 60], [6000, 90]], blurb: 'Trains soldiers with your focus: one for every finished lap (room for 10, 16, 24 by level). Soldiers take the bandit camps on the islands, but each one costs wages and eats a food an hour. You can let it rest (no new soldiers).' };
   TYPES.prison2.unlock = 5; TYPES.prison2.limit = [0, 0, 0, 0, 0, 1, 1]; TYPES.maxprison.unlock = 6; TYPES.maxprison.limit = [0, 0, 0, 0, 0, 0, 1]; // 11.02: a prison at town hall 5, high security at 6
   // 11.04: town halls 5 and 6 allow one or two more of most buildings, and many more homes
   for (const t of Object.values(TYPES)) if (t.limit && t.limit.length === 5) { const l = t.limit[4]; t.limit.push(...(l === 0 ? [0, 0] : t.cat === 'landmark' ? [l, l] : t.cat === 'decor' ? [l + 4, l + 8] : [l + 1, l + 2])); }
@@ -1842,7 +1845,7 @@
   const BUILD_ORDER = ['cottage', 'market', 'markethall', 'cafe', 'park', 'townhouse', 'apartment', 'field', 'farm', 'granary', 'bakery', 'hardware', 'icecream', 'rink', 'fountain', 'arcade', 'cinema', 'library', 'restaurant', 'townsquare', 'greenhouse', 'fishmarket', 'hotel', 'theater', 'pharmacy', 'pub', 'gym', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
   const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle', 'harbour'];
   const hasLandmark = (type) => state.buildings.some((b) => b.type === type && live(b));
-  const SERVICE_ORDER = ['depot', 'recycling', 'wasteplant', 'shed', 'gardencenter', 'parksdept', 'firestation', 'firehall', 'firehq', 'police', 'policestation', 'courthouse', 'clinic', 'medcenter', 'hospital', 'school', 'highschool', 'university', 'bank', 'citybank', 'centralbank', 'prison', 'prison2', 'maxprison', 'cemetery', 'daycare', 'watchtower', 'coastguard'];
+  const SERVICE_ORDER = ['depot', 'recycling', 'wasteplant', 'shed', 'gardencenter', 'parksdept', 'firestation', 'firehall', 'firehq', 'police', 'policestation', 'courthouse', 'clinic', 'medcenter', 'hospital', 'school', 'highschool', 'university', 'bank', 'citybank', 'centralbank', 'prison', 'prison2', 'maxprison', 'cemetery', 'daycare', 'watchtower', 'coastguard', 'barracks'];
   // Focus badges: earned in order, at most one per session, only by the session you just finished.
   const BADGES = [
     { min: 10, reward: 12, tier: 0 }, { min: 15, reward: 18, tier: 0 }, { min: 25, reward: 28, tier: 1 }, { min: 45, reward: 42, tier: 1 },
@@ -1915,7 +1918,7 @@
   // (b.rot: 0 = long along c, 1 = long along r). Everything else is square.
   // 10.08: basic buildings are one tile again; the House is two tiles long (and turns); bigger, better versions are
   // separate buildings (Hospital, Amusement park).
-  const FOOT = { coastguard: [2, 1], hotel: [2, 1], theater: [2, 1], greenhouse: [2, 1], restaurant: [2, 1], library: [2, 1], cinema: [2, 1], rink: [2, 1], gym: [2, 1], markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
+  const FOOT = { barracks: [2, 1], coastguard: [2, 1], hotel: [2, 1], theater: [2, 1], greenhouse: [2, 1], restaurant: [2, 1], library: [2, 1], cinema: [2, 1], rink: [2, 1], gym: [2, 1], markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
   // 10.09 (Navid): every service grows in three steps with its level: 1×1, then 2×1 (it can be turned), then 2×2,
   // with a new name at each size. Upgrading grows the building into the free tiles next to it.
   // 10.10: undone (Navid): a building keeps its size; bigger versions are separate buildings (SVC_LINES).
@@ -2747,7 +2750,7 @@
   }
   // 10.09 (Navid): jobs. Businesses, services and staff give work; homes bring workers. Too few jobs and homes pay less
   // tax and crime goes up; too few workers and the shops earn less. A small new town doesn't feel either yet.
-  const JOBS = { harbour: [0, 6], watchtower: [0, 2, 3, 3], coastguard: [0, 4, 5, 6], hotel: [0, 4, 6, 8], theater: [0, 4, 5, 6], fishmarket: [0, 3, 5, 7], greenhouse: [0, 2, 3, 3], restaurant: [0, 4, 6, 8], library: [0, 2, 3, 3], cinema: [0, 3, 4, 4], townsquare: [0, 1, 1, 2], daycare: [0, 2, 3, 4], hardware: [0, 2, 3, 3], icecream: [0, 1, 2, 2], rink: [0, 2, 3, 3], pharmacy: [0, 2, 3, 4], pub: [0, 3, 4, 5], gym: [0, 3, 4, 5], farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6, 8, 10], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
+  const JOBS = { barracks: [0, 4, 6, 8], harbour: [0, 6], watchtower: [0, 2, 3, 3], coastguard: [0, 4, 5, 6], hotel: [0, 4, 6, 8], theater: [0, 4, 5, 6], fishmarket: [0, 3, 5, 7], greenhouse: [0, 2, 3, 3], restaurant: [0, 4, 6, 8], library: [0, 2, 3, 3], cinema: [0, 3, 4, 4], townsquare: [0, 1, 1, 2], daycare: [0, 2, 3, 4], hardware: [0, 2, 3, 3], icecream: [0, 1, 2, 2], rink: [0, 2, 3, 3], pharmacy: [0, 2, 3, 4], pub: [0, 3, 4, 5], gym: [0, 3, 4, 5], farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6, 8, 10], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
     field: [0, 2, 3, 4], granary: [0, 1, 1, 2], amusement: [0, 3, 4, 5], clinic: [0, 1, 2, 3], school: [0, 1, 1, 2], police: [0, 1, 1, 2], firestation: [0, 0, 1, 1], depot: [0, 1, 2, 3], shed: [0, 0, 1, 1], prison: [0, 2, 3, 4], cemetery: [0, 1], lighthouse: [0, 2], observatory: [0, 2], castle: [0, 3],
     medcenter: [0, 4, 5, 6], hospital: [0, 8, 10, 12], recycling: [0, 3, 4, 5], wasteplant: [0, 6, 8, 10], gardencenter: [0, 2, 2, 3], parksdept: [0, 3, 4, 5], firehall: [0, 2, 2, 3], firehq: [0, 3, 4, 5],
     policestation: [0, 2, 3, 4], courthouse: [0, 5, 6, 8], highschool: [0, 3, 4, 5], university: [0, 8, 10, 12], citybank: [0, 6, 8, 10], centralbank: [0, 10, 12, 15], factory: [0, 16, 20, 24], induspark: [0, 28, 34, 40], prison2: [0, 4, 5, 6], maxprison: [0, 8, 10, 12] };
@@ -2781,7 +2784,7 @@
     if (!foodOn()) return null;
     const fields = act.filter(isGrower); // 11.02: fields and farms
     const staffN = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0); // 11.00: staff eat as much as two residents
-    const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = (residents + 2 * staffN) * FOOD_EAT, have = state.food || 0;
+    const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = (residents + 2 * staffN) * FOOD_EAT + soldiers() * SOLDIER_FOOD, have = state.food || 0; // 11.06: soldiers eat a food an hour
     const supplied = have > FOOD_SHOP, shopEat = supplied ? act.filter((b) => ['market', 'bakery', 'markethall', 'restaurant'].includes(b.type) && !b.shut).reduce((a, b) => a + (b.type === 'bakery' || b.type === 'restaurant' ? 1 : b.type === 'markethall' ? 1.5 : 0.5) * b.level * (PRICED.includes(b.type) ? { cheap: 1.25, dear: 0.8 }[priceOf(b)] || 1 : 1), 0) : 0;
     const fed = have > 0.5 ? 1 : people > 0 ? clamp(grown / people, 0, 1) : 1;
     return { grown, people, shopEat, eaten: people + shopEat, fed, supplied, fields: fields.length, residents, staffN };
@@ -3056,7 +3059,7 @@
     recycling: 4, wasteplant: 7, gardencenter: 2, parksdept: 4, firehall: 6, firehq: 10, policestation: 6, courthouse: 10, medcenter: 7, hospital: 12, highschool: 5, university: 9, citybank: 7, centralbank: 12, prison2: 4, maxprison: 7 };
   // 11.00 (balance): every working building costs upkeep, in whole gold an hour by level. Small level-1 buildings run
   // for free, so a new town isn't punished. Service buildings cost twice what they did.
-  const RUNNING_BY_LEVEL = { watchtower: [0, 3, 5, 7], coastguard: [0, 6, 9, 12], hotel: [0, 4, 6, 9], theater: [0, 4, 6, 8], fishmarket: [0, 2, 3, 4], greenhouse: [0, 3, 4, 5], restaurant: [0, 3, 4, 6], library: [0, 2, 3, 4], cinema: [0, 3, 4, 5], townsquare: [0, 2, 3, 4], daycare: [0, 1, 2, 3], hardware: [0, 1, 2, 3], icecream: [0, 1, 2, 3], rink: [0, 2, 4, 5], pharmacy: [0, 2, 3, 4], pub: [0, 2, 3, 4], gym: [0, 3, 4, 6], farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
+  const RUNNING_BY_LEVEL = { barracks: [0, 4, 6, 8], watchtower: [0, 3, 5, 7], coastguard: [0, 6, 9, 12], hotel: [0, 4, 6, 9], theater: [0, 4, 6, 8], fishmarket: [0, 2, 3, 4], greenhouse: [0, 3, 4, 5], restaurant: [0, 3, 4, 6], library: [0, 2, 3, 4], cinema: [0, 3, 4, 5], townsquare: [0, 2, 3, 4], daycare: [0, 1, 2, 3], hardware: [0, 1, 2, 3], icecream: [0, 1, 2, 3], rink: [0, 2, 4, 5], pharmacy: [0, 2, 3, 4], pub: [0, 2, 3, 4], gym: [0, 3, 4, 6], farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
     factory: [0, 4, 9, 13], induspark: [0, 9, 18, 27], park: [0, 0, 1, 1], fountain: [0, 1, 1, 2], amusement: [0, 3, 6, 9], stadium: [0, 6, 13], field: [0, 0, 1, 2], granary: [0, 0, 1, 2] };
   const runAt = (type, L) => { const r = RUNNING_BY_LEVEL[type]; if (r) return r[clamp(L || 1, 1, r.length - 1)] || 0; return RUNNING[type] ? RUNNING[type] * 2 * (L || 1) : 0; };
   const runningOf = (b) => (live(b) && !b.shut && (seasonOpen(b) || !SEASONAL[b.type]) && runAt(b.type, b.level) ? Math.max(0, Math.round((runAt(b.type, b.level) + (b.type === 'daycare' ? (DAYCARE[choiceOf(b)] || 6) * 0.5 : 0)) * priceIdx() * (isServiceType(b.type) && state.buildings.some((x) => x.type === 'wasteplant' && live(x)) ? 0.85 : 1)) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
@@ -4178,11 +4181,12 @@
     const ci = city(), mood = moodNow(now || Date.now());
     const staffWages = STAFF_ORDER.reduce((a, k) => a + wagesFor(k, state.staff[k] || 0) * (k === 'police' && nightShift() ? 1.5 : 1), 0), fleet = fleetUpkeep(), running = runningCosts(), jail = jailUpkeep();
     const leave = (state.fam ? Math.max(0, onLeaveNow().length - backEarly()) : 0) * LEAVE_PAY; // 10.19: mothers on leave (11.04: a daycare lets some come back)
-    const wages = staffWages + fleet + running + jail + leave;
+    const army0 = soldiers() * SOLDIER_WAGE * priceIdx(); // 11.06: soldiers' wages
+    const wages = staffWages + fleet + running + jail + leave + army0;
     const taxes = ci.total * mood.mult * taxK() * (recessionOn() ? 0.9 : 1), net = taxes - wages; // 11.03: the tax rate; 11.04: a recession
     // An open loan takes its instalment every hour you play or focus (shown as its own red line).
     const loanPay = loans().reduce((a, L) => a + (L.owed > 0 ? playInstalment(L) : 0), 0), loanFocus = loans().reduce((a, L) => a + (L.owed > 0 ? focusInstalment(L) : 0), 0);
-    return { ci, mood, taxes, wages, staffWages, fleet, running, jail, leave, net, loanPay, loanFocus, keep: net - loanPay };
+    return { ci, mood, taxes, wages, staffWages, fleet, running, jail, leave, army: army0, net, loanPay, loanFocus, keep: net - loanPay };
   }
   // 10.03: focusing pays twice the gold: your job pays double, and the town's shops are twice as busy while you focus.
   const FOCUS_PAY = 2;
@@ -5296,6 +5300,7 @@
       } }
     state.queue = state.queue.filter((q) => !gone.has(q));
     touch();
+    if (done || (r.lap && r.lap.k)) { const laps = r.lap ? r.lap.k : Math.floor(m / ROUND_FOCUS + 1e-9); const tr = trainSoldiers(laps); if (tr) r.soldiers = tr; } // 11.06: the Barracks
     if (leftW > 0.05 && m > 0) {
       r.shiftMin = leftW / (workFor(m) / m);
       r.shiftPay = leftW * job.gold;
@@ -6094,7 +6099,7 @@
   function starShape(c, x, y, r, col) { c.fillStyle = col; c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
   function tongue(c, x, y, w, h, col) { c.fillStyle = col; c.beginPath(); c.moveTo(x - w, y); c.quadraticCurveTo(x - w * 0.95, y - h * 0.55, x, y - h); c.quadraticCurveTo(x + w * 0.95, y - h * 0.55, x + w, y); c.closePath(); c.fill(); }
   // How tall each burnable building is (in building units), so flames sit on the roof.
-  const topOf = (type, L) => ({ watchtower: 30 + 4 * L, coastguard: 17 + 2 * L, hotel: 8.5 * (1 + L) + 4, theater: 22 + 3 * L, fishmarket: 12 + 2 * L, greenhouse: 15 + 2 * L, restaurant: 18 + 3 * L, library: 20 + 3 * L, cinema: 19 + 2 * L, daycare: 14 + 2.5 * L, hardware: 19 + 3 * L, icecream: 14 + 2 * L, rink: 8, pharmacy: 18 + 3 * L, pub: 22 + 3 * L, gym: 18 + 2 * L, apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
+  const topOf = (type, L) => ({ barracks: 18 + 3 * L, watchtower: 30 + 4 * L, coastguard: 17 + 2 * L, hotel: 8.5 * (1 + L) + 4, theater: 22 + 3 * L, fishmarket: 12 + 2 * L, greenhouse: 15 + 2 * L, restaurant: 18 + 3 * L, library: 20 + 3 * L, cinema: 19 + 2 * L, daycare: 14 + 2.5 * L, hardware: 19 + 3 * L, icecream: 14 + 2 * L, rink: 8, pharmacy: 18 + 3 * L, pub: 22 + 3 * L, gym: 18 + 2 * L, apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
   function flames(c, x, y, hw, u, topH, k) {
     const t = reduced ? 0 : ART.t, top = y - topH * u;
     const g = c.createRadialGradient(x, y - topH * u * 0.45, 2 * u, x, y - topH * u * 0.45, hw * 1.15);
@@ -6862,6 +6867,16 @@
       case 'cherry': {
         treeAt(c, x, y, 26 * u, col);
         if (!reduced) for (let i = 0; i < 4; i++) { const k = ((now / 2600) + i / 4) % 1; c.fillStyle = `rgba(244,166,198,${1 - k})`; c.beginPath(); c.ellipse(x - 8 * u + i * 5 * u + Math.sin(k * 6 + i) * 3 * u, y - 22 * u + k * 22 * u, 1.3 * u, 0.8 * u, k * 4, 0, Math.PI * 2); c.fill(); }
+        break;
+      }
+      case 'barracks': { // 11.06: a stone barracks with a flag, a gate and a training yard with straw dummies
+        const F = fpv, h = (15 + level * 3) * u, f = boxF(c, x, y, F, 0.8, h, col), { lf, sf } = faces2(f, F);
+        for (let i = 0; i < 6; i++) WQ(c, lf, i / 6, (i + 0.5) / 6, h, h + 2.5 * u, shade(col, 0.9));
+        if (ruin) WQ(c, lf, 0.42, 0.58, 0, h * 0.55, '#3A322B'); else { WQ(c, lf, 0.42, 0.58, 0, h * 0.55, '#5A3A22'); const ap = wallPt(lf[0], lf[1], 0.5, h * 0.55); c.fillStyle = '#5A3A22'; c.beginPath(); c.ellipse(ap[0], ap[1], 0.08 * Math.hypot(lf[1][0] - lf[0][0], lf[1][1] - lf[0][1]), 2.4 * u, 0, Math.PI, 0); c.fill(); }
+        for (const a of [0.12, 0.72]) if (!ruin) windowQ(c, lf[0], lf[1], a, a + 0.12, h * 0.45, h * 0.75, glass, u);
+        const { L: rL, R: rR, B: rB, T: rT } = rectPts(x, y - h, F, 0.8); poly(c, [rT, rR, rB, rL], shade(col, 1.08));
+        if (!ruin) flagAt(c, x, y - h - 2 * u, u, '#C8473D', now, 16);
+        if (!ruin) for (let i = 0; i < Math.min(3, level + 1); i++) { const p0 = lerpPt(sf[0], sf[1], 0.25 + i * 0.25), dx = p0[0] + 5 * u, dy = p0[1] + 4 * u; line(c, [dx, dy], [dx, dy - 7 * u], '#8A6A48', 0.7 * u); c.fillStyle = '#D9B24A'; c.beginPath(); c.ellipse(dx, dy - 6 * u, 1.6 * u, 2.4 * u, 0, 0, Math.PI * 2); c.fill(); line(c, [dx - 2.6 * u, dy - 5 * u], [dx + 2.6 * u, dy - 5 * u], '#8A6A48', 0.6 * u); }
         break;
       }
       case 'harbour': { // 11.05: a stone quay with a warehouse, a crane, crates and a little boat moored
@@ -8060,7 +8075,7 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { harbour: () => 34, watchtower: (L) => 40 + 4 * L, coastguard: (L) => 26 + 2 * L, hotel: (L) => 22 + 8.5 * (1 + L), theater: (L) => 34 + 3 * L, fishmarket: (L) => 20 + 2 * L, greenhouse: (L) => 22 + 2 * L, restaurant: (L) => 26 + 3 * L, library: (L) => 32 + 3 * L, cinema: (L) => 26 + 2 * L, townsquare: () => 26, daycare: (L) => 22 + 2.5 * L, hardware: (L) => 26 + 3 * L, icecream: (L) => 26 + 2 * L, rink: () => 14, pharmacy: (L) => 20 + 3 * L, pub: (L) => 28 + 3 * L, gym: (L) => 26 + 2 * L, apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+  const ROOF = { barracks: (L) => 30 + 3 * L, harbour: () => 34, watchtower: (L) => 40 + 4 * L, coastguard: (L) => 26 + 2 * L, hotel: (L) => 22 + 8.5 * (1 + L), theater: (L) => 34 + 3 * L, fishmarket: (L) => 20 + 2 * L, greenhouse: (L) => 22 + 2 * L, restaurant: (L) => 26 + 3 * L, library: (L) => 32 + 3 * L, cinema: (L) => 26 + 2 * L, townsquare: () => 26, daycare: (L) => 22 + 2.5 * L, hardware: (L) => 26 + 3 * L, icecream: (L) => 26 + 2 * L, rink: () => 14, pharmacy: (L) => 20 + 3 * L, pub: (L) => 28 + 3 * L, gym: (L) => 26 + 2 * L, apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
     workshop: (L) => 36 + 3 * L, factory: (L) => 39 + L, induspark: (L) => 43 + L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 25 + 3 * L, medcenter: (L) => 33 + L, hospital: (L) => 44 + L, stadium: (L) => 44 + 4 * L, depot: (L) => 24 + 2 * L, recycling: (L) => 29 + L, wasteplant: (L) => 49 + L,
     shed: (L) => 19 + 2 * L, gardencenter: (L) => 27 + L, parksdept: (L) => 33 + L, firestation: (L) => 33 + 2 * L, firehall: (L) => 39 + L, firehq: (L) => 61 + L, police: (L) => 25 + 2 * L, policestation: (L) => 29 + L, courthouse: (L) => 47 + L,
     prison: (L) => 20 + 2 * L, prison2: (L) => 33 + L, maxprison: (L) => 33 + L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
@@ -8334,6 +8349,7 @@
     drawBackdrop(c, now);
     c.setTransform(d * z, 0, 0, d * z, d * (geo.w / 2 - cam.x * z), d * (geo.h / 2 - cam.y * z));
     drawSea(c, now);
+    drawCamps(c, now); // 11.06
     const top = [0, 0], right = [N * HW, N * HH], bottom = [0, 2 * N * HH], left = [-N * HW, N * HH], dz = HH * 1.1;
     drawIsland(c, now);
     if (state.pirate && !ui.visit) { const pp = piratePos(state.pirate); drawPirateShip(c, pp.p.x, pp.p.y, pp.dir, tt); const sp = toScreen(pp.p.x, pp.p.y); ui.hits.push({ x0: sp.x - 30 * z, x1: sp.x + 30 * z, y0: sp.y - 40 * z, y1: sp.y + 10 * z, pirate: true }); } // 11.05
@@ -9523,6 +9539,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (p.kind === 'alert') renderAlertPanel(box, byId(p.bid));
       else if (p.kind === 'land') renderLandPanel(box, p.plot);
       else if (p.kind === 'pirate') renderPiratePanel(box); // 11.05
+      else if (p.kind === 'camp') renderCampPanel(box, p.camp); // 11.06
       if (full) box.scrollTop = sc;
     }
     box.classList.toggle('alert', !!(show && p && p.kind === 'alert'));
@@ -9805,6 +9822,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (why) box.append(el('p', 'tiny muted', why));
     if (b.small) box.append(el('p', 'tiny muted', `No room to grow: it works as a level-${b.level} ${nameOf(b).toLowerCase()}, but stays ${dimsB(b).join('×')} until you move it to a spot with ${dimsOf(b.type, 0, b.level).join('×')} free.`));
     { const cb = choiceBox(b); if (cb && !q && !b.ruin) box.append(cb); } // 11.03: one choice for every building
+    if (b.type === 'barracks' && live(b) && campsOn()) campsBox(box); // 11.06
     if (b.shut && !b.ruin) { const ro = actionBtn(`Open it again · ${reopenCost(b)} gold`, 'with all its staff', 'primary', () => reopenShop(b), state.gold + 1e-6 < reopenCost(b)); ro.style.width = '100%'; box.append(el('p', 'small', `Closed: it earned less than its upkeep for three town days. Change its price, build homes nearby, or open it again.`), ro); }
     if (sellable(b) && T(b).cat !== 'decor' && !special(T(b))) {
       const sl = el('button', 'link', `Sell for ${sellPrice(b)} gold (half of what it cost)`);
@@ -9853,6 +9871,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (type === 'fishmarket') out.push('Fishing boats bring food, the same in every season. More boats, more food, and pirates come more often');
     if (type === 'hotel') out.push('Visitors pay to stay: +15% for every landmark in town, +20% once the season\'s festival is won');
     if (type === 'theater') out.push('Festival prizes +50%');
+    if (type === 'barracks') out.push(`Trains one soldier for every finished lap of focus (room for ${BARRACKS_ROOM[L]}). Each soldier costs ${SOLDIER_WAGE} gold and ${SOLDIER_FOOD} food an hour`);
     if (type === 'centralbank') out.push('You can raise interest to cool inflation (loans cost more)');
     if (type === 'restaurant') out.push('Cooks your food (1 food an hour a level) for a big evening income; without food in store it earns half');
     if (type === 'library') out.push('Earns nothing; homes within 3 tiles that a school reaches learn 5% more');
@@ -10236,6 +10255,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     bank: 'A small bank office.', citybank: 'The bank, with a big safe.', centralbank: 'The central bank, with columns and a vault.',
     factory: 'A factory, with a chimney and many hands.', induspark: 'The industrial park: the town\'s biggest employer.',
     monument: 'A monument of the projects you finished, one stone each.',
+    barracks: 'Drills at dawn, soup at noon and a flag on the roof.',
     harbour: 'The old harbour, busy again: a quay, a crane and boats coming home.', watchtower: 'Guards on the lookout for sails on the horizon.', coastguard: 'A fast boat and a radar, ready day and night.', hotel: 'Fresh sheets, sea views and breakfast until ten.', theater: 'Velvet seats, a red curtain and a full house on Saturdays.', fishmarket: 'The catch of the day, straight off the boats.',
     greenhouse: 'Warm glass and tomatoes in December.', restaurant: 'Candles, three courses and the best view in town.', library: 'Rows of books, a reading room and story time on Saturdays.', cinema: 'Popcorn, a big screen and the Friday premiere.', townsquare: 'Where the town meets: market days, music and festivals.', daycare: 'Little chairs, a sandpit and nap time.',
     hardware: 'Nails, paint, tools and good advice.', icecream: 'Cones in every colour, all summer long.', rink: 'Skates, hot chocolate and music on the ice.', pharmacy: 'Medicine and a friendly word.', pub: 'Warm light, a quiz on Thursdays and a fire in winter.', gym: 'Treadmills, weights and the Saturday spin class.',
@@ -11364,6 +11384,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (ec.running) frow('Running the service buildings', `−${Math.round(ec.running)}/h`, 'neg');
     if (ec.fleet) frow('Vehicles', `−${Math.round(ec.fleet)}/h`, 'neg');
     if (ec.jail) frow(`Prisoners in the cells (${state.jail.length})`, `−${Math.round(ec.jail)}/h`, 'neg');
+    if (ec.army) frow(`Soldiers (${soldiers()})`, `−${Math.round(ec.army)}/h`, 'neg');
     if (ec.leave) frow(`Mothers on leave (${Math.round(ec.leave / LEAVE_PAY)})`, `−${Math.round(ec.leave)}/h`, 'neg');
     if (loans().length) frow(`Loan instalments while you play (${loans().length}) · ${Math.round(ec.loanFocus)}/h while you focus, no interest`, `−${Math.round(ec.loanPay)}/h`, 'neg');
     frow('You get', `${ec.keep < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep))}/h`, ec.keep >= 0 ? 'pos' : 'neg');
@@ -11668,7 +11689,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return box;
   }
   /* ---------- 10.09: the Incident report ---------- */
-  const INC_ICON = { pirates: ['#1E1E22', '🏴‍☠️'], strike: ['#D9541E', '✊'], recession: ['#8A5A2B', '📉'], layoff: ['#8A5A2B', '📉'], shut: ['#7A8590', '🔒'], gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
+  const INC_ICON = { camp: ['#7A3B2A', '⚔'], pirates: ['#1E1E22', '🏴‍☠️'], strike: ['#D9541E', '✊'], recession: ['#8A5A2B', '📉'], layoff: ['#8A5A2B', '📉'], shut: ['#7A8590', '🔒'], gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
   const agoText = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   function openIncidents() { const wrap = el('div', 'list inc'); incidentsBody(wrap); openSheet('Incident report', wrap); }
   function incidentsBody(wrap) {
@@ -11984,6 +12005,89 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
   }
+  /* ---------- 11.06 (roadmap part 6, Navid): bandit camps, computer-run only ----------
+     Ten camps on the islands you can see from the shore, each stronger than the last (from town hall 6). The Barracks
+     trains soldiers with focus: one soldier per finished lap. Each costs wages and eats a food an hour, which makes
+     "peaceful or bold" a real choice. Attacking a camp happens in play: the win chance comes from your soldiers
+     against the camp's strength. A win pays gold, food and a chest find, and opens the next camp. If you lose, the
+     soldiers come home hurt and rest for a day; nobody dies. No real player can ever attack you. */
+  const CAMPS = [
+    { name: 'Gull Rock', s: 5, a: 0.35, rr: 1.2 }, { name: 'Crab Key', s: 8, a: 1.05, rr: 1.26 }, { name: 'Driftwood Isle', s: 12, a: 1.6, rr: 1.32 }, { name: 'Smuggler\'s Cove', s: 16, a: 2.25, rr: 1.22 },
+    { name: 'Seal Island', s: 21, a: 2.9, rr: 1.3 }, { name: 'Lantern Reef', s: 27, a: 3.55, rr: 1.36 }, { name: 'Fog Point', s: 34, a: 4.15, rr: 1.24 }, { name: 'Black Sands', s: 42, a: 4.75, rr: 1.34 },
+    { name: 'Thunder Spit', s: 51, a: 5.35, rr: 1.28 }, { name: 'Skull Atoll', s: 62, a: 5.85, rr: 1.4 }];
+  const SOLDIER_WAGE = 2, SOLDIER_FOOD = 1, BARRACKS_ROOM = [0, 10, 16, 24];
+  const army = () => { const A = state.army || (state.army = { n: 0, cleared: 0, hurtUntil: 0, wins: 0, losses: 0 }); if (!(A.n >= 0)) A.n = 0; if (!(A.cleared >= 0)) A.cleared = 0; return A; };
+  const campsOn = () => hallLevel() >= 6;
+  const barracks = () => state.buildings.filter((b) => b.type === 'barracks' && live(b)).sort((a, b) => b.level - a.level)[0] || null;
+  const barracksRoom = () => state.buildings.filter((b) => b.type === 'barracks' && live(b)).reduce((a, b) => a + BARRACKS_ROOM[b.level], 0);
+  const soldiers = () => (state.army ? state.army.n : 0);
+  const armyHurt = () => (state.army ? (state.army.hurtUntil || 0) > Date.now() : false);
+  const training = () => { const b = barracks(); return !!b && choiceOf(b) !== 'off'; };
+  // Soldiers are trained by focus: one per finished lap (a set-time session counts its 25-minute stretches).
+  function trainSoldiers(laps) {
+    if (!campsOn() || !training() || !(laps > 0)) return 0;
+    const A = army(), add = Math.max(0, Math.min(laps, barracksRoom() - A.n)); A.n += add; return add;
+  }
+  const winChance = (n, s) => clamp(0.5 + (n - s) / (2 * s), 0.05, 0.95);
+  const campLoot = (i) => ({ gold: pIdx(150 * (i + 1)), food: 40 * (i + 1), tier: i < 4 ? 1 : i < 8 ? 2 : 3 });
+  function attackCamp() {
+    const A = army(), i = A.cleared, C = CAMPS[i]; if (!C) return;
+    if (armyHurt()) { toast('Your soldiers are resting after the last fight.'); return; }
+    if (A.n < 1) { toast('You have no soldiers yet: the Barracks trains one for every finished lap of focus.'); return; }
+    if (state.session || shieldOn() && false) return;
+    const p = winChance(A.n, C.s), win = Math.random() < p;
+    if (win) {
+      const L = campLoot(i); A.cleared += 1; A.wins = (A.wins || 0) + 1;
+      goldChange(L.gold, `Won ${C.name} from the bandits`, 'chest'); state.food = Math.min(foodCap(), (state.food || 0) + L.food);
+      const finds = CHEST_ITEMS[L.tier].filter(findOk); let item = '';
+      if (finds.length) { const t = pick(finds); state.tray.push({ id: state.nextId++, type: t, origin: 'chest' }); item = ` and a ${TYPES[t].name.toLowerCase()} (in Build → Decor)`; }
+      logIncident('camp', null, `Your soldiers took ${C.name} from the bandits`);
+      toast(`Victory! Your soldiers took ${C.name}: +${L.gold} gold, +${L.food} food${item}.${CAMPS[A.cleared] ? ` Next: ${CAMPS[A.cleared].name} (strength ${CAMPS[A.cleared].s}).` : ' Every camp is yours!'}`);
+      try { sfx.fanfare(); } catch (e) { /* quiet */ }
+    } else {
+      A.hurtUntil = Date.now() + DAY; A.losses = (A.losses || 0) + 1;
+      logIncident('camp', null, `Your soldiers lost at ${C.name} and came home to rest`);
+      toast(`The bandits of ${C.name} held them off. Your soldiers came home hurt and rest for a day. Nobody died. More soldiers, better odds.`);
+    }
+    touch(); save(); renderAll();
+  }
+  // The camps panel (from the Barracks or by tapping an island).
+  function campsBox(box) {
+    const A = army(), i = A.cleared, C = CAMPS[i];
+    const sec = el('div', 'menu-sec'); sec.append(el('h3', '', 'Bandit camps'));
+    sec.append(el('p', 'small', `${A.n} soldier${A.n === 1 ? '' : 's'} of ${barracksRoom()} · ${A.cleared} of ${CAMPS.length} camps taken${armyHurt() ? ` · resting for ${leftText(A.hurtUntil - Date.now())}` : ''}. Each soldier costs ${Math.round(SOLDIER_WAGE * priceIdx())} gold an hour and eats ${SOLDIER_FOOD} food an hour.`));
+    const ul = el('ul', 'monu-list');
+    CAMPS.forEach((cp, k) => { const li = el('li', 'monu-stone' + (k < i ? '' : k === i ? '' : ' off')); li.append(el('b', '', `${k < i ? '🏳 ' : k === i ? '⚔ ' : '🏴 '}${cp.name}`), el('small', '', k < i ? 'Yours' : `Strength ${cp.s}${k === i ? ` · win chance ${Math.round(winChance(A.n, cp.s) * 100)}% with ${A.n} soldiers` : ''}`)); ul.append(li); });
+    sec.append(ul);
+    if (C) { const L = campLoot(i); const at = actionBtn(`Attack ${C.name} · ${Math.round(winChance(A.n, C.s) * 100)}%`, `win: +${L.gold} gold, +${L.food} food and a chest find`, 'primary', () => attackCamp(), A.n < 1 || armyHurt() || ui.screen !== 'play'); at.style.width = '100%'; sec.append(at); }
+    else sec.append(el('p', 'small', 'Every camp is yours. The islands are safe.'));
+    box.append(sec);
+  }
+  function renderCampPanel(box, k) {
+    const C = CAMPS[k], A = army(); if (!C) { ui.panel = null; return; }
+    box.append(panelHead('barracks', 1, {}, C.name, [pill(k < A.cleared ? 'Yours' : `Strength ${C.s}`, k < A.cleared ? 'gold' : 'bad')]));
+    if (!barracks()) box.append(el('p', 'small', `A bandit camp. Build the Barracks (town hall 6): it trains one soldier for every finished lap of focus. Then come back with more soldiers than the camp's strength for the best odds.`));
+    campsBox(box);
+  }
+  // The islands around the main one: always there, with a camp from town hall 6 (a white flag once it's yours).
+  function campPos(k) { const C = CAMPS[k], cx = 0, cy = N * HH; return { x: cx + Math.cos(C.a) * N * HW * C.rr, y: cy + Math.sin(C.a) * N * HH * C.rr }; }
+  function drawCamps(c, now) {
+    const on = campsOn() && !ui.visit, A = state.army || { cleared: 0 };
+    CAMPS.forEach((C, k) => {
+      const { x, y } = campPos(k), s = 0.8 + k * 0.03;
+      c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(x, y + 3, 30 * s, 10 * s, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#D9C48A'; c.beginPath(); c.ellipse(x, y, 26 * s, 9 * s, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#7DA05A'; c.beginPath(); c.ellipse(x - 3 * s, y - 2 * s, 17 * s, 6 * s, 0, 0, Math.PI * 2); c.fill();
+      treeAt(c, x - 13 * s, y - 2 * s, 12 * s, '#2F7A47');
+      if (!on) return;
+      const mine = k < A.cleared;
+      for (const [dx, cc] of [[-2, mine ? '#E8E2D4' : '#5A3A22'], [7, mine ? '#D8D2C4' : '#3A2618']]) { const tx = x + dx * s, ty = y - 1 * s; c.fillStyle = cc; c.beginPath(); c.moveTo(tx - 5 * s, ty); c.lineTo(tx, ty - 8 * s); c.lineTo(tx + 5 * s, ty); c.closePath(); c.fill(); }
+      line(c, [x + 14 * s, y], [x + 14 * s, y - 16 * s], '#59606A', 0.9);
+      const wv = reduced ? 0 : Math.sin(now / 300 + k) * 1.2; c.fillStyle = mine ? '#F4F1EA' : '#1E1E22'; c.beginPath(); c.moveTo(x + 14 * s, y - 16 * s); c.lineTo(x + 22 * s, y - 14 * s + wv); c.lineTo(x + 14 * s, y - 11 * s); c.closePath(); c.fill();
+      if (!mine && k === A.cleared) { c.fillStyle = '#E5482F'; c.beginPath(); c.arc(x, y - 18 * s, 4.5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFF'; c.font = 'bold 6px sans-serif'; c.textAlign = 'center'; c.fillText('⚔', x, y - 16 * s); }
+      const sp = toScreen(x, y), z = cam.z; ui.hits.push({ x0: sp.x - 26 * z, x1: sp.x + 26 * z, y0: sp.y - 24 * z, y1: sp.y + 10 * z, camp: k });
+    });
+  }
   /* ---------- 11.05 (roadmap part 6, Navid): pirates, computer-run only ----------
      After the old harbour is restored, a pirate ship shows on the sea now and then while you play (about every 10–15
      minutes of play) and sails for the shore for about a minute: time to act. A Watchtower (or the Coast guard, further)
@@ -12204,12 +12308,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     gym: { title: 'Membership', opts: [['cheap', 'Cheap', 'more members: sickness −15%, mood +3% in reach, earns less'], ['normal', 'Normal', 'sickness −10%, mood +2%'], ['dear', 'Dear', 'earns 40% more: sickness −5%, mood +1%']] },
     workshop: { title: 'What it makes', opts: [['materials', 'Materials', 'upgrades cost 10% less'], ['repairs', 'Repairs', 'fires cost half as much to repair']] },
     factory: { title: 'Overtime', opts: [['off', 'Off', 'normal shifts'], ['on', 'On', '+30% goods (shops +13%), more noise next door, and staff grumble']] },
+    training: { title: 'Peaceful or bold', opts: [['on', 'Train', 'one soldier per finished lap'], ['off', 'Rest', 'no new soldiers, no new wages']] },
     boats: { title: 'Fishing boats', opts: [['one', 'One', 'less food, pirates come less often'], ['two', 'Two', 'as it is'], ['three', 'Three', 'more food, pirates come more often']] },
     places: { title: 'Places', opts: [['small', 'Few', '3 places, the fewest staff'], ['medium', 'Some', '6 places'], ['large', 'Many', '10 places, more staff']] },
     interest: { title: 'Interest', opts: [['normal', 'Normal', 'as it is'], ['high', 'High', 'inflation half as fast, but new loans cost 20% more']] },
     season: { title: 'Open', opts: [['season', 'In its season', 'no upkeep the rest of the year'], ['allyear', 'All year', 'pay upkeep all year; half the fun out of season']] }
   };
-  const choiceKind = (type) => (type === 'fishmarket' ? 'boats' : type === 'daycare' ? 'places' : type === 'centralbank' ? 'interest' : type === 'pharmacy' ? 'medicine' : type === 'pub' ? 'pub' : type === 'gym' ? 'gym' : type === 'workshop' ? 'workshop' : type === 'factory' ? 'factory' : SEASONAL[type] ? 'season' : type === 'market' || type === 'markethall' ? 'food' : PRICED.includes(type) ? 'price' : null);
+  const choiceKind = (type) => (type === 'barracks' ? 'training' : type === 'fishmarket' ? 'boats' : type === 'daycare' ? 'places' : type === 'centralbank' ? 'interest' : type === 'pharmacy' ? 'medicine' : type === 'pub' ? 'pub' : type === 'gym' ? 'gym' : type === 'workshop' ? 'workshop' : type === 'factory' ? 'factory' : SEASONAL[type] ? 'season' : type === 'market' || type === 'markethall' ? 'food' : PRICED.includes(type) ? 'price' : null);
   const choiceOf = (b) => { const k = choiceKind(b.type); if (!k) return null; const o = CHOICES[k].opts.map((x) => x[0]); return o.includes(b.choice) ? b.choice : o.includes('normal') ? 'normal' : o.includes('medium') ? 'medium' : o.includes('two') ? 'two' : o[0]; };
   // Customers drift toward their target over two town days after a price change.
   function custTarget(b, near, rivals, moodV) {
@@ -13263,6 +13368,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     else if (r.built.length) add('chest', 'build', `${state.builder} finished ${r.built.length} buildings`);
     if (r.combo) add('combo', 'combo', `Combo ×${r.combo.mult.toFixed(1)}: more gold and XP`);
     if (r.newBest) add('xp', 'xp', 'Your longest session yet');
+    if (r.soldiers) add('combo', 'xp', `The Barracks trained ${r.soldiers} soldier${r.soldiers > 1 ? 's' : ''} (${soldiers()} now)`); // 11.06
     if (r.boost) add('energy', 'energy', `Focus energy: town mood +${r.boost.pts} for ${fmtMin(r.boost.durMin)}`);
     if (r.streakUp) add('combo', 'streak', `Day ${state.streak.count} streak${r.freezeUsed ? ' (saved by a freeze)' : ''}`);
     if (r.seasonItem) add('chest', 'gift', `${SEASONS[curSeason()].fest}: a ${TYPES[r.seasonItem].name.toLowerCase()} for your town!`);
@@ -13827,6 +13933,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // Speech bubbles, request markers and land signs lead to what needs doing.
     if (!ui.holding && !ui.attach) for (let i = ui.hits.length - 1; i >= 0; i--) {
       const h = ui.hits[i]; if (sx < h.x0 || sx > h.x1 || sy < h.y0 || sy > h.y1) continue;
+      if (h.camp != null) { if (ui.screen === 'play') openPanel({ kind: 'camp', camp: h.camp }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'camp', camp: h.camp }), 420); return; } // 11.06
       if (h.pirate) { if (ui.screen === 'play') openPanel({ kind: 'pirate' }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'pirate' }), 420); return; } // 11.05
       if (h.plot) { const go = () => openPanel({ kind: 'land', plot: h.plot }); if (ui.screen === 'home') { if (enterPlay()) setTimeout(go, 420); } else go(); return; }
       const b = byId(h.bid); if (!b) break;
@@ -14247,6 +14354,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     pirateTick: (sec) => { for (let i = 0; i < sec * 4; i++) pirateTick(0.25, false); return state.pirate ? { ...state.pirate } : null; },
     pirate: () => (state.pirate ? { ...state.pirate, guard: (guardsFor(state.pirate.c, state.pirate.r) || {}).type || null } : null),
     payPirates: () => { payPirates(); return { pirate: !!state.pirate, gold: state.gold }; },
+    // 11.06: the Barracks and the camps
+    army: () => ({ ...army(), room: barracksRoom(), chance: CAMPS[army().cleared] ? winChance(army().n, CAMPS[army().cleared].s) : null }),
+    train: (laps) => trainSoldiers(laps),
+    attack: () => { attackCamp(); return { ...army() }; },
+    campPanel: (k) => { openPanel({ kind: 'camp', camp: k || 0 }); return document.querySelector('#mpanel').innerText; },
     choose: (bid, v) => { const b = byId(bid); b.choice = v; touch(); return choiceOf(b); },
     shopStep: (min) => { shopStep(min); touch(); return state.buildings.filter((b) => T(b).cat === 'shop').map((b) => ({ id: b.id, type: b.type, cust: b.cust || 1, layoff: b.layoff || 0, shut: !!b.shut, red: b.redMin || 0 })); },
     tax: (k) => { pol().tax = k; touch(); const e = econ(); return { taxes: e.taxes, mood: e.mood.value, policyMood: e.mood.taxes, target: crimeTarget(city()) }; },
