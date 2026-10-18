@@ -1453,7 +1453,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.01'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.02'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1550,11 +1550,11 @@
     granary: { name: 'Granary', cat: 'farm', size: 1, unlock: 3, cost: 60, work: 10, max: 3, color: '#C98B5B', roof: '#7A3B2A', limit: [0, 0, 0, 1, 2], store: [0, 300, 600, 1000],
       up: [null, null, [70, 15], [150, 32]], blurb: 'A barn and a silo: stores 300 food (600, 1,000 by level). Without one the town keeps only 150.',
       needs: [['A field', () => countLive('field') >= 1]] },
-    // 10.09 (Navid): the Courthouse sends repeat thieves here. Inmates do prison work (a little gold), but every one of
+    // 10.09 (Navid): the Central police sends repeat thieves here. Inmates do prison work (a little gold), but every one of
     // them is a break-in the town already paid for.
-    prison: { name: 'Jail', cat: 'service', size: 1, unlock: 3, cost: 120, work: 25, max: 3, color: '#BFC3C9', roof: '#596273', limit: [0, 0, 0, 1, 1], near: { r: 1, v: -0.1, label: 'a prison next door' },
-      up: [null, null, [200, 40], [400, 80]], cells: [0, 3, 4, 5], blurb: 'Holds the thieves the Courthouse sentences. Each inmate earns a little gold from prison work, but a full prison means crime is costing the town far more. Homes next to it pay 10% less. Bigger: the Prison (2×1) and the High-security prison (2×2).',
-      needs: [['A Courthouse (the biggest police building)', () => !!courthouse()]] },
+    prison: { name: 'Jail', cat: 'service', size: 1, unlock: 4, cost: 120, work: 25, max: 3, color: '#BFC3C9', roof: '#596273', limit: [0, 0, 0, 0, 1, 1, 1], near: { r: 1, v: -0.1, label: 'a prison next door' },
+      up: [null, null, [200, 40], [400, 80]], cells: [0, 3, 4, 5], blurb: 'Holds the thieves the Central police sentences. Each inmate earns a little gold from prison work, but a full prison means crime is costing the town far more. Homes next to it pay 10% less. Bigger: the Prison (2×1) and the High-security prison (2×2).',
+      needs: [['The Central police (the biggest police building)', () => !!courthouse()]] },
     // Service buildings: home base for town staff. Each level gives room for more staff.
     depot: { name: 'Cleaning depot', cat: 'service', size: 1, unlock: 1, cost: 30, work: 6, max: 3, color: '#D3E5D0', roof: '#3E8E57', near: { r: 1, v: -0.15, label: 'landfill smell' }, limit: [0, 1, 2, 2, 3], reach: 6,
       up: [null, null, [60, 15], [140, 30]], staff: 'sweeper', slots: [0, 2, 4, 6], blurb: 'Home of the street sweepers, who clean within reach. It smells: homes right next to it pay 15% less. Bigger: the Recycling center (2×1) and the Waste plant (2×2).' },
@@ -1563,7 +1563,7 @@
     firestation: { name: 'Fire post', cat: 'service', size: 1, unlock: 1, cost: 50, work: 10, max: 3, color: '#EFE3D8', roof: '#C8473D', near: { r: 1, v: -0.05, label: 'sirens' }, limit: [0, 1, 1, 2, 2], reach: 6,
       up: [null, null, [90, 20], [200, 40]], staff: 'fire', slots: [0, 2, 4, 6], blurb: 'Home of the firefighters. They rush out when a building in reach catches fire. Bigger: the Fire station (2×1) and Fire headquarters (2×2).' },
     police: { name: 'Police post', cat: 'service', size: 1, unlock: 2, cost: 70, work: 12, max: 3, color: '#D4DCE8', roof: '#2F4E8C', reach: 5, limit: [0, 0, 1, 2, 3],
-      up: [null, null, [110, 25], [260, 50]], staff: 'police', slots: [0, 2, 4, 6], cells: [0, 2, 4, 6], blurb: 'Home of the police officers. Buildings in reach of a staffed station feel safe. Bigger: the Police station (2×1) and the Courthouse (2×2), which finds out why things go wrong in town and sends repeat thieves to prison.' },
+      up: [null, null, [110, 25], [260, 50]], staff: 'police', slots: [0, 2, 4, 6], cells: [0, 0, 0, 0], blurb: 'Home of the police officers. They catch thieves and get the gold back, but a post has no cells: a thief it catches walks free. Bigger: the Police station (2×1, holds thieves for a day) and the Central police (2×2), which finds out why things go wrong and sends repeat thieves to jail.' },
     school: { name: 'Elementary school', cat: 'service', size: 1, unlock: 2, cost: 90, work: 14, max: 3, color: '#F1E2C8', roof: '#B0563A', reach: 6, limit: [0, 0, 1, 2, 2],
       up: [null, null, [150, 30], [340, 60]], staff: 'teacher', slots: [0, 2, 4, 6], blurb: 'Where the town\'s kids learn. With a teacher, homes in reach earn 12% more (and bored kids cause less trouble). Bigger: the High school (2×1) and the University (2×2).',
       needs: [['20 residents', () => city().residents >= 20]] },
@@ -1628,8 +1628,8 @@
     parksdept: { name: 'Parks department', reach: 12, slots: [0, 6, 9, 12], blurb: 'Looks after every green corner of town: twice the reach of a garden shed, and much faster.' },
     firehall: { name: 'Fire station', reach: 8, slots: [0, 4, 6, 8], near: { r: 1, v: -0.05, label: 'sirens' }, blurb: 'A real fire station with a hose tower and a garage: firefighters reach further, get ready sooner and put fires out faster.' },
     firehq: { name: 'Fire headquarters', reach: 12, slots: [0, 6, 9, 12], near: { r: 1, v: -0.05, label: 'sirens' }, blurb: 'Engines, a training yard and a lookout tower: twice the reach of a fire post, and the fastest crews in town.' },
-    policestation: { name: 'Police station', reach: 7, slots: [0, 4, 6, 8], cells: [0, 6, 8, 10], blurb: 'A real police station with more officers and cells: further reach, faster response, more thieves caught.' },
-    courthouse: { name: 'Courthouse', reach: 10, slots: [0, 6, 9, 12], cells: [0, 8, 10, 12], blurb: 'Police, judges and the town\'s court. It finds out why things go wrong in town (the Incident report) and sends thieves caught twice to prison.' },
+    policestation: { name: 'Police station', reach: 7, slots: [0, 4, 6, 8], cells: [0, 2, 3, 4], blurb: 'A real police station with more officers and custody: a thief it catches is held for a town day and can\'t steal.' },
+    courthouse: { name: 'Central police', reach: 10, slots: [0, 6, 9, 12], cells: [0, 4, 5, 6], blurb: 'Police, judges and the town\'s court. It finds out why things go wrong in town (the Incident report) and sends thieves caught twice to prison.' },
     medcenter: { name: 'Medical center', radius: 3, boost: [0, 0.18, 0.24, 0.3], reach: 8, slots: [0, 4, 6, 8], blurb: 'Doctors and nurses, with an ambulance bay: with an ambulance it takes very sick patients. Homes within 3 tiles pay 18% more.' },
     hospital: { name: 'Hospital', radius: 4, boost: [0, 0.2, 0.3, 0.4], reach: 12, slots: [0, 6, 9, 12], blurb: 'Wards, an operating room and a helipad: twice the reach of a clinic, treats very sick patients twice as fast. Homes within 4 tiles pay 20% more.' },
     highschool: { name: 'High school', reach: 8, slots: [0, 4, 6, 8], blurb: 'With a sports field. Homes in reach of a staffed high school earn 16% more.' },
@@ -1687,6 +1687,28 @@
   // 11.01: the Monument, a free gift for your first finished named project (gold can't buy it)
   TYPES.monument = { name: 'Monument', cat: 'joy', size: 1, gift: true, max: 1, color: '#D8D2C4', roof: '#9C9486', radius: 2, boost: [0, 0.05], blurb: 'A stone for every project you finish. Homes within 2 tiles pay 5% more.' };
   const monuCount = () => (state.monument ? Math.max(state.monument.n || 0, (state.monument.stones || []).length) : 0);
+  /* 11.02 (roadmap part 1, Navid): bigger buildings that can do new things. A bigger size gives more per tile (land is
+     the scarce thing), costs more for what it gives, brings an ability the town needs at that stage, and a new need or
+     a downside. Prices here are final. */
+  Object.assign(TYPES, {
+    apartment: { name: 'Apartment block', cat: 'home', size: 2, unlock: 4, cost: 700, work: 40, max: 3, color: '#E6D5BD', roof: '#6F5446', limit: [0, 0, 0, 0, 2, 4, 6],
+      up: [null, null, [900, 60], [1800, 90]], residents: [0, 32, 44, 56], near: { r: 1, v: -0.05, label: 'a crowded block next door' },
+      blurb: 'Four storeys of flats on 2×2 tiles: the most people on the least land. Only a fire engine can save a building this tall, so it needs a Fire station (2×1) or bigger in reach. It makes 50% more trash, and the homes right next to it pay 5% less.',
+      needs: [['A Fire station (2×1) or bigger: only a fire engine can save a tall building', () => countLive('firehall') + countLive('firehq') >= 1]] },
+    farm: { name: 'Farm', cat: 'farm', size: 2, unlock: 4, cost: 600, work: 30, max: 3, color: '#B5473A', roof: '#7A3B2A', limit: [0, 0, 0, 0, 2, 3, 4], grow: [0, 20, 28, 36], barn: 200,
+      up: [null, null, [700, 40], [1400, 60]],
+      job: { verb: 'Feed the animals', at: 'on the farm', gold: 0.2, play: 1.25, food: 3, lines: ['A goat ate your notes. The goat looked proud.', 'You collected 40 eggs and named every hen.', 'The cows lined up for you. You felt like a mayor.'] },
+      blurb: 'A farm with a barn on 2×2 tiles: grows 20 food an hour (28, 36 by level), twice as much while you focus, and the barn stores 200 food.',
+      needs: [['2 fields', () => countLive('field') >= 2]] },
+    markethall: { name: 'Market hall', cat: 'shop', size: 2, unlock: 3, cost: 400, work: 20, max: 3, color: '#EAD8B0', roof: '#B5473A', radius: 3, limit: [0, 0, 0, 1, 2, 2, 3],
+      up: [null, null, [600, 30], [1300, 60]], base: [0, 5, 8, 12], per: [0, 1.2, 1.8, 2.4],
+      job: { verb: 'Run a stall in the hall', at: 'at the market hall', gold: 1.05, play: 1.1, foodGold: 0.85, food: 1.2, lines: ['You sold 60 pears in an hour. A record for the hall.', 'Two stallholders argued about cheese. You solved it with more cheese.', 'A choir sang under the roof. Sales went up.'] },
+      blurb: 'A covered market, two tiles long: it sells three times the food of a stall and draws homes from 3 tiles away. Stalls inside its reach earn 20% less (competition).',
+      needs: [['A market stall at level 2', () => hasLevel('market', 2)]] }
+  });
+  TYPES.prison2.unlock = 5; TYPES.prison2.limit = [0, 0, 0, 0, 0, 1, 1]; TYPES.maxprison.unlock = 6; TYPES.maxprison.limit = [0, 0, 0, 0, 0, 0, 1]; // 11.02: a prison at town hall 5, high security at 6
+  const GROWERS = ['field', 'farm', 'greenhouse'];
+  const isGrower = (b) => !!b && GROWERS.includes(b.type);
   const g1 = (x) => String(Math.round(x * 10) / 10);
   const special = (t) => !!(t.chest || t.season || t.gift); // finds you place for free: no upgrades, no cost (11.01: and the Monument)
   // Town staff: hired at their own building (or the town hall) for a one-off fee, then paid a wage every hour.
@@ -1713,7 +1735,7 @@
   const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
   const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th');
   const noStaff = () => ({ sweeper: 0, police: 0, fire: 0, gardener: 0, nurse: 0, teacher: 0 });
-  const BUILD_ORDER = ['cottage', 'market', 'cafe', 'park', 'townhouse', 'field', 'granary', 'bakery', 'fountain', 'arcade', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
+  const BUILD_ORDER = ['cottage', 'market', 'markethall', 'cafe', 'park', 'townhouse', 'apartment', 'field', 'farm', 'granary', 'bakery', 'fountain', 'arcade', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
   const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle'];
   const hasLandmark = (type) => state.buildings.some((b) => b.type === type && live(b));
   const SERVICE_ORDER = ['depot', 'recycling', 'wasteplant', 'shed', 'gardencenter', 'parksdept', 'firestation', 'firehall', 'firehq', 'police', 'policestation', 'courthouse', 'clinic', 'medcenter', 'hospital', 'school', 'highschool', 'university', 'bank', 'citybank', 'centralbank', 'prison', 'prison2', 'maxprison', 'cemetery'];
@@ -1789,7 +1811,7 @@
   // (b.rot: 0 = long along c, 1 = long along r). Everything else is square.
   // 10.08: basic buildings are one tile again; the House is two tiles long (and turns); bigger, better versions are
   // separate buildings (Hospital, Amusement park).
-  const FOOT = { townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
+  const FOOT = { markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
   // 10.09 (Navid): every service grows in three steps with its level: 1×1, then 2×1 (it can be turned), then 2×2,
   // with a new name at each size. Upgrading grows the building into the free tiles next to it.
   // 10.10: undone (Navid): a building keeps its size; bigger versions are separate buildings (SVC_LINES).
@@ -2575,6 +2597,8 @@
   const leaveText = (m) => (m === 12 ? '1 year' : `${m} month${m > 1 ? 's' : ''}`);
   const realText = (m) => (m === 1 ? '12 hours' : `${fmtHalf(m / 2)} day${m === 2 ? '' : 's'}`);
   const babyAt = (b) => { const t = Date.now(); return fam().kids.find((k) => k.bid === b.id && t - k.born < FAM_YEAR) || null; };
+  const babiesIn = (b, t) => { t = t || Date.now(); return fam().kids.filter((k) => k.bid === b.id && t - k.born < FAM_YEAR).length; };
+  const babyRoom = (b) => ({ townhouse: 2, apartment: 3 }[b.type] || 1);
   const familiesOn = () => state.named && city().residents >= BIRTH_RES;
   function familyStep(now) {
     const F = fam(); if (!F.at) F.at = now;
@@ -2589,7 +2613,7 @@
     if (ci.residents >= BIRTH_RES) {
       const exp = ci.residents / 1440 * span / 3600000; let n = Math.floor(exp) + (Math.random() < exp % 1 ? 1 : 0); n = Math.min(n, 3);
       for (let i = 0; i < n; i++) {
-        const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home' && !b.fire && T(b).residents[b.level] >= 4 && !babyAt(b));
+        const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home' && !b.fire && T(b).residents[b.level] >= 4 && babiesIn(b, now) < babyRoom(b)); // 11.02: a House has room for two little ones, an apartment block three
         if (!homes.length) break;
         const h = pick(homes), born = now - Math.random() * span, girl = Math.random() < 0.5;
         const mom = MOM_NAMES[(h.id * 3 + F.births * 5) % MOM_NAMES.length], nl = girl ? GIRL_NAMES : BOY_NAMES;
@@ -2615,11 +2639,11 @@
     const heard = Math.min(1, fam().births / 3);
     const families = Math.round(bs.reduce((a, k) => a + (LEAVE_MOOD[k.leave] || 0), 0) / bs.length * heard);
     const far = sickOn() ? bs.filter((k) => { const h = byId(k.bid); return h && !coversB('nurse', h); }).length : 0;
-    return { families, babyCare: -Math.min(4, far) };
+    return { families: families + (hasLive('hospital') ? 2 : 0), babyCare: -Math.min(4, far) }; // 11.02: the hospital's maternity ward
   }
   // 10.09 (Navid): jobs. Businesses, services and staff give work; homes bring workers. Too few jobs and homes pay less
   // tax and crime goes up; too few workers and the shops earn less. A small new town doesn't feel either yet.
-  const JOBS = { townhall: [0, 2, 3, 4, 6], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
+  const JOBS = { farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
     field: [0, 2, 3, 4], granary: [0, 1, 1, 2], amusement: [0, 3, 4, 5], clinic: [0, 1, 2, 3], school: [0, 1, 1, 2], police: [0, 1, 1, 2], firestation: [0, 0, 1, 1], depot: [0, 1, 2, 3], shed: [0, 0, 1, 1], prison: [0, 2, 3, 4], cemetery: [0, 1], lighthouse: [0, 2], observatory: [0, 2], castle: [0, 3],
     medcenter: [0, 4, 5, 6], hospital: [0, 8, 10, 12], recycling: [0, 3, 4, 5], wasteplant: [0, 6, 8, 10], gardencenter: [0, 2, 2, 3], parksdept: [0, 3, 4, 5], firehall: [0, 2, 2, 3], firehq: [0, 3, 4, 5],
     policestation: [0, 2, 3, 4], courthouse: [0, 5, 6, 8], highschool: [0, 3, 4, 5], university: [0, 8, 10, 12], citybank: [0, 6, 8, 10], centralbank: [0, 10, 12, 15], factory: [0, 16, 20, 24], induspark: [0, 28, 34, 40], prison2: [0, 4, 5, 6], maxprison: [0, 8, 10, 12] };
@@ -2641,18 +2665,18 @@
   const FOOD_SEASON = { spring: 1, summer: 1.2, autumn: 1.3, winter: 0.5 };
   const DIRTY = ['workshop', 'factory', 'induspark', 'depot', 'recycling', 'wasteplant'];
   const foodOn = () => hallLevel() >= 3;
-  const foodCap = () => FOOD_CELLAR + state.buildings.reduce((a, b) => a + (b.type === 'granary' && live(b) && !b.fire ? TYPES.granary.store[b.level] || 0 : 0), 0);
+  const foodCap = () => FOOD_CELLAR + state.buildings.reduce((a, b) => a + (b.type === 'granary' && live(b) && !b.fire ? TYPES.granary.store[b.level] || 0 : b.type === 'farm' && live(b) && !b.fire ? TYPES.farm.barn : 0), 0);
   const fieldDirty = (b, bs) => (bs || state.buildings).some((o) => o !== b && DIRTY.includes(o.type) && live(o) && dist(o, b) <= 1);
   function fieldYield(b, J, bs) {
     if (!live(b) || b.fire) return 0;
-    return TYPES.field.grow[b.level] * (FOOD_SEASON[SEA.k] || 1) * (fieldDirty(b, bs) ? 0.7 : 1) * (1 - 0.5 * ((J && J.short) || 0) * ((J && J.k) || 0)) + (b.addons && b.addons.tank ? 2 : 0); // 10.13: a water tank
+    return TYPES[b.type].grow[b.level] * (b.type === 'greenhouse' ? 1 : FOOD_SEASON[SEA.k] || 1) * (fieldDirty(b, bs) ? 0.7 : 1) * (1 - 0.5 * ((J && J.short) || 0) * ((J && J.k) || 0)) + (b.addons && b.addons.tank ? 2 : 0); // 10.13: a water tank
   }
   function foodFlow(act, residents, J) {
     if (!foodOn()) return null;
-    const fields = act.filter((b) => b.type === 'field');
+    const fields = act.filter(isGrower); // 11.02: fields and farms
     const staffN = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0); // 11.00: staff eat as much as two residents
     const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = (residents + 2 * staffN) * FOOD_EAT, have = state.food || 0;
-    const supplied = have > FOOD_SHOP, shopEat = supplied ? act.filter((b) => b.type === 'market' || b.type === 'bakery').reduce((a, b) => a + (b.type === 'bakery' ? 1 : 0.5) * b.level, 0) : 0;
+    const supplied = have > FOOD_SHOP, shopEat = supplied ? act.filter((b) => b.type === 'market' || b.type === 'bakery' || b.type === 'markethall').reduce((a, b) => a + (b.type === 'bakery' ? 1 : b.type === 'markethall' ? 1.5 : 0.5) * b.level, 0) : 0;
     const fed = have > 0.5 ? 1 : people > 0 ? clamp(grown / people, 0, 1) : 1;
     return { grown, people, shopEat, eaten: people + shopEat, fed, supplied, fields: fields.length, residents, staffN };
   }
@@ -2712,9 +2736,11 @@
         const shaken = s.robbed ? 0.6 : s.shaken && s.shaken.total ? 1 - 0.3 * clamp(s.shaken.left / s.shaken.total, 0, 1) : 1;
         const pair = (s.type === 'bakery' || s.type === 'cafe') && act.some((o) => o.type === (s.type === 'bakery' ? 'cafe' : 'bakery') && dist(o, s) <= 2) ? 1.1 : 1;
         const staffed = 1 - 0.5 * J.short * J.k; // 10.09: short of workers, it can't open all day
-        const fresh = F && F.supplied && (s.type === 'market' || s.type === 'bakery') ? 1.2 : 1; // 10.10: selling food from your own fields
-        const income = s.fire ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair * staffed * fresh + appliedGold(s);
-        total += income; info.set(s.id, { income, near, short: 1 - staffed, fresh: fresh > 1, applied: appliedGold(s) });
+        const fresh = F && F.supplied && (s.type === 'market' || s.type === 'bakery' || s.type === 'markethall') ? 1.2 : 1; // 10.10: selling food from your own fields
+        const goods = !isFactory(s) && act.some((o) => o.type === 'factory' && !o.fire && !o.goodsGone) ? 1.1 : 1; // 11.02: the factory's goods
+        const rival = s.type === 'market' && act.some((o) => o.type === 'markethall' && !o.fire && dist(o, s) <= TYPES.markethall.radius) ? 0.8 : 1; // the market hall draws the customers
+        const income = s.fire || s.closed ? 0 : (t.base[s.level] + t.per[s.level] * near) * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair * staffed * fresh * goods * rival + appliedGold(s);
+        total += income; info.set(s.id, { income, near, short: 1 - staffed, fresh: fresh > 1, applied: appliedGold(s), goods: goods > 1, rival: rival < 1, closed: !!s.closed });
       } else if (t.cat === 'joy' || t.cat === 'decor') {
         const r = t.cat === 'joy' ? t.radius : 1;
         const income = t.base ? t.base[s.level] : 0;
@@ -2725,7 +2751,9 @@
     // 10.09: prison work: each inmate earns a little
     const prisons = act.filter((b) => lineOf(b.type) === 'prison');
     if (prisons.length) { const inm = Math.min((state.prison || []).length, prisons.reduce((a, b) => a + (TYPES[b.type].cells[b.level] || 0), 0)), pay = inm * PRISON_PAY; total += pay; for (const b of prisons) info.set(b.id, { income: pay / prisons.length, inmates: inm }); }
-    for (const f of act.filter((b) => b.type === 'field')) info.set(f.id, { food: fieldYield(f, J, act), dirty: fieldDirty(f, act) });
+    for (const f of act.filter(isGrower)) info.set(f.id, { food: fieldYield(f, J, act), dirty: fieldDirty(f, act) });
+    // 11.02: a recycling center sells what it sorts: +1 gold an hour for each sweeper working there
+    for (const rc of act.filter((b) => b.type === 'recycling' && !b.fire)) { const n = (staffIn('sweeper').count.get(rc.id) || 0); if (n) { total += n; info.set(rc.id, { income: n }); } }
     return { total, residents, info, jobs: J, food: F };
   }
   let cityCache = null, occCache = null, hintCache = null;
@@ -2905,10 +2933,10 @@
     recycling: 4, wasteplant: 7, gardencenter: 2, parksdept: 4, firehall: 6, firehq: 10, policestation: 6, courthouse: 10, medcenter: 7, hospital: 12, highschool: 5, university: 9, citybank: 7, centralbank: 12, prison2: 4, maxprison: 7 };
   // 11.00 (balance): every working building costs upkeep, in whole gold an hour by level. Small level-1 buildings run
   // for free, so a new town isn't punished. Service buildings cost twice what they did.
-  const RUNNING_BY_LEVEL = { market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
+  const RUNNING_BY_LEVEL = { farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
     factory: [0, 4, 9, 13], induspark: [0, 9, 18, 27], park: [0, 0, 1, 1], fountain: [0, 1, 1, 2], amusement: [0, 3, 6, 9], stadium: [0, 6, 13], field: [0, 0, 1, 2], granary: [0, 0, 1, 2] };
   const runAt = (type, L) => { const r = RUNNING_BY_LEVEL[type]; if (r) return r[clamp(L || 1, 1, r.length - 1)] || 0; return RUNNING[type] ? RUNNING[type] * 2 * (L || 1) : 0; };
-  const runningOf = (b) => (live(b) && runAt(b.type, b.level) ? Math.max(0, runAt(b.type, b.level) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
+  const runningOf = (b) => (live(b) && runAt(b.type, b.level) ? Math.max(0, Math.round(runAt(b.type, b.level) * (isServiceType(b.type) && state.buildings.some((x) => x.type === 'wasteplant' && live(x)) ? 0.85 : 1)) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
   const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0);
   // Thieves who are caught sit in the police station's cells for a while: each one costs a little to keep (10.04).
   const JAIL_COST = 3;
@@ -2982,7 +3010,7 @@
     const swR = roleInfo('sweeper', ci).ratio, gdR = roleInfo('gardener', ci).ratio, swSt = stationsOf('sweeper'), gdSt = stationsOf('gardener');
     for (const b of state.buildings) {
       // out of reach of a staffed depot or shed, nobody comes to clean
-      if (messy(b)) { const kk = coverK('sweeper', b, swSt), sw = kk ? swR : 0, bins = nearAddon(b, 'bin', 2) ? 0.6 : 1; b.trash = clamp((b.trash || 0) + min * (up * 0.05 * bins * (1 - sw) - 0.16 * sw * (kk || 1)), 0, 3); }
+      if (messy(b)) { const kk = coverK('sweeper', b, swSt), sw = kk ? swR : 0, bins = (nearAddon(b, 'bin', 2) ? 0.6 : 1) * (b.type === 'apartment' ? 1.5 : 1); b.trash = clamp((b.trash || 0) + min * (up * 0.05 * bins * (1 - sw) - 0.16 * sw * (kk || 1)), 0, 3); }
       if (b.type === 'park' && live(b)) { const kk = coverK('gardener', b, gdSt), gd = kk ? gdR : 0; b.overgrown = clamp((b.overgrown || 0) + min * (up * 0.03 * (1 - gd) - 0.08 * gd * (kk || 1)), 0, 1); }
       // 10.06: in autumn dry leaves pile up around homes and shops (more next to trees and parks); gardeners rake them
       if (messy(b)) {
@@ -3003,6 +3031,8 @@
     state.civic.health = toward(state.civic.health, nu.needed ? nu.cover : 1, ease, true);
     state.crime = toward(crimeLevel(), crimeTarget(ci), 1 - Math.exp(-min / 40), false);
     if (state.jail && state.jail.length) { for (const j of state.jail) j.left -= min; state.jail = state.jail.filter((j) => j.left > 0); }
+    for (const b of state.buildings) { for (const k of ['closed', 'goodsGone']) if (b[k]) { b[k].left -= min; if (b[k].left <= 0) delete b[k]; } } // 11.02
+    gangStep(Date.now());
     prisonStep(min);
     for (const b of state.buildings) if (b.health != null && b.health < 100 && !b.fire && !b.burnt) { b.health = Math.min(100, b.health + min * 2); if (b.health >= 100) delete b.health; }
     cityCache = null;
@@ -3023,7 +3053,14 @@
   const troubleNow = () => -Math.min(20, (state.scars || []).reduce((a, s) => a + s.pts * clamp(s.left / s.total, 0, 1), 0));
   const nearType = (b, types, d) => state.buildings.some((o) => o !== b && types.includes(o.type) && live(o) && dist(o, b) <= d);
   // The staffed station that can reach this building (nearest first), or null.
-  function responderFor(k, b) { return stationsOf(k).filter((s) => distFull(s, b) <= stationReach(s)).sort((a, c) => dist(a, b) - dist(c, b))[0] || null; }
+  function responderFor(k, b) { return stationsOf(k).filter((s) => distFull(s, b) <= stationReach(s) && !(k === 'fire' && b && b.type === 'apartment' && tierOf(s.type) < 2)).sort((a, c) => dist(a, b) - dist(c, b))[0] || null; } // 11.02: only a fire engine saves an apartment block
+  // 11.02 (roadmap part 1): each size of a service can do something new.
+  const fireCrewK = (st, b) => (!st ? 1 : tierOf(st.type) === 3 ? 2 : tierOf(st.type) === 1 && b && dimsB(b)[0] * dimsB(b)[1] > 1 ? 0.5 : 1); // hand pumps vs a ladder truck
+  const hqCovers = (b) => stationsOf('fire').some((s) => s.type === 'firehq' && distFull(s, b) <= stationReach(s));
+  const hasLive = (type) => state.buildings.some((x) => x.type === type && live(x) && !x.fire);
+  const teenCover = (b) => stationsOf('teacher').some((s) => tierOf(s.type) >= 2 && distFull(s, b) <= stationReach(s)); // a high school keeps teens busy
+  const festPrize = (n) => Math.round(n * (1 + (hasLive('parksdept') ? 0.25 : 0))); // 11.02: the parks department
+  const decorCost = (type) => { const c0 = TYPES[type].cost || 0; return hasLive('gardencenter') || hasLive('parksdept') ? Math.max(1, Math.round(c0 * 0.8)) : c0; }; // the garden center: decorations 20% cheaper
   const weatherK = (wet, stormy) => { const w = skyNow().w; if (!(w.k > 0.3)) return 1; return w.kind === 'rain' || w.kind === 'snow' ? wet : w.kind === 'storm' ? stormy : 1; };
 
   // ---- Fire. Every building can catch fire (not the town hall or landmarks), level-1 buildings most of all.
@@ -3036,6 +3073,7 @@
     let r = (FIRE_RISK[b.type] || 1) * (LEVEL_FIRE[b.level] || 1) * (1 + 0.25 * crowd(b));
     if (!coversB('fire', b)) r *= 1.4; // nobody checks the wiring out there
     if (nearAddon(b, 'hydrant', 2)) r *= 0.5;
+    if (hqCovers(b)) r *= 0.7; // 11.02: fire safety checks
     if (b.leaves) r *= 1 + 1.2 * b.leaves; // dry autumn leaves catch fire easily (10.06)
     return r;
   }
@@ -3109,14 +3147,14 @@
     const st = stationsOf('police'), far = hs.filter((h) => !coversB('police', h, st)).length / hs.length;
     const mood = moodNow(Date.now()).value;
     const kids = TYPES.school && hallLevel() >= TYPES.school.unlock ? state.buildings.filter((h) => live(h) && T(h).cat === 'home' && !coversB('teacher', h)).length / Math.max(1, hs.length) : 0;
-    const J = ci && ci.jobs ? ci.jobs : { unemp: 0, k: 0 }, gang = Math.min(15, freeRepeat().length * 3); // 10.09: no work, and thieves still out there
+    const J = ci && ci.jobs ? ci.jobs : { unemp: 0, k: 0 }, gang = gangFree() ? 15 : 0; // 10.09: no work; 11.02: a gang that is free
     return clamp(10 + 45 * far + Math.max(0, 65 - mood) * 0.6 + 12 * kids + 35 * J.unemp * J.k + gang - Math.min(10, (state.jail || []).length * 4) - Math.min(12, (state.prison || []).length * 3), 0, 100);
   }
   const crimeLevel = () => clamp(state.crime == null ? 25 : state.crime, 0, 100);
   const crimeWord = (v) => (v < 20 ? 'Very low' : v < 40 ? 'Low' : v < 60 ? 'Medium' : v < 80 ? 'High' : 'Very high');
 
-  /* ---------- 10.09 (Navid): the Incident report, the Courthouse, named thieves and the Prison ----------
-     Every fire, break-in, sickness and storm goes into the report with what happened and what it cost. A Courthouse
+  /* ---------- 10.09 (Navid): the Incident report, the Central police, named thieves and the Prison ----------
+     Every fire, break-in, sickness and storm goes into the report with what happened and what it cost. The Central police
      (the biggest police building) also finds out why, and sends thieves caught twice to prison. Inmates do prison work
      (a little gold each), but every one of them is a break-in the town already paid for. */
   const PRISON_PAY = 3;
@@ -3125,18 +3163,7 @@
   const prisonCells = () => state.buildings.reduce((a, b) => a + (lineOf(b.type) === 'prison' && live(b) ? TYPES[b.type].cells[b.level] || 0 : 0), 0);
   const inPrison = (tid) => (state.prison || []).find((x) => x.tid === tid);
   const thiefById = (tid) => (state.thieves || []).find((t) => t.id === tid) || null;
-  const freeRepeat = () => (state.thieves || []).filter((t) => t.caught >= 1 && t.crimes >= 2 && !inPrison(t.id));
-  // Who did it: often someone the police already know, more often when jobs are scarce.
-  function pickThief() {
-    const free = state.thieves.filter((t) => !inPrison(t.id)), ci = city(), u = ci.jobs ? ci.jobs.unemp * ci.jobs.k : 0;
-    if (free.length && Math.random() < 0.45 + 0.4 * u) return weighted(free, (t) => 1 + t.crimes) || free[0];
-    const used = new Set(state.thieves.map((t) => t.name));
-    const nm = THIEF_NAMES.find((n) => !used.has(n)) || `${pick(THIEF_NAMES)} ${state.thieves.length + 1}`;
-    const t = { id: (state.thiefSeq = (state.thiefSeq || 0) + 1), name: nm, crimes: 0, caught: 0 };
-    state.thieves.push(t); if (state.thieves.length > 16) state.thieves = state.thieves.filter((x) => inPrison(x.id) || x !== state.thieves.find((y) => !inPrison(y.id)));
-    return t;
-  }
-  // Why it happened, worked out at the moment it starts (the Courthouse shows these).
+  // Why it happened, worked out at the moment it starts (the Central police shows these).
   function whyFor(kind, b, extra) {
     const out = [], t = T(b), ci = city(), J = ci.jobs || { unemp: 0, k: 0 };
     if (kind === 'fire') {
@@ -3180,14 +3207,14 @@
     for (let i = state.incidents.length - 1; i >= 0; i--) { const e = state.incidents[i]; if (ks.includes(e.kind) && e.bid === (b && b.id) && !e.outcome) { e.outcome = outcome; if (cost) e.cost = (e.cost || 0) + cost; return e; } }
     return null;
   }
-  // The Courthouse looks at a thief who was just caught: twice caught means prison, when there is a free cell.
+  // The Central police looks at a thief who was just caught: twice caught means prison, when there is a free cell.
   function judge(th) {
     if (!th || !courthouse() || th.caught < 2) return '';
-    if ((state.prison || []).length >= prisonCells()) return prisonCells() ? ` The Courthouse would send ${th.name} to prison, but the cells are full.` : ` ${th.name} has been caught ${th.caught} times. The Courthouse would send them to prison, if the town had one.`;
+    if ((state.prison || []).length >= prisonCells()) return prisonCells() ? ` The Central police would send ${th.name} to prison, but the cells are full.` : ` ${th.name} has been caught ${th.caught} times. The Central police would send them to prison, if the town had one.`;
     const left = 180 + 60 * Math.min(4, th.caught);
     state.prison.push({ tid: th.id, left, total: left });
     state.crime = clamp(crimeLevel() - 8, 0, 100);
-    return ` The Courthouse sent ${th.name} to prison (caught ${th.caught} times).`;
+    return ` The Central police sent ${th.name} to prison (caught ${th.caught} times).`;
   }
   // Prison sentences pass in town minutes. Out again, some find work and stop; with few jobs, more go back to stealing.
   function prisonStep(min) {
@@ -3204,41 +3231,110 @@
 
   // Break-ins: far from the police they happen more and cost far more; the town pays the victims back what the
   // police don't recover.
-  function startRobbery(b) {
+  /* ---------- 11.02 (roadmap part 3, Navid): crime that matters ----------
+     From town hall 3 (when the police station and its custody come), a break-in nobody stops costs twice as much at a
+     home; a shop loses its till (1.5× a home break-in) and stays closed for 2 town hours; a factory loses its goods for
+     a town day; and while a gang is free, the bank can be robbed (15% of the treasury, at most 2,000; 3% when a police
+     station reaches it). Limits: a break-in takes at most 10% of the treasury and never more than it holds, at most one
+     heist every 3 days, never during focus or under a shield, and buildings are never destroyed.
+     The police ladder: a police post catches thieves and gets the gold back but has no cells, so it has to let them go
+     (they may strike again within the hour). A police station holds them for a town day. The Central police sends
+     thieves caught twice to jail. A thief who gets away 3 times in 7 days starts a gang: crime +15 while it is free.
+     Holding the leader stops it for that day, jailing the leader breaks it up, a week without a getaway ends it. */
+  const HEIST_GAP = 3 * 86400000, GANG_WEEK = 7 * 86400000, CUSTODY_MIN = 24;
+  const harshCrime = () => hallLevel() >= 3;
+  const inCustody = (tid) => (state.jail || []).some((j) => j.tid === tid);
+  const gangName = (g) => { const l = thiefById(g.leader); return l ? `${l.name}'s gang` : 'The gang'; };
+  function gangFree() { const g = state.gang; return !!g && !inPrison(g.leader) && !inCustody(g.leader); }
+  function gangStep(now) {
+    const g = state.gang; if (!g) return;
+    const l = thiefById(g.leader);
+    if (!l || inPrison(g.leader)) { logIncident('gang', null, `${gangName(g)} broke up: ${l ? l.name : 'its leader'} is in jail`); state.gang = null; return; }
+    if (now - (g.last || g.at) > GANG_WEEK) { logIncident('gang', null, `${gangName(g)} went quiet: a week without a getaway`); state.gang = null; }
+  }
+  function newThief() {
+    const used = new Set(state.thieves.map((t) => t.name));
+    const nm = THIEF_NAMES.find((n) => !used.has(n)) || `${pick(THIEF_NAMES)} ${state.thieves.length + 1}`;
+    const t = { id: (state.thiefSeq = (state.thiefSeq || 0) + 1), name: nm, crimes: 0, caught: 0 };
+    state.thieves.push(t); return t;
+  }
+  function startGang(th) {
+    const now = Date.now(), pool = state.thieves.filter((t) => t !== th && !inPrison(t.id) && !inCustody(t.id));
+    const mates = pool.slice(0, 2); while (mates.length < 2) mates.push(newThief());
+    state.gang = { leader: th.id, members: mates.map((t) => t.id), at: now, last: now };
+    logIncident('gang', null, `${th.name} has started a gang with ${mates[0].name} and ${mates[1].name}`);
+    setTimeout(() => toast(`${th.name} got away three times this week and has started a gang with ${mates[0].name} and ${mates[1].name}. While the gang is free, crime is higher and the bank could be robbed. Catch ${th.name} and hold them (a police station), or send them to jail (the Central police).`), 1800);
+  }
+  // A getaway: nobody caught the thief, or a police post caught them but had no cell to hold them.
+  function noteGetaway(th) {
+    if (!th) return; const now = Date.now();
+    th.away = (th.away || []).filter((t) => now - t < GANG_WEEK).concat([now]);
+    const g = state.gang;
+    if (g && (g.leader === th.id || (g.members || []).includes(th.id))) g.last = now;
+    else if (!g && th.away.length >= 3 && harshCrime()) startGang(th);
+  }
+  // Who did it: often someone the police already know, more often when jobs are scarce. Nobody held in custody or prison;
+  // a thief a police post just let go may come straight back (11.02).
+  function pickThief() {
+    const free = state.thieves.filter((t) => !inPrison(t.id) && !inCustody(t.id)), ci = city(), u = ci.jobs ? ci.jobs.unemp * ci.jobs.k : 0;
+    const rep = state.repeatThief && Date.now() < state.repeatThief.until ? free.find((t) => t.id === state.repeatThief.tid) : null;
+    if (rep) { state.repeatThief = null; return rep; }
+    const g = state.gang; if (g && gangFree() && Math.random() < 0.5) { const gm = free.filter((t) => t.id === g.leader || (g.members || []).includes(t.id)); if (gm.length) return pick(gm); }
+    if (free.length && Math.random() < 0.45 + 0.4 * u) return weighted(free, (t) => 1 + t.crimes) || free[0];
+    const t = newThief();
+    if (state.thieves.length > 16) state.thieves = state.thieves.filter((x) => inPrison(x.id) || inCustody(x.id) || (state.gang && (x.id === state.gang.leader || (state.gang.members || []).includes(x.id))) || x !== state.thieves.find((y) => !inPrison(y.id)));
+    return t;
+  }
+  const isBank = (b) => !!b && lineOf(b.type) === 'bank';
+  const isFactory = (b) => !!b && lineOf(b.type) === 'workshop' && tierOf(b.type) >= 2;
+  function startRobbery(b, heist) {
     if (!b || b.robbed || b.fire || !live(b)) return;
-    const st = responderFor('police', b), ci = city(), big = !st;
+    const st = responderFor('police', b), ci = city(), big = !st, harsh = harshCrime(), cat = T(b).cat;
     const scale = 0.6 + 0.4 * Math.min(1, ci.residents / 60);
-    const stolen = Math.round((big ? 60 + Math.random() * 60 : 8 + Math.random() * 14) * scale * (0.8 + crimeLevel() / 250));
+    let stolen = Math.round((big ? 60 + Math.random() * 60 : 8 + Math.random() * 14) * scale * (0.8 + crimeLevel() / 250) * (harsh && big ? 2 : 1));
+    if (cat === 'shop' && !isFactory(b)) stolen = Math.round(stolen * 1.5); // the till
+    let kind = 'home';
+    if (heist) { kind = 'heist'; const near = !!st && tierOf(st.type) >= 2; stolen = Math.round(Math.min(2000, Math.max(0, state.gold) * (near ? 0.03 : 0.15))); state.lastHeist = Date.now(); }
+    else if (isFactory(b)) { kind = 'goods'; stolen = 0; }
+    else if (harsh) stolen = Math.min(stolen, Math.max(5, Math.floor(Math.max(0, state.gold) * 0.1))); // never more than 10% of the treasury
     const th = pickThief();
-    b.robbed = { at: Date.now(), stolen, open: big ? 60 : 120, far: big, thief: th.id };
-    logIncident('theft', b, `Break-in at ${placeName(b)}`, { thief: th, cost: 0 });
+    b.robbed = { at: Date.now(), stolen, open: big ? 60 : 120, far: big, thief: th.id, kind };
+    logIncident('theft', b, heist ? `Bank robbery at ${placeName(b)}` : kind === 'goods' ? `Goods stolen from ${placeName(b)}` : `Break-in at ${placeName(b)}`, { thief: th, cost: 0 });
     th.crimes += 1;
     touch(); save(); sfx.alarm();
-    toast(`Break-in at ${placeName(b)}! The thief took ${stolen} gold.${st ? (st.vehicle ? ' The patrol car is on its way.' : ' Officers are running over (a patrol car would be faster and catch them more often).') : ' It is too far from the police, so nobody can come. The town will have to pay it back.'}`);
+    const help = st ? (st.vehicle ? ' The patrol car is on its way.' : ' Officers are running over (a patrol car would be faster and catch them more often).') : ' It is too far from the police, so nobody can come.';
+    toast(heist ? `Bank robbery! ${gangName(state.gang || { leader: th.id })} hit ${placeName(b)} for ${stolen} gold.${help}` : kind === 'goods' ? `Thieves at ${placeName(b)}! They are loading up its goods.${help}` : `Break-in at ${placeName(b)}! The thief took ${stolen} gold.${help}${st ? '' : ' The town will have to pay it back.'}`);
     ui.bubbles.push({ bid: b.id, text: pick(LINES.robbery), kind: 'bad', t0: performance.now(), dur: 4200, role: 'police' }); sfx.grumble();
     renderAll();
   }
-  // caught: the officers found the thief. On foot they recover only part of the gold. The rest the town pays back.
-  function endRobbery(b, caught, foot) {
+  // caught: the officers found the thief. On foot they recover only part of the gold; the rest the town pays back (a
+  // break-in never takes the town into debt). stationId: who caught them (a police post can't hold anyone).
+  function endRobbery(b, caught, foot, stationId) {
     if (!b || !b.robbed) return;
     const r = b.robbed, back = caught ? Math.round(r.stolen * (foot ? 0.5 + Math.random() * 0.5 : 1)) : 0;
     let owe = r.stolen - back;
     owe = Math.min(owe, Math.max(0, Math.floor(state.gold))); // 11.00: a break-in never puts the town in debt
-    if (owe > 0) goldChange(-owe, `Break-in at ${placeName(b)}: paid ${b.resident || 'the owner'} back${caught ? ' (some was spent)' : ' (the thief got away)'}`, 'crime'); // the town pays the victim back what the police could not recover
+    const heist = r.kind === 'heist', goods = r.kind === 'goods';
+    if (owe > 0) goldChange(-owe, heist ? `Bank robbery at ${placeName(b)}${caught ? ' (some was spent)' : ' (the gang got away)'}` : `Break-in at ${placeName(b)}: paid ${b.resident || 'the owner'} back${caught ? ' (some was spent)' : ' (the thief got away)'}`, 'crime');
     delete b.robbed;
     b.shaken = { left: caught ? 5 : 12, total: caught ? 5 : 12, label: 'after the break-in' };
-    addScar(`break-in at ${placeName(b)}`, caught ? 2 : 5, caught ? 8 : 15);
-    let jailed = false, verdict = '';
-    const th = thiefById(r.thief);
+    addScar(heist ? `a bank robbery` : `break-in at ${placeName(b)}`, caught ? 2 : heist ? 8 : 5, caught ? 8 : 15);
+    if (!caught && T(b).cat === 'shop' && !goods && harshCrime()) b.closed = { left: 2, total: 2 }; // 11.02: closed for 2 town hours
+    if (!caught && goods) b.goodsGone = { left: 24, total: 24 }; // the shops lose the factory's goods for a town day
+    let jailed = false, verdict = '', letGo = false;
+    const th = thiefById(r.thief), st0 = stationId != null ? byId(stationId) : null, post = caught && st0 && lineOf(st0.type) === 'police' && tierOf(st0.type) === 1;
     if (caught && th) { th.caught += 1; verdict = judge(th); if (verdict.includes('sent')) jailed = true; }
-    if (caught && !jailed) { if ((state.jail || []).length < jailCells()) { state.jail.push({ left: 30 }); jailed = true; state.crime = clamp(crimeLevel() - 6, 0, 100); } }
-    else if (!caught) state.crime = clamp(crimeLevel() + (r.far ? 10 : 6), 0, 100);
-    closeIncident('theft', b, caught ? `${th ? th.name : 'The thief'} was caught. ${back} of ${r.stolen} gold found.${verdict}` : `${th ? th.name : 'The thief'} got away with ${r.stolen} gold.`, owe);
-    const p = centerOf(b), now = performance.now(), who = b.resident || 'the owner';
-    floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: now, text: caught ? (owe ? `Caught! ${back} of ${r.stolen} back` : `Caught! ${back} gold back`) : `Got away with ${r.stolen}`, soft: !caught });
+    if (caught && !jailed && !post) { if ((state.jail || []).length < jailCells()) { state.jail.push({ left: CUSTODY_MIN, tid: th ? th.id : null }); jailed = true; state.crime = clamp(crimeLevel() - 6, 0, 100); } }
+    if (caught && !jailed) { letGo = true; noteGetaway(th); if (post && th) { state.repeatThief = { tid: th.id, until: Date.now() + 3600000 }; ui.robIn = Math.min(ui.robIn == null ? 9e9 : ui.robIn, 60 + Math.random() * 60); } }
+    else if (!caught) { state.crime = clamp(crimeLevel() + (r.far ? 10 : 6), 0, 100); noteGetaway(th); }
+    const nm = th ? th.name : 'The thief';
+    closeIncident('theft', b, caught ? `${nm} was caught. ${goods ? 'The goods are back.' : `${back} of ${r.stolen} gold found.`}${post ? ' The police post has no cells, so they were let go.' : jailed && !verdict ? ' Held for a day.' : ''}${verdict}` : goods ? `${nm} got away with the goods: the shops miss them for a day.` : `${nm} got away with ${r.stolen} gold.`, owe);
+    const p = centerOf(b), now = performance.now(), who = heist ? 'the bank' : b.resident || 'the owner';
+    floats.push({ x: p.x, y: p.y - HH * sizeB(b) - 30, t0: now, text: caught ? (goods ? 'Caught! Goods back' : owe ? `Caught! ${back} of ${r.stolen} back` : `Caught! ${back} gold back`) : goods ? 'Goods stolen' : `Got away with ${r.stolen}`, soft: !caught });
     if (caught) { ui.bubbles.push({ bid: b.id, text: pick(LINES.thanksPolice), kind: 'good', t0: now + 400, dur: 3200 }); sfx.chime(); }
-    toast(caught ? `${th ? th.name : 'Thief'} caught${jailed ? ' and locked up' : ''}!${owe ? ` They had spent some: ${back} of ${r.stolen} gold found. The town paid ${who} the other ${owe}.` : ` All ${back} gold went back to ${who}.`}${caught && !jailed ? ' The cells are full, so they were let off with a warning (upgrade the police station for more cells).' : ''}`
-      : `${th ? th.name : 'The thief'} got away with ${r.stolen} gold. The town paid ${who} back. Crime in town is up.`);
+    const lockTxt = post ? ` A police post has no cells, so ${nm} was let go and may try again soon (a police station can hold them).` : letGo ? ' The cells are full, so they were let off with a warning (a bigger police station has more cells).' : '';
+    toast(caught ? `${nm} caught${jailed ? ' and locked up' : ''}!${goods ? ' The goods are back.' : owe ? ` They had spent some: ${back} of ${r.stolen} gold found.${heist ? '' : ` The town paid ${who} the other ${owe}.`}` : ` All ${back} gold went back to ${who}.`}${lockTxt}`
+      : goods ? `${nm} got away with the factory's goods: the shops lose its +10% for a day. Crime in town is up.` : `${nm} got away with ${r.stolen} gold.${heist ? '' : ` The town paid ${who} back.`}${b.closed ? ` ${capFirst(placeName(b))} is closed for 2 hours.` : ''} Crime in town is up.`);
     if (verdict) setTimeout(() => toast(verdict.trim()), 2600);
     touch(); save(); renderAll();
   }
@@ -3312,7 +3408,7 @@
   // A serious case that waited too long without hospital care.
   function seriousEnd(b) {
     const s = b.sick;
-    if (Math.random() < (s.comfort ? 0.35 : 0.6)) { passAway(b); return; }
+    if (!stationsOf('nurse').some((x) => x.type === 'hospital') && Math.random() < (s.comfort ? 0.35 : 0.6)) { passAway(b); return; } // 11.02: with a staffed hospital (an operating room) nobody dies
     s.serious = false; s.crit = 0; s.phase = 'rest'; s.rest = (s.need || 40) * 2;
     { const e = closeIncident('serious', b, 'No hospital care in time, but they pulled through'); if (e) { e.kind = 'sick'; e.outcome = ''; e.text += ' (pulled through)'; } }
     toast(`${whoAt(b)} pulled through, but needs a long rest. A Medical center or Hospital with an ambulance treats serious cases.`);
@@ -3383,7 +3479,7 @@
       const b = weighted(robbable, w) || pick(robbable), st = responderFor('police', b);
       startRobbery(b); if (!b.robbed) return null;
       const caught = !!st && Math.random() < (st.vehicle ? 0.7 : 0.45);
-      endRobbery(b, caught, !!st && !st.vehicle);
+      endRobbery(b, caught, !!st && !st.vehicle, st ? st.id : null);
       const e = state.incidents.slice().reverse().find((x) => x.kind === 'theft' && x.bid === b.id);
       return info(b, `Break-in at ${placeName(b)}. ${e ? e.outcome : ''}`.trim(), { good: caught });
     }
@@ -3644,9 +3740,9 @@
     for (const b of burningAll()) {
       const f = b.fire; if (!f.max) { f.max = fireHp(b); f.hp = f.hp == null ? f.max : f.hp; f.spreadIn = f.spreadIn || 20; }
       const crews = VEH.filter((v) => v.kind === 'fire' && v.state === 'work' && v.target === b.id), crew = crews[0] || null;
-      if (crews.length) f.hp -= dt * crews.reduce((a, v) => a + (v.foot ? 0.65 : 0.9) * stationK(byId(v.station)), 0) * (nearAddon(b, 'hydrant', 2) ? 1.3 : 1);
+      if (crews.length) f.hp -= dt * crews.reduce((a, v) => a + (v.foot ? 0.65 : 0.9) * stationK(byId(v.station)) * fireCrewK(byId(v.station), b), 0) * (nearAddon(b, 'hydrant', 2) ? 1.3 : 1);
       else if (f.first) f.hp -= dt * 0.12; // the lesson fire: neighbours with buckets get it out after a couple of minutes
-      if (!crew && !f.first && !sh) {
+      if (!crew && !f.first && !sh && !hqCovers(b)) { // 11.02: fire headquarters stop fires spreading
         f.spreadIn -= dt;
         if (f.spreadIn <= 0) {
           f.spreadIn = 18 + Math.random() * 14;
@@ -3680,7 +3776,7 @@
       const v = VEH.find((x) => x.kind === 'police' && x.target === b.id);
       if (v && v.state === 'work') {
         v.workT += dt;
-        if (v.workT >= (v.foot ? 14 : 10) / stationK(byId(v.station))) { endRobbery(b, sh || Math.random() < catchChance(v), v.foot && !sh); sendHome(v); } // the shield holds the thief: caught, with all the gold
+        if (v.workT >= (v.foot ? 14 : 10) / stationK(byId(v.station))) { endRobbery(b, sh || Math.random() < catchChance(v), v.foot && !sh, v.station); sendHome(v); } // the shield holds the thief: caught, with all the gold
         continue;
       }
       if (!v) {
@@ -3755,13 +3851,15 @@
     if ((roleInfo('police', ci).needed || (hallLevel() >= TYPES.police.unlock && homesCount() >= 6)) && !state.buildings.some((b) => b.robbed)) {
       const nk = nightK();
       if (ui.robIn == null) ui.robIn = 240 + Math.random() * 240;
-      ui.robIn -= dt * (1 + 1.2 * nk) * (0.5 + crimeLevel() / 50); // more break-ins at night, and when crime is high
+      ui.robIn -= dt * (1 + 1.2 * nk) * (0.5 + crimeLevel() / 50) * (hasLive('cinema') ? 0.85 : 1); // more break-ins at night, and when crime is high
       if (ui.robIn <= 0 && ui.playVisit >= 25 && !ui.panel) {
         ui.robIn = null;
         const st = stationsOf('police');
         // the farther from a police station, the likelier
         const w = (b) => { if (coversB('police', b, st)) return 0.4; const d = st.length ? Math.min(...st.map((x) => dist(x, b) - stationReach(x))) : 4; return (2 + 0.6 * Math.max(0, d)) * (T(b).cat === 'shop' ? 1.3 : 1) * (nearAddon(b, 'lamp', 1) ? 0.7 : 1); };
-        startRobbery(weighted(state.buildings.filter((b) => messy(b) && !b.fire && !revealFor(b.id)), w));
+        const bank = gangFree() && harshCrime() && Date.now() - (state.lastHeist || 0) > HEIST_GAP ? state.buildings.find((b) => isBank(b) && live(b) && !b.robbed && !b.fire) : null;
+        if (bank && Math.random() < 0.35) startRobbery(bank, true); // 11.02: a heist, only while a gang is free
+        else startRobbery(weighted(state.buildings.filter((b) => messy(b) && !b.fire && !revealFor(b.id)), (b) => w(b) * (teenCover(b) ? 0.7 : 1)));
       }
     }
     if (sickOn() && homesCount() >= 4 && !state.buildings.some((b) => b.sick)) {
@@ -3808,6 +3906,7 @@
     market: ['Turnips! Get your turnips!', 'Fresh apples today!', 'Two-for-one on carrots. I bought nine.', 'The tomato guy winked at me.'],
     arcade: ['New high score!', 'I spent all my tokens on the claw machine. Worth it.', 'Beep boop! Level up!'],
     bookshop: ['I came in for one book. Bought four.', 'Shh! I am at the good part.'],
+    apartment: ['I can see the whole island from my balcony!', 'Someone upstairs is learning the trumpet.'], markethall: ['Fresh bread and gossip, all under one roof.', 'The cheese stall is the best stall.'],
     park2: ['Lovely day for a picnic.', 'The ducks are back!', 'I fed a duck. Now it follows me.', 'Cloud spotting: that one is a sheep.'],
     rain: ['Grab an umbrella!', 'I love the sound of rain.', 'Perfect weather for a café.', 'My umbrella flipped inside out. Again.'], storm: ['Did you hear that thunder?', 'Stay inside, everyone!', 'My cat is hiding under the bed.'],
     fog: ["I can't see a thing!", 'Spooky fog today.', 'I just said hi to a lamp post.'], snow: ['Snowball fight!', 'Brr, so cold!', 'I built a snowman. It looks like you, Mayor.'], night: ['Look at all the stars!', 'Good night, Mayor!', 'Shh, the kids are asleep.'], rainbow: ['A rainbow! Make a wish!', 'Is there gold at the end? Asking for the mayor.']
@@ -4025,7 +4124,7 @@
   function startAttach(type) {
     const t = TYPES[type];
     if (countType(type) >= capFor(type)) { toast(capWhy(type)); return; }
-    if (state.gold + 1e-6 < t.cost) { toast(`A ${t.name.toLowerCase()} costs ${t.cost} gold.`); return; }
+    if (state.gold + 1e-6 < decorCost(type)) { toast(`A ${t.name.toLowerCase()} costs ${decorCost(type)} gold.`); return; }
     closePanel(true); ui.attach = { type }; ui.panel = { kind: 'attach' }; renderAll(); sfx.pop();
   }
   // 10.13: tapping a building picks it; the card asks before anything is bought.
@@ -4038,9 +4137,9 @@
   }
   function confirmAttach() {
     const k = ui.attach && ui.attach.type, t = k && TYPES[k], b = ui.attach && byId(ui.attach.bid); if (!t || !b) return;
-    if (state.gold + 1e-6 < t.cost) { toast(`${t.name} cost${k === 'solar' || k === 'flowerbox' ? '' : 's'} ${t.cost} gold.`); return; }
+    if (state.gold + 1e-6 < decorCost(k)) { toast(`${t.name} cost${k === 'solar' || k === 'flowerbox' ? '' : 's'} ${decorCost(k)} gold.`); return; }
     const A = ADDON[k];
-    goldChange(-t.cost, `${t.name} ${A.on ? 'on' : 'beside'} ${placeName(b)}`, 'buy');
+    goldChange(-decorCost(k), `${t.name} ${A.on ? 'on' : 'beside'} ${placeName(b)}`, 'buy');
     b.addons = Object.assign({}, b.addons || {}, { [k]: true });
     ui.attach = null; ui.panel = null; ui.selected = null; touch(); accrue(Date.now()); sfx.place(); bump(b.id); save();
     toast(`${t.name} ${A.on ? 'on' : 'beside'} ${placeName(b)}: ${A.what(b)}.`); checkQuests(false); afterAction(); renderAll();
@@ -4140,6 +4239,7 @@
       const L = b.level + 1;
       if (L > t.max) return { ok: false, why: 'Fully upgraded.', max: true };
       cost = t.up[L][0]; work = upgradeWork(b.type, L);
+      if (b.type !== 'townhall' && state.buildings.some((x) => lineOf(x.type) === 'workshop' && live(x) && !x.fire)) cost = Math.max(5, Math.round(cost * 0.9 / 5) * 5); // 11.02: building materials
       if (jobMode('upgrade', b.type) === 'play') secs = upgradeSecs(b.type, L);
       if (b.type !== 'townhall' && L > hallLevel()) return { ok: false, why: `Upgrade the town hall to level ${L} first.`, cost, work };
       if (b.type === 'townhall' && city().residents < (HALL_RES[L] || 0)) return { ok: false, why: `The town needs ${HALL_RES[L]} residents first (it has ${city().residents}).`, cost, work, people: true };
@@ -5167,7 +5267,7 @@
     const sk = curSeasonKey(); if (state.season.key !== sk) state.season = { key: sk, min: 0, got: [] }; state.season.min += mAll;
     const sz = SEASONS[curSeason()];
     if (state.season.min >= SEASON_GOAL[0] && !state.season.got.includes(0)) { state.season.got.push(0); state.tray.push({ id: state.nextId++, type: sz.item, origin: 'season' }); r.seasonItem = sz.item; }
-    if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { state.season.got.push(1); state.gold += 100; state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize`, n: 100 }); r.seasonPrize = true; }
+    if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { const prize = festPrize(100); state.season.got.push(1); state.gold += prize; state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize${prize > 100 ? ` (+${prize - 100} from your town)` : ''}`, n: prize }); r.seasonPrize = true; }
     state.lastTaxAt = now;
     state.session = null;
     // 10.12: after a lap: a 5-minute break, then the bell for the next lap. Ending in the middle of a lap stops the laps.
@@ -5356,7 +5456,7 @@
     if (ui.screen !== 'play') return;
     accrue(Date.now());
     // Crews already at work finish the job; everyone else heads back and comes again next time you play.
-    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, shieldOn() || Math.random() < catchChance(v), v.foot && !shieldOn()); if (v.kind === 'nurse' && b.sick && !b.sick.phase) nurseDone(v, b); } if (v.carry != null) { const pb = byId(v.carry); if (pb && pb.sick) pb.sick.ride = false; } }
+    for (const v of VEH) { const b = byId(v.target); if (v.state === 'work' && b) { if (v.kind === 'fire' && b.fire) extinguish(b, true); if (v.kind === 'police' && b.robbed) endRobbery(b, shieldOn() || Math.random() < catchChance(v), v.foot && !shieldOn(), v.station); if (v.kind === 'nurse' && b.sick && !b.sick.phase) nurseDone(v, b); } if (v.carry != null) { const pb = byId(v.carry); if (pb && pb.sick) pb.sick.ride = false; } }
     VEH.length = 0;
     anaPlayEnd(expired);
     ui.screen = 'home'; ui.holding = null; ui.preview = null; ui.playExpired = false; ui.spark = null; ledgerFlush();
@@ -5491,7 +5591,7 @@
     const t = TYPES[type];
     if (hallLevel() < t.unlock) { toast(`Needs town hall level ${t.unlock}.`); return; }
     if (countType(type) >= capFor(type)) { toast(capWhy(type)); return; }
-    if (state.gold + 1e-6 < t.cost) { toast(`A ${t.name.toLowerCase()} costs ${t.cost} gold.`); return; }
+    if (state.gold + 1e-6 < decorCost(type)) { toast(`A ${t.name.toLowerCase()} costs ${decorCost(type)} gold.`); return; }
     closePanel(true); ui.spot = null; ui.attach = null;
     setHolding({ kind: 'decor', type });
     if (c != null && fits(type, c, r)) { ui.preview = { c, r }; ui.panel = { kind: 'place' }; }
@@ -5515,8 +5615,8 @@
     const t = TYPES[type];
     if (!fits(type, c, r)) { toast('This spot is taken.'); return; }
     if (countType(type) >= capFor(type)) { toast(capWhy(type)); return; }
-    if (state.gold + 1e-6 < t.cost) { toast(`A ${t.name.toLowerCase()} costs ${t.cost} gold.`); return; }
-    goldChange(-t.cost, `New ${t.name.toLowerCase()}`, 'buy');
+    if (state.gold + 1e-6 < decorCost(type)) { toast(`A ${t.name.toLowerCase()} costs ${decorCost(type)} gold.`); return; }
+    goldChange(-decorCost(type), `New ${t.name.toLowerCase()}`, 'buy');
     const id = state.nextId++;
     state.buildings.push({ id, type, c, r, level: 1, origin: 'built' });
     touch(); accrue(Date.now()); sfx.place(); bump(id);
@@ -5862,7 +5962,7 @@
   function starShape(c, x, y, r, col) { c.fillStyle = col; c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
   function tongue(c, x, y, w, h, col) { c.fillStyle = col; c.beginPath(); c.moveTo(x - w, y); c.quadraticCurveTo(x - w * 0.95, y - h * 0.55, x, y - h); c.quadraticCurveTo(x + w * 0.95, y - h * 0.55, x + w, y); c.closePath(); c.fill(); }
   // How tall each burnable building is (in building units), so flames sit on the roof.
-  const topOf = (type, L) => ({ school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
+  const topOf = (type, L) => ({ apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
   function flames(c, x, y, hw, u, topH, k) {
     const t = reduced ? 0 : ART.t, top = y - topH * u;
     const g = c.createRadialGradient(x, y - topH * u * 0.45, 2 * u, x, y - topH * u * 0.45, hw * 1.15);
@@ -6016,7 +6116,7 @@
       flagAt(c, x - back[0] * 0.7, y - h - 2.4 * u - back[1] * 0.7, u, '#2F4E8C', now, 16);
     },
     police3(c, x, y, hw, hh, u, F, L, col, roofc, glass, now) {
-      // the Courthouse: wide steps, a row of columns under a pediment, a flat roof with a small dome, scales of justice
+      // the Central police: wide steps, a row of columns under a pediment, a flat roof with a small dome, scales of justice
       const st = 3 * u;
       box(c, x, y, hw, hh, 0.86, st * 0.5, '#CFC7B6'); box(c, x, y - st * 0.5, hw, hh, 0.82, st * 0.5, '#DAD3C4');
       const h = 26 * u, by = y - st, f = box(c, x, by, hw, hh, 0.76, h, '#EEE9DE');
@@ -6630,6 +6730,63 @@
       case 'cherry': {
         treeAt(c, x, y, 26 * u, col);
         if (!reduced) for (let i = 0; i < 4; i++) { const k = ((now / 2600) + i / 4) % 1; c.fillStyle = `rgba(244,166,198,${1 - k})`; c.beginPath(); c.ellipse(x - 8 * u + i * 5 * u + Math.sin(k * 6 + i) * 3 * u, y - 22 * u + k * 22 * u, 1.3 * u, 0.8 * u, k * 4, 0, Math.PI * 2); c.fill(); }
+        break;
+      }
+      case 'apartment': { // 11.02: four storeys of flats on 2×2 tiles, balconies from level 2, a roof garden at level 3
+        const fl = 3 + level, h = (8.5 * fl) * u, s = 0.78, f = box(c, x, y, hw, hh, s, h, col);
+        const floorH = h / fl;
+        for (let i = 0; i < fl; i++) {
+          const v0 = i * floorH + floorH * 0.28, v1 = v0 + floorH * 0.5;
+          wallQuad(c, f.L, f.B, 0, 1, i * floorH, i * floorH + 0.9 * u, shade(col, 0.72));
+          wallQuad(c, f.B, f.R, 0, 1, i * floorH, i * floorH + 0.9 * u, shade(col, 0.8));
+          for (let j = 0; j < 4; j++) {
+            const a = 0.08 + j * 0.23;
+            if (i === 0 && j === 1) { if (ruin) wallQuad(c, f.B, f.R, a, a + 0.14, 0, floorH * 0.8, '#4A3A2C'); else doorQ(c, f.B, f.R, a, a + 0.14, floorH * 0.8, '#5B4632', u); }
+            else if (ruin) wallQuad(c, f.B, f.R, a, a + 0.14, v0, v1, '#3A322B'); else windowQ(c, f.B, f.R, a, a + 0.14, v0, v1, glass, u, (i * 7 + j * 3) % 5 === 0);
+            if (ruin) wallQuad(c, f.L, f.B, a, a + 0.14, v0, v1, '#3A322B'); else windowQ(c, f.L, f.B, a, a + 0.14, v0, v1, glass, u, (i * 5 + j) % 6 === 0);
+            if (!ruin && level >= 2 && i > 0 && j % 2 === 0) { const p1 = wallPt(f.B, f.R, a - 0.02, v0 - 0.4 * u), p2 = wallPt(f.B, f.R, a + 0.16, v0 - 0.4 * u); poly(c, [p1, p2, [p2[0], p2[1] + 2.4 * u], [p1[0], p1[1] + 2.4 * u]], shade(roofc, 1.2)); line(c, [p1[0], p1[1] - 2.6 * u], [p2[0], p2[1] - 2.6 * u], shade(roofc, 0.7), 0.6 * u); if ((i + j) % 4 === 0) { c.fillStyle = '#E46B8A'; c.beginPath(); c.arc((p1[0] + p2[0]) / 2, p1[1] - 1 * u, 1 * u, 0, Math.PI * 2); c.fill(); } }
+          }
+        }
+        // the flat roof: a parapet, the stair house and a water tank (a roof garden at level 3)
+        const top = y - h;
+        poly(c, [[f.L[0], f.L[1] - h], [f.B[0], f.B[1] - h], [f.B[0], f.B[1] - h - 1.6 * u], [f.L[0], f.L[1] - h - 1.6 * u]], shade(roofc, 0.9));
+        poly(c, [[f.B[0], f.B[1] - h], [f.R[0], f.R[1] - h], [f.R[0], f.R[1] - h - 1.6 * u], [f.B[0], f.B[1] - h - 1.6 * u]], shade(roofc, 1));
+        box(c, x - hw * 0.18, top - 0.2 * u, hw * 0.16, hh * 0.16, 1, 6 * u, shade(col, 0.95));
+        box(c, x + hw * 0.22, top - 1 * u, hw * 0.08, hh * 0.08, 1, 7 * u, '#8A9AA6');
+        if (level >= 3 && !ruin) for (const [dx, dy] of [[0.05, 0.2], [0.25, 0.08], [-0.02, -0.05]]) { c.fillStyle = '#4E8A3A'; c.beginPath(); c.arc(x + dx * hw, top + dy * hh - 2 * u, 2.4 * u, 0, Math.PI * 2); c.fill(); }
+        if (ruin) { roofHole(c, x + hw * 0.1, top + hh * 0.1, u); boards(c, f.L, f.B, 0.31, 0.45, floorH * 1.28, floorH * 1.78, u); }
+        break;
+      }
+      case 'farm': { // 11.02: a red barn and crops on 2×2 tiles; a silo from level 2, a tractor at level 3
+        const sk = SEA.k, crop = ruin ? '#7A7A4A' : sk === 'winter' ? '#E6EDF0' : sk === 'spring' ? '#7CC152' : sk === 'summer' ? '#A8C63E' : '#E5B73B';
+        diamond(c, x, y, hw * 0.95, hh * 0.95, ruin ? '#8E7A5E' : '#A3815A');
+        // furrows on the near half
+        for (let i = 0; i < 6; i++) {
+          const k = -0.1 + i * 0.16, a = [x - hw * 0.85 + hw * 0.85 * (k + 0.1), y + hh * (0.15 + 0.85 * (k + 0.1)) - hh * 0.15], b0 = [a[0] + hw * 0.8, a[1] - hh * 0.8];
+          line(c, a, b0, 'rgba(70,45,25,.45)', 1.1 * u);
+          for (let j = 0; j < 6; j++) { const p = lerpPt(a, b0, 0.08 + j * 0.17), ch = (sk === 'winter' ? 1.2 : 2 + 0.6 * level) * u, sw = reduced || ruin ? 0 : Math.sin(now / 700 + i + j * 1.7) * 0.5 * u; c.fillStyle = shade(crop, 0.82); c.beginPath(); c.ellipse(p[0] - 0.4 * u, p[1] - ch * 0.5, 1.2 * u, ch * 0.6, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = crop; c.beginPath(); c.ellipse(p[0] + sw, p[1] - ch * 0.6, 1 * u, ch * 0.62, 0, 0, Math.PI * 2); c.fill(); }
+        }
+        // the barn at the back
+        const bx = x + hw * 0.18, by = y - hh * 0.38, bh = 13 * u, fb = box(c, bx, by, hw * 0.42, hh * 0.42, 1, bh, col);
+        wallQuad(c, fb.B, fb.R, 0.3, 0.7, 0, bh * 0.78, ruin ? '#3A322B' : '#F1E7D8');
+        if (!ruin) { line(c, wallPt(fb.B, fb.R, 0.3, 0), wallPt(fb.B, fb.R, 0.7, bh * 0.78), shade(col, 0.6), 0.9 * u); line(c, wallPt(fb.B, fb.R, 0.7, 0), wallPt(fb.B, fb.R, 0.3, bh * 0.78), shade(col, 0.6), 0.9 * u); }
+        windowQ(c, fb.L, fb.B, 0.38, 0.62, bh * 0.45, bh * 0.75, ruin ? '#3A322B' : '#F1E7D8', u);
+        gable(c, bx, by, hw * 0.42, hh * 0.42, 1, bh, 9 * u, roofc);
+        if (level >= 2) { const sx = x - hw * 0.4, sy = y - hh * 0.36; box(c, sx, sy, 4.2 * u, 2.1 * u, 1, 20 * u, '#C9CED3'); c.fillStyle = '#8A97A1'; c.beginPath(); c.ellipse(sx, sy - 20 * u, 4.2 * u, 2.6 * u, 0, Math.PI, 0); c.fill(); for (let i = 1; i < 4; i++) line(c, [sx - 4.2 * u, sy - i * 5 * u], [sx, sy - i * 5 * u + 2.1 * u], 'rgba(0,0,0,.15)', 0.5 * u); }
+        if (level >= 3 && !ruin) { const tx = x + hw * 0.5, ty = y + hh * 0.2; box(c, tx, ty, 3.2 * u, 1.8 * u, 1, 3.6 * u, '#C8473D'); box(c, tx - 1 * u, ty - 3.6 * u, 1.6 * u, 1 * u, 1, 3 * u, '#C8473D'); c.fillStyle = '#1E1E1E'; for (const [dx, r0] of [[-2.6, 2.2], [2.4, 1.4]]) { c.beginPath(); c.arc(tx + dx * u, ty + 0.4 * u, r0 * u, 0, Math.PI * 2); c.fill(); } }
+        if (!ruin) { for (const [dx, dy] of [[-0.62, 0.05], [-0.5, 0.22]]) { const hx = x + dx * hw, hy = y + dy * hh; c.fillStyle = '#F6F2EA'; c.beginPath(); c.ellipse(hx, hy - 2 * u, 2.6 * u, 1.6 * u, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#2B1E16'; c.beginPath(); c.arc(hx + 0.8 * u, hy - 2.4 * u, 0.7 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#F6F2EA'; c.beginPath(); c.arc(hx + 2.4 * u, hy - 2.8 * u, 1 * u, 0, Math.PI * 2); c.fill(); } }
+        break;
+      }
+      case 'markethall': { // 11.02: a long covered market with arched windows, a clock and striped awnings over its stalls
+        const F = fpv, h = (14 + level * 2) * u, f = boxF(c, x, y, F, 0.86, h, col), { lf, sf } = faces2(f, F);
+        WQ(c, lf, 0, 1, 0, h * 0.12, shade(col, 0.78)); WQ(c, sf, 0, 1, 0, h * 0.12, shade(col, 0.74));
+        for (let i = 0; i < 5; i++) { const a = 0.06 + i * 0.19; if (ruin) WQ(c, lf, a, a + 0.12, h * 0.2, h * 0.75, '#3A322B'); else { WQ(c, lf, a, a + 0.12, h * 0.2, h * 0.7, i === 2 ? '#7A4E2C' : glass); const tp = wallPt(lf[0], lf[1], a + 0.06, h * 0.7); c.fillStyle = i === 2 ? '#7A4E2C' : glass; c.beginPath(); c.ellipse(tp[0], tp[1], 0.06 * Math.hypot(lf[1][0] - lf[0][0], lf[1][1] - lf[0][1]), 2.2 * u, 0, Math.PI, 0); c.fill(); } }
+        for (let i = 0; i < 2; i++) { const a = 0.2 + i * 0.4; if (!ruin) windowQ(c, sf[0], sf[1], a, a + 0.2, h * 0.3, h * 0.7, glass, u); }
+        const g = gableF(c, x, y, F, 0.86, h, (10 + level) * u, roofc);
+        if (!ruin) {
+          const mid = lerpPt(g.m1, g.m2, 0.5); box(c, mid[0], mid[1] + 2 * u, 3 * u, 1.5 * u, 1, 6 * u, '#F4EEE0'); c.fillStyle = '#FFFFFF'; c.beginPath(); c.arc(mid[0] + 1 * u, mid[1] - 2 * u, 1.8 * u, 0, Math.PI * 2); c.fill(); line(c, [mid[0] + 1 * u, mid[1] - 2 * u], [mid[0] + 1 * u, mid[1] - 3.3 * u], '#1E2A28', 0.4 * u);
+          for (let i = 0; i < 3; i++) { const a = 0.08 + i * 0.32, p0 = wallPt(lf[0], lf[1], a, h * 0.2), p1 = wallPt(lf[0], lf[1], a + 0.22, h * 0.2); for (let k = 0; k < 4; k++) { const q0 = lerpPt(p0, p1, k / 4), q1 = lerpPt(p0, p1, (k + 1) / 4); poly(c, [q0, q1, [q1[0] + 2 * u, q1[1] + 3 * u], [q0[0] + 2 * u, q0[1] + 3 * u]], k % 2 ? '#F7F1E5' : ['#C8473D', '#3E8E57', '#E8A93A'][i]); } const cr = lerpPt(p0, p1, 0.5); c.fillStyle = ['#E3A33B', '#7FB34F', '#C7472F'][i]; c.beginPath(); c.arc(cr[0] + 2 * u, cr[1] + 5 * u, 1.6 * u, 0, Math.PI * 2); c.fill(); }
+        } else roofHole(c, g.m1[0] + (g.m2[0] - g.m1[0]) * 0.3, g.m1[1] + (g.m2[1] - g.m1[1]) * 0.3 + 3 * u, u);
         break;
       }
       case 'monument': { // 11.01: an obelisk that grows taller at 5, 10, 25, 50 and 100 stones
@@ -7593,7 +7750,7 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+  const ROOF = { apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
     workshop: (L) => 36 + 3 * L, factory: (L) => 39 + L, induspark: (L) => 43 + L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 25 + 3 * L, medcenter: (L) => 33 + L, hospital: (L) => 44 + L, stadium: (L) => 44 + 4 * L, depot: (L) => 24 + 2 * L, recycling: (L) => 29 + L, wasteplant: (L) => 49 + L,
     shed: (L) => 19 + 2 * L, gardencenter: (L) => 27 + L, parksdept: (L) => 33 + L, firestation: (L) => 33 + 2 * L, firehall: (L) => 39 + L, firehq: (L) => 61 + L, police: (L) => 25 + 2 * L, policestation: (L) => 29 + L, courthouse: (L) => 47 + L,
     prison: (L) => 20 + 2 * L, prison2: (L) => 33 + L, maxprison: (L) => 33 + L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
@@ -8004,7 +8161,7 @@
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
         drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { rot, ruin: b.ruin, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
         if (b.addons) drawAddons(c, b, now);
-        if (b.type === 'field') drawFarmers(c, b, now); // 10.15
+        if (isGrower(b)) drawFarmers(c, b, now); // 10.15; 11.02: farms too
         if (sc !== 1) c.restore();
         if (q && q.done === 0 && bigQ(q)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#5B2DB8', String(focusJobs().indexOf(q) + 1));
         else if (q && !bigQ(q) && !crewOnSite(q.bid)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
@@ -9238,7 +9395,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     else if (t.cat === 'landmark') chips.push(pill('Landmark', 'gold'));
     else if (t.cat !== 'decor' && !special(t)) chips.push(pill(`Level ${b.level}`));
     { const bn = bNet(b, inf, mood); if (live(b) && Math.abs(bn.net) >= 0.5) { const mc = el('button', 'pill money ' + (bn.net >= 0 ? 'gold' : 'bad'), `${bn.net >= 0 ? '+' : '−'}${Math.abs(Math.round(bn.net))} gold/h`); mc.type = 'button'; mc.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); chips.push(mc); } }
-    if (b.type === 'field' && live(b) && inf && inf.food >= 0.1) { const fc = el('button', 'pill money good', `+${g1(inf.food)} food/h`); fc.type = 'button'; fc.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); chips.push(fc); }
+    if (isGrower(b) && live(b) && inf && inf.food >= 0.1) { const fc = el('button', 'pill money good', `+${g1(inf.food)} food/h`); fc.type = 'button'; fc.addEventListener('click', () => { p.tab = 'report'; renderPanel(); }); chips.push(fc); }
     const myJob = jobAt(b), isMine = !!(myJob && currentJob() && currentJob().bid === b.id);
     if (isMine) chips.push(pill('Your job', 'play'));
     const ru = live(b) && t.cat === 'shop' ? rushFor(b.type) : null;
@@ -9366,7 +9523,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (type === 'granary') out.push(`Stores ${TYPES.granary.store[L]} food (the town keeps ${FOOD_CELLAR} without a granary)`);
     if (type === 'market' || type === 'bakery') { if (TYPES[type].unlock <= 3 && hallLevel() >= 3) out.push('Sells food from your fields: earns 20% more while there is food in store'); }
     if (type === 'courthouse') out.push('Finds out why things go wrong in town (see the Incident report) and sends thieves caught twice to prison');
-    else if (lineOf(type) === 'police') out.push('The Courthouse (the biggest police building) finds out why incidents happen and sends repeat thieves to prison');
+    else if (lineOf(type) === 'police') out.push('The Central police (the biggest police building) finds out why incidents happen and sends repeat thieves to prison');
     if (lineOf(type) === 'prison') out.push(`Holds ${t.cells[L]} inmates. Each one earns ${PRISON_PAY} gold an hour from prison work`);
     if (type === 'medcenter' || type === 'hospital') out.push(`Takes very sick patients (with its ambulance)${type === 'hospital' ? ', and treats them twice as fast' : ''}`);
     else if (type === 'clinic') out.push('Very sick patients need a Medical center or a Hospital (with an ambulance)');
@@ -9381,7 +9538,23 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (type === 'hydrant') out.push('Fires start half as often within 2 tiles, and go out faster');
     if (type === 'bin') out.push('Trash piles up 40% slower within 2 tiles');
     if (lineOf(type) === 'school') out.push(`With a teacher, homes within reach earn ${Math.round(SCHOOL_K[tierOf(type)] * 100)}% more`);
-    if (lineOf(type) === 'police') out.push(`Cells for ${t.cells[L] || 0} thieves (each costs ${JAIL_COST} gold an hour)`);
+    if (type === 'police') out.push('No cells: a thief its officers catch gives the gold back but walks free, and may strike again within the hour (a police station can hold them)');
+    else if (lineOf(type) === 'police') out.push(`Custody for ${t.cells[L] || 0} thieves, each held for a town day so they can't steal (${JAIL_COST} gold an hour each)`);
+    if (type === 'firestation') out.push('Hand pumps: fine for 1×1 buildings, bigger ones take twice as long, and only a fire engine (a Fire station or bigger) can save an Apartment block');
+    if (type === 'firehall') out.push('A fire engine: it can save an Apartment block');
+    if (type === 'firehq') out.push('A ladder truck: puts out any fire twice as fast and stops it spreading. Fire safety checks lower the fire risk 30% in reach');
+    if (type === 'hospital') out.push('An operating room: nobody dies of a serious case. A maternity ward: families +2% mood');
+    if (type === 'highschool' || type === 'university') out.push('Teens in reach cause 30% fewer break-ins');
+    if (type === 'recycling') out.push('Sells what it sorts: +1 gold an hour for each street sweeper working here');
+    if (type === 'wasteplant') out.push('Burns waste for power: every service building costs 15% less to run');
+    if (type === 'gardencenter') out.push('Decorations cost 20% less');
+    if (type === 'parksdept') out.push('Festival prizes +25%');
+    if (type === 'workshop') out.push('Building materials: upgrades cost 10% less');
+    if (type === 'factory') out.push('Goods for the shops: every shop in town earns 10% more (unless thieves take the goods)');
+    if (type === 'apartment') out.push('Needs a Fire station (2×1) or bigger in reach. 50% more trash; homes next door pay 5% less');
+    if (type === 'markethall') out.push('Sells three times the food of a stall. Market stalls within 3 tiles earn 20% less');
+    if (type === 'farm') out.push(`Grows ${TYPES.farm.grow[L]} food an hour (twice as much while you focus), ×${FOOD_SEASON[SEA.k]} in ${SEASONS[SEA.k].name.toLowerCase()}. The barn stores ${TYPES.farm.barn} food`);
+    if (t.cat === 'home' && babyRoom({ type }) > 1) out.push(`Room for ${babyRoom({ type })} babies at once`);
     if (jobsOf(type, L)) out.push(`Gives ${jobsOf(type, L)} job${jobsOf(type, L) > 1 ? 's' : ''} to people in town${L < (t.max || 1) && jobsOf(type, L + 1) > jobsOf(type, L) ? ` (${jobsOf(type, L + 1)} at level ${L + 1})` : ''}`);
     if (FLEET[type]) out.push(`${vehLevel(type) > 1 ? 'From level 2: a' : 'Can have a'}${/^[aeiou]/i.test(FLEET[type].name) ? 'n' : ''} ${FLEET[type].name.toLowerCase()} for half again the reach${['firestation', 'police', 'clinic'].includes(lineOf(type)) ? ' and much faster help' : ''}`);
     if (FIRE_RISK[type]) out.push('Catches fire more easily than most (ovens, machines)');
@@ -9438,6 +9611,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (b.robbed) row('Break-in', '−40%', 'neg'); else if (b.shaken && b.shaken.total) row(capFirst(b.shaken.label || 'after a scare'), `−${Math.round(30 * b.shaken.left / b.shaken.total)}%`, 'neg');
       if ((inf.short || 0) >= 0.01) row('Short of workers', `−${Math.round(inf.short * 100)}%`, 'neg');
       if (inf.fresh) row('Selling food from your fields', '+20%', 'pos');
+      if (inf.goods) row('Goods from the factory', '+10%', 'pos'); // 11.02
+      if (inf.rival) row('The market hall nearby draws customers', '−20%', 'neg');
+      if (inf.closed) row(`Closed after a break-in · ${Math.max(1, Math.ceil(b.closed.left))} h`, 'earns nothing', 'neg');
       row(`Town mood ${mood.value}%`, `×${mood.mult.toFixed(2)}`, mood.mult >= 1 ? 'pos' : 'neg');
       row('It earns', `+${Math.round(inc)}/h`, 'gc');
     } else if ((t.cat === 'joy' || t.cat === 'decor') && live(b)) {
@@ -9445,10 +9621,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (pct) { row(`Homes it makes happier (${t.cat === 'joy' ? `within ${t.radius} tile${t.radius > 1 ? 's' : ''}` : 'right next to it'})`, String(inf.near || 0)); row('Each of them pays', `+${Math.round(pct * 100)}%`, 'pos'); }
       if (t.cat === 'decor' && pct) row('Decorations add up to', '+15% at most', 'pos');
       if (inc) row('Its own income', `+${Math.round(inc)}/h`, 'gc');
-    } else if (b.type === 'field' && live(b)) {
+    } else if (isGrower(b) && live(b)) {
       row('Farmers at work', `${farmersOn(b)} of ${1 + b.level}${nightK() > 0.6 ? ' (home for the night)' : ''}`, '');
-      row(`Level ${b.level}`, `+${TYPES.field.grow[b.level]} food/h`, 'gc');
-      row(`${SEASONS[SEA.k].name}`, `×${FOOD_SEASON[SEA.k]}`, FOOD_SEASON[SEA.k] >= 1 ? 'pos' : 'neg');
+      row(`Level ${b.level}`, `+${T(b).grow[b.level]} food/h`, 'gc');
+      if (b.type === 'greenhouse') row('Heated glass', 'the same all year', 'pos'); else row(`${SEASONS[SEA.k].name}`, `×${FOOD_SEASON[SEA.k]}`, FOOD_SEASON[SEA.k] >= 1 ? 'pos' : 'neg');
+      if (b.type === 'farm') row('The barn stores', `${TYPES.farm.barn} food`, '');
       if (inf.dirty) row('Dirty air next door (workshop, factory or depot)', '−30%', 'neg');
       if (city().jobs && city().jobs.short > 0.01) row('Short of farmhands', `−${Math.round(50 * city().jobs.short * city().jobs.k)}%`, 'neg');
       row('It grows', `+${g1(inf.food || 0)} food/h`, 'gc'); row('While you focus', `+${g1(2 * (inf.food || 0))} food/h`, 'pos');
@@ -9470,21 +9647,25 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const bad = (a, v) => { const li = el('li'); li.append(el('span', '', a), el('span', 'neg', v)); tr.append(li); };
     if (b.fire) bad('On fire', `${Math.round(healthOf(b))}% left`);
     if (b.health != null && b.health < 100 && !b.fire && !b.burnt) bad('Scorched by a fire', `${Math.round(b.health)}%, fixing itself`);
-    if (b.robbed) bad('Break-in', `${b.robbed.stolen} gold taken`);
+    if (b.robbed) bad(b.robbed.kind === 'heist' ? 'Bank robbery' : 'Break-in', b.robbed.kind === 'goods' ? 'goods taken' : `${b.robbed.stolen} gold taken`);
+    if (b.closed) bad('Closed after a break-in', `opens in ${Math.max(1, Math.ceil(b.closed.left))} h`);
+    if (b.goodsGone) bad('Goods stolen', 'the shops miss its +10% for a day');
+    if (isBank(b) && live(b)) { const ps = stationsOf('police').find((s) => tierOf(s.type) >= 2 && distFull(s, b) <= stationReach(s)); if (!ps) bad(gangFree() ? 'A gang is free, and no police station reaches the bank' : 'No police station (2×1 or bigger) reaches the bank', gangFree() ? 'a heist could take 15% of the treasury' : 'if a gang forms, a heist could take 15%'); } // 11.02
     if (b.sick) bad('Sick', T(b).staff ? `${staffName(b)} is off sick, so one ${STAFF[T(b).staff].name.toLowerCase()} fewer is on duty until they get better` : 'pays nothing until they get better');
     if (messy(b) && (b.trash || 0) >= 0.5) bad('Trash outside', 'the neighbours mind');
     if (b.type === 'park' && (b.overgrown || 0) > 0.3) bad('Overgrown', `helps ${Math.round(b.overgrown * 60)}% less`);
     if (live(b) && T(b).cat === 'home' && roleInfo('police', city()).needed && !coversB('police', b)) bad('Out of police reach', 'break-ins cost more');
     if (live(b) && canBurn(b) && !coversB('fire', b)) bad('Out of fire station reach', 'a fire would burn it down');
     if (tr.childNodes.length) box.append(el('h4', 'rp-h', 'Right now'), tr);
+    if (isBank(b) && live(b) && stationsOf('police').some((s) => tierOf(s.type) >= 2 && distFull(s, b) <= stationReach(s))) box.append(el('p', 'small', '🛡 A police station reaches the bank: if a gang robs it, they get only 3% of the treasury instead of 15%.')); // 11.02
     // what is special about it
     const sp = specialFacts(b.type, b.level);
     if (sp.length) { const ul = el('ul', 'does'); for (const x of sp) { const li = el('li'); li.append(colorize(x)); ul.append(li); } box.append(el('h4', 'rp-h', 'Special'), ul); }
-    // 10.09: who is in prison, and the Courthouse's report
+    // 10.09: who is in prison, and the Central police's report
     if (lineOf(b.type) === 'prison' && live(b)) {
       const ul = el('ul', 'rp-money');
       for (const pr of state.prison) { const th = thiefById(pr.tid), li = el('li'); li.append(el('span', '', th ? th.name : 'An inmate'), el('span', 'num', `${fmtMin(pr.left)} left`)); ul.append(li); }
-      box.append(el('h4', 'rp-h', 'Inmates'), state.prison.length ? ul : el('p', 'small muted', 'Empty. The Courthouse sends thieves here after their second time caught.'));
+      box.append(el('h4', 'rp-h', 'Inmates'), state.prison.length ? ul : el('p', 'small muted', 'Empty. The Central police sends thieves here after their second time caught.'));
     }
     if ((b.type === 'courthouse' && live(b)) || lineOf(b.type) === 'prison') { const ir = el('button', 'btn fresh', 'Open the incident report'); ir.addEventListener('click', openIncidents); box.append(ir); }
     if (b.addons) {
@@ -9598,12 +9779,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (p.tab === 'decor') {
       for (const type of DECOR) {
         const t = TYPES[type];
-        const locked = hallLevel() < t.unlock, capped = !locked && countType(type) >= capFor(type), fitsHere = fits(type, p.c, p.r), money = state.gold + 1e-6 >= t.cost;
+        const locked = hallLevel() < t.unlock, capped = !locked && countType(type) >= capFor(type), fitsHere = fits(type, p.c, p.r), money = state.gold + 1e-6 >= decorCost(type);
         const ok = !locked && !capped && fitsHere && money;
         const d = deltaAt(type, p.c, p.r);
-        const why = locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : !fitsHere ? 'This spot is taken.' : !money ? `Needs ${fmtGold(t.cost - state.gold + 0.999)} more gold.` : '';
-        if (ADDON[type]) { const okA = !locked && !capped && money; card(type, okA ? '' : 'off', () => { if (okA) startAttach(type); else toast(locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : `Needs ${fmtGold(t.cost - state.gold + 0.999)} more gold.`); }, [goldLine(t.cost), el('span', '', ADDON[type].on ? 'on a building' : 'beside a building')], locked ? `Town hall ${t.unlock}` : ADDON[type].note, locked ? 'lock' : 'pos', locked ? '' : capLabel(type)); continue; }
-        card(type, ok ? '' : 'off', () => { if (ok) startDecor(type, p.c, p.r); else toast(why); }, [goldLine(t.cost), d != null && d >= 0.5 && !locked ? fxChip('gold', `+${Math.round(d)}/h here`) : fxChip('good', `+${Math.round(((t.near && t.near.v) || 0.05) * 100)}% next door`), el('span', '', 'instant')], locked ? `Town hall ${t.unlock}` : '', locked ? 'lock' : 'pos', locked ? '' : capLabel(type));
+        const why = locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : !fitsHere ? 'This spot is taken.' : !money ? `Needs ${fmtGold(decorCost(type) - state.gold + 0.999)} more gold.` : '';
+        if (ADDON[type]) { const okA = !locked && !capped && money; card(type, okA ? '' : 'off', () => { if (okA) startAttach(type); else toast(locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : `Needs ${fmtGold(decorCost(type) - state.gold + 0.999)} more gold.`); }, [goldLine(decorCost(type)), el('span', '', ADDON[type].on ? 'on a building' : 'beside a building')], locked ? `Town hall ${t.unlock}` : ADDON[type].note, locked ? 'lock' : 'pos', locked ? '' : capLabel(type)); continue; }
+        card(type, ok ? '' : 'off', () => { if (ok) startDecor(type, p.c, p.r); else toast(why); }, [goldLine(decorCost(type)), d != null && d >= 0.5 && !locked ? fxChip('gold', `+${Math.round(d)}/h here`) : fxChip('good', `+${Math.round(((t.near && t.near.v) || 0.05) * 100)}% next door`), el('span', '', 'instant')], locked ? `Town hall ${t.unlock}` : '', locked ? 'lock' : 'pos', locked ? '' : capLabel(type));
       }
     } else {
       const order = (p.tab === 'services' ? SERVICE_ORDER : p.tab === 'landmarks' ? LANDMARK_ORDER : BUILD_ORDER).filter((type) => tierOf(type) === 1 || state.buildings.some((b) => b.type === SVC_LINES[lineOf(type)][tierOf(type) - 2] && !b.site));
@@ -9621,7 +9802,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
           else if (!chk.locked && t.cat !== 'landmark') { const d = deltaAt(type, p.c, p.r); const est = d != null ? d : t.cat === 'home' ? t.residents[1] * HOME_TAX : t.base ? t.base[1] : 0; if (est >= 0.5) meta.push(el('span', 'gc', `+${Math.round(est)}/h${d != null ? ' here' : ''}`)); } }
         // 10.15 (Navid): what it adds, as chips like the gold (food, storage, next door, reach), not a line of text
         if (!chk.locked) {
-          if (type === 'field') meta.push(fxChip('food', `+${t.grow[1]} food/h`));
+          if (GROWERS.includes(type)) meta.push(fxChip('food', `+${t.grow[1]} food/h`));
           else if (type === 'granary') meta.push(fxChip('food', `stores ${t.store[1]}`));
           if (t.near) meta.push(fxChip(t.near.v < 0 ? 'bad' : 'good', `${t.near.v < 0 ? '−' : '+'}${Math.round(Math.abs(t.near.v) * 100)}% next door`));
           if (t.staff && t.reach) meta.push(fxChip('reach', `reach ${baseReach(type, 1)}`));
@@ -9717,7 +9898,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     tree: 'Shade and birdsong.', flowers: 'A splash of colour.', bench: 'A seat for a chat.', lamp: 'A warm light at night.',
     // 10.10: every size has its own line
     medcenter: 'A medical center with a doctor on call and an ambulance bay.', hospital: 'The town hospital: wards, an operating room and a helipad.',
-    police: 'A small police post on the corner, with a cell or two.', policestation: 'The police station, with more officers and cells.', courthouse: 'The Courthouse: police, judges and the town\'s court.',
+    police: 'A small police post on the corner, with a cell or two.', policestation: 'The police station, with more officers and cells.', courthouse: 'The Central police: police, judges and the town\'s court.',
     firestation: 'A fire post with one engine bay.', firehall: 'The fire station, with a tall hose tower.', firehq: 'Fire headquarters: engines, a training yard and the lookout tower.',
     school: 'The elementary school, where the little ones learn.', highschool: 'The high school, with a sports field.', university: 'The university: lecture halls, a library and a dome.',
     depot: 'Home of the street sweepers.', recycling: 'A recycling center: sweepers sort what they collect.', wasteplant: 'The waste plant: the town\'s trash ends up here.',
@@ -9725,7 +9906,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     bank: 'A small bank office.', citybank: 'The bank, with a big safe.', centralbank: 'The central bank, with columns and a vault.',
     factory: 'A factory, with a chimney and many hands.', induspark: 'The industrial park: the town\'s biggest employer.',
     monument: 'A monument of the projects you finished, one stone each.',
-    prison: 'A small jail where the thieves the Courthouse sentences serve their time.', prison2: 'A prison with a fenced yard.', maxprison: 'A high-security prison with walls and watchtowers.'
+    apartment: 'Flats for many families, stacked four storeys high.', farm: 'A red barn, a silo and fields full of crops.', markethall: 'A covered market: stalls of fruit, cheese and bread under one roof.',
+    prison: 'A small jail where the thieves the Central police sentences serve their time.', prison2: 'A prison with a fenced yard.', maxprison: 'A high-security prison with walls and watchtowers.'
   };
   const storyOf = (type) => BLD_STORY[type];
 
@@ -9768,7 +9950,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       box.append(panelHead(k, 1, {}, `${A.on ? 'Put' : 'Put up'} ${k === 'solar' || k === 'flowerbox' ? '' : 'a '}${t.name.toLowerCase()} ${A.on ? 'on' : 'beside'} ${placeName(b)}?`, [pill(`${t.cost} gold`, 'gold'), pill(A.what(b), 'good')]));
       const p0 = el('p', 'small'); p0.append(colorize(`${capFirst(A.what(b))}.${A.on ? ' It goes on the building, so it takes no tile.' : " It doesn't take a tile."} You can take it down later for half its price back.`)); box.append(p0);
       const grid = el('div', 'actions-grid');
-      grid.append(actionBtn(`${A.on ? 'Put it on' : 'Put it up'} · ${t.cost} gold`, 'ready right away', 'playc', confirmAttach, state.gold + 1e-6 < t.cost));
+      grid.append(actionBtn(`${A.on ? 'Put it on' : 'Put it up'} · ${decorCost(k)} gold`, 'ready right away', 'playc', confirmAttach, state.gold + 1e-6 < decorCost(k)));
       grid.append(actionBtn('Pick another', null, '', () => { ui.attach.bid = null; ui.selected = null; renderAll(); }));
       grid.append(cancel());
       box.append(grid);
@@ -9785,7 +9967,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const chips = [];
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); chips.push(pill(`${chk.cost} gold`, 'gold'), big ? pill(`Big project · ${lapText(chk.work)} of focus`, 'xp') : pill(`Built in ${fmtSecs(chk.secs || buildSecs(chk.work))}`, 'play')); }
     if (item.isGift) chips.push(pill('Free', 'gold'));
-    if (item.isDecor) chips.push(pill(`${t.cost} gold`, 'gold'), pill('Ready right away', 'play'));
+    if (item.isDecor) chips.push(pill(`${decorCost(item.type)} gold`, 'gold'), pill('Ready right away', 'play'));
     if (delta) chips.push(pill(`${delta > 0 ? '+' : '−'}${Math.abs(delta)} gold/hour`, delta > 0 ? 'good' : 'bad'));
     const ttl = item.isNew ? `Build a ${t.name.toLowerCase()} here?` : item.isGift ? `Place ${item.resident ? `${item.resident}'s cottage` : `the ${t.name.toLowerCase()}`} here?` : item.isDecor ? `Put a ${t.name.toLowerCase()} here?` : `Move the ${tierName(item.type, item.level).toLowerCase()} here?`;
     box.append(panelHead(item.type, item.level, {}, ttl, chips));
@@ -9804,7 +9986,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const grid = el('div', 'actions-grid');
     if (item.isNew) { const chk = checkNew(item.type), big = isBigJob('build', item.type, chk.work || 0); grid.append(actionBtn(`Build it · ${chk.cost} gold`, big ? 'then focus to build it' : `${state.builder} starts right away`, 'playc', confirmPlace)); }
     else if (item.isGift) grid.append(actionBtn('Place it here', 'free', 'playc', confirmPlace));
-    else if (item.isDecor) grid.append(actionBtn(`Place it · ${t.cost} gold`, 'it goes in right away', 'playc', confirmPlace, state.gold + 1e-6 < t.cost));
+    else if (item.isDecor) grid.append(actionBtn(`Place it · ${decorCost(item.type)} gold`, 'it goes in right away', 'playc', confirmPlace, state.gold + 1e-6 < decorCost(item.type)));
     else {
       const mb = byId(item.moveId), here = mb && ui.preview.c === mb.c && ui.preview.r === mb.r, same = here && (ui.rot || 0) === (mb.rot || 0);
       const crew = mb && !here && !quickMove(mb), ms = crew ? moveSecs(mb) : null, fee = !mb ? 0 : here ? turnCost(mb) : moveCost(mb);
@@ -11113,7 +11295,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const avg = burn.reduce((a, b) => a + (fireRisk(b) || 1), 0) / burn.length, far = burn.filter((b) => !coversB('fire', b));
       out.push({ k: 'fire', name: 'Fire risk', v: clamp(Math.round((avg - 0.6) / 2.2 * 100), 0, 100), bad: true, tip: `${far.length ? `${far.length} building${far.length > 1 ? 's are' : ' is'} out of a fire station's reach (they would burn down). ` : ''}Lower it with upgrades, fire hydrants, parks between houses, and fewer packed streets.`, worst: far[0] || null, role: 'fire' });
     }
-    if (roleInfo('police', ci).needed || hallLevel() >= TYPES.police.unlock) out.push({ k: 'crime', name: 'Crime', v: Math.round(crimeLevel()), bad: true, tip: `Up when thieves get away, homes are far from police, kids have no school, people have no job and the town is unhappy. Down with every thief caught and locked up${courthouse() ? '' : ' (a Courthouse sends repeat thieves to prison)'}.`, worst: state.buildings.find((b) => SERVES.police.what(b) && !coversB('police', b)) || null, role: 'police' });
+    if (roleInfo('police', ci).needed || hallLevel() >= TYPES.police.unlock) out.push({ k: 'crime', name: gangFree() ? 'Crime · Gang: free' : 'Crime', v: Math.round(crimeLevel()), bad: true, tip: `Up when thieves get away, homes are far from police, kids have no school, people have no job and the town is unhappy. Down with every thief caught and locked up${courthouse() ? '' : ' (the Central police sends repeat thieves to prison)'}.`, worst: state.buildings.find((b) => SERVES.police.what(b) && !coversB('police', b)) || null, role: 'police' });
     if (sickOn()) { const hs = state.buildings.filter((b) => live(b) && T(b).cat === 'home'), risk = hs.length ? hs.reduce((a, b) => a + (sickRisk(b) || 1), 0) / hs.length : 1; out.push({ k: 'health', name: 'Sickness risk', v: clamp(Math.round((risk - 0.6) / 1.8 * 100), 0, 100), bad: true, tip: 'Up with trash, packed streets, homes next to the depot or workshop, winter, and no clinic nearby. Parks, fountains and markets help.', worst: hs.find((b) => !coversB('nurse', b)) || null, role: 'nurse' }); }
     const dirty = state.buildings.filter(messy);
     if (dirty.length) { const avgT = dirty.reduce((a, b) => a + (b.trash || 0), 0) / dirty.length; out.push({ k: 'clean', name: 'Clean streets', v: clamp(Math.round(100 - avgT / 2 * 100), 0, 100), bad: false, tip: 'Sweepers clean within reach of their depot. Trash bins slow it down.', worst: dirty.filter((b) => (b.trash || 0) > 0.8).sort((a, b) => b.trash - a.trash)[0] || null, role: 'sweeper' }); }
@@ -11143,7 +11325,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return box;
   }
   /* ---------- 10.09: the Incident report ---------- */
-  const INC_ICON = { fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
+  const INC_ICON = { gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
   const agoText = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   function openIncidents() { const wrap = el('div', 'list inc'); incidentsBody(wrap); openSheet('Incident report', wrap); }
   function incidentsBody(wrap) {
@@ -11153,8 +11335,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const sum = el('div', 'inc-sum');
     for (const [k, label, v] of [['fire', 'fires', n('fire')], ['theft', 'break-ins', n('theft')], ['sick', 'sick', n(['sick', 'serious'])], ['lost', 'gold paid back', lost]]) { const c0 = el('div', 'inc-st'); c0.append(el('b', '', String(v)), el('span', '', label)); if (k === 'lost' && v) c0.classList.add('neg'); sum.append(c0); }
     wrap.append(el('p', 'tiny muted', 'The last 7 days in town.'), sum);
-    if (ct) wrap.append(el('p', 'small inc-ct', `⚖ The Courthouse looks into every incident and shows why it happened. Thieves caught twice go to prison${prisonCells() ? '' : ' (build a jail to hold them)'}.`));
-    else { const nb = el('div', 'inc-lock'); nb.append(el('b', '', 'Why did it happen?'), el('span', 'small', 'A Courthouse finds out: the biggest police building (after a level-3 Police station, with town hall 4 and 40 hours of focus in all). Every entry here then gets its reasons, and repeat thieves go to prison.')); wrap.append(nb); }
+    if (ct) wrap.append(el('p', 'small inc-ct', `⚖ The Central police looks into every incident and shows why it happened. Thieves caught twice go to prison${prisonCells() ? '' : ' (build a jail to hold them)'}.`));
+    else { const nb = el('div', 'inc-lock'); nb.append(el('b', '', 'Why did it happen?'), el('span', 'small', 'The Central police finds out: the biggest police building (after a level-3 Police station, with town hall 4 and 40 hours of focus in all). Every entry here then gets its reasons, and repeat thieves go to prison.')); wrap.append(nb); }
+    // 11.02: the gang, if there is one
+    if (state.gang) { const g = state.gang, l = thiefById(g.leader), box0 = el('div', 'inc-box gang'); box0.append(el('b', '', `🦹 ${gangName(g)} · ${gangFree() ? 'free' : inCustody(g.leader) ? 'leader held today' : 'stopped'}`), el('span', 'small', `${l ? l.name : 'The leader'} with ${(g.members || []).map((id) => (thiefById(id) || {}).name).filter(Boolean).join(' and ')}. While the gang is free, crime is 15% higher and the bank can be robbed. Holding the leader (a police station) stops it for a day; jail (the Central police) breaks it up; a week without a getaway ends it.`)); wrap.append(box0); }
     // repeat offenders and the prison
     const th = state.thieves.filter((t) => t.crimes > 0).sort((a, b) => b.crimes - a.crimes).slice(0, 6);
     if (ct && th.length) {
@@ -11201,10 +11385,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     row('While you are away', '2% of what you get while you play', '');
     row('People in town', String(F.residents), '');
     wrap.append(el('h4', 'rp-h', 'Every hour'), ml);
-    const fl = state.buildings.filter((b) => b.type === 'field' && live(b));
+    const fl = state.buildings.filter((b) => isGrower(b) && live(b));
     if (fl.length) {
       const ul = el('ul', 'rp-money');
-      for (const b of fl) { const inf = ci.info.get(b.id) || {}, li = el('li'), lb = el('button', 'link', `Field · level ${b.level}${inf.dirty ? ' · dirty air next door (−30%)' : ''}`); lb.addEventListener('click', () => { closeSheet(); showOnMap(b); }); li.append(lb, el('span', 'num gc', `+${g1(inf.food || 0)}/h`)); ul.append(li); }
+      for (const b of fl) { const inf = ci.info.get(b.id) || {}, li = el('li'), lb = el('button', 'link', `${nameOf(b)} · level ${b.level}${inf.dirty ? ' · dirty air next door (−30%)' : ''}`); lb.addEventListener('click', () => { closeSheet(); showOnMap(b); }); li.append(lb, el('span', 'num gc', `+${g1(inf.food || 0)}/h`)); ul.append(li); }
       wrap.append(el('h4', 'rp-h', 'Your fields'), ul);
     }
     const how = el('ul', 'does');
@@ -11840,7 +12024,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       { k: 'staff', title: 'Town staff & wages', sub: staffN ? `${staffN} staff · ${Math.round(ec.staffWages)} gold an hour in wages · services and buildings` : 'Nobody hired yet · services and buildings', page: staffPage },
       familiesOn() || fam().births ? { k: 'policies', title: 'Policies', sub: `Maternity leave: ${leaveText(fam().leave)} · ${babiesNow().length} bab${babiesNow().length === 1 ? 'y' : 'ies'}, ${kidsNow().length} kid${kidsNow().length === 1 ? '' : 's'}`, page: () => policiesPage(false) } : null,
       { k: 'money', title: 'Money', sub: `${state.gold < 0 ? '−' : ''}${fmtGold(Math.abs(state.gold))} gold · ${ec.net < 0 ? '−' : '+'}${Math.abs(Math.round(ec.net))} an hour${loans().length ? ` · ${loans().length} loan${loans().length > 1 ? 's' : ''}` : ''}`, open: () => openTown('overview') },
-      { k: 'incidents', title: 'Incident report', sub: (() => { const w = state.incidents.filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length; return `${w ? `${w} this week` : 'A quiet week'}${courthouse() ? ' · the Courthouse says why' : ''}`; })(), open: openIncidents },
+      { k: 'incidents', title: 'Incident report', sub: (() => { const w = state.incidents.filter((e) => e.at >= Date.now() - 7 * 86400000 && e.kind !== 'release').length; return `${w ? `${w} this week` : 'A quiet week'}${courthouse() ? ' · the Central police says why' : ''}`; })(), open: openIncidents },
       foodOn() ? { k: 'food', title: 'Food & farms', sub: (() => { const F = city().food, net = F ? F.grown - F.eaten : 0; return `${Math.floor(state.food || 0)} of ${foodCap()} food · ${net >= 0 ? '+' : '−'}${Math.abs(Math.round(net))} an hour while you play${F && F.fed < 0.98 ? ' · hungry!' : ''}`; })(), open: openFood } : null,
       { k: 'coach', title: 'Focus coach', sub: coachOn() ? `Goal ${state.coach.target} min · ${state.coach.hits || 0} of ${COACH_HITS} done${coachSupport() > 1.005 ? ` · starter boost +${Math.round((coachSupport() - 1) * 100)}%` : ''}` : state.coach && state.coach.off ? 'Paused · tap to turn it back on' : 'Four quick questions, then sessions that grow with you', page: coachPage },
       { k: 'data', title: 'Your data', sub: `${fmtMin(state.stats.focusMin || 0)} focused · ${state.stats.sessions || 0} sessions · everything is saved`, page: dataPage },
@@ -13216,7 +13400,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     state.flags.grow9 = true;
     for (const b of state.buildings) if (TYPES[b.type] && b.level > (TYPES[b.type].max || 1)) b.level = TYPES[b.type].max || 1;
     touch(); save();
-    if (n) setTimeout(() => toast('Services keep one size again: a clinic stays a clinic at every level. Bigger versions (Medical center, Hospital, Police station, Courthouse…) are separate buildings for later.'), 2600);
+    if (n) setTimeout(() => toast('Services keep one size again: a clinic stays a clinic at every level. Bigger versions (Medical center, Hospital, Police station, Central police…) are separate buildings for later.'), 2600);
   }
   function boot() {
     if (!devOn() && state.speed > 1) { state.speed = 1; save(); } // test speed is for the developer only
@@ -13389,7 +13573,14 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     incidents: () => JSON.parse(JSON.stringify(state.incidents || [])),
     openIncidents: () => { openIncidents(); return $('sheet').innerText; },
     cityJobs: () => ({ ...city().jobs }),
-    endRob: (bid, caught, foot) => { endRobbery(byId(bid), !!caught, !!foot); return (state.incidents || []).slice(-1)[0] || null; },
+    endRob: (bid, caught, foot, st) => { endRobbery(byId(bid), !!caught, !!foot, st == null ? null : st); return (state.incidents || []).slice(-1)[0] || null; },
+    // 11.02: crime, custody and gangs
+    gang: () => ({ gang: state.gang ? JSON.parse(JSON.stringify(state.gang)) : null, free: gangFree(), crime: crimeLevel(), target: crimeTarget(city()), jail: JSON.parse(JSON.stringify(state.jail || [])), lastHeist: state.lastHeist || 0 }),
+    getaways: (n) => { const th = state.thieves[0] || newThief(); for (let i = 0; i < (n || 3); i++) noteGetaway(th); return { name: th.name, away: (th.away || []).length, gang: !!state.gang }; },
+    heist: (bid) => { const b = byId(bid); startRobbery(b, true); return b && b.robbed ? { ...b.robbed } : null; },
+    shopInfo: (bid) => { const i = city().info.get(bid); return i ? { income: i.income, goods: !!i.goods, rival: !!i.rival, closed: !!i.closed } : null; },
+    responder: (k, bid) => { const s = responderFor(k, byId(bid)); return s ? s.type : null; },
+    hold: (tid) => { state.jail.push({ left: 24, tid }); touch(); return gangFree(); },
     thieves: () => ({ thieves: JSON.parse(JSON.stringify(state.thieves || [])), prison: JSON.parse(JSON.stringify(state.prison || [])), cells: prisonCells(), court: !!courthouse(), jail: (state.jail || []).length }),
     prisonStep: (m) => { prisonStep(m); return (state.prison || []).length; },
     planUp: (bid) => { const q = planJob('upgrade', bid, true), b = byId(bid); return { ok: !!q, why: q ? '' : checkJob('upgrade', b).why, grow: b.grow ? { ...b.grow } : null, gold: state.gold }; },
