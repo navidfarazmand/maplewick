@@ -23,27 +23,24 @@ The game side is the "11.11: the Android app" section of `app/maplewick.html`. I
 | `app.json` | Name, package `com.khoreh.maplewick`, icons, permissions, the game's address (`extra.gameUrl`) |
 | `eas.json` | Build profiles: `preview` makes an APK to install on your phone, `production` an app bundle for Google Play |
 
-## Making a test build for your phone
+## Getting the app on your phone (free, no accounts)
 
-You need Node.js (version 20 or newer) and a free account at expo.dev. On your computer:
+GitHub builds the app on its own computers whenever `mobile/` changes (`.github/workflows/android.yml`), or by hand: Actions → Android test build → Run workflow. It takes about 15 minutes and costs nothing.
 
-```
-cd mobile
-npm install
-npx eas-cli@latest login
-npm run build:android
-```
+On the Samsung, open **https://github.com/navidfarazmand/maplewick/releases/tag/android-test**, tap `maplewick-test.apk`, and install it. Android asks once to allow installs from your browser. Newer test builds install over the old one and keep your town.
 
-The first time, EAS asks a few questions: say yes to creating the project and to generating a new Android keystore (EAS keeps it safe; it signs every build). The build runs on Expo's servers and takes about 10–20 minutes. At the end you get a link and a QR code: open it on the Samsung, download the APK and install it (Android asks you to allow installs from your browser once).
+The test build is signed with React Native's standard test key, so it's for your own phones only. Google Play needs a real key: when the time comes, build with EAS (`npm run build:android:store`, free Expo account) or a key of your own.
+
+The game itself comes from the website, so a new game version doesn't need a new app build, only changes in `mobile/` do.
 
 ## Google sign-in: one setup step
 
-Google only gives the app a sign-in if it knows the app's signing key:
+Google only gives the app a sign-in if it knows the app's package and signing key. In the Google Cloud console, project **maplewick-eb4df** → APIs & Services → Credentials → Create credentials → OAuth client ID → **Android**:
 
-1. After the first build: `npx eas-cli@latest credentials` → Android → preview → copy the **SHA-1 fingerprint**.
-2. Google Cloud console, project **maplewick-eb4df** → APIs & Services → Credentials → Create credentials → OAuth client ID → **Android**. Package name `com.khoreh.maplewick`, the SHA-1 from step 1. Save.
+- Package name: `com.khoreh.maplewick`
+- SHA-1 (the test key): `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`
 
-Nothing else changes: the game keeps using its web client ID. When the app goes on Google Play, add Google Play's own SHA-1 (Play Console → App integrity) the same way.
+Nothing else changes: the game keeps using its web client ID. For Google Play later, add Google Play's own SHA-1 (Play Console → App integrity) the same way.
 
 ## On the Samsung
 
