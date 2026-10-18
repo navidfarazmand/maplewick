@@ -1522,7 +1522,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.00'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.01'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -2788,7 +2788,8 @@
     const n0 = F.kids.length; F.kids = F.kids.filter((k) => now - k.born < 6 * FAM_YEAR); if (F.kids.length !== n0) changed = true;
     const ci = city();
     if (ci.residents >= BIRTH_RES) {
-      const exp = ci.residents / 1440 * span / 3600000 * (taxOn() && pol().tax === 'low' ? 1.2 : 1); // 11.03: low taxes, more babies let n = Math.floor(exp) + (Math.random() < exp % 1 ? 1 : 0); n = Math.min(n, 3);
+      const exp = ci.residents / 1440 * span / 3600000 * (taxOn() && pol().tax === 'low' ? 1.2 : 1); // 11.03: low taxes, more babies
+      let n = Math.floor(exp) + (Math.random() < exp % 1 ? 1 : 0); n = Math.min(n, 3);
       for (let i = 0; i < n; i++) {
         const homes = state.buildings.filter((b) => live(b) && T(b).cat === 'home' && !b.fire && T(b).residents[b.level] >= 4 && babiesIn(b, now) < babyRoom(b)); // 11.02: a House has room for two little ones, an apartment block three
         if (!homes.length) break;
