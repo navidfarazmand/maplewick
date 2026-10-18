@@ -1522,7 +1522,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.01'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.02'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -5108,6 +5108,12 @@
     if (!s.sid) return;
     const req = kind === 'start' ? api.call('focusStart', { sid: s.sid, app: APP.on }) : api.call('focusEnd', { sid: s.sid, minutes: Math.round((minutes || 0) * 100) / 100 });
     req.then((r) => { if (r && r.ok !== false) { state.srvAt = Date.now(); save(); } }).catch(() => { /* not deployed, or offline: the game goes on as before */ });
+  }
+  // This week's minutes as the server counted them (at most once a minute), for the league tab
+  function srvFocusDoc(now) {
+    const api = srvApi(); if (!api || !api.getDoc || now - (SRV.fAsked || 0) < 60000) return;
+    SRV.fAsked = now;
+    api.getDoc('focus/' + FB.user.uid).then((d) => { const had = JSON.stringify(SRV.focus || null); SRV.focus = d; if (JSON.stringify(d) !== had) refreshFriends(); }).catch(() => {});
   }
   // Last week's result from the server (at most every 5 minutes)
   function srvResult(now) {
@@ -11170,6 +11176,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     card.append(lgBadge(t, 46), tx);
     listEl.append(card);
     if (myWeekMin(now) <= 0) listEl.append(el('p', 'small muted', 'Focus this week to take part: points are focus minutes, nothing else.'));
+    if (srvUse(now)) { // 12.00: what the server counted this week
+      const v = SRV.focus && SRV.focus.weeks && SRV.focus.weeks[wk];
+      listEl.append(el('p', 'tiny muted', v ? `Checked by the server: ${fmtMin(Math.round(v.min))} this week. The final table on Monday uses these minutes.` : 'The server checks every session; the final table on Monday uses its minutes.'));
+      srvFocusDoc(now);
+    }
     const last = L.hist[L.hist.length - 1];
     if (last && last.rank) listEl.append(el('p', 'tiny muted', `Last week: ${ordinal(last.rank)} in ${LEAGUES[last.t].name}${last.move > 0 ? ', moved up' : last.move < 0 ? ', moved down' : ''}.`));
     tb.rows.forEach((r, i) => {

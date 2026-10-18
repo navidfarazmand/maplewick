@@ -81,6 +81,16 @@ with sync_playwright() as p:
     else: check(L4['w'] != prevW, 'no result 12 hours into the week: the game works it out itself')
     pg.close()
 
+    # 5. the league tab shows the minutes the server counted this week
+    pg = ctx.new_page(); pg.goto(URL); pg.wait_for_timeout(300)
+    W = pg.evaluate(f"() => ({WEEKKEY})(Date.now())"); pg.close()
+    st5 = json.loads(json.dumps(st)); st5['srvAt'] = int(time.time() * 1000); st5['league'] = { 'w': W, 't': 0, 'm': 0, 'hist': [] }
+    pg = page(st5, "window.__docs = { 'focus/u1': { weeks: { '" + W + "': { min: 42, app: 0, n: 2 } } } };")
+    pg.evaluate("() => document.getElementById('open-friends').click()"); pg.wait_for_timeout(2500)
+    txt = pg.inner_text('#sheet')
+    check('Checked by the server: 42 min' in txt, 'the league tab shows the server-checked minutes')
+    pg.close()
+
     check(not errs, f'no page errors {errs}')
     print('FAILS', fails)
     b.close()
