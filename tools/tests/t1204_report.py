@@ -37,7 +37,7 @@ with sync_playwright() as p:
     check(len(sent) == 1, 'Send posts the report to the server')
     d = sent[0]['data'] if sent else {}
     print('   keys:', sorted(d.keys()))
-    check(d.get('note') == 'The town froze after I came back.' and d.get('ver') == '12.04' and d.get('app') == '1.0.0', 'with the note, the game and app versions')
+    check(d.get('note') == 'The town froze after I came back.' and d.get('ver') == '12.05' and d.get('app') == '1.0.0', 'with the note, the game and app versions')
     check(any('test error for the report' in e['msg'] for e in d.get('errors', [])), 'and recent errors')
     check(isinstance(d.get('state'), dict) and 'screen' in d['state'] and len(d.get('atPoints', [])) == 5, 'and what was on screen')
     check((d.get('shot') or '').startswith('data:image/jpeg;base64,'), 'and a picture of the town')

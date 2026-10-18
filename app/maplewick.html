@@ -283,7 +283,7 @@
   .intro.go .in-go .gl.o { animation: inGoChar .62s cubic-bezier(.2, 1.6, .4, 1) both, inGoO .5s ease-in-out infinite alternate; animation-delay: var(--d, 0s), calc(var(--d, 0s) + .62s); }
   @keyframes inGoChar { 0% { opacity: 0; transform: translateY(34px) scale(.3) rotate(-12deg); } 60% { opacity: 1; transform: translateY(-12px) scale(1.18) rotate(4deg); } 100% { opacity: 1; transform: none; } }
   @keyframes inGoO { to { transform: translateY(-6px) scaleY(1.08); } }
-  @media (prefers-reduced-motion: reduce) { .intro.go .in-go { animation: inUp .2s forwards; left: 50%; top: 46%; transform: translate(-50%, -50%); } .intro.go .in-go .gl, .intro.go .in-go .gl.o { animation: none; } }
+  html.calm .intro.go .in-go { animation: inUp .2s forwards; left: 50%; top: 46%; transform: translate(-50%, -50%); } html.calm .intro.go .in-go .gl, html.calm .intro.go .in-go .gl.o { animation: none; }
   .intro.go .in-card, .intro.go .in-tap { animation: inAway .35s forwards; }
   .intro.go .in-island { animation: inZoom .9s .25s ease-in forwards; }
   .in-burst { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
@@ -301,7 +301,7 @@
   @keyframes inZoom { to { transform: scale(2.4) translateY(-30px); opacity: 0; } }
   @keyframes inBurst { 0% { opacity: 1; transform: translate(-50%, -50%) rotate(0); } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); } }
   @keyframes inRipple { to { transform: scale(9); opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) { .intro.on .in-hi .ch, .intro.on .in-line, .intro.on .in-stats span, .intro.on .in-tap, .intro.on .in-b { animation-duration: .01s; animation-delay: 0s; } .in-cloud, .in-island, .in-orb { animation: none; } }
+  html.calm .intro.on .in-hi .ch, html.calm .intro.on .in-line, html.calm .intro.on .in-stats span, html.calm .intro.on .in-tap, html.calm .intro.on .in-b { animation-duration: .01s; animation-delay: 0s; } html.calm .in-cloud, html.calm .in-island, html.calm .in-orb { animation: none; }
   .banner .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .reqpill { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 0; border-radius: 14px; box-shadow: var(--shadow); padding: 8px 12px; text-align: left; font-size: 13px; line-height: 1.3; animation: popIn .3s both; }
   .reqpill b { font-family: var(--display); font-size: 14px; flex: none; }
@@ -438,7 +438,7 @@
   .tg-wave { padding: 6px 14px; }
   @keyframes tgBob { 50% { transform: translateY(-2px); } }
   @keyframes tgWave { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
-  @media (prefers-reduced-motion: reduce) { .tg-pal img, .tg-pal.waving img { animation: none; } }
+  html.calm .tg-pal img, html.calm .tg-pal.waving img { animation: none; }
   .lbrow.tap:active { transform: scale(.985); }
   #open-friends { position: relative; }
   #open-friends.lg::after { content: ''; position: absolute; right: 5px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--lgc); box-shadow: 0 0 0 2px var(--surface); }
@@ -450,6 +450,15 @@
   .lapcard .lc-unfold { font-size: 12.5px; font-weight: 700; opacity: .85; }
   .set-tog { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; background: none; padding: 6px 2px; font: inherit; font-weight: 700; font-size: 15px; color: var(--ink); text-align: left; }
   .set-tog:disabled { opacity: 1; cursor: default; }
+  .set-tog.card { padding: 12px 14px; margin: 4px 0 2px; border-radius: 16px; border: 2px solid color-mix(in oklab, var(--accent, #7B5BE6) 55%, transparent); background: color-mix(in oklab, var(--accent, #7B5BE6) 16%, var(--surface, transparent)); }
+  .set-tog .st-tx { display: flex; flex-direction: column; gap: 2px; }
+  .set-tog .st-tx b { font-family: var(--display); font-size: 17px; }
+  .set-tog .st-tx small { font-weight: 600; font-size: 13px; color: var(--muted); }
+  .lp-total { margin-top: 6px; text-align: center; font-weight: 800; font-size: 13.5px; opacity: .95; }
+  .lp-count { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 2px 0 8px; font-weight: 700; font-size: 14px; }
+  .lp-count b { min-width: 64px; text-align: center; font-family: var(--display); font-size: 17px; }
+  .lp-step { width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255,255,255,.2); color: inherit; font: inherit; font-size: 20px; font-weight: 800; line-height: 1; }
+  .lp-step:disabled { opacity: .35; }
   .set-tog .chev { margin-left: auto; font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
   .durations.dim button { opacity: .62; }
   .planbadge { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 8px; border-radius: 12px; background: var(--focus-soft); color: var(--focus); font-size: 13px; font-weight: 600; line-height: 1.3; }
@@ -1223,6 +1232,10 @@
   .taskcard { display: grid; gap: 7px; padding: 12px 13px; margin: -4px 0 12px; border-radius: 16px; background: var(--focus-soft); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--focus) 35%, transparent); }
   .tk-head { display: grid; gap: 2px; }
   textarea.tk-if { resize: none; line-height: 1.35; }
+  /* 12.05: the report box reads well in light and dark */
+  textarea.reptext { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; line-height: 1.4; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); color: var(--ink); resize: vertical; user-select: text; -webkit-user-select: text; }
+  textarea.reptext::placeholder { color: var(--muted); opacity: 1; }
+  textarea.reptext:focus { outline: none; border-color: var(--focus); }
   .taskcard .tk-q, .taskcard .tk-title { font-size: 15.5px; color: var(--focus); }
   .taskcard .tk-sub { font-size: 12.5px; color: var(--muted); }
   .taskcard .tk-lbl { font-size: 11.5px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
@@ -1255,7 +1268,8 @@
   .monu-stone.off { opacity: .55; }
   .monu-stone small { color: var(--muted); font-size: 12px; }
   .monu-stone .link { justify-self: start; font-size: 12px; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  /* 12.05: calm motion follows the phone's setting (Remove animations) unless you choose in Settings › Motion */
+  html.calm *, html.calm *::before, html.calm *::after { animation: none !important; transition: none !important; }
 </style>
 
 <div class="app" id="app">
@@ -1498,7 +1512,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.04'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.05'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1521,7 +1535,9 @@
   const LOCK_SOUNDS = { off: 'Off', music: 'Your music', rain: 'Soft rain', brown: 'Brown noise', quiet: 'Almost silent' };
   const BG_SOUNDS = { off: 'Off', rain: 'Soft rain', waves: 'Ocean waves', fire: 'Crackling fire', brown: 'Brown noise' };
   const NAMES = ['Mira', 'Theo', 'Priya', 'Jonas', 'Kofi', 'Ines', 'Hugo', 'Yara', 'Sven', 'Noor', 'Ezra', 'Tilly', 'Ravi', 'Ada', 'Felix', 'June', 'Malik', 'Elsie', 'Tomas', 'Wren', 'Idris', 'Pia', 'Otto', 'Leila'];
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const phoneCalm = (() => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+  let reduced = phoneCalm; // 12.05: set from state.calm once the save is loaded (setCalm)
+  const setCalm = () => { reduced = state.calm == null ? phoneCalm : !!state.calm; document.documentElement.classList.toggle('calm', reduced); };
 
   const live = (b) => !b.ruin && !b.site && !b.moving; // 10.13: a building the crew is moving is closed
   const homesCount = () => state.buildings.filter((b) => live(b) && TYPES[b.type].cat === 'home').length;
@@ -2141,6 +2157,10 @@
     if (s.lapRun && typeof s.lapRun !== 'object') s.lapRun = null;
     // 10.13: the silver shield, the crew's clock and the news from while you were away
     if (!Number.isFinite(s.silverUntil)) s.silverUntil = 0;
+    if (typeof s.silverEver !== 'boolean') s.silverEver = s.silverUntil > 0;
+    if (![0, 1, 2, 3, 4, 5].includes(s.dayEnd)) s.dayEnd = 0; // DAY_ENDS (defined further down)
+    if (!Number.isFinite(s.dayEndAt)) s.dayEndAt = 0;
+    if (s.calm !== true && s.calm !== false) s.calm = null; // 12.05: null = follow the phone
     if (s.crewAt != null && !Number.isFinite(s.crewAt)) s.crewAt = null;
     if (s.awayNews && !(Array.isArray(s.awayNews.done) && Array.isArray(s.awayNews.inc))) s.awayNews = null;
     for (const b of s.buildings || []) if (b.moving && !(s.queue || []).some((q) => q.bid === b.id && q.kind === 'move')) delete b.moving;
@@ -2155,7 +2175,8 @@
     return null;
   }
 
-  let state = normalize(loadLocal()) || normalize(fresh()); // 10.12: a brand-new town gets every default too (the menu crashed before the first reload)
+  let state = normalize(loadLocal()) || normalize(fresh());
+  setCalm(); // 10.12: a brand-new town gets every default too (the menu crashed before the first reload)
   const ui = { screen: 'home', overlay: null, holding: null, preview: null, panel: null, selected: null, spot: null, hover: null, playExpired: false, lastResult: null, reveals: [], bump: null, recharge: null, lastPlaySec: null,
     bubbles: [], nextBubble: 0, lastMood: null, moodFlash: null, playVisit: 0, fireSince: 0, flash: null, hits: [], chest: null, tourSpeed: 0, tour: null, focusPop: 0 };
 
@@ -2708,7 +2729,7 @@
         if (os.exists) { const ob = os.data(); remote = ob && ob.state ? migrate(ob.state) : null; if (remote) remote.savedAt = ob.savedAt || 0; }
       }
       if (remote && valid(remote) && (remote.savedAt || 0) > (state.savedAt || 0) && !state.session && !ui.visit) {
-        state = normalize(JSON.parse(JSON.stringify(remote)));
+        state = normalize(JSON.parse(JSON.stringify(remote))); setCalm();
         try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
         boot();
       }
@@ -3606,9 +3627,17 @@
   /* ---------- 10.13 (Navid): trouble while you are away. With the app closed (or in the background) fires, break-ins
      and sickness still happen: about one every 4 hours, 3 at most. What your staff can reach they deal with; what they
      can't is waiting for you when you're back (a fire out of reach you can still rescue with 10 minutes of focus).
-     The silver shield stops all of it: focus 30 minutes in a day and it is on for the next 24 hours. The golden shield
+     The silver shield stops all of it: focus 30 minutes in a day and it is on until your day ends (12.05: midnight, or
+     the later hour you chose in Settings; your very first one lasts through the next day too). The golden shield
      stops it too. ---------- */
   const SILVER_MIN = 30, SILVER_MS = 24 * 3600000, AWAY_EVERY = 4 * 60, AWAY_MAX = 3, RESCUE_MIN = 10;
+  // 12.05 (Navid): your day ends at midnight, or up to 5 am for night owls (Settings, once a week). Today's minutes, the
+  // streak and the silver shield follow it.
+  const DAY_ENDS = [0, 1, 2, 3, 4, 5], DAY_END_EVERY = 7 * 86400000;
+  const dayEndH = () => (DAY_ENDS.includes(state.dayEnd) ? state.dayEnd : 0);
+  const dayEndLabel = (h) => (h ? `${h} am` : 'midnight');
+  const myDayKey = (t) => dayKey((t || Date.now()) - dayEndH() * 3600000);
+  const myDayEnd = (t, extra) => { const E = dayEndH(), d = new Date((t || Date.now()) - E * 3600000); return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1 + (extra || 0), E).getTime(); };
   const silverOn = (t) => (state.silverUntil || 0) > (t || Date.now());
   const silverLeft = (t) => Math.max(0, ((state.silverUntil || 0) - (t || Date.now())) / 1000);
   function awayNews() { if (!state.awayNews) state.awayNews = { done: [], inc: [], blocked: 0, min: 0 }; return state.awayNews; }
@@ -3665,6 +3694,7 @@
     return info(b, `${whoAt(b)} is sick and can't work${T(b).cat === 'home' ? ', so the home pays no taxes' : ''}. No nurse can reach it: a clinic nearby (with a nurse) would treat it.`);
   }
   const fmtAway = (min) => (min < 1.5 ? 'a minute' : min < 60 ? `${Math.round(min)} minutes` : min < 48 * 60 ? `${Math.floor(min / 60)} h${Math.round(min % 60) ? ` ${Math.round(min % 60)} min` : ''}` : `${Math.round(min / 1440)} days`);
+  const silverUntilText = (sv) => (sv && sv.first ? 'today and all of tomorrow (your first one lasts an extra day)' : `until your day ends (${dayEndLabel(dayEndH())})`);
   const fmtHours = (sec) => (sec >= 3600 ? `${Math.floor(sec / 3600)} h${Math.floor(sec % 3600 / 60) ? ` ${Math.floor(sec % 3600 / 60)} min` : ''}` : `${Math.max(1, Math.ceil(sec / 60))} min`);
   // Back in the app (or opened again): what happened while you were away. t0 is when you left.
   function awayBack(hadFocus, t0) {
@@ -3702,7 +3732,7 @@
       }
     }
     if (n.blocked) wrap.append(el('p', 'small', `🛡 The ${n.by === 'silver' ? 'silver' : 'golden'} shield kept ${n.blocked === 1 ? 'a fire, a break-in or a sickness' : `${n.blocked} fires, break-ins or sicknesses`} away.`));
-    if (n.inc.length && !silverOn()) wrap.append(el('p', 'tiny muted', `Focus ${SILVER_MIN} minutes in a day and the silver shield switches on: nothing bad happens while you're away, for the next 24 hours.`));
+    if (n.inc.length && !silverOn()) wrap.append(el('p', 'tiny muted', `Focus ${SILVER_MIN} minutes in a day and the silver shield switches on: nothing bad happens while you're away, until your day ends (${dayEndLabel(dayEndH())}).`));
     const ok = el('button', 'btn primary full', 'OK'); ok.addEventListener('click', closeSheet); wrap.append(ok);
     openSheet('While you were away', wrap);
   }
@@ -3711,7 +3741,7 @@
     const b = byId(bid); if (!b || !b.fire || state.session) return;
     if (responderFor('fire', b)) { toast('Your firefighters are on their way.'); return; }
     ui.panel = null; ui.selected = null;
-    startSession(RESCUE_MIN, { rescue: b.id });
+    openStart(RESCUE_MIN, false, b.id); // 12.05: the start page first, set to the rescue
   }
   function rescueOut(b) {
     const hp = Math.max(50, Math.round(healthOf(b))); // your focus saved it: it opens again (with some soot)
@@ -4505,7 +4535,7 @@
     state.queue = [q].concat(state.queue.filter((x) => x !== q));
     // 10.13: a project in rounds opens the start sheet on its laps (pick a lap length); a short one starts at its length
     if (roundsQ(q)) { save(); startPick.mode = 'laps'; openStart(null, true); }
-    else startSession(Math.max(MIN_SESSION, exactMinutes(q.work - q.done)));
+    else { save(); openStart(Math.max(MIN_SESSION, exactMinutes(q.work - q.done))); } // 12.05 (Navid): never straight into a countdown: the start page first
   }
   // Planning a session (strict): Sam works through his plan in order and only starts a job he can finish
   // in the time you picked; a long job takes whatever time is left. Replaying a running session uses strict = false.
@@ -4957,9 +4987,18 @@
     if (!APP.on) return;
     try { window.MaplewickApp.on(appRecv); } catch (e) { APP.on = false; return; }
     appPost({ t: 'hello', version: APP_VERSION });
-    // 12.04: a tap means the app is in front. If the page still thinks it's hidden (a late "hidden" from the app after
-    // coming back), wake it up, or the town stops drawing and only the bottom bar answers.
-    document.addEventListener('pointerdown', () => { if (document.hidden) { try { window.MaplewickApp.setHidden(false); } catch (e) { /* older app */ } } }, true);
+    // 12.05: in the app, the game alone decides whether it is on screen. Android's WebView sends its own hidden/visible
+    // events and the app sent more, late and out of order, so after a quick trip away the page could believe it was
+    // still hidden: the town stopped drawing and only the bottom bar answered. Now: the app's "visible" messages set it
+    // right away (no timers), a tap always means visible, and repeated events with no change are ignored.
+    APP.vis = true;
+    try {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => !APP.vis });
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (APP.vis ? 'visible' : 'hidden') });
+    } catch (e) { /* the browser keeps its own */ }
+    APP.setVis = (v) => { v = !!v; if (APP.vis === v) return; APP.vis = v; document.dispatchEvent(new Event('visibilitychange')); };
+    try { window.MaplewickApp.setHidden = (h) => APP.setVis(!h); } catch (e) { /* ignore */ }
+    document.addEventListener('pointerdown', () => APP.setVis(true), true);
     if (state.session) { APP.hold = Date.now() + 4000; appFocus(state.session, true); appPost({ t: 'log?' }); } // reopened mid-session: wait for the log
   }
   // A session starts (fresh log) or goes on after the app was reopened; null when it ends.
@@ -5132,7 +5171,7 @@
       state: { screen: ui.screen, overlay: ui.overlay || null, sheet: $('scrim').hidden ? null : ($('sheet').dataset.kind || $('sheet-title').textContent), visible, hidden: document.hidden, fakeHidden: APP.on ? window.MaplewickApp._fake : null,
         tour: tour.steps ? tour.i : -1, session: s ? { min: Math.round(sessionMinutes(s, Date.now()) * 10) / 10, of: s.duration, laps: !!s.laps } : null,
         playSec: Math.round(state.playSec), town: state.town, hall: hallLevel(), residents: city().residents, gold: Math.round(state.gold), buildings: state.buildings.length,
-        board: board.kind || null, signedIn: !!(FB.user), srvAt: state.srvAt || null },
+        board: board.kind || null, signedIn: !!(FB.user), srvAt: state.srvAt || null, calm: reduced, phoneCalm, dayEnd: dayEndH() },
       atPoints: pts.map(([x, y]) => describeEl(document.elementFromPoint(x, y))),
       errors: ERRS.slice(), events, focusLog: APP.ev.slice(-60),
       shot: withShot ? reportShot() : null, uidHint: board.me || null,
@@ -5143,8 +5182,7 @@
     const wrap = el('div', 'list');
     wrap.append(el('p', 'small', 'What happened? A few words help: what you tapped, what you expected, what you saw. Everything else (version, phone, what was on screen, recent errors) is added for you.'));
     const ta = document.createElement('textarea'); ta.rows = 4; ta.maxLength = 2000; ta.placeholder = 'For example: I came back to the app and the town stopped moving.'; ta.className = 'reptext';
-    ta.style.cssText = 'width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:12px;border:1.5px solid var(--line, #ccc);background:var(--card, #fff);color:inherit;user-select:text;-webkit-user-select:text';
-    const shotRow = el('label', 'small'); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true; shotRow.append(cb, document.createTextNode(' Include a small picture of the town'));
+        const shotRow = el('label', 'small'); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true; shotRow.append(cb, document.createTextNode(' Include a small picture of the town'));
     const out = el('div', 'small');
     const send = el('button', 'btn primary full', 'Send report');
     const shot0 = reportShot(); // the picture as it was when the report opened
@@ -5157,13 +5195,13 @@
         const res = await withTimeout(fetch(`https://us-central1-${cfg.projectId}.cloudfunctions.net/bugReport`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data }) }).then((r) => r.json()), 20000, 'offline');
         const id = res && res.result && res.result.id; if (!id) throw new Error('no id');
         anaEvent('report', { id });
-        out.replaceChildren(el('b', '', `Thank you! Report ${id} is sent.`), el('p', 'small muted', `Tell Claude "${id}" and it can read the whole report.`));
+        out.replaceChildren(el('b', '', `Thank you! Report ${id} is sent.`), el('p', 'small muted', 'If you write to us about it, mention this code.'));
         send.textContent = 'Close'; send.disabled = false; send.onclick = () => closeSheet();
         const cp = el('button', 'btn sm ghost', `Copy ${id}`); cp.addEventListener('click', () => { try { navigator.clipboard.writeText(id); toast('Copied.'); } catch (e) { /* ignore */ } }); out.append(cp);
       } catch (e) {
         send.disabled = false; send.textContent = 'Try again';
         const txt = JSON.stringify(Object.assign({}, data, { shot: undefined }));
-        const cp = el('button', 'btn sm', 'Copy the report instead'); cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(txt); toast('Copied. Paste it to Claude.'); } catch (e2) { toast('This phone can\'t copy here.'); } });
+        const cp = el('button', 'btn sm', 'Copy the report instead'); cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(txt); toast('Copied. Send it to us by email.'); } catch (e2) { toast('This phone can\'t copy here.'); } });
         out.replaceChildren(el('p', 'small', 'Could not send it right now (no internet, or the server is off).'), cp);
       }
     });
@@ -5231,6 +5269,12 @@
   // 11.08 (Navid): every lap on its own, "25+5 + 25+5 + 25+5 + 25", never folded into "5 × 25+5". A long plan shows
   // 12 laps around the one you are on, with how many come before and after. cur = the lap you are on (1-based).
   const LAP_SHOW = 12;
+  // 12.05 (Navid): how long it all takes, under the laps: "4 laps · 50 min of focus · 57½ min in all"
+  function lapTotalEl(laps) {
+    const f = laps.reduce((a, x) => a + x.f, 0), all = laps.reduce((a, x) => a + x.f + x.b, 0);
+    const half = (x) => (Math.abs(x - Math.round(x)) > 0.25 ? `${fmtMin(Math.floor(x))}½`.replace(' min½', '½ min') : fmtMin(Math.round(x)));
+    return el('div', 'lp-total', `${laps.length} lap${laps.length > 1 ? 's' : ''} · ${half(f)} of focus · ${half(all)} in all`);
+  }
   function lapPlanEl(P, len, cur, done) {
     const laps = lapPlan(P, len), box = el('div', 'lapplan');
     const chip = (x, idx) => { const c = el('span', 'lp-chip' + (idx < (done || 0) ? ' done' : idx + 1 === cur ? ' now' : '')); c.append(el('b', '', fmtHalf(x.f))); if (x.b) c.append(el('i', '', `+${fmtHalf(x.b)}`)); return c; };
@@ -5554,6 +5598,7 @@
     state.session = { duration, jobBid: currentJob().bid, start: now + ready * 1000, ready, speed: ui.tourSpeed || state.speed, income: focusNet(econ(now)), combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone, fromPlay, rescue: opts && opts.rescue ? opts.rescue : null };
     if (laps) { const len = (opts && opts.len) || ROUND; startPick.lapLen = len; Object.assign(state.session, { laps: true, lapLen: len, lapP: roundsWork(), lapBase: run ? run.n : 0, lapOf: (run ? run.n : 0) + planLaps(len), lapRung: 0, skip: 0, prevRun: run ? Object.assign({}, run) : null }); }
     { const tq0 = taskQ(state.session); if (tq0) state.session.taskQ = tq0.id; } // 11.01
+    if (laps && !(state.session.lapP > 0)) state.session.lapOf = run && run.free && run.of > run.n ? run.of : state.session.lapBase + clamp(startPick.lapN || 4, 1, 16); // 12.05: free laps, as many as chosen
     if (opts && opts.together) state.session.tg = opts.together; // 11.10: focusing together
     state.lapRun = null; // the break is over
     if (ALARM.lap) closeAlarm();
@@ -5742,11 +5787,16 @@
       // 10.12: the Golden shield: nothing bad can happen in town for 20% of the time you focused.
       const sh = grantShield(m); if (sh) r.shield = { min: sh, until: state.shieldUntil };
     } else state.combo = { n: 0, until: 0 };
-    const key = dayKey(now), st = state.streak;
+    const key = myDayKey(now), st = state.streak;
     if (st.todayKey !== key) { st.todayKey = key; st.todayMin = 0; }
     st.todayMin += mAll;
-    // 10.13 (Navid): 30 minutes of focus in a day switches on the silver shield (24 hours with no trouble while you're away)
-    if (st.todayMin + 1e-9 >= SILVER_MIN) { if (!silverOn(now) || (state.silverUntil || 0) < now + SILVER_MS - 6 * 3600000) r.silver = true; state.silverUntil = Math.max(state.silverUntil || 0, now + SILVER_MS); }
+    // 10.13 (Navid): 30 minutes of focus in a day switches on the silver shield (no trouble while you're away).
+    // 12.05: until the end of your day (the very first one: through the next day as well).
+    if (st.todayMin + 1e-9 >= SILVER_MIN) {
+      const first = !state.silverEver, until = myDayEnd(now, first ? 1 : 0);
+      if (until > (state.silverUntil || 0) + 60000) r.silver = { first, until };
+      state.silverUntil = Math.max(state.silverUntil || 0, until); state.silverEver = true;
+    }
     if (st.todayMin >= 5 && st.lastDay !== key) {
       const gap = st.lastDay ? dayNum(key) - dayNum(st.lastDay) : 99;
       if (gap === 1) st.count += 1;
@@ -5767,7 +5817,7 @@
     if (s.tg) togetherEnd(s, done, r); // 11.10
     // 10.12: after a lap: a 5-minute break, then the bell for the next lap. Ending in the middle of a lap stops the laps.
     if (L && done && (reason0 === 'lap' || reason0 === 'complete' || L.win) && (roundJobs().length || !s.lapP)) {
-      state.lapRun = { n: L.done, of: L.done + planLaps(L.len), at: now, breakUntil: now + breakMs(s.speed, L.len), rang: false, len: L.len, free: !s.lapP && !roundJobs().length };
+      state.lapRun = { n: L.done, of: !s.lapP && s.lapOf > L.done ? s.lapOf : L.done + planLaps(L.len), at: now, breakUntil: now + breakMs(s.speed, L.len), rang: false, len: L.len, free: !s.lapP && !roundJobs().length };
       r.lapBreak = true; state.stats.laps = (state.stats.laps || 0) + L.k;
     } else { state.lapRun = null; if (L && done) state.stats.laps = (state.stats.laps || 0) + L.k; }
     touch();
@@ -8586,7 +8636,20 @@
       c.beginPath(); c.moveTo(x - 9, y); c.quadraticCurveTo(x - 4.5, y + 2.6, x, y); c.quadraticCurveTo(x + 4.5, y + 2.6, x + 9, y); c.stroke();
     }
     for (const [a, rr, s2] of [[0.7, 1.1, 1], [2.6, 1.13, 0.8], [4.1, 1.09, 1.2]]) { const x = cx + Math.cos(a) * N * HW * rr, y = cy + Math.sin(a) * N * HH * rr; c.fillStyle = '#7E7A72'; c.beginPath(); c.ellipse(x, y, 9 * s2, 5 * s2, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#9B958B'; c.beginPath(); c.ellipse(x - 2, y - 2, 6 * s2, 3.2 * s2, 0, 0, Math.PI * 2); c.fill(); c.strokeStyle = css(P.foam); c.lineWidth = 1.2; c.beginPath(); c.ellipse(x, y + 2, 12 * s2, 5.5 * s2, 0, 0, Math.PI); c.stroke(); }
-    const ba = ui.boatA != null ? ui.boatA : t / 90000 * Math.PI * 2, bx = cx + Math.cos(ba) * N * HW * 1.34, by = cy + Math.sin(ba) * N * HH * 1.34, dir = -Math.sin(ba) >= 0 ? 1 : -1;
+  }
+  // 12.05 (Navid): the sailboat goes round outside the bandit islands (it swings wide around each one) and is drawn
+  // after them, so it never slips underneath.
+  function boatLane(a) {
+    let rr = 1.34;
+    for (const C of CAMPS) {
+      let d = Math.abs(a - C.a) % (Math.PI * 2); if (d > Math.PI) d = Math.PI * 2 - d;
+      rr = Math.max(rr, 1.34 + (C.rr + 0.3 - 1.34) * Math.exp(-((d / 0.32) ** 2)));
+    }
+    return rr;
+  }
+  function drawSailboat(c, now) {
+    const P = skyNow(), t = reduced ? 0 : now, cx = 0, cy = N * HH;
+    const ba = ui.boatA != null ? ui.boatA : t / 110000 * Math.PI * 2, rr = boatLane(ba), bx = cx + Math.cos(ba) * N * HW * rr, by = cy + Math.sin(ba) * N * HH * rr, dir = -Math.sin(ba) >= 0 ? 1 : -1;
     drawBoat(c, bx, by, dir, t, P);
   }
   /* ---------- 10.13 (Navid: "make the boat more dope"): a little yacht that rocks on the swell, with billowing sails, a
@@ -8742,6 +8805,7 @@
     c.setTransform(d * z, 0, 0, d * z, d * (geo.w / 2 - cam.x * z), d * (geo.h / 2 - cam.y * z));
     drawSea(c, now);
     drawCamps(c, now); // 11.06
+    drawSailboat(c, now); // 12.05: after the islands
     const top = [0, 0], right = [N * HW, N * HH], bottom = [0, 2 * N * HH], left = [-N * HW, N * HH], dz = HH * 1.1;
     drawIsland(c, now);
     if (state.pirate && !ui.visit) { const pp = piratePos(state.pirate); drawPirateShip(c, pp.p.x, pp.p.y, pp.dir, tt); const sp = toScreen(pp.p.x, pp.p.y); ui.hits.push({ x0: sp.x - 30 * z, x1: sp.x + 30 * z, y0: sp.y - 40 * z, y1: sp.y + 10 * z, pirate: true }); } // 11.05
@@ -9216,8 +9280,8 @@
     { const node = $('shield-home'), on = sOn && !state.session && ui.screen !== 'play';
       if (on) { const t = `${SHIELD_SVG}Golden shield ${fmtClock(sl)}<span>· your town is safe</span>`; if (node.dataset.t !== t) { node.innerHTML = t; node.dataset.t = t; } }
       if (node.hidden === on) node.hidden = !on; }
-    // 10.13: the silver shield (on Home): on for 24 hours after 30 minutes of focus in a day; before that, how far along today is
-    { const node = $('silver-home'), svOn = silverOn(now), st = state.streak, todayM = st && st.todayKey === dayKey(now) ? st.todayMin || 0 : 0;
+    // 10.13: the silver shield (on Home): on until your day ends after 30 minutes of focus in a day; before that, how far along today is
+    { const node = $('silver-home'), svOn = silverOn(now), st = state.streak, todayM = st && st.todayKey === myDayKey(now) ? st.todayMin || 0 : 0;
       const on = !ui.visit && !state.session && ui.screen !== 'play' && !sOn && state.named && (svOn || (todayM > 0 && todayM < SILVER_MIN));
       if (on) { const t = svOn ? `${SHIELD_SVG}Silver shield ${fmtHours(silverLeft(now))}<span>· safe while you're away</span>` : `${SHIELD_SVG}Silver shield<span>· ${Math.floor(todayM)} of ${SILVER_MIN} min today</span>`; if (node.dataset.t !== t) { node.innerHTML = t; node.dataset.t = t; node.classList.toggle('off', !svOn); } }
       if (node.hidden === on) node.hidden = !on; }
@@ -9938,6 +10002,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     box.classList.toggle('alert', !!(show && p && p.kind === 'alert'));
     if (!show || !ui.panel) box.classList.remove('full');
     const really = show && !!ui.panel;
+    if (!really && box.style.animation) box.style.animation = '';
     if (box.hidden === really) box.hidden = !really;
   }
   // 10.11: the handle at the top of a card. Tap it, or swipe the card up, for full screen; swipe down (or tap) to shrink.
@@ -9948,9 +10013,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     g.addEventListener('click', () => setPanelFull(!full));
     return g;
   }
-  function setPanelFull(on) {
+  function setPanelFull(on, dragged) {
     const p = ui.panel; if (!p || !!p.full === on) return;
     p.full = on; delete p._tabShown;
+    $('mpanel').style.animation = dragged ? 'none' : ''; // 12.05: after a drag the card is already there
     sfx.pop(); renderPanel();
     if (!on) $('mpanel').scrollTop = 0;
     anaEvent('card-' + (on ? 'full' : 'small'), { kind: p.kind });
@@ -9966,16 +10032,51 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
   }
   (function panelGestures() {
-    const box = $('mpanel'); let sy = 0, sx = 0, st = 0, on = false, fired = false, grab = false;
-    box.addEventListener('touchstart', (e) => { if (e.touches.length !== 1 || !ui.panel) { on = false; return; } const t = e.touches[0]; sy = t.clientY; sx = t.clientX; st = box.scrollTop; on = true; fired = false; grab = !!(e.target.closest && e.target.closest('.mp-grab, .mp-head')); }, { passive: true });
-    box.addEventListener('touchmove', (e) => {
-      if (!on || fired || !ui.panel) return;
-      const t = e.touches[0], dy = t.clientY - sy, dx = t.clientX - sx;
-      if (Math.abs(dy) < Math.abs(dx) * 1.4) return;
-      if (!ui.panel.full && dy < -34 && (grab || st <= 1)) { fired = true; setPanelFull(true); }
-      else if (ui.panel.full && dy > 64 && (grab || (st <= 1 && box.scrollTop <= 1))) { fired = true; setPanelFull(false); }
+    // 12.05 (Navid): the card follows your finger as you pull it up (or down), then glides the rest of the way.
+    const box = $('mpanel'); let sy = 0, sx = 0, st = 0, on = false, grab = false, drag = 0, h0 = 0, lastY = 0, lastT = 0, vy = 0;
+    const clear = () => { box.style.height = ''; box.style.maxHeight = ''; box.style.transform = ''; box.style.transition = ''; box.style.zIndex = ''; };
+    const glide = (props, done) => {
+      if (reduced) { done(); return; }
+      let ok = false; const fin = () => { if (ok) return; ok = true; box.removeEventListener('transitionend', fin); done(); };
+      box.style.transition = 'height .26s cubic-bezier(.2,.9,.3,1), transform .26s cubic-bezier(.2,.9,.3,1)';
+      requestAnimationFrame(() => { Object.assign(box.style, props); box.addEventListener('transitionend', fin); setTimeout(fin, 360); });
+    };
+    box.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1 || !ui.panel || drag === 3) { on = false; return; }
+      const t = e.touches[0]; sy = lastY = t.clientY; sx = t.clientX; lastT = performance.now(); vy = 0; st = box.scrollTop; on = true; drag = 0;
+      grab = !!(e.target.closest && e.target.closest('.mp-grab, .mp-head'));
     }, { passive: true });
-    box.addEventListener('touchend', () => { on = false; }, { passive: true });
+    box.addEventListener('touchmove', (e) => {
+      if (!on || !ui.panel) return;
+      const t = e.touches[0], dy = t.clientY - sy, dx = t.clientX - sx, now = performance.now();
+      if (now > lastT) { vy = 0.7 * vy + 0.3 * ((t.clientY - lastY) / (now - lastT)); lastY = t.clientY; lastT = now; }
+      if (!drag) {
+        if (Math.abs(dy) < 8 || Math.abs(dy) < Math.abs(dx) * 1.4) return;
+        const full = !!ui.panel.full;
+        if (!full && dy < 0 && (grab || st <= 1)) { drag = 1; h0 = box.getBoundingClientRect().height; box.style.transition = 'none'; box.style.maxHeight = 'none'; box.style.zIndex = '30'; }
+        else if (full && dy > 0 && (grab || (st <= 1 && box.scrollTop <= 1))) { drag = 2; box.style.transition = 'none'; }
+        else { on = false; return; }
+      }
+      e.preventDefault();
+      const H = (box.parentElement && box.parentElement.clientHeight) || innerHeight;
+      if (drag === 1) box.style.height = `${clamp(h0 - dy, h0 * 0.85, H)}px`;
+      else box.style.transform = `translateY(${Math.max(0, dy)}px)`;
+    }, { passive: false });
+    const release = (e) => {
+      if (!on) return; on = false;
+      if (drag !== 1 && drag !== 2) { drag = 0; return; }
+      const t = e.changedTouches && e.changedTouches[0], dy = t ? t.clientY - sy : 0, H = (box.parentElement && box.parentElement.clientHeight) || innerHeight, which = drag;
+      drag = 3;
+      if (which === 1) {
+        const go = vy < -0.4 || (-dy > (H - h0) * 0.28 && vy < 0.3);
+        glide({ height: `${go ? H : h0}px` }, () => { drag = 0; clear(); if (go) setPanelFull(true, true); });
+      } else {
+        const go = vy > 0.4 || (dy > Math.min(160, H * 0.22) && vy > -0.3);
+        glide({ transform: `translateY(${go ? Math.round(H * 0.45) : 0}px)` }, () => { drag = 0; clear(); if (go) setPanelFull(false, true); });
+      }
+    };
+    box.addEventListener('touchend', release, { passive: true });
+    box.addEventListener('touchcancel', release, { passive: true });
     // with a mouse: drag the handle
     let my = null;
     box.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse' && e.target.closest && e.target.closest('.mp-grab')) my = e.clientY; });
@@ -10900,7 +11001,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (code === 'auth/unauthorized-domain') return 'The leaderboard does not allow this web address yet.';
     if (code === 'permission-denied') return 'The leaderboard refused the update.';
     if (code === 'auth/google-return') return 'Google sign-in did not finish. Please try again.';
-    if (code === 'auth/invalid-credential') return 'Google sign-in was refused by the leaderboard. Claude has to check the setup.';
+    if (code === 'auth/invalid-credential') return 'Google sign-in was refused by the leaderboard. Please send a problem report (Menu › Report a problem).';
     if (code === 'auth/timeout') return 'Google sign-in did not come back. Join with a name instead: it always works.';
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Sign-in closed.';
     return 'Sign-in did not work this time. Joining with a name always works.';
@@ -10914,7 +11015,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   const realState = () => (ui.visit ? ui.visit.real : state);
   // What other mayors see of your town: stats and the layout (never your gold or anything personal).
   function townSnap() {
-    const now = Date.now(), wk = weekKey(now), dk = dayKey(now);
+    const now = Date.now(), wk = weekKey(now), dk = myDayKey(now);
     return { v: 2, town: state.town, builder: state.builder, level: state.level, residents: city().residents, mood: moodNow(now).value, streak: state.streak.count,
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
@@ -11888,6 +11989,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (['celebrate', 'chest'].includes(ui.overlay) && now - run.breakUntil < 60000) return;
     run.rang = true; save();
     if (!roundJobs().length && !run.free) { state.lapRun = null; toast(`Break's over! ${state.builder}'s projects are done. Start a session any time.`); renderAll(); return; }
+    if (run.free && run.of && run.n >= run.of) { state.lapRun = null; toast(`All ${run.of} laps done. Well focused! Start a session any time.`); sfx.chime(); renderAll(); return; } // 12.05
     showLapAlarm();
   }
   function showLapAlarm() {
@@ -12888,10 +12990,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
 
   const startPick = { duration: 25, mode: 'fixed', lapLen: ROUND };
-  function openStart(prefDuration, keepMode) {
+  function openStart(prefDuration, keepMode, rescue) {
     if (state.session) return;
+    startPick.rescue = rescue || null; // 12.05: a fire to put out with this session
     startPick.cmbAt = performance.now(); // 10.14: the combo stamps play as the sheet opens
-    if (!state.coach && !state.flags.coachAsked && !tour.steps && state.named) { state.flags.coachAsked = true; save(); openSurvey(() => openStart(prefDuration)); return; } // 10.11
+    if (!state.coach && !state.flags.coachAsked && !tour.steps && state.named) { state.flags.coachAsked = true; save(); openSurvey(() => openStart(prefDuration, keepMode, rescue)); return; } // 10.11
     const cg = coachGoal(), rounds = roundJobs().length > 0;
     // 10.13: with a project in rounds, the sheet opens on its laps; the eight set lengths are always there too
     if (!keepMode) startPick.mode = rounds && !prefDuration ? 'laps' : 'fixed';
@@ -12906,7 +13009,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   function lapSwitch(opts, cur, onChange) {
     const ci = opts.indexOf(ROUND), lo = opts.slice(0, ci), hi = opts.slice(ci + 1);
     const pos = (L) => (opts.length > 1 ? opts.indexOf(L) / (opts.length - 1) : 0.5), pr = pos(ROUND); // 10.16 (Navid): evenly spaced
-    const desc = (L) => `${fmtMin(L)} laps · ${fmtHalf(lapFocus(L))} focus + ${fmtHalf(lapBreakOf(L))} break`;
+    const desc = (L) => `${fmtMin(L)} lap: ${fmtHalf(lapFocus(L))} min focus + ${fmtHalf(lapBreakOf(L))} min break`; // 12.05
     const box = el('div', 'lapsw' + (hi.length ? '' : ' nohi')); box.tabIndex = 0; box.setAttribute('role', 'slider');
     box.setAttribute('aria-label', 'Lap length'); box.setAttribute('aria-valuemin', '0'); box.setAttribute('aria-valuemax', String(opts.length - 1));
     const head = el('div', 'lsw-head'), val = el('b', '');
@@ -12951,7 +13054,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const update = (L) => {
       const lf = lapFocus(L), n = Math.max(1, Math.ceil(P / lf - 1e-9));
       title.textContent = `Lap ${n0 + 1} of ${n0 + n}`;
-      planBox.replaceChildren(lapPlanEl(P, L, 1));
+      planBox.replaceChildren(lapPlanEl(P, L, 1), lapTotalEl(lapPlan(P, L))); // 12.05: and the total
     };
     const sw = lapSwitch(opts, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
     update(startPick.lapLen);
@@ -12970,8 +13073,25 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     top.append(el('span', 'lc-eye', brk ? `Break · ${fmtClock(breakLeft())} left` : 'Focus in laps'), title);
     const planBox = el('div', 'lc-plan');
     // 11.08: lap after lap, each with its break, for as long as you like
-    const oneLap = (L) => { const box = el('div', 'lapplan'); for (let k = 0; k < 3; k++) { if (k) box.append(el('span', 'lp-plus', '+')); const c = el('span', 'lp-chip' + (k ? '' : ' now')); c.append(el('b', '', fmtHalf(lapFocus(L))), el('i', '', `+${fmtHalf(lapBreakOf(L))}`)); box.append(c); } box.append(el('span', 'lp-plus', '+ …')); return box; };
-    const update = (L) => planBox.replaceChildren(oneLap(L));
+    // 12.05 (Navid): you choose how many laps; every lap is shown (they wrap), the last one has no break, and the total
+    // time is under them. During a run of laps the count is the one you chose at the start.
+    const N = () => (run && run.free && run.of > n0 ? run.of - n0 : clamp(startPick.lapN || 4, 1, 16));
+    const lapsFor = (L) => Array.from({ length: N() }, (_, k) => ({ f: lapFocus(L), b: k < N() - 1 ? lapBreakOf(L) : 0 }));
+    const oneLap = (L) => {
+      const box = el('div', 'lapplan'), laps = lapsFor(L);
+      laps.forEach((x, k) => { if (k) box.append(el('span', 'lp-plus', '+')); const c = el('span', 'lp-chip' + (k ? '' : ' now')); c.append(el('b', '', fmtHalf(x.f))); if (x.b) c.append(el('i', '', `+${fmtHalf(x.b)}`)); box.append(c); });
+      return box;
+    };
+    const stepper = () => {
+      const row = el('div', 'lp-count'), minus = el('button', 'lp-step', '−'), plus = el('button', 'lp-step', '+'), val = el('b', '', `${N()} lap${N() > 1 ? 's' : ''}`);
+      minus.type = 'button'; plus.type = 'button'; minus.setAttribute('aria-label', 'One lap fewer'); plus.setAttribute('aria-label', 'One more lap');
+      const fixed = !!(run && run.free && run.of > n0); minus.disabled = fixed || N() <= 1; plus.disabled = fixed || N() >= 16;
+      minus.addEventListener('click', (e) => { e.stopPropagation(); startPick.lapN = Math.max(1, N() - 1); renderStart(); });
+      plus.addEventListener('click', (e) => { e.stopPropagation(); startPick.lapN = Math.min(16, N() + 1); renderStart(); });
+      row.append(el('span', '', 'How many'), minus, val, plus);
+      return row;
+    };
+    const update = (L) => planBox.replaceChildren(stepper(), oneLap(L), lapTotalEl(lapsFor(L)));
     const sw = lapSwitch(LAP_LENS, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
     update(startPick.lapLen);
     card.append(top);
@@ -13048,18 +13168,23 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   function drawCamps(c, now) {
     const on = campsOn() && !ui.visit, A = state.army || { cleared: 0 };
     CAMPS.forEach((C, k) => {
-      const { x, y } = campPos(k), s = 0.8 + k * 0.03;
-      c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(x, y + 3, 30 * s, 10 * s, 0, 0, Math.PI * 2); c.fill();
-      c.fillStyle = '#D9C48A'; c.beginPath(); c.ellipse(x, y, 26 * s, 9 * s, 0, 0, Math.PI * 2); c.fill();
-      c.fillStyle = '#7DA05A'; c.beginPath(); c.ellipse(x - 3 * s, y - 2 * s, 17 * s, 6 * s, 0, 0, Math.PI * 2); c.fill();
-      treeAt(c, x - 13 * s, y - 2 * s, 12 * s, '#2F7A47');
+      // 12.05 (Navid: "the islands are too small"): bigger islands with a shallow lagoon, surf, rocks and two trees
+      const { x, y } = campPos(k), s = 2.1 + k * 0.05, P = skyNow(), wob = reduced ? 0 : Math.sin(now / 1100 + k * 1.7);
+      c.fillStyle = css(P.shallow.concat([0.3])); c.beginPath(); c.ellipse(x, y + 3 * s, 36 * s, 13 * s, 0, 0, Math.PI * 2); c.fill();
+      { const f = P.foam.slice(); f[3] = 0.45 + 0.2 * wob; c.strokeStyle = css(f); c.lineWidth = 1.4; c.beginPath(); c.ellipse(x, y + 2 * s, (29 + wob) * s, (10.4 + wob * 0.4) * s, 0, 0, Math.PI * 2); c.stroke(); }
+      c.fillStyle = '#8C7A55'; c.beginPath(); c.ellipse(x, y + 2.6 * s, 26 * s, 9 * s, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#E2CF96'; c.beginPath(); c.ellipse(x, y, 26 * s, 9 * s, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#7DA05A'; c.beginPath(); c.ellipse(x - 3 * s, y - 1.6 * s, 18 * s, 6.2 * s, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#93B86A'; c.beginPath(); c.ellipse(x - 6 * s, y - 2.6 * s, 10 * s, 3.4 * s, 0, 0, Math.PI * 2); c.fill();
+      for (const [rx, ry, rs] of [[19, 3, 2.6], [-21, 2.4, 2], [16, 5.2, 1.6]]) { c.fillStyle = '#7E7A72'; c.beginPath(); c.ellipse(x + rx * s, y + ry * s, rs * 1.5 * s, rs * s, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#A29C91'; c.beginPath(); c.ellipse(x + (rx - 0.5) * s, y + (ry - 0.6) * s, rs * s, rs * 0.6 * s, 0, 0, Math.PI * 2); c.fill(); }
+      treeAt(c, x - 15 * s, y - 1.6 * s, 11 * s, '#2F7A47'); treeAt(c, x - 8 * s, y + 1 * s, 8 * s, '#3B8A52');
       if (!on) return;
       const mine = k < A.cleared;
       for (const [dx, cc] of [[-2, mine ? '#E8E2D4' : '#5A3A22'], [7, mine ? '#D8D2C4' : '#3A2618']]) { const tx = x + dx * s, ty = y - 1 * s; c.fillStyle = cc; c.beginPath(); c.moveTo(tx - 5 * s, ty); c.lineTo(tx, ty - 8 * s); c.lineTo(tx + 5 * s, ty); c.closePath(); c.fill(); }
       line(c, [x + 14 * s, y], [x + 14 * s, y - 16 * s], '#59606A', 0.9);
       const wv = reduced ? 0 : Math.sin(now / 300 + k) * 1.2; c.fillStyle = mine ? '#F4F1EA' : '#1E1E22'; c.beginPath(); c.moveTo(x + 14 * s, y - 16 * s); c.lineTo(x + 22 * s, y - 14 * s + wv); c.lineTo(x + 14 * s, y - 11 * s); c.closePath(); c.fill();
       if (!mine && k === A.cleared) { c.fillStyle = '#E5482F'; c.beginPath(); c.arc(x, y - 18 * s, 4.5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#FFF'; c.font = 'bold 6px sans-serif'; c.textAlign = 'center'; c.fillText('⚔', x, y - 16 * s); }
-      const sp = toScreen(x, y), z = cam.z; ui.hits.push({ x0: sp.x - 26 * z, x1: sp.x + 26 * z, y0: sp.y - 24 * z, y1: sp.y + 10 * z, camp: k });
+      const sp = toScreen(x, y), z = cam.z; ui.hits.push({ x0: sp.x - 26 * s * z, x1: sp.x + 26 * s * z, y0: sp.y - 24 * s * z, y1: sp.y + 10 * s * z, camp: k });
     });
   }
   /* ---------- 11.05 (roadmap part 6, Navid): pirates, computer-run only ----------
@@ -13601,8 +13726,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const allD = singles.length ? opts.find((d) => !pvs.get(d).unfinished) : null;
     // 10.15 (Navid): no long sentence here: "How long?" sits next to the title (the ✓ on a block says what finishes Sam's plan)
     // 10.19 (Navid): while the laps are open the eight blocks are folded; opening them folds the laps
-    const setTog = el('button', 'set-tog', isLaps ? 'Or focus a set time' : 'Or focus a set time:'); setTog.type = 'button'; setTog.setAttribute('aria-expanded', String(!isLaps));
-    if (isLaps) { setTog.append(el('span', 'chev', '▾')); setTog.addEventListener('click', () => { startPick.mode = 'fixed'; renderStart(); }); } else setTog.disabled = true;
+    const setTog = el('button', 'set-tog' + (isLaps ? ' card' : ''), isLaps ? '' : 'Or focus a set time:'); setTog.type = 'button'; setTog.setAttribute('aria-expanded', String(!isLaps));
+    if (isLaps) { // 12.05 (Navid): folded, it's a bold card you can't miss
+      const tx = el('span', 'st-tx'); tx.append(el('b', '', 'Or focus a set time'), el('small', '', 'One session of 5 minutes to 2 hours, and your job'));
+      setTog.append(tx, el('span', 'chev', '▾')); setTog.addEventListener('click', () => { startPick.mode = 'fixed'; renderStart(); });
+    } else setTog.disabled = true;
     wrap.append(setTog);
     const durs = el('div', 'durations'); durs.hidden = isLaps;
     for (const d of opts) {
@@ -13659,7 +13787,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (wait) lab.append(`${state.builder} finishes `, finB(), `, then you (${jobName(wait.q)} needs longer):`);
       else lab.append(`${state.builder} finishes `, finB(), ', then you:');
     } else lab.append('Your job');
-    const jobsHidden = isLaps && hasRounds && pv.sim.leftover < 0.05; // 10.19: the whole lap goes to the building
+    const jobsHidden = isLaps && !(hasRounds && pv.sim.leftover > 0.05); // 12.05 (Navid): in laps, your job shows only when Sam finishes in the lap and you work after
     if (!jobsHidden) wrap.append(lab);
     const oldJr = !$('scrim').hidden && document.querySelector('#sheet .startsheet .jobs'), jrLeft = oldJr ? oldJr.scrollLeft : null; // 10.15: keep the job row where it was
     const jr = el('div', 'jobs' + (planned && pv.sim.leftover < 0.05 ? ' idle' : ''));
@@ -13694,6 +13822,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else extras.push(`Play earned today: ${fmtMin(Math.round(playDayNow().sec / 60))} of ${fmtMin(DAILY_PLAY / 60)}. You can hold up to ${fmtMin(PLAY_CAP / 60)}.`);
       if (singles.some((q) => pv.sim.items.some((x) => x.q === q && !x.waiting))) extras.push('Short projects (30 minutes or less) have to be finished in one go: end early and they are torn down.');
     }
+    if (startPick.rescue && !isLaps) { const fb = byId(startPick.rescue); if (fb && fb.fire) extras.unshift(`Finish it and the fire at ${placeName(fb)} is out.`); }
     if (pv.onPlan) extras.push(`On your plan: ${pv.block.label || 'focus block'} · +50% XP and a silver chest or better`);
     if (pv.goalGold) extras.push(`Finish it to earn the ${TIER_NAMES[pv.goal.badge.tier].toLowerCase()} ${fmtMin(pv.goal.goal)} badge`);
     if (pv.comboN) extras.push(`Combo ×${pv.combo.toFixed(1)}: session ${pv.comboN + 1} in a row${isLaps ? ' (each lap after a break keeps it going)' : ''}`);
@@ -13711,9 +13840,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (pv.chest) box.append(oddsBar(m, 0));
     wrap.append(box);
     const run = lapRunNow(), next = (run ? run.n : 0) + 1;
-    const go = el('button', 'btn primary full' + (comboNow() > 0 ? ' combo' : ''), isLaps ? `Start lap ${next} · ${fmtHalf(lapFocus(lenL))} min` : `Start ${fmtMin(m)} of focus`);
+    const freeOf = isLaps && !hasRounds ? (run && run.free && run.of > run.n ? run.of : (run ? run.n : 0) + clamp(startPick.lapN || 4, 1, 16)) : 0;
+    const go = el('button', 'btn primary full' + (comboNow() > 0 ? ' combo' : ''), isLaps ? `Start lap ${next}${freeOf ? ` of ${freeOf}` : ''} · ${fmtHalf(lapFocus(lenL))} min` : `Start ${fmtMin(m)} of focus`);
     go.style.minHeight = '52px'; go.style.fontSize = '17px';
-    go.addEventListener('click', () => (isLaps ? startLaps(lenL) : startSession(m)));
+    go.addEventListener('click', () => (isLaps ? startLaps(lenL) : startSession(m, startPick.rescue ? { rescue: startPick.rescue } : undefined)));
     wrap.append(go);
     if (state.speed > 1) wrap.append(el('p', 'tiny muted', isLaps ? `Test speed is on: a lap takes ${Math.max(1, Math.round(lapFocus(lenL) * 60 / state.speed))} seconds, a break ${Math.round(breakMs(state.speed, lenL) / 1000)} seconds.` : `Test speed is on: this takes ${Math.max(1, Math.round(m * 60 / state.speed))} seconds.`));
     openSheet('Start focus', wrap, { full: true });
@@ -13756,7 +13886,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       { k: 'coach', title: 'Focus coach', sub: coachOn() ? `Goal ${state.coach.target} min · ${state.coach.hits || 0} of ${COACH_HITS} done${coachSupport() > 1.005 ? ` · starter boost +${Math.round((coachSupport() - 1) * 100)}%` : ''}` : state.coach && state.coach.off ? 'Paused · tap to turn it back on' : 'Four quick questions, then sessions that grow with you', page: coachPage },
       { k: 'data', title: 'Your data', sub: `${fmtMin(state.stats.focusMin || 0)} focused · ${state.stats.sessions || 0} sessions · everything is saved`, page: dataPage },
       { k: 'festival', title: SEASONS[curSeason()].fest, sub: `${Math.floor(seasonProgress().min)} of ${SEASON_GOAL[0]} minutes for its prize`, open: openSeason },
-      { k: 'settings', title: 'Settings', sub: 'Names, sounds, focus alarm, days, lock-screen timer', page: settingsPage },
+      { k: 'settings', title: 'Settings', sub: 'Names, sounds, focus alarm, when your day ends, lock-screen timer', page: settingsPage },
       { k: 'help', title: 'Help', sub: 'Why this app, play-time limits, the quick tour', page: helpPage },
       { k: 'report', title: 'Report a problem', sub: APP.on ? 'Or shake your phone · sends what went wrong, so it can be fixed' : 'Sends what went wrong, so it can be fixed', open: () => openReport() }, // 12.04
       { k: 'about', title: 'About', sub: `Version ${APP_VERSION} · music credits · rate us`, page: aboutPage },
@@ -14002,6 +14132,24 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     for (const k of Object.keys(LOCK_SOUNDS)) { const b = el('button', '', LOCK_SOUNDS[k]); b.type = 'button'; b.setAttribute('aria-pressed', String(state.lockSound === k)); b.addEventListener('click', () => { state.lockSound = k; if (k !== 'off') state.lockKind = k; save(); openMenuPage('settings'); }); lks.append(b); }
     menuSec(wrap, 'Focus', switchRow('Focus plan alarm', 'A bell rings when a planned focus block starts (while Maplewick is open).', 'set-alarm', state.alarms !== false, (v) => { state.alarms = v; save(); if (v) ringBell(); }),
       el('div', 'tiny muted', 'Lock-screen timer: while you focus, your music (or a soft sound) keeps playing, so your iPhone lock screen shows the time left like a song that is playing. It pauses other music apps while it plays.'), lks);
+    // 12.05 (Navid): when your day ends
+    const de = el('div', 'dp-durs'), deWait = (state.dayEndAt || 0) + DAY_END_EVERY - Date.now(), deNote = el('p', 'tiny muted');
+    const deSay = () => { const w = (state.dayEndAt || 0) + DAY_END_EVERY - Date.now(); deNote.textContent = w > 0 ? `You can change it again on ${new Date(state.dayEndAt + DAY_END_EVERY).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}.` : 'You can change it once a week.'; };
+    for (const h of DAY_ENDS) {
+      const b = el('button', '', h ? `${h} am` : 'Midnight'); b.type = 'button'; b.setAttribute('aria-pressed', String(dayEndH() === h)); b.disabled = deWait > 0 && dayEndH() !== h;
+      b.addEventListener('click', () => {
+        if (dayEndH() === h) return;
+        if ((state.dayEndAt || 0) + DAY_END_EVERY > Date.now()) { toast('You changed it this week already.'); return; }
+        state.dayEnd = h; state.dayEndAt = Date.now(); save(); renderAll();
+        for (const o of de.children) { o.setAttribute('aria-pressed', String(o === b)); o.disabled = o !== b; }
+        deSay(); toast(`Your day now ends at ${dayEndLabel(h)}.`);
+      });
+      de.append(b);
+    }
+    deSay();
+    // 12.05: motion. Phones with "Remove animations" ask for calm; the town can still move if you like.
+    menuSec(wrap, 'Motion', switchRow('Moving town', `Waves, the sailboat, sliding cards and other small animations.${phoneCalm ? ' Your phone asks apps for less motion (Remove animations), so this starts off.' : ''}`, 'set-motion', !reduced, (v) => { state.calm = v === !phoneCalm ? null : !v; save(); setCalm(); renderAll(); }));
+    menuSec(wrap, 'Your day ends at', el('div', 'tiny muted', "Today's minutes, your streak and the silver shield follow your day. Up late? Let it end later."), de, deNote);
     menuSec(wrap, 'Town', switchRow('Fast days', 'A day in town lasts 24 minutes, with dawn, dusk, night and weather. Off: town time follows your real clock.', 'set-clock', !state.realClock, (v) => { state.realClock = !v; save(); renderHud(); }));
     const mv = el('button', 'btn', 'Move your town to another device'); mv.addEventListener('click', openMoveTown);
     menuSec(wrap, 'Your town', mv, el('p', 'tiny muted', `Progress is saved on ${cloud.status}.`));
@@ -14355,7 +14503,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const add = (kind, ic, t) => { const li = el('li', 'k-' + kind); li.append(rico(ic), el('span', '', t)); lines.append(li); };
     if (r.rescued) add('shield', 'shield', `Your focus put out the fire at ${r.rescued}`);
     if (r.shield) add('shield', 'shield', `Golden shield: ${fmtMin(Math.max(1, Math.round(r.shield.min)))} with nothing bad in town`);
-    if (r.silver) add('silver', 'shield', `Silver shield: nothing bad while you're away, for 24 hours`);
+    if (r.silver) add('silver', 'shield', `Silver shield: nothing bad while you're away, ${silverUntilText(r.silver)}`);
     if (r.built.length === 1) { const one = r.built[0]; add('chest', 'build', `${state.builder} ${one.kind === 'repair' ? 'repaired' : one.kind === 'upgrade' ? 'upgraded' : 'built'} the ${one.label.toLowerCase()}${one.kind === 'upgrade' ? ` to level ${one.level}` : ''}`); }
     else if (r.built.length) add('chest', 'build', `${state.builder} finished ${r.built.length} buildings`);
     if (r.combo) add('combo', 'combo', `Combo ×${r.combo.mult.toFixed(1)}: more gold and XP`);
@@ -14669,7 +14817,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (r.rescued) row('gold', 'shield', `Rescue: your focus put out the fire at ${r.rescued}`, '✓', 'gold');
     if (r.rescueFail) row('bad', 'alert', `Ended early: the fire at ${r.rescueFail} is still burning`, 'burning', 'bad');
     if (r.shield) row('gold', 'shield', `Golden shield: for ${fmtMin(Math.max(1, Math.round(r.shield.min)))} no new trouble can start in town, and fires, thieves and sickness stand still`, `${fmtMin(Math.max(1, Math.round(r.shield.min)))}`, 'gold');
-    if (r.silver) row('gold', 'shield', `Silver shield: ${SILVER_MIN} minutes of focus today, so no fires, break-ins or sickness while you're away for the next 24 hours`, '24 h', 'gold');
+    if (r.silver) row('gold', 'shield', `Silver shield: ${SILVER_MIN} minutes of focus today, so no fires, break-ins or sickness while you're away, ${silverUntilText(r.silver)}`, r.silver.first ? '2 days' : 'today', 'gold');
     if (r.lost) for (const l of r.lost) row('bad', 'alert', `Ended early: ${l.text}`, l.gold ? `−${l.gold} gold` : 'lost', 'bad');
     if (r.noPlay) row('bad', 'play', `Ended before ${MIN_SESSION} minutes: no play time`, 'none', 'bad');
     for (const g of r.gold) row(g.ic === 'heart' || g.ic === 'gift' ? 'req' : g.ic === 'chest' ? 'chest' : g.ic === 'badge' ? 'badge' : 'gold', g.ic, g.label, `${g.n < 0 ? '−' : '+'}${fmtGold(Math.abs(g.n))} gold`, g.n < 0 ? 'bad' : 'gold', g.ic === 'badge' ? `background:${TIER_COLORS[g.tier][0]};color:#3B2A10` : g.ic === 'chest' ? `background:${RARITY[g.rar].body};color:#fff` : '');
@@ -15015,7 +15163,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   $('season-card').addEventListener('click', openSeason);
   $('al-start').addEventListener('click', () => {
     if (ALARM.lap) { closeAlarm(); if (state.session) return; hideResult(); if (ui.recharge) closeRecharge(); startLaps(); return; } // 10.12: the next lap
-    const b = ALARM.b; closeAlarm(); if (!b || state.session) return; hideResult(); if (ui.recharge) closeRecharge(); startSession(b.dur);
+    const b = ALARM.b; closeAlarm(); if (!b || state.session) return; hideResult(); if (ui.recharge) closeRecharge(); openStart(b.dur); // 12.05: the start page first
   });
   $('al-snooze').addEventListener('click', () => {
     if (ALARM.lap) { const run = ALARM.lap; run.breakUntil = Date.now() + breakMs(state.speed); run.rang = false; save(); closeAlarm(); toast(`Five more minutes of break. The bell rings again for lap ${run.n + 1}.`); return; }
@@ -15086,7 +15234,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   $('result-recharge').addEventListener('click', openRecharge);
   $('rb-go').addEventListener('click', () => { if (state.session) return; hideResult(); startLaps(); }); // 10.12: the next lap
   $('shieldbadge').addEventListener('click', () => toast(`Golden shield: ${fmtClock(shieldLeft())} left. No fires, break-ins, sickness, storms or roadworks can start, trash and weeds don't pile up, and trouble already going on stands still. Every finished focus brings one (20% of its length).`));
-  $('silver-home').addEventListener('click', () => toast(silverOn() ? `Silver shield: ${fmtHours(silverLeft())} left. While you're away no fires, break-ins or sickness can happen. Focus ${SILVER_MIN} minutes again today to keep it on.` : `Focus ${SILVER_MIN} minutes in a day and the silver shield switches on for 24 hours: no fires, break-ins or sickness while you're away.`));
+  $('silver-home').addEventListener('click', () => toast(silverOn() ? `Silver shield: ${fmtHours(silverLeft())} left. While you're away no fires, break-ins or sickness can happen. Focus ${SILVER_MIN} minutes tomorrow to have it again.` : `Focus ${SILVER_MIN} minutes in a day and the silver shield switches on until your day ends (${dayEndLabel(dayEndH())}): no fires, break-ins or sickness while you're away.`));
   $('tally').addEventListener('click', () => { if (TALLY.finish) TALLY.finish(); });
   $('result-more').addEventListener('click', () => { const led = $('result-ledger'), open = led.hidden; led.hidden = !open; $('result-more').setAttribute('aria-expanded', String(open)); $('result-more').textContent = open ? 'Hide details' : 'Show details'; if (TALLY.finish) TALLY.finish(); });
   $('welcome-form').addEventListener('submit', (ev) => {
@@ -15099,7 +15247,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const next = () => { if (!state.flags.tourDone) setTimeout(() => startTour(false), 300); else setTimeout(() => enterPlay(), 350); };
     if (!state.coach) { state.flags.coachAsked = true; setTimeout(() => openSurvey(next), 250); } else next(); // 10.11
   });
+  let visWas = false; // 12.05: act once per change (the WebView and the app can both report the same change)
   document.addEventListener('visibilitychange', () => {
+    if (document.hidden === visWas) return; visWas = document.hidden;
     lastTick = Date.now();
     try { anaEvent(document.hidden ? 'hide' : 'show', { s: state.session ? 1 : 0, screen: ui.screen }); if (state.session && document.hidden) state.session.away = (state.session.away || 0) + 1; } catch (e) { /* ignore */ }
     // 10.13: when you leave, note the time (the crew and the town go on); back again, see what happened
@@ -15109,13 +15259,21 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   window.addEventListener('resize', layout);
 
   /* ---------- Boot ---------- */
+  // 12.05 (Navid: "it still freezes after leaving the app"): the next frame is asked for first, so an error while
+  // drawing can never stop the town; and a watchdog restarts the frames if the phone dropped them while away.
+  let rafId = 0, lastFrame = 0, drawErrAt = 0;
   function loop(now) {
-    if (!document.hidden) {
+    rafId = requestAnimationFrame(loop); lastFrame = performance.now();
+    if (document.hidden) return;
+    try {
       if (state.session && !$('focus').hidden) drawFocusScene(now);
       else if (geo.w && ui.overlay !== 'celebrate' && ui.overlay !== 'chest') draw(now);
-    }
-    requestAnimationFrame(loop);
+    } catch (e) { if (Date.now() - drawErrAt > 5000) { drawErrAt = Date.now(); console.error('draw: ' + ((e && e.stack) || e)); } }
   }
+  setInterval(() => {
+    if (document.hidden || performance.now() - lastFrame < 2500) return;
+    cancelAnimationFrame(rafId); rafId = requestAnimationFrame(loop);
+  }, 1000);
   // 10.06: older towns had a 1×1 fire station and police station and a 2×2 clinic. Fit them to their new 2×1 footprint:
   // where they stand if there is room next to them, otherwise the nearest free spot.
   function fitFootprints() {
@@ -15180,7 +15338,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   boot();
   try { tick(); awayBack(hadSession0, lastSeen0); } catch (e) { console.error(e); } // 10.13: the crew caught up, and what happened while you were away
   setInterval(tick, 250);
-  requestAnimationFrame(loop);
+  rafId = requestAnimationFrame(loop);
   connectCloud();
   googleReturn();
   try { radio.warm(); } catch (e) { /* no saved songs */ }

@@ -92,9 +92,8 @@ class FocusGuardModule : Module() {
     }
   }
 
-  // ---- Shake to report a problem: two strong shakes within a second, at most once every 3 seconds ----
+  // ---- Shake to report a problem: one strong shake (12.05, Navid: not two), at most once every 3 seconds ----
   private var sensors: SensorManager? = null
-  private var lastSpike = 0L
   private var lastShake = 0L
   private val shakeListener = object : SensorEventListener {
     override fun onSensorChanged(e: SensorEvent) {
@@ -102,14 +101,11 @@ class FocusGuardModule : Module() {
       val y = e.values[1] / SensorManager.GRAVITY_EARTH
       val z = e.values[2] / SensorManager.GRAVITY_EARTH
       val g = Math.sqrt((x * x + y * y + z * z).toDouble())
-      if (g < 2.6) return
+      if (g < 2.7) return
       val now = System.currentTimeMillis()
-      val dt = now - lastSpike
-      if (dt in 120L..1000L && now - lastShake > 3000L) {
-        lastShake = now
-        try { sendEvent("onShake", mapOf("t" to now.toDouble())) } catch (err: Exception) { /* JavaScript not ready */ }
-      }
-      lastSpike = now
+      if (now - lastShake < 3000L) return
+      lastShake = now
+      try { sendEvent("onShake", mapOf("t" to now.toDouble())) } catch (err: Exception) { /* JavaScript not ready */ }
     }
     override fun onAccuracyChanged(s: Sensor?, a: Int) {}
   }
