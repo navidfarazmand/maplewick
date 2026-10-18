@@ -1477,7 +1477,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.04'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.05'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1783,11 +1783,35 @@
       up: [null, null, [500, 40], [1100, 70]], blurb: 'Little chairs, a sandpit and nap time: mothers on leave can go back to work early if they want to (a worker again, and no leave pay). You choose how many places: more places, more staff.',
       needs: [['A baby in town', () => !!state.fam && babiesNow().length > 0]] }
   });
+  // 11.05 (roadmap parts 2 and 6, Navid): the old harbour (an 8-lap focus project at town hall 5), and with it pirates,
+  // the hotel and the fish market. Pirates are computer-run only: no real player can ever attack you.
+  Object.assign(TYPES, {
+    harbour: { name: 'Old harbour', cat: 'landmark', size: 2, where: 'shore', unlock: 5, cost: 2000, work: 240, max: 1, color: '#B08356', roof: '#6E4A2C', limit: [0, 0, 0, 0, 0, 1, 1], mood: 5,
+      perk: 'Ships come back: shops earn 5% more, visitors can stay at a hotel, and fishing boats can go out. But pirates can come too.', blurb: 'The old harbour, restored: a quay, a crane and a warehouse. Ships bring trade (shops +5%) and visitors, the fishing boats go out, and the town is 5% happier. Pirates sometimes sail in: a Watchtower drives them off.' },
+    watchtower: { name: 'Watchtower', cat: 'service', size: 1, unlock: 5, cost: 600, work: 25, max: 3, color: '#B08356', roof: '#7A3B2A', limit: [0, 0, 0, 0, 0, 3, 4], reach: 4,
+      up: [null, null, [700, 40], [1400, 70]], blurb: 'A lookout tower with guards: they drive off pirate ships that sail for the shore within its reach (4 tiles, one more a level).',
+      needs: [['The old harbour', () => hasLandmark('harbour')]] },
+    coastguard: { name: 'Coast guard', cat: 'service', size: 2, where: 'shore', unlock: 5, cost: 1400, work: 40, max: 3, color: '#F2F0EA', roof: '#C8473D', limit: [0, 0, 0, 0, 0, 1, 2], reach: 8,
+      up: [null, null, [1600, 50], [3000, 80]], blurb: 'A coast guard station with a fast boat, two tiles long on the shore: it drives pirates off much further away (8 tiles, one more a level).',
+      needs: [['A watchtower at level 2', () => hasLevel('watchtower', 2)]] },
+    hotel: { name: 'Hotel', cat: 'shop', size: 2, unlock: 5, cost: 1500, work: 30, max: 3, color: '#F1E4CF', roof: '#2F4E6E', radius: 0, limit: [0, 0, 0, 0, 0, 1, 2],
+      up: [null, null, [1800, 50], [3500, 80]], base: [0, 12, 18, 26], per: [0, 0, 0, 0], levelNames: ['Inn', 'Hotel', 'Grand hotel'],
+      job: { verb: 'Carry suitcases', at: 'at the hotel', gold: 1.6, play: 1, lines: ['A guest tipped you in seashells. You kept them.', 'You learned to say hello in five languages.', 'The lift broke. You carried a piano.'] },
+      blurb: 'Visitors from the ferry pay to stay: an inn first, a hotel at level 2. It earns 15% more for every landmark in town, and 20% more once this season\'s festival is won.',
+      needs: [['The old harbour', () => hasLandmark('harbour')]] },
+    theater: { name: 'Theater', cat: 'shop', size: 2, unlock: 5, cost: 1200, work: 30, max: 3, color: '#E9D8C8', roof: '#6A2E4A', radius: 3, limit: [0, 0, 0, 0, 0, 1, 2],
+      up: [null, null, [1400, 50], [3000, 80]], base: [0, 8, 12, 18], per: [0, 1, 1.5, 2],
+      job: { verb: 'Work the lights', at: 'at the theater', gold: 0.9, play: 1.4, lines: ['You found the spotlight for the big scene. Applause!', 'The lead forgot a line. You whispered it.', 'You swept the stage after the encore. It sparkled.'] },
+      blurb: 'Plays and concerts: homes within 3 tiles are 4% happier, and festival prizes are 50% bigger.' },
+    fishmarket: { name: 'Fish market', cat: 'farm', size: 1, where: 'shore', unlock: 5, cost: 700, work: 20, max: 3, color: '#DCE6EA', roof: '#2F7D8C', limit: [0, 0, 0, 0, 0, 1, 2], grow: [0, 5, 7, 9],
+      up: [null, null, [900, 40], [1800, 70]], blurb: 'Fishing boats bring in a second source of food, the same in every season. More boats bring more food, but pirates notice.',
+      needs: [['The old harbour', () => hasLandmark('harbour')]] }
+  });
   TYPES.prison2.unlock = 5; TYPES.prison2.limit = [0, 0, 0, 0, 0, 1, 1]; TYPES.maxprison.unlock = 6; TYPES.maxprison.limit = [0, 0, 0, 0, 0, 0, 1]; // 11.02: a prison at town hall 5, high security at 6
   // 11.04: town halls 5 and 6 allow one or two more of most buildings, and many more homes
   for (const t of Object.values(TYPES)) if (t.limit && t.limit.length === 5) { const l = t.limit[4]; t.limit.push(...(l === 0 ? [0, 0] : t.cat === 'landmark' ? [l, l] : t.cat === 'decor' ? [l + 4, l + 8] : [l + 1, l + 2])); }
   TYPES.cottage.limit.splice(5, 2, 16, 18); TYPES.townhouse.limit.splice(5, 2, 10, 12); TYPES.farm.limit = [0, 0, 0, 0, 2, 3, 4];
-  const GROWERS = ['field', 'farm', 'greenhouse'];
+  const GROWERS = ['field', 'farm', 'greenhouse', 'fishmarket'];
   const isGrower = (b) => !!b && GROWERS.includes(b.type);
   const g1 = (x) => String(Math.round(x * 10) / 10);
   const special = (t) => !!(t.chest || t.season || t.gift); // finds you place for free: no upgrades, no cost (11.01: and the Monument)
@@ -1815,10 +1839,10 @@
   const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
   const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th');
   const noStaff = () => ({ sweeper: 0, police: 0, fire: 0, gardener: 0, nurse: 0, teacher: 0 });
-  const BUILD_ORDER = ['cottage', 'market', 'markethall', 'cafe', 'park', 'townhouse', 'apartment', 'field', 'farm', 'granary', 'bakery', 'hardware', 'icecream', 'rink', 'fountain', 'arcade', 'cinema', 'library', 'restaurant', 'townsquare', 'greenhouse', 'pharmacy', 'pub', 'gym', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
-  const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle'];
+  const BUILD_ORDER = ['cottage', 'market', 'markethall', 'cafe', 'park', 'townhouse', 'apartment', 'field', 'farm', 'granary', 'bakery', 'hardware', 'icecream', 'rink', 'fountain', 'arcade', 'cinema', 'library', 'restaurant', 'townsquare', 'greenhouse', 'fishmarket', 'hotel', 'theater', 'pharmacy', 'pub', 'gym', 'workshop', 'factory', 'induspark', 'bookshop', 'amusement', 'stadium'];
+  const LANDMARK_ORDER = ['lighthouse', 'observatory', 'castle', 'harbour'];
   const hasLandmark = (type) => state.buildings.some((b) => b.type === type && live(b));
-  const SERVICE_ORDER = ['depot', 'recycling', 'wasteplant', 'shed', 'gardencenter', 'parksdept', 'firestation', 'firehall', 'firehq', 'police', 'policestation', 'courthouse', 'clinic', 'medcenter', 'hospital', 'school', 'highschool', 'university', 'bank', 'citybank', 'centralbank', 'prison', 'prison2', 'maxprison', 'cemetery', 'daycare'];
+  const SERVICE_ORDER = ['depot', 'recycling', 'wasteplant', 'shed', 'gardencenter', 'parksdept', 'firestation', 'firehall', 'firehq', 'police', 'policestation', 'courthouse', 'clinic', 'medcenter', 'hospital', 'school', 'highschool', 'university', 'bank', 'citybank', 'centralbank', 'prison', 'prison2', 'maxprison', 'cemetery', 'daycare', 'watchtower', 'coastguard'];
   // Focus badges: earned in order, at most one per session, only by the session you just finished.
   const BADGES = [
     { min: 10, reward: 12, tier: 0 }, { min: 15, reward: 18, tier: 0 }, { min: 25, reward: 28, tier: 1 }, { min: 45, reward: 42, tier: 1 },
@@ -1891,14 +1915,14 @@
   // (b.rot: 0 = long along c, 1 = long along r). Everything else is square.
   // 10.08: basic buildings are one tile again; the House is two tiles long (and turns); bigger, better versions are
   // separate buildings (Hospital, Amusement park).
-  const FOOT = { greenhouse: [2, 1], restaurant: [2, 1], library: [2, 1], cinema: [2, 1], rink: [2, 1], gym: [2, 1], markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
+  const FOOT = { coastguard: [2, 1], hotel: [2, 1], theater: [2, 1], greenhouse: [2, 1], restaurant: [2, 1], library: [2, 1], cinema: [2, 1], rink: [2, 1], gym: [2, 1], markethall: [2, 1], townhouse: [2, 1], field: [2, 1], recycling: [2, 1], gardencenter: [2, 1], firehall: [2, 1], policestation: [2, 1], medcenter: [2, 1], highschool: [2, 1], citybank: [2, 1], factory: [2, 1], prison2: [2, 1] };
   // 10.09 (Navid): every service grows in three steps with its level: 1×1, then 2×1 (it can be turned), then 2×2,
   // with a new name at each size. Upgrading grows the building into the free tiles next to it.
   // 10.10: undone (Navid): a building keeps its size; bigger versions are separate buildings (SVC_LINES).
   const GROW = {};
   const GROW_DIMS = [null, [1, 1], [2, 1], [2, 2]];
   const growLv = (level) => clamp(level || 1, 1, 3);
-  const tierName = (type, level) => (GROW[type] ? GROW[type][growLv(level) - 1] : TYPES[type].name);
+  const tierName = (type, level) => (GROW[type] ? GROW[type][growLv(level) - 1] : TYPES[type].levelNames ? TYPES[type].levelNames[clamp(level || 1, 1, 3) - 1] : TYPES[type].name);
   const nameOf = (b) => (b && TYPES[b.type] ? tierName(b.type, b.level) : '');
   // The level whose size applies when a call doesn't say: the building being moved, or level 1 for a new one.
   const heldLevel = (type) => { const h = ui.holding; if (!h || h.kind === 'new') return 1; const b = byId(h.id); return b && b.type === type ? b.level : 1; };
@@ -2723,7 +2747,7 @@
   }
   // 10.09 (Navid): jobs. Businesses, services and staff give work; homes bring workers. Too few jobs and homes pay less
   // tax and crime goes up; too few workers and the shops earn less. A small new town doesn't feel either yet.
-  const JOBS = { greenhouse: [0, 2, 3, 3], restaurant: [0, 4, 6, 8], library: [0, 2, 3, 3], cinema: [0, 3, 4, 4], townsquare: [0, 1, 1, 2], daycare: [0, 2, 3, 4], hardware: [0, 2, 3, 3], icecream: [0, 1, 2, 2], rink: [0, 2, 3, 3], pharmacy: [0, 2, 3, 4], pub: [0, 3, 4, 5], gym: [0, 3, 4, 5], farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6, 8, 10], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
+  const JOBS = { harbour: [0, 6], watchtower: [0, 2, 3, 3], coastguard: [0, 4, 5, 6], hotel: [0, 4, 6, 8], theater: [0, 4, 5, 6], fishmarket: [0, 3, 5, 7], greenhouse: [0, 2, 3, 3], restaurant: [0, 4, 6, 8], library: [0, 2, 3, 3], cinema: [0, 3, 4, 4], townsquare: [0, 1, 1, 2], daycare: [0, 2, 3, 4], hardware: [0, 2, 3, 3], icecream: [0, 1, 2, 2], rink: [0, 2, 3, 3], pharmacy: [0, 2, 3, 4], pub: [0, 3, 4, 5], gym: [0, 3, 4, 5], farm: [0, 4, 5, 6], markethall: [0, 5, 7, 9], townhall: [0, 2, 3, 4, 6, 8, 10], market: [0, 2, 3, 4], cafe: [0, 2, 3, 4], bakery: [0, 3, 4, 5], workshop: [0, 5, 9, 14], bookshop: [0, 2, 3, 4], arcade: [0, 2, 3, 4], bank: [0, 3, 5, 8], stadium: [0, 8, 12],
     field: [0, 2, 3, 4], granary: [0, 1, 1, 2], amusement: [0, 3, 4, 5], clinic: [0, 1, 2, 3], school: [0, 1, 1, 2], police: [0, 1, 1, 2], firestation: [0, 0, 1, 1], depot: [0, 1, 2, 3], shed: [0, 0, 1, 1], prison: [0, 2, 3, 4], cemetery: [0, 1], lighthouse: [0, 2], observatory: [0, 2], castle: [0, 3],
     medcenter: [0, 4, 5, 6], hospital: [0, 8, 10, 12], recycling: [0, 3, 4, 5], wasteplant: [0, 6, 8, 10], gardencenter: [0, 2, 2, 3], parksdept: [0, 3, 4, 5], firehall: [0, 2, 2, 3], firehq: [0, 3, 4, 5],
     policestation: [0, 2, 3, 4], courthouse: [0, 5, 6, 8], highschool: [0, 3, 4, 5], university: [0, 8, 10, 12], citybank: [0, 6, 8, 10], centralbank: [0, 10, 12, 15], factory: [0, 16, 20, 24], induspark: [0, 28, 34, 40], prison2: [0, 4, 5, 6], maxprison: [0, 8, 10, 12] };
@@ -2750,6 +2774,7 @@
   const fieldDirty = (b, bs) => (bs || state.buildings).some((o) => o !== b && DIRTY.includes(o.type) && live(o) && dist(o, b) <= 1);
   function fieldYield(b, J, bs) {
     if (!live(b) || b.fire) return 0;
+    if (b.type === 'fishmarket') return TYPES.fishmarket.grow[b.level] * (BOATS[choiceOf(b)] || 2) / 2 * (1 - 0.5 * ((J && J.short) || 0) * ((J && J.k) || 0)); // 11.05: the boats, steady all year
     return TYPES[b.type].grow[b.level] * (b.type === 'greenhouse' ? 1 : FOOD_SEASON[SEA.k] || 1) * (fieldDirty(b, bs) ? 0.7 : 1) * (1 - 0.5 * ((J && J.short) || 0) * ((J && J.k) || 0)) + (b.addons && b.addons.tank ? 2 : 0); // 10.13: a water tank
   }
   function foodFlow(act, residents, J) {
@@ -2801,6 +2826,7 @@
         if (o.type === 'pub') { joy += 0.03; from.push(['a cosy pub nearby', 0.03, o.id]); }
         if (o.type === 'restaurant') { joy += 0.05; from.push(['a restaurant nearby', 0.05, o.id]); if (d <= 1 && nightK() > 0.3) { const v = 0.05 * nightK(); noise += v; from.push(['restaurant noise at night', -v, o.id]); } }
         if (o.type === 'cinema') { joy += 0.03; from.push(['a cinema nearby', 0.03, o.id]); }
+        if (o.type === 'theater') { joy += 0.04; from.push(['a theater nearby', 0.04, o.id]); }
         if (o.type === 'gym') { const v = choiceOf(o) === 'cheap' ? 0.03 : choiceOf(o) === 'dear' ? 0.01 : 0.02; joy += v; from.push(['a gym nearby', v, o.id]); }
         if (SEASONAL[o.type] && seasonOpen(o)) { const v = (T(o).fun || 0.08) * (inSeason(o) ? 1 : 0.5); joy += v; from.push([`the ${T(o).name.toLowerCase()} is open`, v, o.id]); }
       }
@@ -2833,7 +2859,8 @@
         const fac = act.find((o) => o.type === 'factory' && !o.fire && !o.goodsGone && !o.shut), goods = !isFactory(s) && fac ? (choiceOf(fac) === 'on' ? 1.13 : 1.1) : 1; // 11.02: the factory's goods (11.03: overtime)
         const rival = s.type === 'market' && act.some((o) => o.type === 'markethall' && !o.fire && dist(o, s) <= TYPES.markethall.radius) ? 0.8 : 1; // the market hall draws the customers
         const pk = PRICE_K[priceOf(s)] * (s.type === 'pub' ? (choiceOf(s) === 'late' ? 1.3 : choiceOf(s) === 'early' ? 0.85 : 1) * (1 + 0.6 * nightK()) : s.type === 'gym' ? (choiceOf(s) === 'dear' ? 1.4 : choiceOf(s) === 'cheap' ? 0.85 : 1) * (act.some((o) => o.type === 'stadium') ? 1.1 : 1) : s.type === 'factory' && choiceOf(s) === 'on' ? 1.3 : 1) * (1 - 0.25 * Math.min(3, s.layoff || 0)) * (SEASONAL[s.type] && !inSeason(s) ? 0.5 : 1);
-        const cook = s.type === 'restaurant' ? (F && !F.supplied ? 0.5 : 1) * (1 + 0.6 * nightK()) : 1; // 11.04: it cooks your food, busiest in the evening
+        const guests = s.type === 'hotel' ? (1 + 0.15 * LANDMARK_ORDER.filter((k) => act.some((o) => o.type === k)).length) * (state.season && state.season.got && state.season.got.includes(0) ? 1.2 : 1) : 1; // 11.05: visitors
+        const cook = (act.some((o) => o.type === 'harbour') ? 1.05 : 1) * guests * (s.type === 'restaurant' ? (F && !F.supplied ? 0.5 : 1) * (1 + 0.6 * nightK()) : 1); // 11.04: it cooks your food, busiest in the evening; 11.05: harbour trade
         const income = s.fire || s.closed || s.shut || !seasonOpen(s) ? 0 : (t.base[s.level] + t.per[s.level] * near * (s.cust == null ? 1 : s.cust) * (recessionOn() ? 0.8 : 1)) * pk * cook * shopBoost(s.type) * (lighthouse ? 1.1 : 1) * shaken * pair * staffed * fresh * goods * rival + appliedGold(s);
         total += income; info.set(s.id, { income, near, short: 1 - staffed, fresh: fresh > 1, applied: appliedGold(s), goods: goods > 1, rival: rival < 1, closed: !!s.closed });
       } else if (t.cat === 'joy' || t.cat === 'decor') {
@@ -3029,7 +3056,7 @@
     recycling: 4, wasteplant: 7, gardencenter: 2, parksdept: 4, firehall: 6, firehq: 10, policestation: 6, courthouse: 10, medcenter: 7, hospital: 12, highschool: 5, university: 9, citybank: 7, centralbank: 12, prison2: 4, maxprison: 7 };
   // 11.00 (balance): every working building costs upkeep, in whole gold an hour by level. Small level-1 buildings run
   // for free, so a new town isn't punished. Service buildings cost twice what they did.
-  const RUNNING_BY_LEVEL = { greenhouse: [0, 3, 4, 5], restaurant: [0, 3, 4, 6], library: [0, 2, 3, 4], cinema: [0, 3, 4, 5], townsquare: [0, 2, 3, 4], daycare: [0, 1, 2, 3], hardware: [0, 1, 2, 3], icecream: [0, 1, 2, 3], rink: [0, 2, 4, 5], pharmacy: [0, 2, 3, 4], pub: [0, 2, 3, 4], gym: [0, 3, 4, 6], farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
+  const RUNNING_BY_LEVEL = { watchtower: [0, 3, 5, 7], coastguard: [0, 6, 9, 12], hotel: [0, 4, 6, 9], theater: [0, 4, 6, 8], fishmarket: [0, 2, 3, 4], greenhouse: [0, 3, 4, 5], restaurant: [0, 3, 4, 6], library: [0, 2, 3, 4], cinema: [0, 3, 4, 5], townsquare: [0, 2, 3, 4], daycare: [0, 1, 2, 3], hardware: [0, 1, 2, 3], icecream: [0, 1, 2, 3], rink: [0, 2, 4, 5], pharmacy: [0, 2, 3, 4], pub: [0, 2, 3, 4], gym: [0, 3, 4, 6], farm: [0, 2, 3, 4], markethall: [0, 2, 3, 5], market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
     factory: [0, 4, 9, 13], induspark: [0, 9, 18, 27], park: [0, 0, 1, 1], fountain: [0, 1, 1, 2], amusement: [0, 3, 6, 9], stadium: [0, 6, 13], field: [0, 0, 1, 2], granary: [0, 0, 1, 2] };
   const runAt = (type, L) => { const r = RUNNING_BY_LEVEL[type]; if (r) return r[clamp(L || 1, 1, r.length - 1)] || 0; return RUNNING[type] ? RUNNING[type] * 2 * (L || 1) : 0; };
   const runningOf = (b) => (live(b) && !b.shut && (seasonOpen(b) || !SEASONAL[b.type]) && runAt(b.type, b.level) ? Math.max(0, Math.round((runAt(b.type, b.level) + (b.type === 'daycare' ? (DAYCARE[choiceOf(b)] || 6) * 0.5 : 0)) * priceIdx() * (isServiceType(b.type) && state.buildings.some((x) => x.type === 'wasteplant' && live(x)) ? 0.85 : 1)) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
@@ -3156,7 +3183,7 @@
   const hqCovers = (b) => stationsOf('fire').some((s) => s.type === 'firehq' && distFull(s, b) <= stationReach(s));
   const hasLive = (type) => state.buildings.some((x) => x.type === type && live(x) && !x.fire);
   const teenCover = (b) => stationsOf('teacher').some((s) => tierOf(s.type) >= 2 && distFull(s, b) <= stationReach(s)) || state.buildings.some((o) => o.type === 'cinema' && live(o) && !o.shut && dist(o, b) <= 3); // a high school or a cinema keeps teens busy
-  const festPrize = (n) => Math.round(n * (1 + (hasLive('parksdept') ? 0.25 : 0) + (hasLive('townsquare') ? 0.5 : 0))); // 11.02: the parks department; 11.04: the town square
+  const festPrize = (n) => Math.round(n * (1 + (hasLive('parksdept') ? 0.25 : 0) + (hasLive('townsquare') ? 0.5 : 0) + (hasLive('theater') ? 0.5 : 0))); // 11.02: the parks department; 11.04: the town square
   const decorCost = (type) => { const c0 = Math.round((TYPES[type].cost || 0) * priceIdx()); return hasLive('gardencenter') || hasLive('parksdept') ? Math.max(1, Math.round(c0 * 0.8)) : c0; }; // the garden center: decorations 20% cheaper
   const weatherK = (wet, stormy) => { const w = skyNow().w; if (!(w.k > 0.3)) return 1; return w.kind === 'rain' || w.kind === 'snow' ? wet : w.kind === 'storm' ? stormy : 1; };
 
@@ -3935,6 +3962,7 @@
       else if (v.kind === 'nurse' && !(tb && tb.sick)) sendHome(v);
       else if (v.kind === 'crew' && !tb) sendHome(v);
     }
+    pirateTick(dt, sh); // 11.05
     // ---- new incidents (none while one of the same kind is going on, and none at all under the golden shield)
     if (sh) return;
     const live2 = state.buildings.filter((b) => canBurn(b) && !revealFor(b.id));
@@ -6066,7 +6094,7 @@
   function starShape(c, x, y, r, col) { c.fillStyle = col; c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
   function tongue(c, x, y, w, h, col) { c.fillStyle = col; c.beginPath(); c.moveTo(x - w, y); c.quadraticCurveTo(x - w * 0.95, y - h * 0.55, x, y - h); c.quadraticCurveTo(x + w * 0.95, y - h * 0.55, x + w, y); c.closePath(); c.fill(); }
   // How tall each burnable building is (in building units), so flames sit on the roof.
-  const topOf = (type, L) => ({ greenhouse: 15 + 2 * L, restaurant: 18 + 3 * L, library: 20 + 3 * L, cinema: 19 + 2 * L, daycare: 14 + 2.5 * L, hardware: 19 + 3 * L, icecream: 14 + 2 * L, rink: 8, pharmacy: 18 + 3 * L, pub: 22 + 3 * L, gym: 18 + 2 * L, apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
+  const topOf = (type, L) => ({ watchtower: 30 + 4 * L, coastguard: 17 + 2 * L, hotel: 8.5 * (1 + L) + 4, theater: 22 + 3 * L, fishmarket: 12 + 2 * L, greenhouse: 15 + 2 * L, restaurant: 18 + 3 * L, library: 20 + 3 * L, cinema: 19 + 2 * L, daycare: 14 + 2.5 * L, hardware: 19 + 3 * L, icecream: 14 + 2 * L, rink: 8, pharmacy: 18 + 3 * L, pub: 22 + 3 * L, gym: 18 + 2 * L, apartment: (8.5 * (3 + L)) / 1.35, farm: 18, markethall: 24 + 2 * L, school: 26 + 3 * L, cottage: 20 + 2.5 * L, townhouse: 33 + 4 * L, market: 24 + 2 * L, cafe: 21 + 3 * L, bakery: 24 + 3 * L, workshop: 23 + 3 * L, bookshop: 19 + 3 * L, arcade: 21 + 3 * L, bank: 27 + 3 * L }[type] || 20);
   function flames(c, x, y, hw, u, topH, k) {
     const t = reduced ? 0 : ART.t, top = y - topH * u;
     const g = c.createRadialGradient(x, y - topH * u * 0.45, 2 * u, x, y - topH * u * 0.45, hw * 1.15);
@@ -6834,6 +6862,63 @@
       case 'cherry': {
         treeAt(c, x, y, 26 * u, col);
         if (!reduced) for (let i = 0; i < 4; i++) { const k = ((now / 2600) + i / 4) % 1; c.fillStyle = `rgba(244,166,198,${1 - k})`; c.beginPath(); c.ellipse(x - 8 * u + i * 5 * u + Math.sin(k * 6 + i) * 3 * u, y - 22 * u + k * 22 * u, 1.3 * u, 0.8 * u, k * 4, 0, Math.PI * 2); c.fill(); }
+        break;
+      }
+      case 'harbour': { // 11.05: a stone quay with a warehouse, a crane, crates and a little boat moored
+        diamond(c, x, y, hw * 0.95, hh * 0.95, '#9B958B');
+        diamond(c, x + hw * 0.3, y + hh * 0.3, hw * 0.55, hh * 0.55, '#5A8FB0');
+        for (let i = 0; i < 3; i++) { const k = ((now / 2400) + i / 3) % 1; c.strokeStyle = `rgba(255,255,255,${0.4 * (1 - k)})`; c.lineWidth = 0.6 * u; c.beginPath(); c.ellipse(x + hw * 0.3, y + hh * 0.3, hw * 0.2 * (0.5 + k), hh * 0.2 * (0.5 + k), 0, 0, Math.PI * 2); c.stroke(); }
+        for (let i = 0; i < 6; i++) { const p0 = lerpPt([x - hw * 0.3, y + hh * 0.7], [x + hw * 0.7, y - hh * 0.3], i / 5); c.fillStyle = '#6E4A2C'; c.fillRect(p0[0] - 0.8 * u, p0[1] - 3 * u, 1.6 * u, 4 * u); }
+        const wf = box(c, x - hw * 0.35, y - hh * 0.3, hw * 0.4, hh * 0.4, 1, 16 * u, col);
+        wallQuad(c, wf.B, wf.R, 0.3, 0.7, 0, 16 * u * 0.65, ruin ? '#3A322B' : '#6E4A2C');
+        gable(c, x - hw * 0.35, y - hh * 0.3, hw * 0.4, hh * 0.4, 1, 16 * u, 9 * u, roofc);
+        const cx0 = x + hw * 0.2, cy0 = y - hh * 0.25; line(c, [cx0, cy0], [cx0, cy0 - 30 * u], '#C8473D', 1.4 * u); line(c, [cx0, cy0 - 30 * u], [cx0 + 18 * u, cy0 - 22 * u], '#C8473D', 1.2 * u); line(c, [cx0 + 16 * u, cy0 - 23 * u], [cx0 + 16 * u, cy0 - 10 * u], '#59606A', 0.5 * u); box(c, cx0 + 16 * u, cy0 - 6 * u, 2.4 * u, 1.2 * u, 1, 3.5 * u, '#3E6F8E');
+        for (const [dx, dy, cc] of [[-0.05, 0.25, '#B08356'], [0.08, 0.32, '#8A5A3A'], [-0.12, 0.38, '#C8473D']]) box(c, x + dx * hw, y + dy * hh, 2.6 * u, 1.3 * u, 1, 3.2 * u, cc);
+        if (!ruin) { const bx = x + hw * 0.42, by = y + hh * 0.42 + (reduced ? 0 : Math.sin(now / 800) * 0.8 * u); c.fillStyle = '#F4F1EA'; c.beginPath(); c.moveTo(bx - 8 * u, by - 2 * u); c.lineTo(bx + 8 * u, by - 2 * u); c.lineTo(bx + 5 * u, by + 2 * u); c.lineTo(bx - 6 * u, by + 2 * u); c.closePath(); c.fill(); line(c, [bx, by - 2 * u], [bx, by - 14 * u], '#6E4A2C', 0.7 * u); poly(c, [[bx, by - 14 * u], [bx + 7 * u, by - 4 * u], [bx, by - 4 * u]], '#E8E2D4'); }
+        break;
+      }
+      case 'watchtower': { // 11.05: a tall timber tower with a lookout and a bell
+        const h = (24 + level * 4) * u, lx = 4 * u, ly = 2 * u;
+        for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) line(c, [x + dx * lx * 1.6, y + dy * ly * 1.6], [x + dx * lx * 0.8, y + dy * ly * 0.8 - h], '#6E4A2C', 1.3 * u);
+        for (let i = 1; i < 4; i++) { const yy = y - h * i / 4; line(c, [x - lx * 1.4, yy + ly * 0.2], [x + lx * 1.4, yy - ly * 0.2], '#8A6A48', 0.7 * u); }
+        box(c, x, y - h, lx * 1.9, ly * 1.9, 1, 4 * u, ruin ? '#5A4A3A' : col);
+        pyramid(c, x, y - h, lx * 1.9, ly * 1.9, 1, 4 * u, 7 * u, roofc);
+        if (!ruin) { c.fillStyle = '#E8A93A'; c.beginPath(); c.arc(x, y - h - 2 * u, 1.2 * u, 0, Math.PI * 2); c.fill(); flagAt(c, x, y - h - 11 * u, u, '#3E6FB0', now, 8); }
+        break;
+      }
+      case 'coastguard': { // 11.05: a white station with a red stripe, a radar mast and its boat on a ramp
+        const F = fpv, h = (15 + level * 2) * u, f = boxF(c, x, y, F, 0.8, h, col), { lf, sf } = faces2(f, F);
+        WQ(c, lf, 0, 1, h * 0.55, h * 0.68, ruin ? '#5A4A3A' : '#C8473D'); WQ(c, sf, 0, 1, h * 0.55, h * 0.68, ruin ? '#5A4A3A' : '#B33A30');
+        for (const a of [0.1, 0.35, 0.6]) if (ruin) WQ(c, lf, a, a + 0.14, h * 0.2, h * 0.48, '#3A322B'); else windowQ(c, lf[0], lf[1], a, a + 0.14, h * 0.2, h * 0.48, glass, u);
+        if (!ruin) doorQ(c, lf[0], lf[1], 0.8, 0.94, h * 0.5, '#2F4E6E', u);
+        const { L: rL, R: rR, B: rB, T: rT } = rectPts(x, y - h, F, 0.8); poly(c, [rT, rR, rB, rL], '#E9E6DE');
+        if (!ruin) { line(c, [x, y - h], [x, y - h - 14 * u], '#59606A', 0.9 * u); const sp = reduced ? 0 : (now / 600) % (Math.PI * 2); line(c, [x - Math.cos(sp) * 4 * u, y - h - 14 * u - Math.sin(sp) * 1.5 * u], [x + Math.cos(sp) * 4 * u, y - h - 14 * u + Math.sin(sp) * 1.5 * u], '#F4F6F7', 1.2 * u); const bp = lerpPt(lf[0], lf[1], 0.5); c.fillStyle = '#E8502A'; c.beginPath(); c.moveTo(bp[0] - 7 * u, bp[1] + 3 * u); c.lineTo(bp[0] + 7 * u, bp[1] + 3 * u); c.lineTo(bp[0] + 5 * u, bp[1] + 6 * u); c.lineTo(bp[0] - 5 * u, bp[1] + 6 * u); c.closePath(); c.fill(); c.fillStyle = '#F4F6F7'; c.fillRect(bp[0] - 2 * u, bp[1] + 0.5 * u, 4 * u, 2.5 * u); }
+        break;
+      }
+      case 'hotel': { // 11.05: an inn first (two storeys), then a hotel with a flag and a canopy, then a grand hotel
+        const F = fpv, fl = 1 + level, h = (8.5 * fl + 4) * u, f = boxF(c, x, y, F, 0.84, h, col), { lf, sf } = faces2(f, F);
+        for (let i = 0; i < fl; i++) for (let j = 0; j < 5; j++) { const a = 0.06 + j * 0.19, v0 = h * (i + 0.3) / (fl + 0.4), v1 = v0 + h * 0.45 / (fl + 0.4); if (i === 0 && j === 2) { if (!ruin) doorQ(c, lf[0], lf[1], a, a + 0.12, v1 + 1 * u, '#6E4A2C', u); continue; } if (ruin) WQ(c, lf, a, a + 0.12, v0, v1, '#3A322B'); else windowQ(c, lf[0], lf[1], a, a + 0.12, v0, v1, glass, u, (i + j) % 4 === 1 && nightK() > 0.3); }
+        for (let i = 0; i < fl; i++) { const v0 = h * (i + 0.3) / (fl + 0.4); if (!ruin) windowQ(c, sf[0], sf[1], 0.35, 0.65, v0, v0 + h * 0.45 / (fl + 0.4), glass, u); }
+        if (level >= 2 && !ruin) { const p1 = wallPt(lf[0], lf[1], 0.4, h * 0.26), p2 = wallPt(lf[0], lf[1], 0.6, h * 0.26); poly(c, [p1, p2, [p2[0] + 2 * u, p2[1] + 4 * u], [p1[0] + 2 * u, p1[1] + 4 * u]], roofc); }
+        gableF(c, x, y, F, 0.84, h, (8 + level) * u, roofc);
+        if (level >= 2 && !ruin) flagAt(c, x, y - h - 8 * u, u, '#E8A93A', now, 12);
+        break;
+      }
+      case 'theater': { // 11.05: columns, a pediment and red curtains behind tall windows
+        const F = fpv, h = (19 + level * 3) * u, f = boxF(c, x, y, F, 0.84, h, col), { lf, sf } = faces2(f, F);
+        for (let i = 0; i < 3; i++) { const a = 0.15 + i * 0.27; if (ruin) WQ(c, lf, a, a + 0.16, h * 0.15, h * 0.7, '#3A322B'); else { WQ(c, lf, a, a + 0.16, h * 0.15, h * 0.7, '#8E2A3A'); WQ(c, lf, a + 0.06, a + 0.1, h * 0.15, h * 0.62, '#F2C14E'); } }
+        if (!ruin) columnsQ(c, lf, 6, 0.06, 0.94, h * 0.8, '#F4EEE0', u);
+        const g = gableF(c, x, y, F, 0.84, h, 7 * u, shade(roofc, 1.1)); void g;
+        if (!ruin) { const tp = wallPt(lf[0], lf[1], 0.5, h * 0.9); c.fillStyle = '#F2C14E'; c.beginPath(); c.arc(tp[0], tp[1], 1.8 * u, 0, Math.PI * 2); c.fill(); }
+        break;
+      }
+      case 'fishmarket': { // 11.05: a stall of fish under a blue awning, a jetty and the boats
+        const h = (9 + level * 2) * u, f = box(c, x, y, hw, hh, 0.5, h, col);
+        for (let i = 0; i < 4; i++) wallQuad(c, f.B, f.R, i / 4, (i + 1) / 4, h * 0.8, h, i % 2 ? '#F7F3EA' : roofc);
+        if (!ruin) for (let i = 0; i < 4; i++) { const p0 = wallPt(f.B, f.R, 0.15 + i * 0.22, h * 0.3); c.fillStyle = i % 2 ? '#9AA6AE' : '#C9D1D8'; c.beginPath(); c.ellipse(p0[0], p0[1], 2.2 * u, 0.9 * u, -0.3, 0, Math.PI * 2); c.fill(); }
+        pyramid(c, x, y, hw, hh, 0.5, h, 6 * u, roofc);
+        const n = clamp(BOATS[opt.choice] || 2, 1, 3);
+        for (let i = 0; i < n; i++) { const bx = x - hw * 0.6 + i * 6 * u, by = y + hh * 0.55 + i * 2 * u + (reduced ? 0 : Math.sin(now / 700 + i) * 0.6 * u); c.fillStyle = ['#C8473D', '#3E6FB0', '#E8A93A'][i]; c.beginPath(); c.moveTo(bx - 4 * u, by - 1 * u); c.lineTo(bx + 4 * u, by - 1 * u); c.lineTo(bx + 2.6 * u, by + 1.4 * u); c.lineTo(bx - 3 * u, by + 1.4 * u); c.closePath(); c.fill(); line(c, [bx, by - 1 * u], [bx, by - 6 * u], '#6E4A2C', 0.5 * u); }
         break;
       }
       case 'greenhouse': { // 11.04: a long glass house with rows of green inside, warm even in winter
@@ -7975,7 +8060,7 @@
     return { w: w * sc, h: (h + 7 * px) * sc };
   }
   // Roof height of each kind of building (in building units), so labels sit just above the roof.
-  const ROOF = { greenhouse: (L) => 22 + 2 * L, restaurant: (L) => 26 + 3 * L, library: (L) => 32 + 3 * L, cinema: (L) => 26 + 2 * L, townsquare: () => 26, daycare: (L) => 22 + 2.5 * L, hardware: (L) => 26 + 3 * L, icecream: (L) => 26 + 2 * L, rink: () => 14, pharmacy: (L) => 20 + 3 * L, pub: (L) => 28 + 3 * L, gym: (L) => 26 + 2 * L, apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
+  const ROOF = { harbour: () => 34, watchtower: (L) => 40 + 4 * L, coastguard: (L) => 26 + 2 * L, hotel: (L) => 22 + 8.5 * (1 + L), theater: (L) => 34 + 3 * L, fishmarket: (L) => 20 + 2 * L, greenhouse: (L) => 22 + 2 * L, restaurant: (L) => 26 + 3 * L, library: (L) => 32 + 3 * L, cinema: (L) => 26 + 2 * L, townsquare: () => 26, daycare: (L) => 22 + 2.5 * L, hardware: (L) => 26 + 3 * L, icecream: (L) => 26 + 2 * L, rink: () => 14, pharmacy: (L) => 20 + 3 * L, pub: (L) => 28 + 3 * L, gym: (L) => 26 + 2 * L, apartment: (L) => 30 + 8.5 * (3 + L) / 1.35, farm: () => 26, markethall: (L) => 30 + 2 * L, monument: () => 26 + 5.5 * monuStage(monuCount()), townhall: (L) => 48 + 8 * L, cottage: (L) => 21 + 2.5 * L, townhouse: (L) => 22 + 4 * L, school: (L) => 27 + 4 * L, highschool: (L) => 31 + L, university: (L) => 49 + L, market: (L) => 24 + 2 * L, cafe: (L) => 24 + 3 * L, bakery: (L) => 32 + 3 * L,
     workshop: (L) => 36 + 3 * L, factory: (L) => 39 + L, induspark: (L) => 43 + L, bookshop: (L) => 20 + 3 * L, park: () => 16, fountain: (L) => 18 + 2 * L, clinic: (L) => 25 + 3 * L, medcenter: (L) => 33 + L, hospital: (L) => 44 + L, stadium: (L) => 44 + 4 * L, depot: (L) => 24 + 2 * L, recycling: (L) => 29 + L, wasteplant: (L) => 49 + L,
     shed: (L) => 19 + 2 * L, gardencenter: (L) => 27 + L, parksdept: (L) => 33 + L, firestation: (L) => 33 + 2 * L, firehall: (L) => 39 + L, firehq: (L) => 61 + L, police: (L) => 25 + 2 * L, policestation: (L) => 29 + L, courthouse: (L) => 47 + L,
     prison: (L) => 20 + 2 * L, prison2: (L) => 33 + L, maxprison: (L) => 33 + L, amusement: () => 40, cemetery: () => 15, tree: () => 22, flowers: () => 7, bench: () => 11, lamp: () => 31, gnome: () => 22, birdbath: () => 17,
@@ -8251,6 +8336,7 @@
     drawSea(c, now);
     const top = [0, 0], right = [N * HW, N * HH], bottom = [0, 2 * N * HH], left = [-N * HW, N * HH], dz = HH * 1.1;
     drawIsland(c, now);
+    if (state.pirate && !ui.visit) { const pp = piratePos(state.pirate); drawPirateShip(c, pp.p.x, pp.p.y, pp.dir, tt); const sp = toScreen(pp.p.x, pp.p.y); ui.hits.push({ x0: sp.x - 30 * z, x1: sp.x + 30 * z, y0: sp.y - 40 * z, y1: sp.y + 10 * z, pirate: true }); } // 11.05
     const occ = occupancy(), wild = [];
     for (let r = 0; r < N; r++) for (let cc = 0; cc < N; cc++) {
       const p = tileCenter(cc, r);
@@ -9436,6 +9522,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (p.kind === 'attach') renderAttachPanel(box);
       else if (p.kind === 'alert') renderAlertPanel(box, byId(p.bid));
       else if (p.kind === 'land') renderLandPanel(box, p.plot);
+      else if (p.kind === 'pirate') renderPiratePanel(box); // 11.05
       if (full) box.scrollTop = sc;
     }
     box.classList.toggle('alert', !!(show && p && p.kind === 'alert'));
@@ -9762,6 +9849,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (lineOf(type) === 'workshop') out.push(`While you have one, the crew builds ${[0, 20, 30, 40][tierOf(type)]}% faster`);
     if (lineOf(type) === 'bank') out.push(`You can borrow up to ${BANK_LIMIT[bankPower(type, L)]} gold, and the treasury holds ${BANK_SAFE[bankPower(type, L)]} gold more`);
     if (type === 'citybank') out.push('Savings that inflation can\'t touch (Money page)');
+    if (type === 'watchtower' || type === 'coastguard') out.push(`Its guards drive off pirate ships that sail for the shore within ${(TYPES[type].reach || 0) + L - 1} tiles`);
+    if (type === 'fishmarket') out.push('Fishing boats bring food, the same in every season. More boats, more food, and pirates come more often');
+    if (type === 'hotel') out.push('Visitors pay to stay: +15% for every landmark in town, +20% once the season\'s festival is won');
+    if (type === 'theater') out.push('Festival prizes +50%');
     if (type === 'centralbank') out.push('You can raise interest to cool inflation (loans cost more)');
     if (type === 'restaurant') out.push('Cooks your food (1 food an hour a level) for a big evening income; without food in store it earns half');
     if (type === 'library') out.push('Earns nothing; homes within 3 tiles that a school reaches learn 5% more');
@@ -10145,6 +10236,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     bank: 'A small bank office.', citybank: 'The bank, with a big safe.', centralbank: 'The central bank, with columns and a vault.',
     factory: 'A factory, with a chimney and many hands.', induspark: 'The industrial park: the town\'s biggest employer.',
     monument: 'A monument of the projects you finished, one stone each.',
+    harbour: 'The old harbour, busy again: a quay, a crane and boats coming home.', watchtower: 'Guards on the lookout for sails on the horizon.', coastguard: 'A fast boat and a radar, ready day and night.', hotel: 'Fresh sheets, sea views and breakfast until ten.', theater: 'Velvet seats, a red curtain and a full house on Saturdays.', fishmarket: 'The catch of the day, straight off the boats.',
     greenhouse: 'Warm glass and tomatoes in December.', restaurant: 'Candles, three courses and the best view in town.', library: 'Rows of books, a reading room and story time on Saturdays.', cinema: 'Popcorn, a big screen and the Friday premiere.', townsquare: 'Where the town meets: market days, music and festivals.', daycare: 'Little chairs, a sandpit and nap time.',
     hardware: 'Nails, paint, tools and good advice.', icecream: 'Cones in every colour, all summer long.', rink: 'Skates, hot chocolate and music on the ice.', pharmacy: 'Medicine and a friendly word.', pub: 'Warm light, a quiz on Thursdays and a fire in winter.', gym: 'Treadmills, weights and the Saturday spin class.',
     apartment: 'Flats for many families, stacked four storeys high.', farm: 'A red barn, a silo and fields full of crops.', markethall: 'A covered market: stalls of fruit, cheese and bread under one roof.',
@@ -11576,7 +11668,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return box;
   }
   /* ---------- 10.09: the Incident report ---------- */
-  const INC_ICON = { layoff: ['#8A5A2B', '📉'], shut: ['#7A8590', '🔒'], gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
+  const INC_ICON = { pirates: ['#1E1E22', '🏴‍☠️'], strike: ['#D9541E', '✊'], recession: ['#8A5A2B', '📉'], layoff: ['#8A5A2B', '📉'], shut: ['#7A8590', '🔒'], gang: ['#5A2F6B', '🦹'], fire: ['#E5482F', '🔥'], theft: ['#2F4E8C', '🕵'], sick: ['#2E8F7A', '🤒'], serious: ['#C2477A', '🚑'], storm: ['#5A7FB0', '🌪'], release: ['#7A8590', '🔓'] };
   const agoText = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   function openIncidents() { const wrap = el('div', 'list inc'); incidentsBody(wrap); openSheet('Incident report', wrap); }
   function incidentsBody(wrap) {
@@ -11892,6 +11984,100 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     card.addEventListener('click', () => { if (startPick.mode !== 'laps') { startPick.mode = 'laps'; renderStart(); } });
     return card;
   }
+  /* ---------- 11.05 (roadmap part 6, Navid): pirates, computer-run only ----------
+     After the old harbour is restored, a pirate ship shows on the sea now and then while you play (about every 10–15
+     minutes of play) and sails for the shore for about a minute: time to act. A Watchtower (or the Coast guard, further)
+     drives it off within its reach; or pay them off. If they land they take up to 10% of the food in store or 5% of the
+     gold, never buildings, at most once a play day. Never during focus or under a shield. */
+  const BOATS = { one: 1, two: 2, three: 3 };
+  const fishBoats = () => state.buildings.filter((b) => b.type === 'fishmarket' && live(b)).reduce((a, b) => a + (BOATS[choiceOf(b)] || 2), 0);
+  const piratesOn = () => hasLandmark('harbour');
+  const SAIL_SEC = 60;
+  const guardReach = (b) => (TYPES[b.type].reach || 0) + Math.max(0, (b.level || 1) - 1);
+  const guardsFor = (c, r) => state.buildings.filter((b) => (b.type === 'watchtower' || b.type === 'coastguard') && live(b) && !b.fire && distFull(b, { type: 'tree', c, r, level: 1 }) <= guardReach(b)).sort((a, b) => tierOfGuard(b) - tierOfGuard(a))[0] || null;
+  const tierOfGuard = (b) => (b.type === 'coastguard' ? 2 : 1);
+  // A spot on the shore near the town for the ship to sail at, and where it starts out at sea.
+  function pirateTarget() {
+    const shore = []; for (let i = 0; i < N; i++) for (const [c, r] of [[i, 0], [i, N - 1], [0, i], [N - 1, i]]) if (isOpen(c, r)) shore.push({ c, r });
+    if (!shore.length) return null;
+    const town = state.buildings.filter((b) => live(b) && ['home', 'shop', 'farm'].includes(T(b).cat));
+    const w = (s) => 1 / (1 + Math.min(...town.map((b) => Math.max(Math.abs(b.c - s.c), Math.abs(b.r - s.r))), 20));
+    const s = weighted(shore, w) || pick(shore);
+    const out = s.r === N - 1 ? [0, 1] : s.c === N - 1 ? [1, 0] : s.r === 0 ? [0, -1] : [-1, 0];
+    return { c: s.c, r: s.r, sc: s.c + out[0] * 9, sr: s.r + out[1] * 9, ec: s.c + out[0] * 1.6, er: s.r + out[1] * 1.6 };
+  }
+  function startPirates() {
+    const tg = pirateTarget(); if (!tg) return;
+    state.pirate = Object.assign(tg, { left: SAIL_SEC, at: Date.now(), name: pick(['The Salty Gull', 'The Black Herring', 'The Rusty Anchor', 'The Grim Tide', 'The Crooked Kettle']) });
+    logIncident('pirates', null, `${state.pirate.name} sailed for the shore`);
+    const g = guardsFor(tg.c, tg.r);
+    toast(g ? `Pirates! ${state.pirate.name} is sailing for the shore. Your ${nameOf(g).toLowerCase()}'s guards are watching.` : `Pirates! ${state.pirate.name} is sailing for the shore and lands in about a minute. Tap the ship to pay them off, or build a watchtower near the shore.`);
+    sfx.alarm(); save(); renderAll();
+  }
+  function endPirates(how) {
+    const P = state.pirate; if (!P) return; state.pirate = null;
+    if (how === 'landed') {
+      state.pirateDay = dayKey(Date.now());
+      const foodTake = Math.floor((state.food || 0) * 0.1), goldTake = Math.floor(Math.max(0, state.gold) * 0.05);
+      let txt;
+      if (foodTake >= 20 && foodTake / 2 >= goldTake * 0.25) { state.food -= foodTake; txt = `${P.name} landed and carried off ${foodTake} food (10% of the store).`; closeIncidentKind('pirates', `They landed and took ${foodTake} food`, 0); }
+      else { if (goldTake > 0) goldChange(-goldTake, `Pirates landed (${P.name})`, 'crime'); txt = `${P.name} landed and took ${goldTake} gold (5% of the treasury).`; closeIncidentKind('pirates', `They landed and took ${goldTake} gold`, goldTake); }
+      addScar('pirates in town', 4, 12);
+      toast(`${txt} They never touch buildings. A watchtower near the shore drives them off next time.`);
+    } else if (how === 'guards') { closeIncidentKind('pirates', 'Driven off by the guards'); state.stats.piratesOff = (state.stats.piratesOff || 0) + 1; toast(`Your guards drove ${P.name} off! 🏴‍☠️`); try { sfx.chime(); } catch (e) { /* quiet */ } }
+    else if (how === 'paid') closeIncidentKind('pirates', `Paid them off`);
+    touch(); save(); renderAll();
+  }
+  function closeIncidentKind(kind, outcome, cost) { for (let i = state.incidents.length - 1; i >= 0; i--) { const e = state.incidents[i]; if (e.kind === kind && !e.outcome) { e.outcome = outcome; if (cost) e.cost = (e.cost || 0) + cost; return; } } }
+  const payoffCost = () => Math.max(40, Math.round(Math.max(0, state.gold) * 0.03));
+  function payPirates() {
+    const cost = payoffCost(); if (state.gold + 1e-6 < cost) { toast(`They want ${cost} gold.`); return; }
+    goldChange(-cost, 'Paid the pirates to sail away', 'crime'); toast(`You paid ${cost} gold. The pirates sail away.`); closePanel(true); endPirates('paid');
+  }
+  // While you play: the ship sails in; guards in reach drive it off halfway; otherwise it lands. dt in play seconds.
+  function pirateTick(dt, sh) {
+    if (!piratesOn()) { if (state.pirate) state.pirate = null; return; }
+    const P = state.pirate;
+    if (P) {
+      if (sh) return; // the golden shield holds it out at sea
+      P.left -= dt;
+      const g = guardsFor(P.c, P.r);
+      if (g && P.left <= SAIL_SEC * 0.55) { endPirates('guards'); return; }
+      if (P.left <= 0) endPirates('landed');
+      return;
+    }
+    if (sh || state.pirateDay === dayKey(Date.now())) return;
+    if (ui.pirIn == null) ui.pirIn = (600 + Math.random() * 300) / (1 + 0.15 * fishBoats());
+    ui.pirIn -= dt;
+    if (ui.pirIn <= 0 && ui.playVisit >= 40 && !ui.panel) { ui.pirIn = null; startPirates(); }
+  }
+  function piratePos(P) { const k = clamp(1 - P.left / SAIL_SEC, 0, 1), c = P.sc + (P.ec - P.sc) * k, r = P.sr + (P.er - P.sr) * k; return { p: tileCenter(c, r), dir: (P.ec - P.sc) - (P.er - P.sr) >= 0 ? 1 : -1 }; }
+  function drawPirateShip(c, x, y, dir, t) {
+    const rock = reduced ? 0 : Math.sin(t / 700) * 0.07, bob = reduced ? 0 : Math.sin(t / 500) * 1.4;
+    c.save(); c.translate(x, y + bob); c.rotate(rock); c.scale(dir, 1);
+    c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(-4, 5, 26, 4, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#3A2618'; c.beginPath(); c.moveTo(-22, -2); c.lineTo(22, -2); c.lineTo(15, 7); c.lineTo(-17, 7); c.closePath(); c.fill();
+    c.fillStyle = '#5A3A22'; c.fillRect(-22, -4, 44, 2.4); c.fillStyle = '#C9A23A'; for (let i = -16; i <= 12; i += 7) c.fillRect(i, 1, 2.6, 2.2);
+    c.strokeStyle = '#2B1E16'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(-2, -2); c.lineTo(-2, -36); c.moveTo(11, -2); c.lineTo(11, -26); c.stroke();
+    c.fillStyle = '#1E1E22'; c.beginPath(); c.moveTo(-15, -33); c.quadraticCurveTo(-8, -22, -15, -8); c.lineTo(10, -8); c.quadraticCurveTo(4, -22, 10, -33); c.closePath(); c.fill();
+    c.fillStyle = '#F4F1EA'; c.beginPath(); c.arc(-3, -23, 3.2, 0, Math.PI * 2); c.fill(); c.fillStyle = '#1E1E22'; c.beginPath(); c.arc(-4.2, -23.4, 0.8, 0, Math.PI * 2); c.arc(-1.8, -23.4, 0.8, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#F4F1EA'; c.lineWidth = 1; c.beginPath(); c.moveTo(-7, -17); c.lineTo(1, -14); c.moveTo(1, -17); c.lineTo(-7, -14); c.stroke();
+    c.fillStyle = '#2B2B30'; c.beginPath(); c.moveTo(5, -24); c.quadraticCurveTo(9, -16, 5, -6); c.lineTo(17, -6); c.quadraticCurveTo(14, -16, 17, -24); c.closePath(); c.fill();
+    const wv = reduced ? 0 : Math.sin(t / 220) * 1.5; c.fillStyle = '#C8473D'; c.beginPath(); c.moveTo(-2, -36); c.lineTo(8, -34 + wv); c.lineTo(-2, -31); c.closePath(); c.fill();
+    c.restore();
+  }
+  function renderPiratePanel(box) {
+    const P = state.pirate; if (!P) { ui.panel = null; return; }
+    const g = guardsFor(P.c, P.r), cost = payoffCost();
+    box.append(panelHead('harbour', 1, {}, `Pirates! ${P.name}`, [pill(`lands in ${Math.max(1, Math.ceil(P.left))} s`, 'bad')]));
+    const p0 = el('p', 'small'); p0.append(colorize(g ? `They are sailing into the reach of your ${nameOf(g).toLowerCase()}: its guards will drive them off before they land.` : `No watchtower reaches the spot where they want to land. If they land they take up to 10% of the food in store or 5% of the gold (never buildings), once a day at most. Pay them off now, or build a watchtower near the shore for next time.`));
+    box.append(p0);
+    const grid = el('div', 'actions-grid');
+    if (!g) grid.append(actionBtn(`Pay them off · ${cost} gold`, 'they sail away', 'primary', payPirates, state.gold + 1e-6 < cost));
+    grid.append(actionBtn(g ? 'Watch the guards' : 'Let them come', null, '', () => closePanel()));
+    if (!g && countLive('watchtower') < capFor('watchtower')) grid.append(actionBtn('Build a watchtower', 'near the shore, for next time', '', () => { closePanel(true); startPlacing('watchtower'); }));
+    box.append(grid);
+  }
   /* ---------- 11.04 (roadmap part 3, Navid): an economy that reacts, from town hall 5 ----------
      Guardrails: shown on the map and the Money page; strikes and recessions are announced ahead (staff and shop owners
      talk first); always a fix button; never during focus or under a shield; never destroys buildings; at most one at a
@@ -12018,12 +12204,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     gym: { title: 'Membership', opts: [['cheap', 'Cheap', 'more members: sickness −15%, mood +3% in reach, earns less'], ['normal', 'Normal', 'sickness −10%, mood +2%'], ['dear', 'Dear', 'earns 40% more: sickness −5%, mood +1%']] },
     workshop: { title: 'What it makes', opts: [['materials', 'Materials', 'upgrades cost 10% less'], ['repairs', 'Repairs', 'fires cost half as much to repair']] },
     factory: { title: 'Overtime', opts: [['off', 'Off', 'normal shifts'], ['on', 'On', '+30% goods (shops +13%), more noise next door, and staff grumble']] },
+    boats: { title: 'Fishing boats', opts: [['one', 'One', 'less food, pirates come less often'], ['two', 'Two', 'as it is'], ['three', 'Three', 'more food, pirates come more often']] },
     places: { title: 'Places', opts: [['small', 'Few', '3 places, the fewest staff'], ['medium', 'Some', '6 places'], ['large', 'Many', '10 places, more staff']] },
     interest: { title: 'Interest', opts: [['normal', 'Normal', 'as it is'], ['high', 'High', 'inflation half as fast, but new loans cost 20% more']] },
     season: { title: 'Open', opts: [['season', 'In its season', 'no upkeep the rest of the year'], ['allyear', 'All year', 'pay upkeep all year; half the fun out of season']] }
   };
-  const choiceKind = (type) => (type === 'daycare' ? 'places' : type === 'centralbank' ? 'interest' : type === 'pharmacy' ? 'medicine' : type === 'pub' ? 'pub' : type === 'gym' ? 'gym' : type === 'workshop' ? 'workshop' : type === 'factory' ? 'factory' : SEASONAL[type] ? 'season' : type === 'market' || type === 'markethall' ? 'food' : PRICED.includes(type) ? 'price' : null);
-  const choiceOf = (b) => { const k = choiceKind(b.type); if (!k) return null; const o = CHOICES[k].opts.map((x) => x[0]); return o.includes(b.choice) ? b.choice : o.includes('normal') ? 'normal' : o.includes('medium') ? 'medium' : o[0]; };
+  const choiceKind = (type) => (type === 'fishmarket' ? 'boats' : type === 'daycare' ? 'places' : type === 'centralbank' ? 'interest' : type === 'pharmacy' ? 'medicine' : type === 'pub' ? 'pub' : type === 'gym' ? 'gym' : type === 'workshop' ? 'workshop' : type === 'factory' ? 'factory' : SEASONAL[type] ? 'season' : type === 'market' || type === 'markethall' ? 'food' : PRICED.includes(type) ? 'price' : null);
+  const choiceOf = (b) => { const k = choiceKind(b.type); if (!k) return null; const o = CHOICES[k].opts.map((x) => x[0]); return o.includes(b.choice) ? b.choice : o.includes('normal') ? 'normal' : o.includes('medium') ? 'medium' : o.includes('two') ? 'two' : o[0]; };
   // Customers drift toward their target over two town days after a price change.
   function custTarget(b, near, rivals, moodV) {
     const p = priceOf(b);
@@ -13640,6 +13827,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // Speech bubbles, request markers and land signs lead to what needs doing.
     if (!ui.holding && !ui.attach) for (let i = ui.hits.length - 1; i >= 0; i--) {
       const h = ui.hits[i]; if (sx < h.x0 || sx > h.x1 || sy < h.y0 || sy > h.y1) continue;
+      if (h.pirate) { if (ui.screen === 'play') openPanel({ kind: 'pirate' }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'pirate' }), 420); return; } // 11.05
       if (h.plot) { const go = () => openPanel({ kind: 'land', plot: h.plot }); if (ui.screen === 'home') { if (enterPlay()) setTimeout(go, 420); } else go(); return; }
       const b = byId(h.bid); if (!b) break;
       const bb = h.bubble;
@@ -14054,6 +14242,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     alerts: () => activeQuests().filter((q) => q.alert).map((q) => q.id),
     shopsRed: () => { for (const b of state.buildings) if (T(b).cat === 'shop') b.redMin = 10; touch(); return shopsLosing(); },
     jobsNow: () => ({ ...city().jobs }),
+    // 11.05: pirates
+    pirates: () => { if (!piratesOn()) return null; startPirates(); return state.pirate ? { ...state.pirate } : null; },
+    pirateTick: (sec) => { for (let i = 0; i < sec * 4; i++) pirateTick(0.25, false); return state.pirate ? { ...state.pirate } : null; },
+    pirate: () => (state.pirate ? { ...state.pirate, guard: (guardsFor(state.pirate.c, state.pirate.r) || {}).type || null } : null),
+    payPirates: () => { payPirates(); return { pirate: !!state.pirate, gold: state.gold }; },
     choose: (bid, v) => { const b = byId(bid); b.choice = v; touch(); return choiceOf(b); },
     shopStep: (min) => { shopStep(min); touch(); return state.buildings.filter((b) => T(b).cat === 'shop').map((b) => ({ id: b.id, type: b.type, cust: b.cust || 1, layoff: b.layoff || 0, shut: !!b.shut, red: b.redMin || 0 })); },
     tax: (k) => { pol().tax = k; touch(); const e = econ(); return { taxes: e.taxes, mood: e.mood.value, policyMood: e.mood.taxes, target: crimeTarget(city()) }; },

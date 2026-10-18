@@ -1,5 +1,5 @@
 // Maplewick service worker: fresh game when online, saved copy when offline.
-const CACHE = 'maplewick-11.04';
+const CACHE = 'maplewick-11.05';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './fb.js'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE && !k.startsWith('mw-music')).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
