@@ -14,6 +14,8 @@ declare class FocusGuardModule extends NativeModule<FocusGuardModuleEvents> {
   hideCountdown(): void;
   /** Sends the app to the back (the Android back button on Home), without closing it. */
   moveToBack(): void;
+  /** Full screen: hides the status bar and the navigation buttons (a swipe from the edge shows them for a moment). */
+  setImmersive(on: boolean): void;
 }
 
 /** Android only for now; null on iPhone until the Screen Time version exists. */

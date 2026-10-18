@@ -69,6 +69,9 @@ function Game() {
     })();
   }, []);
 
+  // Full screen, like a game: no status bar or navigation buttons (a swipe from the edge shows them for a moment)
+  useEffect(() => { FocusGuard?.setImmersive(true); }, []);
+
   // Each thing the phone does during focus goes straight to the game
   useEffect(() => {
     if (!FocusGuard) return;
@@ -82,6 +85,7 @@ function Game() {
       const was = appState.current;
       appState.current = next;
       if (next === 'active' && was !== 'active') {
+        FocusGuard?.setImmersive(true); // Android can bring the bars back after the app was away
         clearAway();
         send({ t: 'visible', on: true });
         sendLog();
@@ -203,7 +207,7 @@ function Game() {
     // The game draws edge to edge and keeps clear of the status and navigation bars itself (CSS env(safe-area-inset-*),
     // which Android's WebView reports), so only the offline screen needs the insets.
     <View style={[styles.fill, { backgroundColor: BG }]}>
-      <StatusBar style={dark ? 'light' : 'dark'} />
+      <StatusBar style={dark ? 'light' : 'dark'} hidden />
       {failed ? (
         <View style={[styles.center, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
           <Text style={styles.title}>Maplewick needs the internet the first time</Text>
