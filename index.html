@@ -1425,7 +1425,7 @@
   const isOpen = (c, r) => inGrid(c, r) && state.land.includes(plotAt(c, r));
   const HW = 32, HH = 16; // tile half-width/height in map units
   const HOME_TAX = 1.2; // gold per resident per hour (version 10: 1.2; 10.05 tried 2; 10.06 back to 1.2: the gold should come from focus, not the buildings)
-  const AWAY_RATE = 0.1; // taxes when you're not focusing or playing
+  const AWAY_RATE = 0.02; // 11.00 (balance): taxes and town time when you're not focusing or playing (was 0.1): focus is what runs the town
   const PLAY_CAP = 45 * 60; // most play time you can hold at once (10.07, Navid: 45 min)
   const DAILY_PLAY = 120 * 60; // most play time you can earn in one day (10.07, Navid: 2 hours), so a fake 8-hour "focus" can't buy a day of play
   const QUEUE_MAX = 5;
@@ -1438,7 +1438,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '10.19'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.00'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1652,27 +1652,44 @@
     }
     TYPES.townhall.cap = [0, 250, 600, 1500, 3500];
   })();
+  /* 11.00 (balance, Navid): prices go up again, so every purchase is a choice: new homes, shops, parks, the clinic line
+     and landmarks ×1.5; fields, the granary and services ×1.3. Upgrades take the same factor, then ×1.3 more for level 2
+     and ×2 more for level 3. Rounded to 5. The town hall has its own numbers, and now needs people. */
+  const HALL_RES = [0, 0, 10, 40, 110, 200, 320];
+  const priceK = (type) => { const t = TYPES[type]; if (!t || type === 'townhall' || t.cat === 'decor' || t.cat === 'works' || t.chest || t.season) return 1; if (lineOf(type) === 'clinic') return 1.5; if (t.cat === 'farm' || t.cat === 'service' || t.staff) return 1.3; return 1.5; };
+  function rebalance(types) {
+    const r5 = (x) => Math.max(5, Math.round(x / 5) * 5);
+    for (const type of types) {
+      const t = TYPES[type], k = priceK(type); if (k === 1) continue;
+      if (t.cost) t.cost = r5(t.cost * k);
+      if (t.up) t.up = t.up.map((u, L) => (u ? [r5(u[0] * k * (L === 2 ? 1.3 : L >= 3 ? 2 : 1)), u[1]] : u));
+    }
+  }
+  rebalance(Object.keys(TYPES));
+  TYPES.townhall.up = [null, null, [200, 15], [900, 60], [3000, 240]];
+  TYPES.townhall.cap = [0, 300, 1200, 3500, 6500];
+  TYPES.townhouse.residents = [0, 12, 16, 22]; // 11.00: a House gives more per tile than a cottage
   const g1 = (x) => String(Math.round(x * 10) / 10);
   const special = (t) => !!(t.chest || t.season); // finds you place for free: no upgrades, no cost
   // Town staff: hired at their own building (or the town hall) for a one-off fee, then paid a wage every hour.
   // needed() says when the town starts to need them; need() how many it needs.
   const STAFF = {
-    sweeper: { name: 'Street sweeper', plural: 'street sweepers', home: 'depot', alt: ['recycling', 'wasteplant'], fee: 60, wage: 4, look: { shirt: '#3E8E57', hat: '#F3C64B', hair: '#5A3A22', skin: '#E0AC7E' }, what: 'Cleans up trash around homes and shops.',
+    sweeper: { name: 'Street sweeper', plural: 'street sweepers', home: 'depot', alt: ['recycling', 'wasteplant'], fee: 80, wage: 5, look: { shirt: '#3E8E57', hat: '#F3C64B', hair: '#5A3A22', skin: '#E0AC7E' }, what: 'Cleans up trash around homes and shops.',
       needed: () => true, need: (ci) => Math.max(1, Math.ceil(ci.residents / 15)), needText: '1 for every 15 residents' },
-    gardener: { name: 'Gardener', plural: 'gardeners', home: 'shed', alt: ['gardencenter', 'parksdept'], fee: 60, wage: 4, look: { shirt: '#6EA453', hat: '#D8B26A', hair: '#2B1E16', skin: '#C68B5E' }, what: 'Keeps parks tidy, rakes the dry autumn leaves (they catch fire), clears trees that fall in storms, trims the grass so fires spread less, and clears snowy paths.',
+    gardener: { name: 'Gardener', plural: 'gardeners', home: 'shed', alt: ['gardencenter', 'parksdept'], fee: 80, wage: 5, look: { shirt: '#6EA453', hat: '#D8B26A', hair: '#2B1E16', skin: '#C68B5E' }, what: 'Keeps parks tidy, rakes the dry autumn leaves (they catch fire), clears trees that fall in storms, trims the grass so fires spread less, and clears snowy paths.',
       needed: (ci) => countLive('park') >= 1 || ci.residents >= 20, neededText: 'Needed once you have a park or 20 residents', need: (ci) => Math.max(1, Math.ceil(countLive('park') / 2), Math.ceil(ci.residents / 40)), needText: '1 for every 2 parks or 40 residents' },
-    fire: { name: 'Firefighter', plural: 'firefighters', home: 'firestation', alt: ['firehall', 'firehq'], fee: 180, wage: 10, look: { shirt: '#C8473D', hat: '#F3C64B', hair: '#1A1A1A', skin: '#F2C9A0' }, what: 'Rushes out to put out fires.',
+    fire: { name: 'Firefighter', plural: 'firefighters', home: 'firestation', alt: ['firehall', 'firehq'], fee: 235, wage: 13, look: { shirt: '#C8473D', hat: '#F3C64B', hair: '#1A1A1A', skin: '#F2C9A0' }, what: 'Rushes out to put out fires.',
       needed: (ci) => ci.residents >= 16, neededText: 'Needed from 16 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 30)), needText: '1 for every 30 residents' },
-    police: { name: 'Police officer', plural: 'police officers', home: 'police', alt: ['policestation', 'courthouse'], fee: 240, wage: 10, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
+    police: { name: 'Police officer', plural: 'police officers', home: 'police', alt: ['policestation', 'courthouse'], fee: 310, wage: 13, look: { shirt: '#2F4E8C', hat: '#1E2F55', hair: '#2B1E16', skin: '#8D5B3C' }, what: 'Keeps people and their bikes safe.',
       needed: (ci) => ci.residents >= 24, neededText: 'Needed from 24 residents', need: (ci) => Math.max(1, Math.ceil(ci.residents / 25)), needText: '1 for every 25 residents, and every home within 5 tiles of a station' },
-    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', alt: ['medcenter', 'hospital'], fee: 320, wage: 12, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
+    nurse: { name: 'Nurse', plural: 'nurses', home: 'clinic', alt: ['medcenter', 'hospital'], fee: 415, wage: 16, look: { shirt: '#E9EEF1', hat: '#FFFFFF', hair: '#8E3B1F', skin: '#F5D5B8' }, what: 'Keeps everyone healthy.',
       needed: () => countLine('clinic') >= 1, neededText: 'Needed once you have a clinic', need: (ci) => Math.max(1, Math.ceil((ci.residents + 4 * (state.fam ? babiesNow().length : 0)) / 30)), needText: '1 for every 30 residents (a baby counts as 4)' },
-    teacher: { name: 'Teacher', plural: 'teachers', home: 'school', alt: ['highschool', 'university'], fee: 150, wage: 8, look: { shirt: '#7B5EA7', hat: '#4A3B6B', hair: '#6B4226', skin: '#E7B98F' }, what: 'Teaches the town\'s kids: homes near a school earn more.',
+    teacher: { name: 'Teacher', plural: 'teachers', home: 'school', alt: ['highschool', 'university'], fee: 195, wage: 10, look: { shirt: '#7B5EA7', hat: '#4A3B6B', hair: '#6B4226', skin: '#E7B98F' }, what: 'Teaches the town\'s kids: homes near a school earn more.',
       needed: (ci) => countLine('school') >= 1 || (hallLevel() >= 2 && ci.residents >= 20), neededText: 'Needed from town hall level 2 and 20 residents', need: (ci) => Math.max(1, Math.ceil((ci.residents + 2 * (state.fam ? kidsNow().length : 0)) / 30)), needText: '1 for every 30 residents (a kid counts as 2)' }
   };
   const STAFF_ORDER = ['sweeper', 'gardener', 'fire', 'police', 'nurse', 'teacher'];
   // Staff are expensive (version 10). Each extra person of the same kind costs more to hire and asks a higher wage: the 2nd 1.8× the fee and 1.6× the wage, the 3rd 2.6× and 2.2×, and so on.
-  const STAFF_STEP_FEE = 0.8, STAFF_STEP_WAGE = 0.6;
+  const STAFF_STEP_FEE = 0.8, STAFF_STEP_WAGE = 0.5; // 11.00: the 2nd costs 1.5× the wage, the 3rd 2×
   const hireFee = (k, n) => Math.round(STAFF[k].fee * (1 + STAFF_STEP_FEE * (n == null ? (state.staff[k] || 0) : n)));
   const wageOf = (k, i) => Math.round(STAFF[k].wage * (1 + STAFF_STEP_WAGE * i));
   const wagesFor = (k, n) => { let w = 0; for (let i = 0; i < n; i++) w += wageOf(k, i); return w; };
@@ -1704,7 +1721,7 @@
   const TITLES = [[1, 'New mayor'], [3, 'Busy mayor'], [5, 'Beloved mayor'], [8, 'Famous mayor'], [12, 'Legendary mayor'], [20, 'Mayor of mayors']];
   const titleFor = (L) => TITLES.filter(([l]) => L >= l).pop()[1];
   // Combos: start the next session within 20 minutes of finishing one and it pays more.
-  const COMBO_MULT = [1, 1.2, 1.4, 1.6, 2];
+  const COMBO_MULT = [1, 1.1, 1.2, 1.3, 1.4]; // 11.00: was up to ×2
   const COMBO_WINDOW = 20;
   const comboMultFor = (n) => COMBO_MULT[Math.min(n, COMBO_MULT.length - 1)];
   const SKINS = ['#F2C9A0', '#E0AC7E', '#C68B5E', '#8D5B3C', '#F5D5B8'];
@@ -1805,7 +1822,8 @@
   // Longer continuous sessions build and earn a little faster: +25% average at four hours, nothing extra up to 30 minutes.
   // 10.11: longer sessions pay more, in steps: 25 min +5%, 45 min +10%, 1 h +15%, 1½ h +20%, 2 h +25%, 3 h +30%, 4 h +35%.
   // It counts on everything the session makes: Sam's work (so your job's gold and food), play time and XP.
-  const LONG_BONUS = [[25, 0.05], [45, 0.10], [60, 0.15], [90, 0.20], [120, 0.25], [180, 0.30], [240, 0.35]];
+  // 11.00 (balance): one long session now pays more than a chain of short ones.
+  const LONG_BONUS = [[25, 0.05], [45, 0.10], [60, 0.15], [90, 0.25], [120, 0.35], [180, 0.45], [240, 0.50]];
   function longBonus(t) { let b = 0; for (const [m, p] of LONG_BONUS) if (t + 1e-9 >= m) b = p; return b; }
   const nextLongBonus = (t) => LONG_BONUS.find(([m]) => m > t + 1e-9) || null;
   const workFor = (t) => t * (1 + longBonus(t));
@@ -2525,7 +2543,7 @@
      easily (more so out of a clinic's reach). After a year a baby is a kid; kids grow up after 6 years. Longer leave costs
      more, but the family is happier and other families hear about it: the mood follows the leave given to the babies born
      in the last year. */
-  const FAM_MONTH = 12 * 3600000, FAM_YEAR = 12 * FAM_MONTH, LEAVE_PAY = 3, BIRTH_RES = 16;
+  const FAM_MONTH = 12 * 3600000, FAM_YEAR = 12 * FAM_MONTH, LEAVE_PAY = 5, BIRTH_RES = 16; // 11.00: leave pay 5 (was 3), in line with the new wages
   const LEAVE_OPTS = [1, 2, 3, 6, 9, 12];
   const LEAVE_MOOD = { 1: -4, 2: -2, 3: 0, 6: 2, 9: 3, 12: 4 };
   const GIRL_NAMES = ['Lily', 'Mila', 'Ava', 'Nora', 'Ivy', 'Zara', 'Elsa', 'Maya', 'Nina', 'Dara', 'Tess', 'Yara', 'Lena'];
@@ -2587,7 +2605,7 @@
     field: [0, 2, 3, 4], granary: [0, 1, 1, 2], amusement: [0, 3, 4, 5], clinic: [0, 1, 2, 3], school: [0, 1, 1, 2], police: [0, 1, 1, 2], firestation: [0, 0, 1, 1], depot: [0, 1, 2, 3], shed: [0, 0, 1, 1], prison: [0, 2, 3, 4], cemetery: [0, 1], lighthouse: [0, 2], observatory: [0, 2], castle: [0, 3],
     medcenter: [0, 4, 5, 6], hospital: [0, 8, 10, 12], recycling: [0, 3, 4, 5], wasteplant: [0, 6, 8, 10], gardencenter: [0, 2, 2, 3], parksdept: [0, 3, 4, 5], firehall: [0, 2, 2, 3], firehq: [0, 3, 4, 5],
     policestation: [0, 2, 3, 4], courthouse: [0, 5, 6, 8], highschool: [0, 3, 4, 5], university: [0, 8, 10, 12], citybank: [0, 6, 8, 10], centralbank: [0, 10, 12, 15], factory: [0, 16, 20, 24], induspark: [0, 28, 34, 40], prison2: [0, 4, 5, 6], maxprison: [0, 8, 10, 12] };
-  const jobsOf = (type, level) => { const j = JOBS[type]; return j ? j[clamp(level || 1, 1, j.length - 1)] || 0 : 0; };
+  const jobsOf = (type, level) => { const j = JOBS[type]; if (!j) return 0; let L = clamp(level || 1, 1, j.length - 1); if (type !== 'townhall' && L >= 3) L = 2; return j[L] || 0; }; // 11.00: level 3 gives the same jobs as level 2
   function jobsIn(act, residents) {
     let jobs = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0);
     for (const b of act) jobs += jobsOf(b.type, b.level);
@@ -2601,6 +2619,7 @@
      stalls and bakeries sell it (and earn 20% more while there is food). The store holds 150, each granary more.
      When the store is empty and the fields can't keep up, homes go hungry: they pay less and the town is sadder. */
   const FOOD_EAT = 0.25, FOOD_PRICE = 0.5, FOOD_CELLAR = 150, FEAST = 300, FOOD_SHOP = 20;
+  const FOOD_BUY = 2; // 11.00: the ferry sells food for 2 gold each, so winter or the feast can never lock the town
   const FOOD_SEASON = { spring: 1, summer: 1.2, autumn: 1.3, winter: 0.5 };
   const DIRTY = ['workshop', 'factory', 'induspark', 'depot', 'recycling', 'wasteplant'];
   const foodOn = () => hallLevel() >= 3;
@@ -2613,10 +2632,11 @@
   function foodFlow(act, residents, J) {
     if (!foodOn()) return null;
     const fields = act.filter((b) => b.type === 'field');
-    const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = residents * FOOD_EAT, have = state.food || 0;
+    const staffN = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0); // 11.00: staff eat as much as two residents
+    const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = (residents + 2 * staffN) * FOOD_EAT, have = state.food || 0;
     const supplied = have > FOOD_SHOP, shopEat = supplied ? act.filter((b) => b.type === 'market' || b.type === 'bakery').reduce((a, b) => a + (b.type === 'bakery' ? 1 : 0.5) * b.level, 0) : 0;
     const fed = have > 0.5 ? 1 : people > 0 ? clamp(grown / people, 0, 1) : 1;
-    return { grown, people, shopEat, eaten: people + shopEat, fed, supplied, fields: fields.length, residents };
+    return { grown, people, shopEat, eaten: people + shopEat, fed, supplied, fields: fields.length, residents, staffN };
   }
   function computeCity(bs) {
     const act = bs.filter(live);
@@ -2865,7 +2885,12 @@
   // Every service building costs a little to run (heating, water, paperwork), more at higher levels (10.04).
   const RUNNING = { depot: 2, shed: 1, firestation: 3, police: 3, clinic: 4, school: 3, bank: 4, cemetery: 1, prison: 2,
     recycling: 4, wasteplant: 7, gardencenter: 2, parksdept: 4, firehall: 6, firehq: 10, policestation: 6, courthouse: 10, medcenter: 7, hospital: 12, highschool: 5, university: 9, citybank: 7, centralbank: 12, prison2: 4, maxprison: 7 };
-  const runningOf = (b) => (RUNNING[b.type] && live(b) ? Math.max(0, RUNNING[b.type] * b.level - (b.addons && b.addons.solar ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
+  // 11.00 (balance): every working building costs upkeep, in whole gold an hour by level. Small level-1 buildings run
+  // for free, so a new town isn't punished. Service buildings cost twice what they did.
+  const RUNNING_BY_LEVEL = { market: [0, 0, 1, 2], cafe: [0, 1, 2, 3], bakery: [0, 1, 3, 4], workshop: [0, 2, 4, 7], bookshop: [0, 1, 3, 4], arcade: [0, 1, 3, 4],
+    factory: [0, 4, 9, 13], induspark: [0, 9, 18, 27], park: [0, 0, 1, 1], fountain: [0, 1, 1, 2], amusement: [0, 3, 6, 9], stadium: [0, 6, 13], field: [0, 0, 1, 2], granary: [0, 0, 1, 2] };
+  const runAt = (type, L) => { const r = RUNNING_BY_LEVEL[type]; if (r) return r[clamp(L || 1, 1, r.length - 1)] || 0; return RUNNING[type] ? RUNNING[type] * 2 * (L || 1) : 0; };
+  const runningOf = (b) => (live(b) && runAt(b.type, b.level) ? Math.max(0, runAt(b.type, b.level) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
   const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0);
   // Thieves who are caught sit in the police station's cells for a while: each one costs a little to keep (10.04).
   const JAIL_COST = 3;
@@ -3178,7 +3203,9 @@
   // caught: the officers found the thief. On foot they recover only part of the gold. The rest the town pays back.
   function endRobbery(b, caught, foot) {
     if (!b || !b.robbed) return;
-    const r = b.robbed, back = caught ? Math.round(r.stolen * (foot ? 0.5 + Math.random() * 0.5 : 1)) : 0, owe = r.stolen - back;
+    const r = b.robbed, back = caught ? Math.round(r.stolen * (foot ? 0.5 + Math.random() * 0.5 : 1)) : 0;
+    let owe = r.stolen - back;
+    owe = Math.min(owe, Math.max(0, Math.floor(state.gold))); // 11.00: a break-in never puts the town in debt
     if (owe > 0) goldChange(-owe, `Break-in at ${placeName(b)}: paid ${b.resident || 'the owner'} back${caught ? ' (some was spent)' : ' (the thief got away)'}`, 'crime'); // the town pays the victim back what the police could not recover
     delete b.robbed;
     b.shaken = { left: caught ? 5 : 12, total: caught ? 5 : 12, label: 'after the break-in' };
@@ -3914,7 +3941,10 @@
   }
   // 10.03: focusing pays twice the gold: your job pays double, and the town's shops are twice as busy while you focus.
   const FOCUS_PAY = 2;
-  const focusNet = (e) => { e = e || econ(); return e.taxes * FOCUS_PAY - e.wages; };
+  // 11.00 (balance): your job still pays double while you focus, but the town only runs a bit faster: taxes ×1.25 (was ×2).
+  const FOCUS_TAX = 1.25;
+  const hallPayK = () => 1 + 0.15 * (hallLevel() - 1); // job pay +15% for each town hall level above 1
+  const focusNet = (e) => { e = e || econ(); return e.taxes * FOCUS_TAX - e.wages; };
   function faceMarkup(v) {
     const hue = Math.round(clamp(v, 0, 100) * 1.15), my = (15 + (v - 50) / 50 * 3.8).toFixed(1);
     const brows = v < 30 ? '<path d="M6.6 7.4 9.7 8.5M17.4 7.4 14.3 8.5" stroke="#1E2A28" stroke-width="1.4" stroke-linecap="round"/>' : '';
@@ -3926,7 +3956,7 @@
     const t = T(b); if (!live(b) || !t.job) return null;
     // 10.11: from town hall 3 some jobs also bring in food (and pay a little less gold for it)
     const fo = foodOn(), lv = 1 + 0.25 * (b.level - 1);
-    const gold = (fo && t.job.foodGold != null ? t.job.foodGold : t.job.gold) * FOCUS_PAY * lv, food = fo ? (t.job.food || 0) * lv : 0;
+    const gold = (fo && t.job.foodGold != null ? t.job.foodGold : t.job.gold) * FOCUS_PAY * lv * hallPayK(), food = fo ? (t.job.food || 0) * lv : 0;
     return { bid: b.id, type: b.type, gold, food, play: t.job.play, verb: t.job.verb, at: t.job.at, title: `${t.job.verb} ${t.job.at}` };
   }
   function jobs() {
@@ -3944,7 +3974,7 @@
   const jobFood = (j) => `${g1(j.food || 0)} food/min`;
   const jobLine = (j) => `${jobGold(j)}${j.food ? ' · ' + jobFood(j) : ''} · ${jobPlay(j)} time`;
   function jobRatesText(tj) {
-    const fo = foodOn(), g = (fo && tj.foodGold != null ? tj.foodGold : tj.gold) * FOCUS_PAY, f = fo ? tj.food || 0 : 0;
+    const fo = foodOn(), g = (fo && tj.foodGold != null ? tj.foodGold : tj.gold) * FOCUS_PAY * hallPayK(), f = fo ? tj.food || 0 : 0;
     return `${g.toFixed(1)} gold a minute${f ? ` · ${g1(f)} food a minute` : ''} · ${tj.play === 1 ? 'normal play time' : `${tj.play}× play time`}`;
   }
 
@@ -4094,6 +4124,7 @@
       cost = t.up[L][0]; work = upgradeWork(b.type, L);
       if (jobMode('upgrade', b.type) === 'play') secs = upgradeSecs(b.type, L);
       if (b.type !== 'townhall' && L > hallLevel()) return { ok: false, why: `Upgrade the town hall to level ${L} first.`, cost, work };
+      if (b.type === 'townhall' && city().residents < (HALL_RES[L] || 0)) return { ok: false, why: `The town needs ${HALL_RES[L]} residents first (it has ${city().residents}).`, cost, work, people: true };
       if (b.type === 'townhall' && L === 4 && foodOn() && (state.food || 0) < FEAST) return { ok: false, why: `A town this big needs a feast first: ${FEAST} food in store (you have ${Math.floor(state.food || 0)}). Build fields and a granary.`, cost, work, food: true };
       if (GROW[b.type] && !growSpot(b, L)) { const [w, d] = dimsOf(b.type, 0, L); return { ok: false, noRoom: true, why: `The ${tierName(b.type, L)} needs ${w}×${d} tiles, and there is no free tile next to the ${nameOf(b).toLowerCase()} to grow into. Move it to a spot with room, or clear a neighbour.`, cost, work }; }
     }
@@ -9315,7 +9346,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   // What a building earns or costs an hour, all in (10.08: also shown next to its level on the card).
   function bNet(b, inf, mood) {
     const t = T(b); inf = inf || city().info.get(b.id) || {}; mood = mood || econ().mood;
-    const sc = isServiceType(b.type) ? serviceCost(b) : null, cost = sc ? sc.running + sc.wages + sc.fleet : 0;
+    const sc = isServiceType(b.type) ? serviceCost(b) : null, cost = sc ? sc.running + sc.wages + sc.fleet : runningOf(b);
     const inc = live(b) ? (inf.income || 0) * (t.cat === 'home' || t.cat === 'shop' ? mood.mult : 1) : 0;
     return { sc, inc, cost, net: inc - cost };
   }
@@ -9380,6 +9411,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     } else if (lineOf(b.type) === 'prison' && live(b)) {
       row(`Prison work (${inf.inmates || 0} inmate${inf.inmates === 1 ? '' : 's'} × ${PRISON_PAY} gold)`, `+${Math.round(inc)}/h`, 'gc');
     }
+    if (!sc && runningOf(b)) row('Upkeep', `−${runningOf(b)}/h`, 'neg'); // 11.00
     if (sc) {
       if (sc.running) row('Running costs', `−${sc.running}/h`, 'neg');
       if (sc.wages) row(`Wages (${sc.staff} ${sc.staff === 1 ? STAFF[t.staff].name.toLowerCase() : STAFF[t.staff].plural})`, `−${Math.round(sc.wages)}/h`, 'neg');
@@ -9418,13 +9450,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (t.cat !== 'decor' && t.cat !== 'civic' && t.cat !== 'landmark' && !special(t) && b.level < t.max && !q) {
       const g = levelGain(b), chk = checkJob('upgrade', b), mode = jobMode('upgrade', b.type);
       const p0 = el('p', 'small');
-      const pay = g >= 0.5 && chk.cost ? Math.max(0.5, chk.cost / (g * FOCUS_PAY)) : 0;
+      const pay = g >= 0.5 && chk.cost ? Math.max(0.5, chk.cost / (g * FOCUS_TAX)) : 0;
       p0.append(colorize(`Level ${b.level + 1}: ${g >= 0.5 ? `+${Math.round(g)} gold an hour, ` : ''}${chk.cost} gold and ${mode === 'focus' ? `${lapText(chk.work)} of focus` : `${fmtMin(Math.round(chk.secs / 60))} of crew time`}${pay ? ` · it pays for itself in about ${pay < 1 ? 'an hour' : `${Math.round(pay)} h`} of focus` : ''}.`));
       box.append(p0);
     }
     if (b.type === 'townhall' && b.level < t.max) {
       const L = b.level + 1, more = BUILD_ORDER.concat(SERVICE_ORDER, LANDMARK_ORDER).filter((k) => capFor(k, L) > capFor(k, b.level)).map((k) => (capFor(k, b.level) === 0 ? `${TYPES[k].name} (new)` : `${capFor(k, L)} ${TYPES[k].name.toLowerCase()}${capFor(k, L) > 1 ? 's' : ''}`));
-      const p0 = el('p', 'small'); p0.append(colorize(`Level ${L}: treasury of ${fmtGold(t.cap[L])} gold, room for ${more.join(', ')}.${HALL_DUTY[L] ? ` ${HALL_DUTY[L]}` : ''}`)); box.append(p0);
+      const p0 = el('p', 'small'); p0.append(colorize(`Level ${L}: needs ${HALL_RES[L] || 0} residents (you have ${city().residents})${L === 4 ? ` and a feast of ${FEAST} food` : ''}. Treasury of ${fmtGold(t.cap[L])} gold, room for ${more.join(', ')}.${HALL_DUTY[L] ? ` ${HALL_DUTY[L]}` : ''}`)); box.append(p0);
     }
     if (t.cat === 'home') box.append(el('div', 'quote', homeQuote(b, inf)));
     const rl = rangeLine(b); if (rl) box.append(el('p', 'tiny muted', rl));
@@ -9538,7 +9570,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         const meta = [goldLine(chk.cost), big ? el('span', 'bc-big', isRoundsW(chk.work) ? `${fmtHalf(chk.work / ROUND_FOCUS)} rounds` : `${fmtMin(chk.work)} focus`) : el('span', '', `${fmtSecs(chk.secs || buildSecs(chk.work))}`)];
         if (t.size > 1) meta.push(el('span', '', FOOT[type] ? `${FOOT[type].join('×')}` : `${t.size}×${t.size}`));
         // 10.07: what it earns here, or what it costs to run
-        { const run = RUNNING[type] || 0, wage = t.staff ? wageOf(t.staff, state.staff[t.staff] || 0) : 0;
+        { const run = runAt(type, 1), wage = t.staff ? wageOf(t.staff, state.staff[t.staff] || 0) : 0;
           if (run || wage) meta.push(el('span', 'neg', `−${run + wage}/h${wage ? ` with a ${STAFF[t.staff].name.toLowerCase()}` : ' to run'}`));
           else if (!chk.locked && t.cat !== 'landmark') { const d = deltaAt(type, p.c, p.r); const est = d != null ? d : t.cat === 'home' ? t.residents[1] * HOME_TAX : t.base ? t.base[1] : 0; if (est >= 0.5) meta.push(el('span', 'gc', `+${Math.round(est)}/h${d != null ? ' here' : ''}`)); } }
         // 10.15 (Navid): what it adds, as chips like the gold (food, storage, next door, reach), not a line of text
@@ -9659,7 +9691,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (t.cat === 'decor' && !special(t)) out.push('Homes right next to it pay 5% more (up to 15% from decorations)');
     if (t.near) out.push(t.near.v < 0 ? `Homes right next to it pay ${Math.round(-t.near.v * 100)}% less (${t.near.label})` : `Homes right next to it pay ${Math.round(t.near.v * 100)}% more (${t.near.label})`);
     if (t.staff) out.push(`${capFirst(STAFF[t.staff].plural)} work here (room for ${t.slots[L]}) and look after every building within ${baseReach(type, L)} tiles`);
-    if (RUNNING[type]) out.push(`Costs ${RUNNING[type] * L} gold an hour to run${t.staff ? ', plus wages' : ''}`);
+    if (runAt(type, L)) out.push(`Costs ${runAt(type, L)} gold an hour to run${t.staff ? ', plus wages' : ''}`);
     if (lineOf(type) === 'workshop') out.push(`While you have one, the crew builds ${[0, 20, 30, 40][tierOf(type)]}% faster`);
     if (lineOf(type) === 'bank') out.push(`You can borrow up to ${BANK_LIMIT[bankPower(type, L)]} gold from neighbour towns, and the treasury holds ${BANK_SAFE[bankPower(type, L)]} more`);
     if (type === 'bakery' || type === 'cafe') out.push(`Next to a ${type === 'bakery' ? 'café' : 'bakery'} (within 2 tiles), both earn 10% more`);
@@ -10757,7 +10789,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (state.gold < 0 || ec.keep < 0) wrap.append(moneyBox());
     const st = el('div', 'stats');
     const s1 = el('div', 'stat'); s1.append(el('b', 'num ' + (ec.keep < 0 ? 'neg' : 'gc'), `${ec.keep < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep))}`), el('span', '', 'gold an hour while you play'));
-    const s2 = el('div', 'stat'); s2.append(el('b', 'num gc', `${ec.keep + ec.taxes * (FOCUS_PAY - 1) < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep + ec.taxes * (FOCUS_PAY - 1)))}`), el('span', '', 'an hour while you focus'));
+    const s2 = el('div', 'stat'); s2.append(el('b', 'num gc', `${ec.keep + ec.taxes * (FOCUS_TAX - 1) < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep + ec.taxes * (FOCUS_TAX - 1)))}`), el('span', '', 'an hour while you focus'));
     st.append(s1, s2); wrap.append(st);
     const fl = el('ul', 'factors');
     const frow = (a, b, cls) => { const li = el('li'); li.append(el('span', '', a), el('span', 'v ' + (cls || ''), b)); fl.append(li); };
@@ -10771,7 +10803,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (loans().length) frow(`Loan instalments while you play (${loans().length}) · ${Math.round(ec.loanFocus)}/h while you focus, no interest`, `−${Math.round(ec.loanPay)}/h`, 'neg');
     frow('You get', `${ec.keep < 0 ? '−' : '+'}${Math.abs(Math.round(ec.keep))}/h`, ec.keep >= 0 ? 'pos' : 'neg');
     wrap.append(fl);
-    wrap.append(el('p', 'small muted', 'While you focus, the town earns twice the taxes (costs stay the same). The rest of the time (app closed, or resting on Home) everything runs at a tenth of the speed, and no instalments are taken.'));
+    wrap.append(el('p', 'small muted', 'While you focus, the town earns a quarter more taxes (costs stay the same), and your job pays double. The rest of the time (app closed, or resting on Home) everything runs at 2% of the speed, and no instalments are taken.'));
     const tb = el('div');
     const tl = el('div', 'tiny muted'); tl.style.display = 'flex'; tl.style.justifyContent = 'space-between';
     tl.append(el('span', '', 'Treasury'), el('span', 'num', `${fmtGold(state.gold)} / ${fmtGold(cap)}`));
@@ -10913,7 +10945,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const tx = el('div'); tx.append(el('b', '', r.name));
     let info;
     if (!ro.hasHome) info = `${r.what} They work from a ${TYPES[r.home].name.toLowerCase()}, so build one first${ro.needed ? '' : r.neededText ? ` (${r.neededText.toLowerCase()})` : ''}.`;
-    else info = `${ro.working} working${ro.needed ? ` · town needs ${ro.need} (${r.needText})` : r.neededText ? ` · ${r.neededText.toLowerCase()}` : ''} · room for ${ro.cap}`;
+    else info = `${ro.working} working${ro.needed && ro.homes ? ` · ${ro.covered} of ${ro.homes} ${SERVES[k].word} in reach · ${!ro.working ? 'nobody on duty' : ro.ratio >= 0.999 ? 'keeping up' : ro.ratio >= 0.7 ? 'busy' : 'can\'t keep up'}` : r.neededText ? ` · ${r.neededText.toLowerCase()}` : ''} · room for ${ro.cap}`; // 11.00: what staff do, not how many the town needs
     const nf = hireFee(k, ro.hired), nw = wageOf(k, ro.hired);
     tx.append(el('small', '', info), el('span', 'fee', `${ro.hired ? `${ordinal(ro.hired + 1)} hire` : 'Hire'}: ${nf} gold, then ${nw} gold an hour${ro.hired ? ` · now paying ${wagesFor(k, ro.hired)}/h` : ''}`));
     if (ro.hired) tx.append(el('small', 'wages', `Wages: ${[...Array(ro.hired).keys()].map((i) => `${ordinal(i + 1)} ${wageOf(k, i)}/h`).join(' · ')}`));
@@ -11111,13 +11143,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const ml = el('ul', 'rp-money');
     const row = (a, v, cls) => { const li = el('li'); li.append(el('span', '', a), el('span', 'num ' + (cls || ''), v)); ml.append(li); };
     row(`Grown by ${F.fields} field${F.fields === 1 ? '' : 's'} (${SEASONS[SEA.k].name.toLowerCase()} ×${FOOD_SEASON[SEA.k]})`, `+${g1(F.grown)}/h`, 'gc');
-    row(`Eaten by ${F.residents} residents (${FOOD_EAT} each)`, `−${g1(F.people)}/h`, 'neg');
+    row(`Eaten by ${F.residents} residents${F.staffN ? ` and ${F.staffN} staff` : ''}`, `−${g1(F.people)}/h`, 'neg');
     if (F.shopEat) row('Sold at market stalls and bakeries (they earn 20% more)', `−${g1(F.shopEat)}/h`, 'neg');
     // 10.17 (Navid): the bottom line, like the gold: what goes into the store in the end, big and bold
     const tot = (a, v) => { const li = el('li', 'ftotal' + (v < 0 ? ' neg' : '')); li.append(el('span', '', a), el('span', 'num', `${v >= 0 ? '+' : '−'}${g1(Math.abs(v))}/h`)); ml.append(li); };
     tot('Into your store while you play', net);
     tot('Into your store while you focus (fields grow twice as fast)', F.grown * 2 - F.eaten);
-    row('While you are away', 'a tenth of what you get while you play', '');
+    row('While you are away', '2% of what you get while you play', '');
     row('People in town', String(F.residents), '');
     wrap.append(el('h4', 'rp-h', 'Every hour'), ml);
     const fl = state.buildings.filter((b) => b.type === 'field' && live(b));
@@ -11129,11 +11161,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const how = el('ul', 'does');
     for (const x of [
       `**Fields** grow food: ${TYPES.field.grow.slice(1).join(' / ')} an hour by level, **twice as much while you focus**. Best in summer (×1.2) and autumn (×1.3), slow in winter (×0.5). Next to a workshop, factory or depot they grow 30% less. Each field gives ${jobsOf('field', 1)}–${jobsOf('field', 3)} farm jobs, and grows less when the town is short of workers.`,
-      `**Everyone eats**: a quarter of a food an hour per resident. Market stalls and bakeries sell your food and earn 20% more while there is food in store.`,
+      `**Everyone eats**: a quarter of a food an hour per resident, and staff eat twice that. Market stalls and bakeries sell your food and earn 20% more while there is food in store.`,
       `**The store** holds ${FOOD_CELLAR} food; each granary adds ${TYPES.granary.store.slice(1).join(' / ')} by level.`,
       `**Hungry**: when the store is empty and the fields can't keep up, homes pay up to 30% less and the town is up to 10% sadder.`,
       `**Town hall level 4** needs a feast: ${FEAST} food.`,
-      `**Too much?** Sell it at a market stall: ${Math.round(1 / FOOD_PRICE)} food for 1 gold.`
+      `**Too much?** Sell it at a market stall: ${Math.round(1 / FOOD_PRICE)} food for 1 gold.`,
+      `**Too little?** The ferry sells food for ${FOOD_BUY} gold each, any time.`
     ]) { const li = el('li'); li.append(colorize(x.replace(/\*\*/g, ''))); how.append(li); }
     wrap.append(el('h4', 'rp-h', 'How food works'), how);
     const acts = el('div', 'actions-grid');
@@ -11142,9 +11175,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (!countLive('granary') && capFor('granary') > 0) acts.append(actionBtn('Build a granary', `${newCost('granary').cost} gold`, '', () => { closeSheet(); openServiceSpot('granary'); }));
       const n = Math.min(50, have), mk = countLive('market') > 0;
       acts.append(actionBtn(`Sell ${n} food`, mk ? `+${Math.floor(n * FOOD_PRICE)} gold at the market` : 'needs a market stall', '', () => sellFood(n)));
+      { const nb = Math.max(0, Math.min(50, Math.floor(cap - have))); acts.append(actionBtn(`Buy ${nb || 50} food`, nb ? `${nb * FOOD_BUY} gold from the ferry` : 'the store is full', F.fed < 0.98 ? 'primary' : '', () => buyFood(nb), !nb || state.gold + 1e-6 < nb * FOOD_BUY)); }
     } else { const go = el('button', 'btn playc full', 'Play to build fields'); go.addEventListener('click', () => { closeSheet(); enterPlay(); }); wrap.append(go); }
     if (acts.childNodes.length) wrap.append(acts);
     openSheet('Food & farms', wrap);
+  }
+  function buyFood(n) {
+    const room = Math.floor(foodCap() - (state.food || 0)); n = Math.min(n, room);
+    if (n < 1) { toast('The store is full.'); return; }
+    if (state.gold + 1e-6 < n * FOOD_BUY) { toast(`${n} food costs ${n * FOOD_BUY} gold.`); return; }
+    accrue(Date.now()); state.food = (state.food || 0) + n; goldChange(-n * FOOD_BUY, `Bought ${n} food from the ferry`, 'buy'); touch(); save(); sfx.coin(); toast(`The ferry brought ${n} food for ${n * FOOD_BUY} gold.`); openFood();
   }
   function sellFood(n) {
     if (!countLive('market')) { toast('Food is sold at a market stall. Build one first.'); return; }
@@ -11202,7 +11242,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const swFar = sw.working && sw.covered < sw.homes ? ` ${sw.homes - sw.covered} of them are out of reach of a staffed depot, so nobody cleans there.` : '';
     fac('Clean streets', m.clean, dirty ? `Trash is piling up outside homes and shops.${sw.working ? ' Your street sweepers are cleaning it up.' + swFar : ' Build a cleaning depot and hire a street sweeper.'}` : `The streets are clean.${swFar}`, dirty ? (sw.cover > 0.3 ? 'up' : 'down') : null, [-15, 6]);
     const po = role('police'), safeT = safetyTarget(city()), nk = nightK();
-    if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? `, and the town needs ${po.need} officers` : ''}.`} ${nk > 0.5 ? 'It is night: homes far from the police are not safe now, and most break-ins happen after dark.' : 'Crime rises at night, most of all far from the police.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
+    if (po.needed) fac('Safety', m.safety, `${po.cover >= 0.99 ? 'Every home is near a staffed police station.' : `${po.covered} of ${po.homes} homes are within ${reachOf('police')} tiles of a staffed police station${po.working < po.need ? ', and your officers can\'t keep up' : ''}.`} ${nk > 0.5 ? 'It is night: homes far from the police are not safe now, and most break-ins happen after dark.' : 'Crime rises at night, most of all far from the police.'}`, Math.abs(state.civic.safety - safeT) > 0.03 ? (safeT > state.civic.safety ? 'up' : 'down') : null, [-8, 8]);
     const nu = role('nurse');
     if (m.school) fac('School', m.school, m.school > 0 ? 'Kids near a school with a teacher learn, and their families earn more.' : 'Some homes are too far from a school (or there is no teacher).', null, [-4, 4]);
     if (m.sick) fac('Sick residents', m.sick, `${state.buildings.filter((b) => b.sick).length} home${state.buildings.filter((b) => b.sick).length > 1 ? 's are' : ' is'} sick and can't work. A nurse treats them.`, null, [-9, 0]);
