@@ -1453,7 +1453,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.06'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.07'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -10349,11 +10349,27 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return FB.loading;
   }
   // Firestore can't hold lists inside lists, so the town layout travels as one short string.
+  // 11.07: the server only accepts these fields (firestore.rules), so anything newer (the Monument, leagues, friends)
+  // travels inside the layout string as a first "~" item that older apps skip.
+  const FB_KEYS = ['v', 'name', 'town', 'builder', 'level', 'residents', 'mood', 'streak', 'week', 'weekMin', 'day', 'dayMin', 'total', 'badges', 'hall', 'land', 'bs', 'staff', 'cheers', 'updatedAt'];
+  const BS_MAX = 11800;
+  function packOut(b) {
+    const o = Object.assign({}, b), x = {};
+    for (const k of Object.keys(o)) if (!FB_KEYS.includes(k) && k !== 'b') { x[k] = o[k]; delete o[k]; }
+    if (!('b' in o)) return o; // a partial update (cheers): the layout string stays as it is
+    const lay = packB(o.b || []); delete o.b;
+    let ex = Object.keys(x).length ? '~' + encodeURIComponent(JSON.stringify(x)) : '';
+    if (ex && ex.length + lay.length + 1 > BS_MAX && x.monu && x.monu.s) { x.monu = Object.assign({}, x.monu, { s: x.monu.s.slice(-8) }); ex = '~' + encodeURIComponent(JSON.stringify(x)); }
+    if (ex.length + lay.length + 1 > BS_MAX) { delete x.monu; ex = Object.keys(x).length ? '~' + encodeURIComponent(JSON.stringify(x)) : ''; }
+    o.bs = (ex ? ex + ';' : '') + lay;
+    return o;
+  }
+  function unpackExtra(str) { const s0 = String(str || ''); if (s0[0] !== '~') return {}; try { const end = s0.indexOf(';'); const x = JSON.parse(decodeURIComponent(s0.slice(1, end >= 0 ? end : s0.length))); return x && typeof x === 'object' ? x : {}; } catch (e) { return {}; } }
   const packB = (b) => (b || []).map((x) => x.join(':')).join(';');
-  const unpackB = (str) => String(str || '').split(';').filter(Boolean).map((x) => { const p = x.split(':'); return p[5] != null ? [p[0], +p[1], +p[2], +p[3], +p[4], +p[5]] : [p[0], +p[1], +p[2], +p[3], +p[4]]; });
+  const unpackB = (str) => String(str || '').split(';').filter((x) => x && x[0] !== '~').map((x) => { const p = x.split(':'); return p[5] != null ? [p[0], +p[1], +p[2], +p[3], +p[4], +p[5]] : [p[0], +p[1], +p[2], +p[3], +p[4]]; });
   function fbDb(api) {
-    const docs = async () => { const list = await api.list(); return { docs: list.map((d) => { const o = Object.assign({}, d); o.b = unpackB(o.bs); delete o.bs; delete o.id; return { id: d.id, data: () => o }; }) }; };
-    const out = (b) => { const o = Object.assign({}, b); if (o.b) { o.bs = packB(o.b); delete o.b; } return o; };
+    const docs = async () => { const list = await api.list(); return { docs: list.map((d) => { const o = Object.assign({}, d), x = unpackExtra(o.bs); for (const k of Object.keys(x)) if (!FB_KEYS.includes(k) && k !== 'b') o[k] = x[k]; o.b = unpackB(o.bs); delete o.bs; delete o.id; return { id: d.id, data: () => o }; }) }; };
+    const out = (b) => packOut(b); // 11.07: only the fields the server accepts
     return {
       doc: (path) => { const id = path.split('/')[1]; return { set: (b) => api.put(id, out(b)), update: (b) => api.merge(id, out(b)) }; },
       // No live updates in the light Firestore client: check every 20 s while Friends is open, else every 5 minutes.
