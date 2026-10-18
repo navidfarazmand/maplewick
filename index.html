@@ -413,6 +413,22 @@
   .lp-chip.now i { color: #0B7F77; }
   .lp-plus { font-weight: 800; opacity: .6; font-size: 12px; }
   .lp-more { font-weight: 700; font-size: 12px; opacity: .85; white-space: nowrap; }
+  /* 11.08: leagues */
+  .lgcard { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--lgc) 30%, var(--surface)), color-mix(in srgb, var(--lgc) 12%, var(--surface))); border: 2px solid color-mix(in srgb, var(--lgc) 55%, transparent); margin-bottom: 6px; }
+  .lgc-text { display: grid; gap: 2px; min-width: 0; }
+  .lgc-text b { font-family: var(--display); font-size: 18px; }
+  .lgc-text span { font-size: 13px; font-weight: 700; }
+  .lgc-text small { font-size: 12px; opacity: .85; line-height: 1.3; }
+  .lgbadge { display: inline-flex; flex: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,.18)); }
+  .lgzone { font-size: 11.5px; font-weight: 800; letter-spacing: .02em; text-align: center; padding: 3px 0; border-radius: 8px; margin: 2px 0; }
+  .lgzone.up { color: #1F7A4A; background: rgba(46,159,104,.14); }
+  .lgzone.down { color: #A3283E; background: rgba(209,58,82,.12); }
+  .lgres { display: grid; justify-items: center; gap: 4px; text-align: center; padding: 6px 0 2px; }
+  .lgres-rank { font-family: var(--display); font-size: 30px; line-height: 1.1; }
+  .lbrow.tap { cursor: pointer; padding-top: 6px; padding-bottom: 6px; }
+  .lbrow.tap:active { transform: scale(.985); }
+  #open-friends { position: relative; }
+  #open-friends.lg::after { content: ''; position: absolute; right: 5px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--lgc); box-shadow: 0 0 0 2px var(--surface); }
   .lc-plan { display: grid; gap: 5px; }
   .lc-plan .lc-sum { font-size: 12px; font-weight: 600; opacity: .85; }
   .lapcard .lc-job { font-size: 15px; font-weight: 800; min-width: 0; }
@@ -1478,7 +1494,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.08'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.09'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1712,6 +1728,12 @@
   // 11.01: the Monument, a free gift for your first finished named project (gold can't buy it)
   TYPES.monument = { name: 'Monument', cat: 'joy', size: 1, gift: true, max: 1, color: '#D8D2C4', roof: '#9C9486', radius: 2, boost: [0, 0.05], blurb: 'A stone for every project you finish. Homes within 2 tiles pay 5% more.' };
   const monuCount = () => (state.monument ? Math.max(state.monument.n || 0, (state.monument.stones || []).length) : 0);
+  // 11.08 (roadmap part 7, Navid): leagues. Ten of them, Bronze to Diamond. A trophy's level is its league (1 to 10).
+  const LEAGUES = [
+    { name: 'Bronze', col: '#B8743A' }, { name: 'Silver', col: '#A7B2C1' }, { name: 'Gold', col: '#E3AE2F' }, { name: 'Sapphire', col: '#3D6BD6' }, { name: 'Ruby', col: '#D13A52' },
+    { name: 'Emerald', col: '#2E9F68' }, { name: 'Amethyst', col: '#8A55D4' }, { name: 'Pearl', col: '#DCD3C2' }, { name: 'Obsidian', col: '#3B3446' }, { name: 'Diamond', col: '#6FD3E6' }];
+  TYPES.trophy = { name: 'League trophy', cat: 'joy', size: 1, gift: true, max: LEAGUES.length, color: '#E3AE2F', roof: '#B9862A', radius: 2, boost: [0, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.06, 0.07, 0.07],
+    levelNames: LEAGUES.map((l) => `${l.name} trophy`), blurb: 'For a top-3 week in a league. Gold can\'t buy it. Homes within 2 tiles pay a little more.' };
   /* 11.02 (roadmap part 1, Navid): bigger buildings that can do new things. A bigger size gives more per tile (land is
      the scarce thing), costs more for what it gives, brings an ability the town needs at that stage, and a new need or
      a downside. Prices here are final. */
@@ -1926,7 +1948,7 @@
   const GROW = {};
   const GROW_DIMS = [null, [1, 1], [2, 1], [2, 2]];
   const growLv = (level) => clamp(level || 1, 1, 3);
-  const tierName = (type, level) => (GROW[type] ? GROW[type][growLv(level) - 1] : TYPES[type].levelNames ? TYPES[type].levelNames[clamp(level || 1, 1, 3) - 1] : TYPES[type].name);
+  const tierName = (type, level) => (GROW[type] ? GROW[type][growLv(level) - 1] : TYPES[type].levelNames ? TYPES[type].levelNames[clamp(level || 1, 1, TYPES[type].levelNames.length) - 1] : TYPES[type].name);
   const nameOf = (b) => (b && TYPES[b.type] ? tierName(b.type, b.level) : '');
   // The level whose size applies when a call doesn't say: the building being moved, or level 1 for a new one.
   const heldLevel = (type) => { const h = ui.holding; if (!h || h.kind === 'new') return 1; const b = byId(h.id); return b && b.type === type ? b.level : 1; };
@@ -5703,7 +5725,7 @@
     if (h.kind === 'new') return { type: h.type, level: 1, moveId: null, isNew: true, rot: rotFor(h.type) };
     // 10.13: a decoration you buy and a free find are placed with a preview and a confirm too
     if (h.kind === 'decor') return { type: h.type, level: 1, moveId: null, isDecor: true, rot: 0 };
-    if (h.kind === 'gift') { const tr = state.tray.find((x) => x.id === h.tray); return tr ? { type: tr.type, level: 1, moveId: null, isGift: true, tray: tr.id, resident: tr.resident, rot: rotFor(tr.type) } : null; }
+    if (h.kind === 'gift') { const tr = state.tray.find((x) => x.id === h.tray); return tr ? { type: tr.type, level: tr.level || 1, moveId: null, isGift: true, tray: tr.id, resident: tr.resident, rot: rotFor(tr.type) } : null; }
     const b = byId(h.id); return b ? { type: b.type, level: b.level, moveId: b.id, resident: b.resident, rot: rotFor(b.type) } : null;
   }
   // Turn a two-tile building around while placing it (10.06).
@@ -5832,8 +5854,9 @@
     const tr = state.tray.find((x) => x.id === trayId); if (!tr) return;
     const a = anchored ? { c, r } : anchorFor(tr.type, c, r);
     if (!fits(tr.type, a.c, a.r)) return;
-    const b = { id: tr.id, type: tr.type, c: a.c, r: a.r, level: 1, origin: tr.origin };
+    const b = { id: tr.id, type: tr.type, c: a.c, r: a.r, level: tr.level || 1, origin: tr.origin };
     if (tr.resident) b.resident = tr.resident;
+    if (tr.place) { b.place = tr.place; b.wk = tr.wk; } // 11.08: a league trophy
     state.buildings.push(b);
     state.tray = state.tray.filter((x) => x !== tr);
     setHolding(null); touch(); accrue(Date.now());
@@ -5962,7 +5985,7 @@
       if (ui.recharge && ui.recharge.step === 'timer') renderRecharge();
       const run = state.lapRun; // 10.12: the break between laps is over: ring for the next lap (unless it is long gone)
       if (run && !run.rang && run.breakUntil && now >= run.breakUntil) { if (lapRunNow(now) && now - run.breakUntil < 10 * 60000) breakOver(now); else { run.rang = true; save(); } }
-      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock();
+      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock(); leagueStep(now); leaguePopup();
         if (state.sparkSet && state.sparkSet.auto && ui.screen === 'home' && !ui.overlay && !state.session && $('scrim').hidden && Date.now() - (ui.sparkAt || 0) > 12000) { nextSpark(); renderBanner(); } if (ui.screen === 'play' || ui.screen === 'home') syncWalkers(); }
     }
     if (ui.panel) liveJobButtons();
@@ -7219,6 +7242,23 @@
         for (let i = 0; i < Math.min(14, n); i++) { const k = (i + 1) / 15, p1 = lerpPt(L, tL, k), p2 = lerpPt(B, tB, k); line(c, lerpPt(p1, p2, 0.18), lerpPt(p1, p2, 0.82), 'rgba(70,58,44,.4)', 0.55 * u); }
         if (ART.w) { c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; outline(c, [L, B, R, tR, apex, tL]); }
         if (st >= 3 && !reduced) for (let i = 0; i < 2; i++) { const k = ((now / 1500) + i / 2) % 1, a = 1 - Math.abs(k * 2 - 1); starShape(c, x + (i ? 4 : -5) * u, top - (i ? 2 : 8) * u, 1.6 * u * a, `rgba(255,248,210,${a})`); }
+        break;
+      }
+      case 'trophy': { // 11.08: a cup in the league's colour on a stone base (level = league)
+        const lc = LEAGUES[clamp(level || 1, 1, LEAGUES.length) - 1].col;
+        box(c, x, y, hw * 0.5, hh * 0.5, 1, 5 * u, '#D3CBBA');
+        box(c, x, y - 5 * u, hw * 0.34, hh * 0.34, 1, 2.5 * u, '#B3AA97');
+        const y0 = y - 7.5 * u, k = 1.45, top = y0 - 16 * u * k;
+        c.fillStyle = shade(lc, 0.8); c.beginPath(); c.ellipse(x, y0 - 0.6 * u, 3.6 * u * k, 1.5 * u * k, 0, 0, Math.PI * 2); c.fill();
+        c.fillRect(x - 1.1 * u * k, y0 - 7 * u * k, 2.2 * u * k, 6.6 * u * k);
+        c.strokeStyle = shade(lc, 0.78); c.lineWidth = 1.3 * u * k;
+        c.beginPath(); c.arc(x - 5.6 * u * k, top + 3.6 * u * k, 2.5 * u * k, Math.PI * 0.5, Math.PI * 1.5); c.stroke();
+        c.beginPath(); c.arc(x + 5.6 * u * k, top + 3.6 * u * k, 2.5 * u * k, -Math.PI * 0.5, Math.PI * 0.5); c.stroke();
+        c.fillStyle = lc; c.beginPath(); c.moveTo(x - 6.2 * u * k, top); c.quadraticCurveTo(x - 6.2 * u * k, y0 - 6.5 * u * k, x, y0 - 6.5 * u * k); c.quadraticCurveTo(x + 6.2 * u * k, y0 - 6.5 * u * k, x + 6.2 * u * k, top); c.closePath(); c.fill();
+        c.fillStyle = shade(lc, 0.72); c.beginPath(); c.ellipse(x, top, 6.2 * u * k, 1.7 * u * k, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = shade(lc, 1.18); c.beginPath(); c.ellipse(x, top - 0.25 * u * k, 5.4 * u * k, 1.2 * u * k, 0, 0, Math.PI); c.fill();
+        c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(x - 2.6 * u * k, top + 4.5 * u * k, 0.9 * u * k, 3.2 * u * k, 0.25, 0, Math.PI * 2); c.fill();
+        if (level >= 6 && !reduced) for (let i = 0; i < 2; i++) { const k = ((now / 1400) + i / 2) % 1, a = 1 - Math.abs(k * 2 - 1); starShape(c, x + (i ? 5 : -6) * u, top - (i ? 3 : 7) * u, 1.6 * u * a, `rgba(255,250,220,${a})`); }
         break;
       }
       case 'statue': case 'goldstatue': {
@@ -8826,6 +8866,7 @@
   let CHIP_RES_HTML = null;
   function renderHud() {
     if (CHIP_RES_HTML == null) CHIP_RES_HTML = $('chip-res').innerHTML;
+    { const fb = $('open-friends'), L = state.league; if (fb && L && L.w && !ui.visit) { const c = LEAGUES[L.t | 0].col; if (fb.dataset.lgc !== c) { fb.dataset.lgc = c; fb.classList.add('lg'); fb.style.setProperty('--lgc', c); fb.setAttribute('aria-label', `Friends, leaderboard and your league (${LEAGUES[L.t | 0].name})`); } } } // 11.08
     const cap = treasuryCap(), ec = econ(), ci = ec.ci;
     $('gold').textContent = state.gold < 0 ? `−${fmtGold(-state.gold + 0.999)}` : fmtGold(state.gold);
     $('gold-cap').textContent = state.gold >= cap || state.gold < 0 ? '' : ` / ${fmtGold(cap)}`;
@@ -9805,6 +9846,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (b.type === 'works') { renderWorksPanel(box, b); return; }
     if (b.type === 'fallen') { renderFallenPanel(box, b); return; }
     if (b.type === 'monument') { renderMonumentPanel(box, b, false); return; } // 11.01
+    if (b.type === 'trophy') { renderTrophyPanel(box, b, false); return; } // 11.08
     const p = ui.panel, t = T(b), ci = city(), inf = ci.info.get(b.id) || {}, q = jobFor(b.id), mood = econ().mood;
     const chips = [];
     if (b.fire) chips.push(fixPill('On fire!', () => { if (staffWorking('fire') >= 1) toast(fireStatus(b) + '.'); else openPanel({ kind: 'alert', bid: b.id }); }));
@@ -10215,7 +10257,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const tt = TYPES[tr.type], inDecor = special(tt);
       if ((p.tab === 'decor') !== inDecor || p.tab === 'services' || p.tab === 'landmarks') continue;
       const a0 = anchorFor(tr.type, p.c, p.r), ok = fits(tr.type, a0.c, a0.r);
-      const c = card(tr.type, 'free' + (ok ? '' : ' off'), () => { if (ok) startGift(tr.id, p.c, p.r); else toast(spotWhy(tr.type, a0.c, a0.r)); }, [el('span', '', tr.resident ? `For ${tr.resident}` : tt.chest ? `${RARITY[tt.chest].name} chest` : 'Festival find')], 'Free · tap to place', 'pos', 'FREE');
+      const c = card(tr.type, 'free' + (ok ? '' : ' off'), () => { if (ok) startGift(tr.id, p.c, p.r); else toast(spotWhy(tr.type, a0.c, a0.r)); }, [el('span', '', tr.resident ? `For ${tr.resident}` : tt.chest ? `${RARITY[tt.chest].name} chest` : tr.type === 'trophy' ? `${LEAGUES[clamp(tr.level || 1, 1, 10) - 1].name} league` : tt.gift ? 'Gift' : 'Festival find')], 'Free · tap to place', 'pos', 'FREE');
       c.setAttribute('aria-label', `${tt.name}, free, place here`);
     }
     if (p.tab === 'decor') {
@@ -10450,7 +10492,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
 
   /* ---------- Friends: a live leaderboard (inside Claude) and town codes (anywhere) ---------- */
   const CLAUDE_URL = 'https://claude.ai/artifact/53uNamQYLGrU1EeoWjVPfq';
-  const board = { db: null, user: null, me: null, docs: [], unsub: null, timer: 0, last: '', canWrite: null, isOwner: false, tab: 'week', loaded: false, kind: null };
+  const board = { db: null, user: null, me: null, docs: [], unsub: null, timer: 0, last: '', canWrite: null, isOwner: false, tab: 'league', loaded: false, kind: null }; // 11.08: the league comes first
   /* The home-screen app's leaderboard runs on Firebase: join with just a name (an anonymous account), or sign in with
      Google to keep your spot across phones. The module loads only when needed. Inside Claude, Claude's own storage is used. */
   const FB = { cfg: window.MAPLEWICK_FIREBASE && window.MAPLEWICK_FIREBASE.apiKey ? window.MAPLEWICK_FIREBASE : null, api: null, loading: null, user: null, busy: false, err: '' };
@@ -10614,7 +10656,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
       b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works' && b.type !== 'fallen').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0) | (b.small === 1 ? 4 : b.small === 2 ? 8 : 0), b.rot ? 1 : 0]),
-      staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])), monu: monuSnap() };
+      staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])), monu: monuSnap(), lg: leagueSnap() };
   }
   function boardSoon() { if (!board.db || !state.board.joined) return; clearTimeout(board.timer); board.timer = setTimeout(boardPush, 1500); }
   async function boardPush() {
@@ -10629,7 +10671,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       // show my own row right away, without waiting for the next refresh
       const mine = Object.assign({ id: board.me }, body), i = board.docs.findIndex((d) => d.id === board.me);
       if (i >= 0) board.docs[i] = mine; else board.docs.push(mine);
-      if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const l = $('sheet-body').querySelector('.lb'); if (l) renderBoardList(l); }
+      if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const l = $('sheet-body').querySelector('.lb'); if (l) { if (board.tab === 'league') renderLeague(l); else renderBoardList(l); } }
     }
     catch (e) {
       if (board.kind === 'firebase') { FB.err = (e && e.code) || 'error'; return; }
@@ -10731,6 +10773,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
   function renderVisitInfo(box, b) {
     if (b.type === 'monument') { renderMonumentPanel(box, b, true); return; } // 11.01
+    if (b.type === 'trophy') { renderTrophyPanel(box, b, true); return; } // 11.08
     const t = T(b), inf = city().info.get(b.id) || {}, mood = econ().mood, chips = [];
     if (t.cat !== 'decor' && !special(t) && t.cat !== 'landmark') chips.push(pill(`Level ${b.level}`));
     if (t.cat === 'landmark') chips.push(pill('Landmark', 'gold'));
@@ -10744,6 +10787,27 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     ['Pinehaven', 'Rosa', 9, 70], ['Saltmarsh', 'Abe', 6, 45], ['Willowby', 'Juno', 12, 95], ['Copperbrook', 'Milo', 4, 30],
     ['Thornfield', 'Greta', 8, 60], ['Amberly Bay', 'Kai', 14, 120], ['Mossgate', 'Lou', 5, 38]
   ];
+  // A robot's town: the same kind of town for every robot of that level (the seed decides where things go).
+  function botLayout(rnd, level) {
+    const hall = level >= 12 ? 4 : level >= 8 ? 3 : level >= 5 ? 2 : 1;
+    const land = ['base'].concat(level >= 6 ? ['east'] : [], level >= 10 ? ['south'] : []);
+    const b = [['townhall', 5, 5, hall, 0]], occ = new Set(); const put = (type, c, r) => { const [sw, sd] = dimsOf(type, 0); for (let x = 0; x < sw; x++) for (let y = 0; y < sd; y++) occ.add((c + x) + ',' + (r + y)); };
+    put('townhall', 5, 5);
+    const open = (c, r) => (c < 12 && r < 12) || (land.includes('east') && c >= 12 && r < 12) || (land.includes('south') && c < 12 && r >= 12);
+    const fitsBot = (type, c, r) => { const [sw, sd] = dimsOf(type, 0); for (let x = 0; x < sw; x++) for (let y = 0; y < sd; y++) { const cc = c + x, rr = r + y; if (cc < 0 || rr < 0 || cc >= N || rr >= N || !open(cc, rr) || occ.has(cc + ',' + rr)) return false; } return true; };
+    const want = ['cottage', 'cottage', 'cottage', 'market', 'cafe', 'park', 'tree', 'flowers', 'cottage', 'depot', 'firestation', 'townhouse', 'bakery', 'fountain', 'police', 'cottage', 'tree', 'workshop', 'townhouse', 'arcade', 'bookshop', 'clinic', 'cottage', 'bench', 'lighthouse', 'bank', 'tree', 'flowers'];
+    const count = Math.min(want.length, 8 + level * 2);
+    for (let k = 0; k < count; k++) {
+      const type = want[k]; if (!TYPES[type]) continue;
+      for (let tries = 0; tries < 60; tries++) {
+        const c = Math.floor(rnd() * N), r = Math.floor(rnd() * N);
+        if (type === 'lighthouse' && !(c === 0 || r === 0)) continue;
+        if (fitsBot(type, c, r)) { put(type, c, r); b.push([type, c, r, clamp(1 + Math.floor(rnd() * (hall + 1)), 1, Math.min(hall, TYPES[type].max || 1)), 0]); break; }
+      }
+    }
+    const residents = b.reduce((a, x) => a + (TYPES[x[0]].residents ? TYPES[x[0]].residents[x[3]] : 0), 0);
+    return { hall, land, b, residents };
+  }
   let botCache = null;
   function botTowns() {
     const now = Date.now(), dk = dayKey(now), wk = weekKey(now);
@@ -10751,23 +10815,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const d = new Date(now), dow = (d.getDay() + 6) % 7, frac = (d.getHours() + d.getMinutes() / 60) / 24;
     const list = BOTS.map(([town, mayor, level, pace], i) => {
       let seed = 1234567 + i * 7919; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-      const hall = level >= 12 ? 4 : level >= 8 ? 3 : level >= 5 ? 2 : 1;
-      const land = ['base'].concat(level >= 6 ? ['east'] : [], level >= 10 ? ['south'] : []);
-      const b = [['townhall', 5, 5, hall, 0]], occ = new Set(); const put = (type, c, r) => { const [sw, sd] = dimsOf(type, 0); for (let x = 0; x < sw; x++) for (let y = 0; y < sd; y++) occ.add((c + x) + ',' + (r + y)); };
-      put('townhall', 5, 5);
-      const open = (c, r) => (c < 12 && r < 12) || (land.includes('east') && c >= 12 && r < 12) || (land.includes('south') && c < 12 && r >= 12);
-      const fitsBot = (type, c, r) => { const [sw, sd] = dimsOf(type, 0); for (let x = 0; x < sw; x++) for (let y = 0; y < sd; y++) { const cc = c + x, rr = r + y; if (cc < 0 || rr < 0 || cc >= N || rr >= N || !open(cc, rr) || occ.has(cc + ',' + rr)) return false; } return true; };
-      const want = ['cottage', 'cottage', 'cottage', 'market', 'cafe', 'park', 'tree', 'flowers', 'cottage', 'depot', 'firestation', 'townhouse', 'bakery', 'fountain', 'police', 'cottage', 'tree', 'workshop', 'townhouse', 'arcade', 'bookshop', 'clinic', 'cottage', 'bench', 'lighthouse', 'bank', 'tree', 'flowers'];
-      const count = Math.min(want.length, 8 + level * 2);
-      for (let k = 0; k < count; k++) {
-        const type = want[k]; if (!TYPES[type]) continue;
-        for (let tries = 0; tries < 60; tries++) {
-          const c = Math.floor(rnd() * N), r = Math.floor(rnd() * N);
-          if (type === 'lighthouse' && !(c === 0 || r === 0)) continue;
-          if (fitsBot(type, c, r)) { put(type, c, r); b.push([type, c, r, clamp(1 + Math.floor(rnd() * (hall + 1)), 1, Math.min(hall, TYPES[type].max || 1)), 0]); break; }
-        }
-      }
-      const residents = b.reduce((a, x) => a + (TYPES[x[0]].residents ? TYPES[x[0]].residents[x[3]] : 0), 0);
+      const { hall, land, b, residents } = botLayout(rnd, level);
       const daily = pace * (0.7 + 0.6 * rnd());
       return { id: 'bot:' + i, bot: true, mayor, d: { v: 1, town, builder: mayor, level, residents, mood: 60 + Math.round(rnd() * 30), streak: 2 + Math.floor(rnd() * 20), week: wk, weekMin: Math.round(daily * (dow + frac)), day: dk, dayMin: Math.round(daily * frac), total: Math.round(daily * (40 + level * 8)), badges: Math.min(9, 2 + Math.floor(level / 2)), hall, land, b, staff: {} } };
     });
@@ -10782,6 +10830,142 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const codes = realState().friends.filter((f) => !live2.some((x) => x.d.town === f.snap.town && x.d.total === f.snap.total)).map((f) => ({ id: 'code:' + f.key, d: f.snap, live: false, score: score(f.snap), key: f.key, at: f.at }));
     const bots = showBots() ? botTowns().map((x) => ({ id: x.id, d: x.d, live: false, bot: true, mayor: x.mayor, score: score(x.d) })) : [];
     return live2.concat(codes, bots).sort((a, b) => b.score - a.score || (b.d.level | 0) - (a.d.level | 0));
+  }
+  /* ---------- 11.08 (roadmap part 7, Navid): leagues ----------
+     Every week you race 29 other towns in your league: real players in the same league (on the online board) and robot
+     towns that fill the gaps. Points are focus minutes only, never purchases or bonuses. At the end of the week the top
+     10 move up a league and the bottom 5 move down; nobody loses their town. The top 3 get a trophy for their town in
+     the league's colour (gold can't buy it) and a royal chest. You take part in a week once you focus in it.
+     The board's server only accepts its old fields, so the league travels in the "~" extras of the layout string. */
+  const LG_SIZE = 30, LG_UP = 10, LG_DOWN = 5, BOOT_AT = Date.now();
+  const hash32 = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const seeded = (n) => { let s = (n % 2147483646) + 1; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; };
+  function weekStart(t) { const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime(); }
+  function league() {
+    const L = state.league || (state.league = { w: null, t: 0, m: 0, hist: [] });
+    if (!(L.t >= 0 && L.t < LEAGUES.length)) L.t = 0; if (!Array.isArray(L.hist)) L.hist = [];
+    return L;
+  }
+  const myWeekMin = (now) => (state.week && state.week.key === weekKey(now || Date.now()) ? Math.round(state.week.min || 0) : 0);
+  // What the board carries: this week's league and minutes, and last week's, so others can finish the same table.
+  function leagueSnap() { const L = league(); return { w: L.w, t: L.t, m: L.m | 0, pw: L.pw || null, pt: L.pt | 0, pm: L.pm | 0 }; }
+  const LG_TOWN_A = ['Pine', 'Salt', 'Willow', 'Copper', 'Thorn', 'Amber', 'Moss', 'Oak', 'Maple', 'Birch', 'Elder', 'Fern', 'Heather', 'Juniper', 'Lark', 'Mill', 'North', 'Orchard', 'Pebble', 'Raven', 'Stone', 'Thistle', 'Wren', 'Clover', 'Hollow', 'Bramble', 'Cedar', 'Linden', 'Rush', 'Sorrel'];
+  const LG_TOWN_B = ['haven', 'marsh', 'by', 'brook', 'field', ' Bay', 'gate', 'ford', 'wick', 'stead', 'holm', 'dale', 'combe', 'ton', 'mere', 'well', 'bridge', 'cliff', 'port', 'vale'];
+  const LG_MAYOR = ['Rosa', 'Abe', 'Juno', 'Milo', 'Greta', 'Kai', 'Lou', 'Ines', 'Theo', 'Nora', 'Omar', 'Pia', 'Ravi', 'Sana', 'Tess', 'Ugo', 'Vera', 'Wim', 'Yara', 'Zane', 'Ada', 'Bo', 'Cleo', 'Dev', 'Elif', 'Finn', 'Gus', 'Hana', 'Ivo', 'Jas'];
+  // A robot town: its week's total grows with the league (about 1 h in Bronze, 13 h in Diamond, half of them less), and
+  // its minutes come in day by day, in its own working hours, so the race moves while you watch.
+  function lgRobot(W, t, g, j) {
+    const rnd = seeded(hash32(`${W}|${t}|${g}|${j}`)), h0g = hash32(`${W}|${t}|${g}`); // names don't repeat within a group
+    const town = LG_TOWN_A[(h0g + j * 7) % LG_TOWN_A.length] + LG_TOWN_B[Math.floor(rnd() * LG_TOWN_B.length)], mayor = LG_MAYOR[(h0g + j * 11) % LG_MAYOR.length]; rnd();
+    const z = Math.sqrt(-2 * Math.log(Math.max(1e-9, rnd()))) * Math.cos(2 * Math.PI * rnd());
+    const M = Math.max(5, Math.round(60 * Math.pow(1.33, t) * Math.exp(0.6 * z)));
+    const days = Array.from({ length: 7 }, () => 0.25 + rnd()), sum = days.reduce((a, b) => a + b, 0);
+    const h0 = 7 + rnd() * 5, h1 = h0 + 7 + rnd() * 6;
+    return { id: `lgbot:${W}:${t}:${g}:${j}`, bot: true, mayor, town, M, days: days.map((x) => x / sum), h0, h1, seed: hash32(`${W}|${t}|${g}|${j}|town`), level: clamp(2 + t * 2 + Math.floor(rnd() * 3), 1, 30), streak: 1 + Math.floor(rnd() * (6 + t * 3)) };
+  }
+  function lgRobotMin(R, now, ws) {
+    if (now >= ws + 7 * 86400000) return R.M;
+    const d = clamp(Math.floor((now - ws) / 86400000), 0, 6); let acc = 0;
+    for (let i = 0; i < d; i++) acc += R.days[i];
+    const hr = (now - (ws + d * 86400000)) / 3600000; acc += R.days[d] * clamp((hr - R.h0) / (R.h1 - R.h0), 0, 1);
+    return Math.round(R.M * acc);
+  }
+  // A robot's town, for a visit: the same kind of town as the board's robots, sized to its league.
+  function lgRobotSnap(R, min, W) { const rnd = seeded(R.seed), lay = botLayout(rnd, R.level); return { v: 1, town: R.town, builder: R.mayor, level: R.level, residents: lay.residents, mood: 70, streak: R.streak, week: W, weekMin: min, hall: lay.hall, land: lay.land, b: lay.b, staff: {} }; }
+  // The table for a week: the real players in this league that week (plus me), cut into groups of 30 in a fixed shuffled
+  // order everyone works out the same way, then robots fill my group up to 30.
+  function leagueTable(W, t, now, myMin) {
+    const meId = board.me || 'me', hum = [{ id: meId, me: true, min: myMin, town: state.town, name: 'You' }];
+    for (const d of board.docs) {
+      if (!d || !d.lg || d.id === board.me || oldMine(d) || !d.town) continue;
+      const lg = d.lg; let tt = -1, m = 0;
+      if (lg.w === W) { tt = lg.t | 0; m = d.week === W ? d.weekMin | 0 : lg.m | 0; } else if (lg.pw === W) { tt = lg.pt | 0; m = lg.pm | 0; }
+      if (tt === t && m > 0) hum.push({ id: d.id, d, live: true, min: m, town: d.town, name: String(d.name || 'A mayor').slice(0, 20) });
+    }
+    hum.sort((a, b) => hash32(a.id + '|' + W) - hash32(b.id + '|' + W));
+    const g = Math.floor(hum.findIndex((x) => x.me) / LG_SIZE), rows = hum.slice(g * LG_SIZE, g * LG_SIZE + LG_SIZE);
+    const ws = W === weekKey(now) ? weekStart(now) : 0;
+    for (let j = 0; rows.length < LG_SIZE; j++) { const R = lgRobot(W, t, g, j); rows.push({ id: R.id, bot: true, R, min: lgRobotMin(R, now, ws), town: R.town, name: R.mayor }); }
+    rows.sort((a, b) => b.min - a.min || (a.bot ? 1 : 0) - (b.bot ? 1 : 0) || hash32(a.id) - hash32(b.id));
+    return { rows, rank: rows.findIndex((x) => x.me) + 1, g, n: rows.length };
+  }
+  const lgMove = (rank, n, t) => (rank <= LG_UP && t < LEAGUES.length - 1 ? 1 : rank > n - LG_DOWN && t > 0 ? -1 : 0);
+  // Once a week: where did I finish? Waits (up to 2 minutes after start-up) for the online board, if I'm on it.
+  function leagueStep(now) {
+    if (ui.visit || !state.named) return;
+    const L = league(), wk = weekKey(now);
+    if (!L.w) { L.w = wk; L.t = L.t || 0; L.m = myWeekMin(now); return; }
+    if (L.w === wk) { const m = myWeekMin(now); if (m > (L.m | 0)) { L.m = m; boardSoon(); } return; }
+    if (state.board.joined && board.kind === 'firebase' && !board.loaded && now - BOOT_AT < 120000) return;
+    const W = L.w, t = L.t, m = Math.max(L.m | 0, state.week && state.week.key === W ? Math.round(state.week.min || 0) : 0);
+    L.pw = W; L.pt = t; L.pm = m; L.w = wk; L.m = myWeekMin(now);
+    if (m <= 0) { L.hist.push({ w: W, t, rank: 0, move: 0, min: 0 }); L.hist = L.hist.slice(-26); save(); boardSoon(); return; } // sat that week out: no move
+    const tb = leagueTable(W, t, now + 14 * 86400000, m), move = lgMove(tb.rank, tb.n, t);
+    L.t = clamp(t + move, 0, LEAGUES.length - 1);
+    const res = { w: W, t, rank: tb.rank, n: tb.n, move, min: m, to: L.t };
+    if (tb.rank <= 3) {
+      state.tray.push({ id: state.nextId++, type: 'trophy', origin: 'league', level: t + 1, place: tb.rank, wk: W });
+      const loot = chestLoot(3); applyLoot(loot); res.loot = loot; res.trophy = true;
+      state.stats.trophies = (state.stats.trophies || 0) + 1;
+    }
+    L.hist.push({ w: W, t, rank: tb.rank, move, min: m }); L.hist = L.hist.slice(-26);
+    L.pend = res; save(); boardSoon(); renderHud();
+  }
+  // The week's result, shown once on Home when nothing else is going on.
+  function leaguePopup() {
+    const L = state.league; if (!L || !L.pend || state.session || ui.overlay || ui.visit || ui.screen !== 'home' || !$('scrim').hidden || (tour && tour.steps)) return;
+    const r = L.pend; L.pend = null; save();
+    const lg = LEAGUES[r.t], nx = LEAGUES[r.to], wrap = el('div', 'list');
+    const head = el('div', 'lgres'); head.style.setProperty('--lgc', lg.col);
+    head.append(lgBadge(r.t, 64), el('b', 'lgres-rank', `${ordinal(r.rank)} of ${r.n}`), el('span', 'small', `in the ${lg.name} league · ${fmtMin(r.min)} of focus`));
+    wrap.append(head);
+    wrap.append(el('p', 'small', r.move > 0 ? `You move up to the ${nx.name} league!` : r.move < 0 ? `You move down to the ${nx.name} league. Your town stays exactly as it is, and one good week brings you back up.` : r.t === LEAGUES.length - 1 && r.rank <= LG_UP ? 'You stay in Diamond, the top league.' : `You stay in the ${lg.name} league.`));
+    if (r.trophy) wrap.append(el('p', 'small', `Top 3! A ${lg.name.toLowerCase()} trophy is waiting in Build → Decor (gold can't buy it), and a royal chest.`));
+    const go = el('button', 'btn primary full', r.loot ? 'Open the royal chest' : 'See this week\'s league');
+    go.addEventListener('click', () => { closeSheet(); if (r.loot) { ui.lastResult = null; showChest({ minutes: r.min, chest: { rar: 3, loot: r.loot }, xp: null, solo: true, eye: `League prize · ${lg.name}` }); } else { board.tab = 'league'; openFriends(); } });
+    wrap.append(go);
+    openSheet('Last week\'s league', wrap);
+    sfx.chime(); if (r.move > 0 || r.trophy) setTimeout(() => sfx.fanfare(), 250);
+  }
+  function lgBadge(t, size) {
+    const c = LEAGUES[t].col, dark = t === 8, s = el('span', 'lgbadge');
+    s.innerHTML = `<svg viewBox="0 0 40 44" width="${size}" height="${Math.round(size * 1.1)}" aria-hidden="true"><path d="M20 2 36 8v13c0 11-7 18-16 21C11 39 4 32 4 21V8z" fill="${c}" stroke="${shade(c, 0.7)}" stroke-width="2"/><path d="M20 7 31 11v10c0 8-5 13-11 16-6-3-11-8-11-16V11z" fill="${shade(c, dark ? 1.5 : 1.15)}" opacity=".55"/><text x="20" y="27" font-family="system-ui,sans-serif" font-size="13" font-weight="800" fill="${dark ? '#fff' : shade(c, 0.45)}" text-anchor="middle">${t + 1}</text></svg>`;
+    s.setAttribute('aria-label', `${LEAGUES[t].name} league`);
+    return s;
+  }
+  const lgEnds = (now) => { const ms = weekStart(now) + 7 * 86400000 - now, h = Math.floor(ms / 3600000); return h >= 24 ? `${Math.floor(h / 24)} d ${h % 24} h` : h >= 1 ? `${h} h ${Math.floor(ms / 60000) % 60} min` : `${Math.max(1, Math.floor(ms / 60000))} min`; };
+  function renderLeague(listEl) {
+    const now = Date.now(), L = league(), wk = weekKey(now);
+    if (!L.w) { L.w = wk; L.m = myWeekMin(now); }
+    const t = L.t, lg = LEAGUES[t], tb = leagueTable(wk, t, now, myWeekMin(now));
+    listEl.replaceChildren();
+    const card = el('div', 'lgcard'); card.style.setProperty('--lgc', lg.col); if (t === 8) card.classList.add('dark');
+    const tx = el('div', 'lgc-text');
+    tx.append(el('b', '', `${lg.name} league`), el('span', '', `Week ends in ${lgEnds(now)} · you are ${ordinal(tb.rank)} of ${tb.n}`),
+      el('small', '', `${t < LEAGUES.length - 1 ? `Top ${LG_UP} move up to ${LEAGUES[t + 1].name}` : 'The top league'}${t > 0 ? ` · bottom ${LG_DOWN} move down` : ' · nobody moves down from Bronze'} · top 3 win a trophy and a royal chest`));
+    card.append(lgBadge(t, 46), tx);
+    listEl.append(card);
+    if (myWeekMin(now) <= 0) listEl.append(el('p', 'small muted', 'Focus this week to take part: points are focus minutes, nothing else.'));
+    const last = L.hist[L.hist.length - 1];
+    if (last && last.rank) listEl.append(el('p', 'tiny muted', `Last week: ${ordinal(last.rank)} in ${LEAGUES[last.t].name}${last.move > 0 ? ', moved up' : last.move < 0 ? ', moved down' : ''}.`));
+    tb.rows.forEach((r, i) => {
+      const rank = i + 1;
+      if (rank === LG_UP + 1 && t < LEAGUES.length - 1) listEl.append(el('div', 'lgzone up', `↑ top ${LG_UP} move up`));
+      if (rank === tb.n - LG_DOWN + 1 && t > 0) listEl.append(el('div', 'lgzone down', `↓ bottom ${LG_DOWN} move down`));
+      const row = el('div', 'lbrow' + (r.me ? ' me' : '') + (i < 3 ? ` r${i + 1}` : ''));
+      const img = el('img'); img.alt = ''; img.src = r.live ? initialAvatar(r.name, r.id) : r.me ? initialAvatar(state.board.name || state.builder, board.me || 'me') : 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="18" fill="#8E9AAF"/><rect x="10" y="12" width="16" height="13" rx="3" fill="#fff"/><circle cx="15" cy="18" r="1.8" fill="#8E9AAF"/><circle cx="21" cy="18" r="1.8" fill="#8E9AAF"/><path d="M18 8v4" stroke="#fff" stroke-width="2"/><circle cx="18" cy="7.5" r="1.6" fill="#fff"/></svg>');
+      const nm = el('div'); nm.append(el('b', '', r.me ? 'You' : r.bot ? `${r.name} (robot)` : r.name), el('small', '', r.me ? state.town : r.town));
+      const sc = el('div', 'sc'); sc.append(document.createTextNode(fmtMin(r.min)));
+      row.append(el('span', 'rk', String(rank)), img, nm, sc);
+      if (!r.me) {
+        // tap a town to visit it (cheers are on the "This week" tab)
+        const go = () => (r.bot ? visitTown(lgRobotSnap(r.R, r.min, wk), r.name, null) : visitTown(r.d, r.name, r.id));
+        row.classList.add('tap'); row.tabIndex = 0; row.setAttribute('role', 'button'); row.setAttribute('aria-label', `${rank}. ${r.bot ? `${r.name}, a robot town` : r.name}, ${r.town}, ${fmtMin(r.min)}. Visit the town`);
+        row.addEventListener('click', go); row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+      }
+      listEl.append(row);
+    });
+    listEl.append(el('p', 'tiny muted', board.me ? 'Players in your league on the online board race in your group; robot towns fill the rest. Nobody ever loses their town.' : 'Robot towns fill your group. Join the online board (above) to race real players in your league too. Nobody ever loses their town.'));
   }
   async function renderBoardList(listEl) {
     const rows = boardRows(), ids = rows.filter((r) => r.live).map((r) => r.id);
@@ -10857,7 +11041,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       wrap.append(j);
     }
     const tabs = el('div', 'tabs');
-    for (const [k, lab] of [['week', 'This week'], ['day', 'Today'], ['all', 'All time']]) { const tb = el('button', '', lab); tb.setAttribute('aria-selected', String(board.tab === k)); tb.addEventListener('click', () => { board.tab = k; openFriends(); }); tabs.append(tb); }
+    for (const [k, lab] of [['league', 'League'], ['week', 'This week'], ['day', 'Today'], ['all', 'All time']]) { const tb = el('button', '', lab); tb.setAttribute('aria-selected', String(board.tab === k)); tb.addEventListener('click', () => { board.tab = k; openFriends(); }); tabs.append(tb); }
     const listEl = el('div', 'lb');
     wrap.append(tabs, listEl);
     if (!live && !FB.cfg) wrap.append(el('p', 'small muted', inFrame ? 'The live leaderboard needs your Claude account. Your saved neighbours are below.' : 'The live leaderboard runs inside Claude, where your accounts keep the scores. Here you can still swap town codes with friends.'));
@@ -10883,11 +11067,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     wrap.append(codes);
     openSheet('Friends', wrap);
     $('sheet').dataset.kind = 'friends';
-    renderBoardList(listEl);
+    if (board.tab === 'league') renderLeague(listEl); else renderBoardList(listEl);
     if (live && !board.unsub) {
       board.unsub = board.db.collection('board').onSnapshot((snap) => {
         board.docs = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); board.loaded = true; checkCheers();
-        if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const l = $('sheet-body').querySelector('.lb'); if (l) renderBoardList(l); }
+        if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const l = $('sheet-body').querySelector('.lb'); if (l) { if (board.tab === 'league') renderLeague(l); else renderBoardList(l); } }
       }, () => { board.unsub = null; });
     }
   }
@@ -12704,6 +12888,19 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     box.append(row);
     void stage;
   }
+  // 11.08: a league trophy: which league, which place, which week.
+  function renderTrophyPanel(box, b, visiting) {
+    const t = clamp(b.level || 1, 1, LEAGUES.length) - 1, chips = [pill(`${LEAGUES[t].name} league`, 'gold')];
+    if (b.place) chips.push(pill(`${ordinal(b.place)} place`));
+    box.append(panelHead('trophy', b.level, {}, nameOf(b), chips));
+    const wk = b.wk ? String(b.wk).replace(/^(\d+)-W(\d+)$/, 'week $2 of $1') : '';
+    box.append(el('p', 'small', `${b.place ? `${ordinal(b.place)} place` : 'Top 3'} in the ${LEAGUES[t].name} league${wk ? `, ${wk}` : ''}. Won with focus minutes only: gold can't buy it. Homes within 2 tiles pay ${Math.round(TYPES.trophy.boost[t + 1] * 100)}% more.`));
+    if (visiting) return;
+    const row = el('div', 'acts3 two');
+    row.append(actionBtn('Move', state.freeMoves ? `free move · ${state.freeMoves} left` : `${moveCost(b)} gold`, '', () => { ui.panel = null; ui.selected = null; setHolding({ kind: 'move', id: b.id }); renderAll(); }));
+    row.append(actionBtn('Close', null, '', () => closePanel()));
+    box.append(row);
+  }
   // What a town shares about its Monument with visitors (Navid: visitors see what you choose).
   function monuSnap() {
     const M = state.monument; if (!M || !M.stones || !M.stones.length) return null;
@@ -13136,6 +13333,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // 10.12
     menuSec(wrap, 'Rounds for big projects', el('p', '', 'A focus project over 30 minutes takes whole rounds of 30 minutes: 25 minutes of focus, then a 5-minute break. On the start sheet you can drag the lap switch to split it into shorter laps (15 minutes: 12½ + 2½) or longer ones (45 minutes, an hour…), as long as they add up. When a lap ends the bell rings and the clock keeps going: stop safely and take your break (every minute you focused counts), or skip the break and keep going. Progress is saved after every lap and every 30 minutes, so a big project can be spread over days. Projects of 30 minutes or less are done in one session: end early and they are torn down.'));
     menuSec(wrap, 'The golden shield', el('p', '', `Every finished focus puts a golden shield over your town for a fifth of the time you focused (25 minutes gives ${fmtMin(25 * SHIELD_K)}). Under it no new trouble starts (fires, break-ins, sickness, storms, roadworks, trash and weeds piling up), and trouble already going on stands still. Your firefighters, police and nurses keep working, so trouble can still end.`));
+    menuSec(wrap, 'Leagues', el('p', '', `Every week you race 29 other towns in your league (Friends › League): players in the same league on the online board, and robot towns that fill the gaps. Points are focus minutes only, nothing you can buy. When the week ends, the top ${LG_UP} move up a league and the bottom ${LG_DOWN} move down, from Bronze to Diamond. The top 3 win a trophy for their town in the league's colour and a royal chest. A week you don't focus in doesn't count, and nobody ever loses their town.`)); // 11.08
     const tourBtn = el('button', 'btn full', 'Replay the quick tour'); tourBtn.addEventListener('click', () => { closeSheet(); if (ui.screen === 'play') leavePlay(false, true); setTimeout(() => startTour(true), 250); });
     menuSec(wrap, 'Quick tour', el('p', '', 'A one-minute walk through Home, your town and focusing.'), tourBtn);
     return wrap;
@@ -13611,11 +13809,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     CH.timers.forEach(clearTimeout); CH.timers = [];
     Object.assign(CH, { active: true, r, phase: 'idle', t0: performance.now(), shown: 0, openedAt: 0, flashAt: 0, parts: [], last: performance.now() });
     $('chest-title').textContent = 'Tap the chest!';
-    $('chest-eye').textContent = `Focus chest · ${fmtMin(r.minutes)} session`;
+    $('chest-eye').textContent = r.eye || `Focus chest · ${fmtMin(r.minutes)} session`;
     $('chest-rarity').hidden = true;
     $('chest-loot').replaceChildren(); $('chest-xp').hidden = true; $('chest-level').hidden = true;
     $('chest-hit').classList.remove('opened'); $('chest-hit').disabled = false;
-    const od = $('chest-odds'); od.hidden = false; od.replaceChildren(el('div', '', `Odds for a ${fmtMin(r.minutes)} session${r.combo ? ` with a ×${r.combo.mult.toFixed(1)} combo` : ''}:`), oddsBar(r.minutes, r.combo ? r.combo.n : 0));
+    const od = $('chest-odds'); od.hidden = !!r.solo; if (!r.solo) od.replaceChildren(el('div', '', `Odds for a ${fmtMin(r.minutes)} session${r.combo ? ` with a ×${r.combo.mult.toFixed(1)} combo` : ''}:`), oddsBar(r.minutes, r.combo ? r.combo.n : 0));
     const go = $('chest-go'); go.textContent = 'Open it'; go.disabled = false;
     const rect = chestFx.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
     chestFx.width = Math.round(rect.width * d); chestFx.height = Math.round(rect.height * d); chestFxCtx.setTransform(d, 0, 0, d, 0, 0);
@@ -13738,6 +13936,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   function finishChest() {
     CH.active = false; CH.timers.forEach(clearTimeout); CH.timers = [];
     $('chest').hidden = true; if (ui.overlay === 'chest') ui.overlay = null;
+    if (CH.r && CH.r.solo) { renderAll(); return; } // 11.08: a league chest has no session result behind it
     if (ui.lastResult) showResult(ui.lastResult);
   }
 
@@ -14404,6 +14603,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     lockSeek: (left) => { const a = LOCK.el; if (a && isFinite(a.duration)) a.currentTime = Math.max(0, a.duration - left); return a ? a.duration : null; }, // 11.08
     lockPause: () => { if (LOCK.el) LOCK.el.pause(); return navigator.mediaSession ? navigator.mediaSession.playbackState : null; },
     lockPlay: () => { const h = navigator.mediaSession && navigator.mediaSession.__h; if (h && h.play) h.play(); else lockResume(); },
+    league: () => { const L = league(), now = Date.now(), tb = leagueTable(weekKey(now), L.t, now, myWeekMin(now)); return { L: JSON.parse(JSON.stringify(L)), rank: tb.rank, n: tb.n, top: tb.rows.slice(0, 12).map((r) => [r.bot ? 'bot' : r.me ? 'me' : 'live', r.min]), snap: leagueSnap() }; }, // 11.08
+    leagueSet: (o) => { Object.assign(league(), o); save(); return JSON.parse(JSON.stringify(state.league)); },
+    leagueStep: () => { leagueStep(Date.now()); return JSON.parse(JSON.stringify(state.league)); },
+    leaguePopup: () => leaguePopup(),
+    boardDocs: (docs) => { board.docs = docs; board.loaded = true; return board.docs.length; },
+    lgRobots: (t, n) => Array.from({ length: n || 29 }, (_, j) => lgRobot('2026-W1', t, 0, j).M).sort((a, b) => b - a),
     lockState: () => ({ ps: navigator.mediaSession ? navigator.mediaSession.playbackState : null, els: (LOCK.els || []).map((x) => ({ paused: x.paused, src: x.src.slice(-40), t: Math.round(x.currentTime * 10) / 10, muted: x.muted })), track: state.track | 0, kind: navigator.audioSession ? navigator.audioSession.type : null }),
     audio: () => (AUD.ac ? AUD.ac.state : null),
     plan: () => ({ focus: focusJobs().length, all: state.queue.length, work: planWork() }),
