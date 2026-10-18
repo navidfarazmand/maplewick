@@ -1498,7 +1498,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.10'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.11'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -4945,6 +4945,129 @@
     return wrap;
   }
 
+  /* ---------- 11.11: the Android app. The app (mobile/ in the repo) shows this page and gives it window.MaplewickApp.
+     It tells the page what the phone did during focus (screen off or on, unlocked, Maplewick in front or in the back),
+     shows the time left on the lock screen, rings the lap, break and plan alarms while the app is in the back, and signs
+     in to Google natively. In a browser, APP.on is false and none of this runs. ---------- */
+  const APP_GRACE = 15; // seconds you can be unlocked in another app before it counts as picking up the phone
+  const APP = { on: !!(window.MaplewickApp && typeof window.MaplewickApp.post === 'function'), ev: [], keys: new Set(), hold: 0 };
+  const appPost = (m) => { if (APP.on) try { window.MaplewickApp.post(m); } catch (e) { /* the app went away */ } };
+  function appInit() {
+    if (!APP.on) return;
+    try { window.MaplewickApp.on(appRecv); } catch (e) { APP.on = false; return; }
+    appPost({ t: 'hello', version: APP_VERSION });
+    if (state.session) { APP.hold = Date.now() + 4000; appFocus(state.session, true); appPost({ t: 'log?' }); } // reopened mid-session: wait for the log
+  }
+  // A session starts (fresh log) or goes on after the app was reopened; null when it ends.
+  function appFocus(s, resume) {
+    if (!APP.on) return;
+    if (!s) { APP.hold = 0; appPost({ t: 'focus', on: false }); return; }
+    if (!resume) { APP.ev = []; APP.keys = new Set(); }
+    appPost({ t: 'focus', on: true, resume: !!resume, start: s.start, grace: APP_GRACE,
+      nudgeTitle: 'Your focus is still running', nudgeText: `Back to Maplewick within %d seconds and ${state.builder} keeps working.` });
+  }
+  function appEvents(list) {
+    let added = false;
+    for (const x of list || []) {
+      if (!x || typeof x.t !== 'number' || typeof x.e !== 'string') continue;
+      const k = x.t + x.e; if (APP.keys.has(k)) continue;
+      APP.keys.add(k); APP.ev.push({ t: x.t, e: x.e }); added = true;
+    }
+    if (added) APP.ev.sort((a, b) => a.t - b.t);
+  }
+  // When the phone was picked up during this session, or null. Picked up = unlocked with Maplewick in the back for
+  // APP_GRACE seconds or more (the screen going off, or coming back to Maplewick in time, doesn't count).
+  function appPickupAt(s, now) {
+    if (!APP.on || !s || inReady(s, now)) return null;
+    const lim = APP_GRACE * 1000;
+    let fg = true, unlocked = true, t0 = null;
+    const over = (t) => { const a = Math.max(t0, s.start); return t - a >= lim ? a : null; };
+    for (const x of APP.ev) {
+      if (x.t > now) break;
+      const was = unlocked && !fg;
+      if (x.e === 'fg') fg = true; else if (x.e === 'bg') fg = false;
+      else if (x.e === 'unlock') unlocked = true; else if (x.e === 'off' || x.e === 'on') unlocked = false;
+      const is = unlocked && !fg;
+      if (!was && is) t0 = x.t;
+      else if (was && !is) { const a = over(x.t); if (a != null) return a; t0 = null; }
+    }
+    if (unlocked && !fg && t0 != null) return over(now);
+    return null;
+  }
+  // Picking up the phone in the safe minutes after a lap is taking your break; any other time, it ends the session there.
+  function appPickupEnd(s, at) {
+    const L = s.laps ? lapInfo(s, at) : null, onBreak = !!(L && L.win);
+    try { anaEvent('pickup', { m: Math.round(sessionMinutes(s, at)), lap: onBreak ? 1 : 0 }); } catch (e) { /* ignore */ }
+    finishSession(onBreak ? 'lap' : 'pickup', false, at);
+  }
+  // The laps that end after `now`: [{ at, done }]
+  function appLapEnds(s, now, n) {
+    const lf0 = lapFocus(s.lapLen || ROUND), P = s.lapP > 0 ? s.lapP : Infinity, base = s.lapBase || 0, sp = s.speed || 1, out = [];
+    let acc = 0, k = 0;
+    while (k < 400 && out.length < n) {
+      const f = P - acc > 0.01 ? Math.min(lf0, P - acc) : lf0;
+      acc += f; k++;
+      if (acc > s.duration + 1e-9) break;
+      const at = s.start + acc * 60000 / sp;
+      if (at > now) out.push({ at, done: base + k });
+    }
+    return out;
+  }
+  // Leaving the app: the lock-screen countdown and the alarms to ring while Maplewick is in the back.
+  function appAway() {
+    if (!APP.on) return;
+    const now = Date.now(), s = state.session, notes = [];
+    let countdown = null;
+    if (s && !inReady(s, now)) {
+      const end = s.start + s.duration * 60000 / (s.speed || 1);
+      if (s.laps) {
+        const len = s.lapLen || ROUND, br = Math.max(2.5, lapBreakOf(len)), ends = appLapEnds(s, now, 12);
+        for (const x of ends) notes.push({ id: 'lap' + x.done, at: x.at, title: `Lap ${x.done} done!`, body: `Every minute counts. Stop in the next ${fmtHalf(br)} minutes to take your ${fmtHalf(lapBreakOf(len))}-minute break, or keep going.` });
+        if (ends[0]) countdown = { until: ends[0].at, title: `Lap ${ends[0].done} · ${fmtHalf(lapFocus(len))} minutes`, text: `${state.builder} is working. Keep the phone down.` };
+      } else countdown = { until: end, title: `Focus · ${fmtMin(s.duration)}`, text: `${state.builder} is working. Keep the phone down.` };
+      if (end > now) notes.push({ id: 'end', at: end, title: 'Focus done!', body: 'Your chest is waiting in Maplewick.' });
+    }
+    const run = state.lapRun;
+    if (!s && run && !run.rang && run.breakUntil > now) notes.push({ id: 'break', at: run.breakUntil, title: `Break's over: lap ${run.n + 1}`, body: `${state.builder} is ready. Open Maplewick to start the next lap.` });
+    try {
+      const day0 = new Date(); day0.setHours(0, 0, 0, 0);
+      for (const b of dayPlan().blocks) {
+        const at = day0.getTime() + b.at * 60000;
+        if (b.status === 'planned' && !b.rung && at > now) notes.push({ id: 'block' + b.id, at, title: `Time to focus: ${b.label || fmtMin(b.dur)}`, body: `Your ${fmtMin(b.dur)} block starts now. Open Maplewick to start on time.` });
+      }
+      if (onBoard()) for (const x of frx().dates) {
+        const at = nextOcc(x, now) - 10 * 60000;
+        if (at > now && at - now < 7 * 86400000) notes.push({ id: 'date' + x.id, at, title: `Focus with ${x.name} at ${hm(x.h, x.m)}`, body: 'In 10 minutes. Open Maplewick to start together.' });
+      }
+    } catch (e) { /* plans and friends are a bonus */ }
+    appPost({ t: 'away', countdown, notes: state.alarms ? notes.filter((x) => x.at > now + 3000).sort((a, b) => a.at - b.at).slice(0, 40) : [] });
+  }
+  // Back in the app: wait a moment for the phone's log before a session can finish by itself.
+  function appBack() {
+    if (!APP.on) return;
+    if (state.session) APP.hold = Date.now() + 1500;
+    appPost({ t: 'log?' });
+  }
+  function appGoogle() {
+    if (!GOOGLE_CLIENT) { FB.busy = false; toast('Google sign-in is not set up for the app yet.'); refreshFriends(); return; }
+    FB.busy = true; appPost({ t: 'google', clientId: GOOGLE_CLIENT });
+  }
+  // The Android back button: close what is open; otherwise the app goes to the back.
+  function appBackButton() {
+    if (!$('scrim').hidden) { closeSheet(); return true; }
+    return false;
+  }
+  function appRecv(m) {
+    if (!m || typeof m !== 'object') return;
+    if (m.t === 'log') { appEvents(m.events); APP.hold = 0; if (state.session) tick(); }
+    else if (m.t === 'ev') { appEvents([{ t: m.at, e: m.e }]); }
+    else if (m.t === 'back') { appPost({ t: 'back', handled: appBackButton() }); }
+    else if (m.t === 'google') {
+      if (m.tok) googleWithToken(m.tok);
+      else { FB.busy = false; if (m.err !== 'cancelled') toast(m.err === 'play' ? 'Google sign-in needs Google Play services on this phone.' : 'Google sign-in did not finish. Please try again.'); refreshFriends(); }
+    }
+  }
+
   /* ---------- Focus sessions ---------- */
   const sessionMinutes = (s, now) => Math.min(s.duration, Math.max(0, (now - s.start) / 60000 * s.speed));
   /* ---------- 10.12 (Navid): laps. A focus project is worked 25 minutes at a time. At the end of a lap the alarm goes
@@ -5326,7 +5449,7 @@
     anaEvent('start', { dur: laps ? 'laps' + state.session.lapLen : duration, job: currentJob().type, plan: plan.length, goal: coachGoal(), fromPlay, lap: laps ? state.session.lapBase + 1 : 0 });
     sfx.pop();
     save(); closeSheet(); renderAll(); showFocus();
-    lockStart();
+    lockStart(); appFocus(state.session); // 11.11
   }
   const inReady = (s, now) => !!s && (now || Date.now()) < s.start;
   // Cancelled during the get-ready countdown: as if it never started.
@@ -5337,15 +5460,15 @@
     const back = state.session.fromPlay && state.playSec > 0;
     if (state.session.prevRun) state.lapRun = Object.assign(state.session.prevRun, { rang: true }); // 10.12: the lap count carries on
     if (state.session.tg && state.together && state.together.id === state.session.tg) { state.together.st = 'stop'; state.together.fin = Date.now(); state.together.res = 'none'; boardSoon(); } // 11.10
-    state.session = null; state.lastTaxAt = Date.now();
+    state.session = null; state.lastTaxAt = Date.now(); appFocus(null); // 11.11
     save(); hideFocus(); renderAll();
     if (back) enterPlay(); // back to your town, where you were (10.05)
     toast('Cancelled before it started. Nothing lost.');
   }
-  function finishSession(reason, forceFull) {
+  function finishSession(reason, forceFull, at) {
     const s = state.session; if (!s) return;
-    if (!forceFull && inReady(s)) { cancelSession(); return; }
-    const now = Date.now();
+    const now = at && at < Date.now() ? Math.max(at, s.start) : Date.now(); // 11.11: the app ends a session where the phone was picked up
+    if (!forceFull && inReady(s, now)) { cancelSession(); return; }
     // Laps: taking the break (or stopping in the minutes after a lap) is safe: every minute counts. Ending in the middle
     // of a later lap counts as a finished session for the laps you finished; progress was saved every 30 minutes too.
     const reason0 = reason, L = s.laps ? lapInfo(s, now) : null;
@@ -5528,7 +5651,7 @@
     if (state.season.min >= SEASON_GOAL[0] && !state.season.got.includes(0)) { state.season.got.push(0); state.tray.push({ id: state.nextId++, type: sz.item, origin: 'season' }); r.seasonItem = sz.item; }
     if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { const prize = festPrize(100); state.season.got.push(1); state.gold += prize; state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize${prize > 100 ? ` (+${prize - 100} from your town)` : ''}`, n: prize }); r.seasonPrize = true; }
     state.lastTaxAt = now;
-    state.session = null;
+    state.session = null; appFocus(null); // 11.11
     if (s.tg) togetherEnd(s, done, r); // 11.10
     // 10.12: after a lap: a 5-minute break, then the bell for the next lap. Ending in the middle of a lap stops the laps.
     if (L && done && (reason0 === 'lap' || reason0 === 'complete' || L.win) && (roundJobs().length || !s.lapP)) {
@@ -5974,6 +6097,12 @@
     else if (shieldOn(now)) ui.shieldWas = true;
     if (state.session) {
       const s = state.session;
+      if (APP.on) { // 11.11: in the Android app, the phone-pickup check comes first
+        if (APP.hold && now < APP.hold) { renderFocus(now); return; }
+        APP.hold = 0;
+        const at = appPickupAt(s, now);
+        if (at != null) { appPickupEnd(s, at); return; }
+      }
       if (sessionMinutes(s, now) >= s.duration - 1e-9) { finishSession('complete'); return; }
       if (s.laps && !inReady(s, now)) lapTick(s, now);
       renderFocus(now); lockUpdate();
@@ -10611,6 +10740,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   const rand = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (x) => x.toString(16).padStart(2, '0')).join('');
   const backHere = () => location.origin + location.pathname.replace(/index\.html$/, '');
   function googleStart() {
+    if (APP.on) { appGoogle(); return; } // 11.11: Google doesn't allow its sign-in page inside apps; the app signs in natively
     const st = rand(), nonce = rand();
     try { localStorage.setItem('mw-google', JSON.stringify({ st, nonce, at: Date.now() })); } catch (e) { /* private mode */ }
     save();
@@ -10625,6 +10755,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     let saved = null; try { saved = JSON.parse(localStorage.getItem('mw-google') || 'null'); localStorage.removeItem('mw-google'); } catch (e) { /* ignore */ }
     let nonce = null; try { nonce = JSON.parse(atob(tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).nonce; } catch (e) { /* bad token */ }
     if (err || !tok || !saved || saved.st !== h.get('state') || nonce !== saved.nonce) { FB.err = err === 'access_denied' ? 'auth/popup-closed-by-user' : 'auth/google-return'; setTimeout(() => toast(fbErrText(FB.err)), 800); return; }
+    googleWithToken(tok);
+  }
+  function googleWithToken(tok) {
     FB.busy = true;
     fbLoad().then((api) => { if (!api) throw { code: 'offline' }; return withTimeout(api.googleIdToken(tok), 25000, 'offline'); })
       .then((r) => { FB.busy = false; toast(r === 'switched' ? 'Welcome back! Your spot on the board is here.' : 'Signed in. You are on the leaderboard!'); refreshFriends(); })
@@ -14823,7 +14956,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     lastTick = Date.now();
     try { anaEvent(document.hidden ? 'hide' : 'show', { s: state.session ? 1 : 0, screen: ui.screen }); if (state.session && document.hidden) state.session.away = (state.session.away || 0) + 1; } catch (e) { /* ignore */ }
     // 10.13: when you leave, note the time (the crew and the town go on); back again, see what happened
-    if (document.hidden) { if (!ui.visit) { state.awaySince = Date.now(); state.awayFocus = !!state.session; } awayMusicStart(); save(); anaFlush(); } else { awayMusicStop(); tick(); awayBack(false, null); }
+    if (document.hidden) { if (!ui.visit) { state.awaySince = Date.now(); state.awayFocus = !!state.session; } awayMusicStart(); save(); anaFlush(); appAway(); } else { appBack(); awayMusicStop(); tick(); awayBack(false, null); }
   });
   if (window.ResizeObserver) new ResizeObserver(() => layout()).observe(stage);
   window.addEventListener('resize', layout);
@@ -14872,6 +15005,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (n) setTimeout(() => toast('Services keep one size again: a clinic stays a clinic at every level. Bigger versions (Medical center, Hospital, Police station, Central police…) are separate buildings for later.'), 2600);
   }
   function boot() {
+    appInit(); // 11.11: the Android app
     if (!devOn() && state.speed > 1) { state.speed = 1; save(); } // test speed is for the developer only
     attachOldAddons();
     migrateTiers();

@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Maplewick",
+    "slug": "maplewick",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "backgroundColor": "#E6ECE1",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.khoreh.maplewick"
+    },
+    "android": {
+      "package": "com.khoreh.maplewick",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#5B3BC4",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.VIBRATE",
+        "android.permission.RECEIVE_BOOT_COMPLETED"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#5B3BC4",
+          "defaultChannel": "alarms"
+        }
+      ]
+    ],
+    "extra": {
+      "gameUrl": "https://navidfarazmand.github.io/maplewick/"
+    }
+  }
+}
