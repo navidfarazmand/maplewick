@@ -426,6 +426,32 @@
   .lgres { display: grid; justify-items: center; gap: 4px; text-align: center; padding: 6px 0 2px; }
   .lgres-rank { font-family: var(--display); font-size: 30px; line-height: 1.1; }
   .lbrow.tap { cursor: pointer; padding-top: 6px; padding-bottom: 6px; }
+  /* 11.10: friends */
+  .frsec { display: grid; gap: 8px; }
+  .frchips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .frchip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-weight: 700; font-size: 13.5px; color: inherit; cursor: pointer; }
+  .frchip img { width: 26px; height: 26px; border-radius: 50%; }
+  .frask, .frmsg { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border-radius: 12px; background: var(--surface-2); }
+  .frmsg { background: var(--focus-soft); }
+  .frmsg.mine { background: var(--surface-2); }
+  .frmsg .row, .frask .row { gap: 6px; margin-left: auto; }
+  .fair { display: grid; gap: 5px; padding: 10px 12px; border-radius: 14px; background: linear-gradient(135deg, #FFE9D6, #FFF6E0); color: #5A3412; }
+  .fair small { font-size: 12px; opacity: .9; line-height: 1.3; }
+  .fairbar { height: 8px; border-radius: 99px; background: rgba(0,0,0,.1); overflow: hidden; }
+  .fairbar span { display: block; height: 100%; background: linear-gradient(90deg, #E8503A, #F3C93A); border-radius: 99px; }
+  .pol-opts.days { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .focus-tg { display: grid; gap: 6px; justify-items: center; margin: 4px 0 2px; }
+  .tg-head { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--night-ink); opacity: .8; }
+  .tg-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .tg-pal { display: grid; justify-items: center; gap: 1px; min-width: 64px; color: var(--night-ink); }
+  .tg-pal img { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,.25); animation: tgBob 1.6s ease-in-out infinite; }
+  .tg-pal.inv img { opacity: .45; animation: none; } .tg-pal.done img { box-shadow: 0 0 0 2px #8FE3A0; animation: none; } .tg-pal.stop img { opacity: .5; animation: none; }
+  .tg-pal b { font-size: 12.5px; } .tg-pal small { font-size: 11px; opacity: .8; }
+  .tg-pal.waving img { animation: tgWave .5s ease-in-out 6; }
+  .tg-wave { padding: 6px 14px; }
+  @keyframes tgBob { 50% { transform: translateY(-2px); } }
+  @keyframes tgWave { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+  @media (prefers-reduced-motion: reduce) { .tg-pal img, .tg-pal.waving img { animation: none; } }
   .lbrow.tap:active { transform: scale(.985); }
   #open-friends { position: relative; }
   #open-friends.lg::after { content: ''; position: absolute; right: 5px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--lgc); box-shadow: 0 0 0 2px var(--surface); }
@@ -1289,7 +1315,7 @@
       <button id="zoom-home" aria-label="Back to the town hall"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 3 2.5 11H5v9h5v-6h4v6h5v-9h2.5z"/></svg></button>
     </div>
     <div class="board-hint" id="board-hint" hidden></div>
-    <div class="visitbar" id="visitbar" hidden><span id="visit-text">Visiting</span><button class="btn sm goldc" id="visit-cheer">Cheer</button><button class="btn sm" id="visit-home">Home</button></div>
+    <div class="visitbar" id="visitbar" hidden><span id="visit-text">Visiting</span><button class="btn sm goldc" id="visit-cheer">Cheer</button><button class="btn sm" id="visit-gift" hidden>Gift</button><button class="btn sm" id="visit-home">Home</button></div>
     <section class="mpanel" id="mpanel" aria-live="polite" hidden></section>
   </main>
 
@@ -1301,6 +1327,7 @@
     <div class="in-burst" id="in-burst" aria-hidden="true"></div>
   </div>
   <section class="homebody" id="homebody" aria-label="Today">
+    <div class="nextblock frbanner" id="frbanner" hidden></div>
     <div class="nextblock" id="nextblock" hidden></div>
     <div class="banner" id="banner" hidden></div>
   </section>
@@ -1349,6 +1376,7 @@
       <div class="focus-actions"><button class="night-btn brk" id="lap-break">Take my 5-minute break</button><button class="night-btn" id="lap-skip">Skip the break</button></div>
     </div>
     <div class="focus-combo" id="focus-combo" hidden></div>
+    <div class="focus-tg" id="focus-tg" hidden></div>
     <canvas class="focus-scene" id="focus-scene" width="520" height="400" aria-hidden="true"></canvas>
     <div class="focus-task" id="focus-task"></div>
     <div class="focus-meter"><span id="focus-meter"></span></div>
@@ -1494,7 +1522,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '11.09'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '11.10'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1732,6 +1760,8 @@
   const LEAGUES = [
     { name: 'Bronze', col: '#B8743A' }, { name: 'Silver', col: '#A7B2C1' }, { name: 'Gold', col: '#E3AE2F' }, { name: 'Sapphire', col: '#3D6BD6' }, { name: 'Ruby', col: '#D13A52' },
     { name: 'Emerald', col: '#2E9F68' }, { name: 'Amethyst', col: '#8A55D4' }, { name: 'Pearl', col: '#DCD3C2' }, { name: 'Obsidian', col: '#3B3446' }, { name: 'Diamond', col: '#6FD3E6' }];
+  // 11.10: a Town Fair your friends and you reached together leaves a stall in town
+  TYPES.fairstall = { name: 'Fair stall', cat: 'joy', size: 1, gift: true, max: 1, color: '#E8503A', roof: '#F6E7B5', radius: 2, boost: [0, 0.05], blurb: 'From a Town Fair you and your friends reached together. Homes within 2 tiles pay 5% more.' };
   TYPES.trophy = { name: 'League trophy', cat: 'joy', size: 1, gift: true, max: LEAGUES.length, color: '#E3AE2F', roof: '#B9862A', radius: 2, boost: [0, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.06, 0.07, 0.07],
     levelNames: LEAGUES.map((l) => `${l.name} trophy`), blurb: 'For a top-3 week in a league. Gold can\'t buy it. Homes within 2 tiles pay a little more.' };
   /* 11.02 (roadmap part 1, Navid): bigger buildings that can do new things. A bigger size gives more per tile (land is
@@ -5313,6 +5343,7 @@
     state.session = { duration, jobBid: currentJob().bid, start: now + ready * 1000, ready, speed: ui.tourSpeed || state.speed, income: focusNet(econ(now)), combo: comboNow(now), planBlock: blk ? blk.id : null, plan, startDone, fromPlay, rescue: opts && opts.rescue ? opts.rescue : null };
     if (laps) { const len = (opts && opts.len) || ROUND; startPick.lapLen = len; Object.assign(state.session, { laps: true, lapLen: len, lapP: roundsWork(), lapBase: run ? run.n : 0, lapOf: (run ? run.n : 0) + planLaps(len), lapRung: 0, skip: 0, prevRun: run ? Object.assign({}, run) : null }); }
     { const tq0 = taskQ(state.session); if (tq0) state.session.taskQ = tq0.id; } // 11.01
+    if (opts && opts.together) state.session.tg = opts.together; // 11.10: focusing together
     state.lapRun = null; // the break is over
     if (ALARM.lap) closeAlarm();
     state.lastTaxAt = now;
@@ -5329,6 +5360,7 @@
     lockStop(false);
     const back = state.session.fromPlay && state.playSec > 0;
     if (state.session.prevRun) state.lapRun = Object.assign(state.session.prevRun, { rang: true }); // 10.12: the lap count carries on
+    if (state.session.tg && state.together && state.together.id === state.session.tg) { state.together.st = 'stop'; state.together.fin = Date.now(); state.together.res = 'none'; boardSoon(); } // 11.10
     state.session = null; state.lastTaxAt = Date.now();
     save(); hideFocus(); renderAll();
     if (back) enterPlay(); // back to your town, where you were (10.05)
@@ -5521,6 +5553,7 @@
     if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { const prize = festPrize(100); state.season.got.push(1); state.gold += prize; state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize${prize > 100 ? ` (+${prize - 100} from your town)` : ''}`, n: prize }); r.seasonPrize = true; }
     state.lastTaxAt = now;
     state.session = null;
+    if (s.tg) togetherEnd(s, done, r); // 11.10
     // 10.12: after a lap: a 5-minute break, then the bell for the next lap. Ending in the middle of a lap stops the laps.
     if (L && done && (reason0 === 'lap' || reason0 === 'complete' || L.win) && (roundJobs().length || !s.lapP)) {
       state.lapRun = { n: L.done, of: L.done + planLaps(L.len), at: now, breakUntil: now + breakMs(s.speed, L.len), rang: false, len: L.len, free: !s.lapP && !roundJobs().length };
@@ -5985,7 +6018,7 @@
       if (ui.recharge && ui.recharge.step === 'timer') renderRecharge();
       const run = state.lapRun; // 10.12: the break between laps is over: ring for the next lap (unless it is long gone)
       if (run && !run.rang && run.breakUntil && now >= run.breakUntil) { if (lapRunNow(now) && now - run.breakUntil < 10 * 60000) breakOver(now); else { run.rang = true; save(); } }
-      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock(); leagueStep(now); leaguePopup();
+      if (Math.floor(now / 2000) !== tick.planBeat) { tick.planBeat = Math.floor(now / 2000); planReminders(); renderNextBlock(); leagueStep(now); leaguePopup(); friendsTick(now); togetherPopup();
         if (state.sparkSet && state.sparkSet.auto && ui.screen === 'home' && !ui.overlay && !state.session && $('scrim').hidden && Date.now() - (ui.sparkAt || 0) > 12000) { nextSpark(); renderBanner(); } if (ui.screen === 'play' || ui.screen === 'home') syncWalkers(); }
     }
     if (ui.panel) liveJobButtons();
@@ -7242,6 +7275,15 @@
         for (let i = 0; i < Math.min(14, n); i++) { const k = (i + 1) / 15, p1 = lerpPt(L, tL, k), p2 = lerpPt(B, tB, k); line(c, lerpPt(p1, p2, 0.18), lerpPt(p1, p2, 0.82), 'rgba(70,58,44,.4)', 0.55 * u); }
         if (ART.w) { c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; outline(c, [L, B, R, tR, apex, tL]); }
         if (st >= 3 && !reduced) for (let i = 0; i < 2; i++) { const k = ((now / 1500) + i / 2) % 1, a = 1 - Math.abs(k * 2 - 1); starShape(c, x + (i ? 4 : -5) * u, top - (i ? 2 : 8) * u, 1.6 * u * a, `rgba(255,248,210,${a})`); }
+        break;
+      }
+      case 'fairstall': { // 11.10: a striped fair tent over a counter, with two balloons
+        box(c, x, y, hw * 0.6, hh * 0.6, 1, 6 * u, '#F2E2C2');
+        const apex = [x, y - 24 * u], L = [x - hw * 0.72, y - 8 * u], F = [x, y - 8 * u + hh * 0.72], R = [x + hw * 0.72, y - 8 * u];
+        for (let i = 0; i < 4; i++) { poly(c, [apex, lerpPt(L, F, i / 4), lerpPt(L, F, (i + 1) / 4)], i % 2 ? '#FFF6EA' : '#E8503A'); poly(c, [apex, lerpPt(F, R, i / 4), lerpPt(F, R, (i + 1) / 4)], i % 2 ? '#EFE4D6' : '#C93F2C'); }
+        line(c, apex, [apex[0], apex[1] - 5 * u], '#59606A', 0.6 * u); poly(c, [[apex[0], apex[1] - 5 * u], [apex[0] + 4 * u, apex[1] - 4 * u], [apex[0], apex[1] - 3 * u]], '#F3C93A');
+        const bob = reduced ? 0 : Math.sin(now / 600) * 1.2 * u;
+        for (const [dx, cc] of [[-hw * 0.5, '#3E9ADB'], [hw * 0.46, '#F3C93A']]) { line(c, [x + dx, y - 6 * u], [x + dx, y - 17 * u + bob], 'rgba(60,60,60,.6)', 0.4 * u); c.fillStyle = cc; c.beginPath(); c.ellipse(x + dx, y - 19.5 * u + bob, 2.4 * u, 3 * u, 0, 0, Math.PI * 2); c.fill(); }
         break;
       }
       case 'trophy': { // 11.08: a cup in the league's colour on a stone base (level = league)
@@ -9869,7 +9911,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (live(b) && t.cat === 'home' && roleInfo('police', ci).needed && !policeCovers(b)) chips.push(fixPill(nightK() > 0.5 ? 'Not safe at night' : 'Not safe', () => staffAction('police', b)));
     if (live(b) && t.cat === 'home' && roleInfo('nurse', ci).needed && stationsOf('nurse').length && !coversB('nurse', b)) chips.push(fixPill('Clinic too far', () => staffAction('nurse', b)));
     if (live(b) && messy(b) && staffWorking('fire') && !coversB('fire', b)) chips.push(fixPill('Far from fire station', () => staffAction('fire', b)));
-    if (special(t)) chips.push(pill(t.chest ? `${RARITY[t.chest].name} chest find` : `${SEASONS[t.season].fest} find`, 'gold'));
+    if (special(t)) chips.push(pill(t.chest ? `${RARITY[t.chest].name} chest find` : t.season ? `${SEASONS[t.season].fest} find` : b.type === 'fairstall' ? 'Town Fair' : 'Gift', 'gold'));
     box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${nameOf(b)}${b.label ? ' · ' + b.label : b.resident ? ' · ' + b.resident : ''}`, chips));
     // Two tabs: what you can do here, and everything about it (including what people ask for).
     const reqs = questsAt(b).filter((rq) => !(b.fire && rq.alert));
@@ -10254,10 +10296,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     };
     // Free things waiting to be placed: the gift cottage under Buildings, chest and festival finds under Decor.
     for (const tr of state.tray) {
-      const tt = TYPES[tr.type], inDecor = special(tt);
+      const tt = TYPES[tr.type], inDecor = special(tt) || tt.cat === 'decor';
       if ((p.tab === 'decor') !== inDecor || p.tab === 'services' || p.tab === 'landmarks') continue;
       const a0 = anchorFor(tr.type, p.c, p.r), ok = fits(tr.type, a0.c, a0.r);
-      const c = card(tr.type, 'free' + (ok ? '' : ' off'), () => { if (ok) startGift(tr.id, p.c, p.r); else toast(spotWhy(tr.type, a0.c, a0.r)); }, [el('span', '', tr.resident ? `For ${tr.resident}` : tt.chest ? `${RARITY[tt.chest].name} chest` : tr.type === 'trophy' ? `${LEAGUES[clamp(tr.level || 1, 1, 10) - 1].name} league` : tt.gift ? 'Gift' : 'Festival find')], 'Free · tap to place', 'pos', 'FREE');
+      const c = card(tr.type, 'free' + (ok ? '' : ' off'), () => { if (ok) startGift(tr.id, p.c, p.r); else toast(spotWhy(tr.type, a0.c, a0.r)); }, [el('span', '', tr.resident ? `For ${tr.resident}` : tt.chest ? `${RARITY[tt.chest].name} chest` : tr.type === 'trophy' ? `${LEAGUES[clamp(tr.level || 1, 1, 10) - 1].name} league` : tr.origin === 'friend' ? `From ${tr.from || 'a friend'}` : tr.origin === 'fair' ? 'Town Fair' : tt.gift ? 'Gift' : 'Festival find')], 'Free · tap to place', 'pos', 'FREE');
       c.setAttribute('aria-label', `${tt.name}, free, place here`);
     }
     if (p.tab === 'decor') {
@@ -10537,7 +10579,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         const go = async (force) => {
           if (stop) return;
           const open = !$('scrim').hidden && $('sheet').dataset.kind === 'friends';
-          if (!force && !open && Date.now() - last < 300000) return;
+          if (!force && !open && Date.now() - last < (fastPoll() ? 20000 : 300000)) return; // 11.10: every 20 s while friends focus together
           last = Date.now();
           try { fn(await docs()); } catch (e) { if (err) err(e); }
         };
@@ -10656,7 +10698,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       week: wk, weekMin: state.week.key === wk ? Math.round(state.week.min) : 0, day: dk, dayMin: state.streak.todayKey === dk ? Math.round(state.streak.todayMin) : 0,
       total: Math.round(state.stats.focusMin), badges: state.badges.length, hall: hallLevel(), land: state.land.slice(),
       b: state.buildings.filter((b) => TYPES[b.type] && b.type !== 'works' && b.type !== 'fallen').map((b) => [b.type, b.c, b.r, b.level, (b.ruin ? 1 : 0) | (b.site ? 2 : 0) | (b.small === 1 ? 4 : b.small === 2 ? 8 : 0), b.rot ? 1 : 0]),
-      staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])), monu: monuSnap(), lg: leagueSnap() };
+      staff: Object.fromEntries(STAFF_ORDER.map((k) => [k, staffWorking(k)])), monu: monuSnap(), lg: leagueSnap(), ...friendsSnap() };
   }
   function boardSoon() { if (!board.db || !state.board.joined) return; clearTimeout(board.timer); board.timer = setTimeout(boardPush, 1500); }
   async function boardPush() {
@@ -10684,8 +10726,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     try {
       const snap = await db.collection('board').get();
       board.docs = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); board.loaded = true;
-      if (state.board.joined) { checkCheers(); boardSoon(); }
+      if (state.board.joined) { checkCheers(); friendsInbox(); boardSoon(); }
     } catch (e) { /* board unavailable */ }
+    if (board.kind === 'firebase') boardWatch();
   }
   // Cheers: each mayor can cheer each town once a day. Every new cheer you get pays 5 gold (up to 5 a day).
   function checkCheers() {
@@ -10770,6 +10813,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     $('visit-text').textContent = `Visiting ${v.who ? `${v.who}'s ` : ''}${state.town} · Lv ${state.level}`;
     const cb = $('visit-cheer'), can = !!(v.id && board.me && v.id !== board.me && realState().board.joined);
     cb.hidden = !can; cb.disabled = can && cheeredToday(v.id); cb.textContent = cb.disabled ? 'Cheered ✓' : 'Cheer';
+    { const gb = $('visit-gift'), ok = can && onBoard() && mutual(v.id); gb.hidden = !ok; gb.disabled = ok && gaveToday(v.id); gb.textContent = gb.disabled ? 'Gift left ✓' : 'Gift'; } // 11.10
   }
   function renderVisitInfo(box, b) {
     if (b.type === 'monument') { renderMonumentPanel(box, b, true); return; } // 11.01
@@ -10967,6 +11011,381 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     });
     listEl.append(el('p', 'tiny muted', board.me ? 'Players in your league on the online board race in your group; robot towns fill the rest. Nobody ever loses their town.' : 'Robot towns fill your group. Join the online board (above) to race real players in your league too. Nobody ever loses their town.'));
   }
+  /* ---------- 11.10 (roadmap part 8, Navid): focusing with friends ----------
+     One rule runs through all of it: a friend can help you, but can never cost you anything. Friends are players on the
+     online board who added each other. Each player can only write their own board entry, so everything between friends
+     travels as short messages in the sender's entry ("ob", an outbox) that the other phone reads and answers. */
+  const FR_MAX = 20, TG_MAX = 4, TG_LENS = [25, 45, 60, 90], GIFT_FOOD = 25, OFFER_MS = 48 * 3600000, BANK_DAYS = 14, FAIR_PER = 240, FAIR_MAX = 1200;
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  function frx() {
+    const B = realState().board;
+    for (const k of ['friends', 'ob', 'dates', 'lent', 'inbox']) if (!Array.isArray(B[k])) B[k] = [];
+    for (const k of ['seen', 'gave', 'lpDone', 'remind', 'datesNo', 'refunded']) if (!B[k] || typeof B[k] !== 'object' || Array.isArray(B[k])) B[k] = {};
+    return B;
+  }
+  const onBoard = () => !!(board.me && board.kind === 'firebase' && realState().board.joined);
+  const docOf = (id) => board.docs.find((d) => d && d.id === id) || null;
+  const frName = (x) => { const d = typeof x === 'string' ? docOf(x) : x; return d ? String(d.name || d.builder || 'A friend').slice(0, 20) : 'A friend'; };
+  const isFriend = (id) => frx().friends.includes(id);
+  const likesMe = (id) => { const d = docOf(id); return !!(d && Array.isArray(d.fr) && d.fr.includes(board.me)); };
+  const mutual = (id) => isFriend(id) && likesMe(id);
+  const mutuals = () => frx().friends.filter((id) => mutual(id) && docOf(id));
+  const msgId = () => `${String(board.me || 'x').slice(0, 5)}${Date.now().toString(36)}${Math.floor(Math.random() * 1296).toString(36)}`;
+  function frSend(to, k, payload) { const B = frx(), m = Object.assign({ i: msgId(), to, k, at: Date.now() }, payload || {}); B.ob.push(m); save(); boardSoon(); return m; }
+  // What my board entry carries for friends: kept small (the server takes about 12 KB in all).
+  function friendsSnap() {
+    if (!onBoard()) return {};
+    const B = frx(), now = Date.now();
+    B.ob = B.ob.filter((m) => (m.k === 'offer' && !m.done ? now - m.at < OFFER_MS + 86400000 : now - m.at < 7 * 86400000)).slice(-24);
+    for (const [k, t] of Object.entries(B.seen)) if (now - t > 30 * 86400000) delete B.seen[k];
+    const out = { fr: B.friends.slice(0, FR_MAX) };
+    if (B.ob.length) out.ob = B.ob.map((m) => { const o = Object.assign({}, m); delete o.done; return o; });
+    const T = state.together; if (T && now - (T.fin || T.at || 0) < 12 * 3600000) out.tg = { i: T.id, h: T.host, len: T.len, st: T.st, k: T.k | 0, wv: T.wv || 0, at: T.at, inv: T.host === board.me ? T.inv : undefined };
+    if (B.dates.length) out.dt = B.dates.map((x) => [x.id, x.w, x.d, x.h, x.m]);
+    const lp = {};
+    for (const L of loans()) if (L.friend) lp[L.ref] = [Math.round(L.amount - L.owed + (L.interest || 0)), 0];
+    for (const [r, v] of Object.entries(B.lpDone)) { if (now - (v[2] || 0) > 21 * 86400000) delete B.lpDone[r]; else lp[r] = [v[0], 1]; }
+    if (Object.keys(lp).length) out.lp = lp;
+    return out;
+  }
+  // Read what friends sent me (on every board refresh).
+  function friendsInbox() {
+    if (!onBoard() || ui.visit) return;
+    const B = frx(), me = board.me, now = Date.now(); let changed = false;
+    for (const d of board.docs) {
+      if (!d || d.id === me || !Array.isArray(d.ob)) continue;
+      for (const m of d.ob) { if (!m || m.to !== me || !m.i || B.seen[m.i]) continue; B.seen[m.i] = now; changed = true; frHandle(m, d, now); }
+    }
+    // set times a friend made with me (once each), and ones they took away
+    for (const d of board.docs) {
+      if (!d || d.id === me || !Array.isArray(d.dt) || !mutual(d.id)) continue;
+      for (const x of d.dt) { if (!Array.isArray(x) || x[1] !== me || B.dates.some((y) => y.id === x[0]) || B.datesNo[x[0]]) continue; B.dates.push({ id: x[0], w: d.id, name: frName(d), d: x[2] | 0, h: x[3] | 0, m: x[4] | 0, added: now }); changed = true; toast(`${frName(d)} set a time to focus with you: ${dateText(B.dates[B.dates.length - 1])}. You both get a reminder 10 minutes before.`); }
+    }
+    for (const x of B.dates.slice()) { const d = docOf(x.w); if (d && (d.updatedAt || 0) > (x.added || 0) + 60000 && !(Array.isArray(d.dt) && d.dt.some((y) => y[0] === x.id))) { B.dates = B.dates.filter((y) => y !== x); B.datesNo[x.id] = now; changed = true; toast(`${x.name} took away the set time ${dateText(x)}.`); } }
+    // trade offers nobody took: back to me after two days
+    for (const o of B.ob) if (o.k === 'offer' && !o.done && now - o.at > OFFER_MS) { offerBack(o, 'Nobody took it in two days'); changed = true; }
+    // loans I gave: what has been paid back, and the town bank's promise after 14 quiet days
+    for (const l of B.lent) {
+      if (l.closed) continue;
+      const d = docOf(l.to); if (d) l.seen = Math.max(l.seen || 0, d.updatedAt || 0);
+      const e = d && d.lp ? d.lp[l.ref] : null;
+      if (Array.isArray(e)) {
+        const paid = Math.min(+e[0] || 0, l.due || l.amount * 1.05);
+        if (paid > (l.got || 0) + 0.5) { const add = Math.round(paid - (l.got || 0)); goldChange(add, `${l.name} paid back part of the loan`, 'loan'); l.got = (l.got || 0) + add; changed = true; }
+        if (e[1]) { l.closed = now; changed = true; toast(`${l.name} paid back the whole loan (${Math.round(l.got)} gold). ♥`); continue; }
+      }
+      if (now - Math.max(l.seen || 0, l.at) > BANK_DAYS * 86400000) {
+        const rest = Math.max(0, Math.round(l.amount - (l.got || 0)));
+        if (rest) goldChange(rest, `The town bank paid back ${l.name}'s loan`, 'loan');
+        l.closed = now; l.bank = true; changed = true; frSend(l.to, 'lclose', { r: l.ref });
+        toast(`${l.name} hasn't played for two weeks, so the town bank paid you back ${rest} gold and closed the loan.`);
+      }
+    }
+    B.lent = B.lent.filter((l) => !l.closed || now - l.closed < 30 * 86400000);
+    B.inbox = B.inbox.filter((x) => !(x.k === 'inv' && now - x.at > 20 * 60000) && !(x.k === 'offer' && now - x.at > OFFER_MS));
+    togetherCheck(now); fairCheck(now);
+    if (changed) { save(); boardSoon(); renderHome2(); }
+  }
+  function frHandle(m, d, now) {
+    const B = frx(), nm = frName(d);
+    if (m.k === 'gift') {
+      if (m.f > 0) {
+        if (foodOn()) { const room = Math.max(0, foodCap() - (state.food || 0)), add = Math.min(m.f, room); state.food = (state.food || 0) + add; toast(`${nm} left you ${m.f} food${add + 0.5 < m.f ? ` (${Math.floor(add)} fitted in your store)` : ''}. ♥`); }
+        else { const g = Math.round(m.f * FOOD_PRICE); goldChange(g, `${nm}'s gift of food, sold at the market`, 'gift'); toast(`${nm} left you ${m.f} food. Your town has no food store yet, so it was sold for ${g} gold. ♥`); }
+      } else if (m.d && TYPES[m.d]) { state.tray.push({ id: state.nextId++, type: m.d, origin: 'friend', from: nm }); toast(`${nm} left you a ${TYPES[m.d].name.toLowerCase()}. It's waiting in Build → Decor. ♥`); }
+      sfx.chime();
+    } else if (m.k === 'offer' || m.k === 'lreq' || m.k === 'inv') {
+      B.inbox.push(Object.assign({}, m, { from: d.id, name: nm })); B.inbox = B.inbox.slice(-20);
+      toast(m.k === 'inv' ? `${nm} invites you to focus together for ${m.len} minutes.` : m.k === 'offer' ? `${nm} offers a trade: ${offerText(m, true)}.` : `${nm} asks to borrow ${m.g} gold.`);
+      sfx.chime(); if (m.k === 'inv') notify(`${nm} invites you to focus together`, `${m.len} minutes · open Maplewick to join`);
+    } else if (m.k === 'acc') {
+      const o = B.ob.find((x) => x.i === m.r && x.k === 'offer');
+      if (o && !o.done) { o.done = true; B.ob = B.ob.filter((x) => x !== o); if (o.s) goldChange(o.g, `${nm} bought ${o.f} food`, 'trade'); else state.food = (state.food || 0) + o.f; toast(`${nm} took your trade: ${o.s ? `+${o.g} gold` : `+${o.f} food`}.`); sfx.coin(); }
+      else if (B.refunded[m.r]) { const o2 = B.refunded[m.r]; delete B.refunded[m.r]; if (o2.s) { state.food = Math.max(0, (state.food || 0) - o2.f); goldChange(o2.g, `${nm} bought ${o2.f} food`, 'trade'); } else { goldChange(-o2.g, `Bought ${o2.f} food from ${nm}`, 'trade'); state.food = (state.food || 0) + o2.f; } toast(`${nm} took your trade just in time.`); }
+    } else if (m.k === 'dec') { const o = B.ob.find((x) => x.i === m.r && x.k === 'offer'); if (o && !o.done) offerBack(o, `${nm} said no thanks`); }
+    else if (m.k === 'lgive') {
+      if (!loans().some((L) => L.ref === m.r)) {
+        loans().push({ id: state.nextId++, v: 6, lender: `${nm} (friend)`, friend: d.id, ref: m.r, amount: m.g, owed: m.g, total: m.g, perHour: Math.max(5, Math.ceil(m.g / 6)), h: 6, rate: clamp((m.p || 0) / 100, 0, 0.05), at: now, hoursDone: 0, interest: 0, saved: 0, signer: playerName() || 'Mayor' });
+        goldChange(m.g, `Loan from ${nm}`, 'loan'); toast(`${nm} lent you ${m.g} gold. You pay it back a little each hour while you play or focus${m.p ? ` (${m.p}% interest, only on what you pay while playing)` : ', with no interest'}.`); sfx.coin();
+      }
+      B.ob = B.ob.filter((x) => !(x.k === 'lreq' && x.i === m.r));
+    } else if (m.k === 'ldec') { B.ob = B.ob.filter((x) => !(x.k === 'lreq' && x.i === m.r)); toast(`${nm} can't lend gold right now.`); }
+    else if (m.k === 'lclose') { const L = loans().find((x) => x.ref === m.r); if (L) { loanDone(L, true); toast(`The town bank settled your loan from ${nm}: you owe nothing more.`); } }
+  }
+  function notify(title, body) {
+    try { if (!state.alarms || !('Notification' in window) || Notification.permission !== 'granted' || !document.hidden) return; const opts = { body, tag: 'maplewick-friends', renotify: true }; if (navigator.serviceWorker) navigator.serviceWorker.getRegistration().then((reg) => { if (reg && reg.showNotification) reg.showNotification(title, opts); else new Notification(title, opts); }).catch(() => {}); else new Notification(title, opts); } catch (e) { /* a bonus */ }
+  }
+  // ---- Friends: add, add back, remove ----
+  function addFriend(id) { const B = frx(); if (!B.friends.includes(id) && B.friends.length < FR_MAX) { B.friends.push(id); save(); boardSoon(); toast(likesMe(id) ? `You and ${frName(id)} are friends now.` : `Friend request sent to ${frName(id)}. You're friends once they add you back.`); } else if (B.friends.length >= FR_MAX) toast(`You can have up to ${FR_MAX} friends.`); refreshFriends(); }
+  function removeFriend(id) { const B = frx(); B.friends = B.friends.filter((x) => x !== id); B.dates = B.dates.filter((x) => { if (x.w === id) B.datesNo[x.id] = Date.now(); return x.w !== id; }); save(); boardSoon(); toast(`${frName(id)} is no longer on your friends list.`); }
+  // ---- Gifts: once a day for each friend (food from your store, or a decoration you buy) ----
+  const GIFT_DECOR = () => DECOR.filter((t) => TYPES[t] && !ADDON[t] && (TYPES[t].cost || 0) > 0 && (TYPES[t].cost || 0) <= 80).slice(0, 4);
+  const gaveToday = (id) => frx().gave[id] === dayKey(Date.now());
+  function sendGift(id, what) {
+    const S = realState(), B = frx();
+    if (gaveToday(id)) { toast(`You already left ${frName(id)} a gift today.`); return; }
+    if (what === 'food') { if ((S.food || 0) < GIFT_FOOD) { toast(`A gift of food takes ${GIFT_FOOD} food from your store.`); return; } S.food -= GIFT_FOOD; frSend(id, 'gift', { f: GIFT_FOOD }); }
+    else { const c = decorCost(what); if (S.gold + 1e-6 < c) { toast(`A ${TYPES[what].name.toLowerCase()} costs ${c} gold.`); return; } S.gold -= c; frSend(id, 'gift', { d: what }); }
+    B.gave[id] = dayKey(Date.now()); sfx.chime(); closeSheet(); toast(`Gift left for ${frName(id)}. ♥`); if (ui.visit) renderVisit();
+  }
+  function openGift(id) {
+    const S = realState(), wrap = el('div', 'list');
+    wrap.append(el('p', 'small', `Leave ${frName(id)} a gift, once a day. They'll find it next time they open Maplewick.`));
+    const fb = actionBtn(`${GIFT_FOOD} food`, `from your store (you have ${Math.floor(S.food || 0)})`, '', () => sendGift(id, 'food')); if ((S.food || 0) < GIFT_FOOD) fb.disabled = true;
+    const g = el('div', 'actions-grid'); g.append(fb);
+    for (const t of GIFT_DECOR()) { const b = actionBtn(`A ${TYPES[t].name.toLowerCase()}`, `${decorCost(t)} gold`, '', () => sendGift(id, t)); if (S.gold + 1e-6 < decorCost(t)) b.disabled = true; g.append(b); }
+    wrap.append(g); openSheet(`A gift for ${frName(id)}`, wrap);
+  }
+  // ---- Trade: food for gold, at 0.5 to 2 gold a food (between the ferry's prices, so it beats the ferry for both) ----
+  const offerText = (o, theirs) => { const sells = theirs ? !!o.s : !!o.s; return theirs ? (sells ? `${o.f} food for ${o.g} gold` : `${o.g} gold for ${o.f} of your food`) : (sells ? `your ${o.f} food for ${o.g} gold` : `${o.g} gold for ${o.f} food`); };
+  function makeOffer(id, sell, f, price) {
+    const S = realState(), g = Math.round(f * price);
+    if (sell) { if ((S.food || 0) < f) { toast(`You have ${Math.floor(S.food || 0)} food.`); return; } S.food -= f; } else { if (S.gold + 1e-6 < g) { toast(`That takes ${g} gold.`); return; } S.gold -= g; }
+    frSend(id, 'offer', { f, g, s: sell ? 1 : 0 });
+    sfx.pop(); closeSheet(); toast(`Offer sent to ${frName(id)}: ${sell ? `${f} food for ${g} gold` : `${g} gold for ${f} food`}. What you offered waits safely until they answer (two days at most).`);
+  }
+  function offerBack(o, why) {
+    const B = frx(); o.done = true; B.ob = B.ob.filter((x) => x !== o);
+    if (o.s) state.food = (state.food || 0) + o.f; else state.gold += o.g;
+    B.refunded[o.i] = { s: o.s, f: o.f, g: o.g, at: Date.now() };
+    toast(`${why}: your trade with ${frName(o.to)} is off and ${o.s ? `your ${o.f} food is` : `your ${o.g} gold is`} back.`);
+  }
+  function acceptOffer(x) {
+    const B = frx(), d = docOf(x.from), still = d && Array.isArray(d.ob) && d.ob.some((m) => m.i === x.i);
+    B.inbox = B.inbox.filter((y) => y !== x);
+    if (!still || Date.now() - x.at > OFFER_MS - 600000) { toast('That offer has ended.'); save(); refreshFriends(); return; }
+    if (x.s) { if (state.gold + 1e-6 < x.g) { B.inbox.push(x); toast(`It takes ${x.g} gold.`); return; } if (foodOn() && (state.food || 0) + x.f > foodCap() + 0.5) { B.inbox.push(x); toast('Your food store has no room for it.'); return; } goldChange(-x.g, `Bought ${x.f} food from ${x.name}`, 'trade'); state.food = (state.food || 0) + x.f; }
+    else { if ((state.food || 0) < x.f) { B.inbox.push(x); toast(`It takes ${x.f} food.`); return; } state.food -= x.f; goldChange(x.g, `Sold ${x.f} food to ${x.name}`, 'trade'); }
+    frSend(x.from, 'acc', { r: x.i }); sfx.coin(); toast('Done! Trade made.'); refreshFriends(); renderHud();
+  }
+  function declineOffer(x) { const B = frx(); B.inbox = B.inbox.filter((y) => y !== x); frSend(x.from, 'dec', { r: x.i }); refreshFriends(); }
+  function openTrade(id) {
+    const wrap = el('div', 'list'), st = { sell: true, f: 25, p: 1 };
+    const draw = () => {
+      wrap.replaceChildren(el('p', 'small', `Trade food and gold with ${frName(id)}. A fair price is 0.5 to 2 gold a food (the ferry pays 0.5 and sells at 2), so it beats the ferry for you both.`));
+      const seg = (opts, cur, set) => { const g = el('div', 'pol-opts'); for (const [v, lab] of opts) { const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(cur === v)); b.append(el('b', '', lab)); b.addEventListener('click', () => { set(v); draw(); }); g.append(b); } return g; };
+      wrap.append(seg([[true, 'I sell food'], [false, 'I buy food']], st.sell, (v) => { st.sell = v; }));
+      wrap.append(el('span', 'label', 'How much food'), seg([[10, '10'], [25, '25'], [50, '50'], [100, '100']], st.f, (v) => { st.f = v; }));
+      wrap.append(el('span', 'label', 'Gold for each food'), seg([[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2']], st.p, (v) => { st.p = v; }));
+      const go = el('button', 'btn primary full', st.sell ? `Offer ${st.f} food for ${Math.round(st.f * st.p)} gold` : `Offer ${Math.round(st.f * st.p)} gold for ${st.f} food`);
+      go.addEventListener('click', () => makeOffer(id, st.sell, st.f, st.p)); wrap.append(go);
+    };
+    draw(); openSheet(`Trade with ${frName(id)}`, wrap);
+  }
+  // ---- Loans between friends: up to a quarter of the lender's treasury, at most 5% interest ----
+  const lendMax = (d) => Math.floor(((TYPES.townhall.cap[clamp((d && d.hall) | 0, 1, TYPES.townhall.cap.length - 1)] || 300) * 0.25) / 10) * 10;
+  function openLoanAsk(id) {
+    const d = docOf(id), max = lendMax(d), wrap = el('div', 'list'), st = { g: Math.max(10, Math.floor(max / 2 / 10) * 10), p: 2 };
+    if (loans().some((L) => L.friend === id) || frx().ob.some((m) => m.k === 'lreq' && m.to === id)) { toast(`You already have a loan with ${frName(id)}.`); return; }
+    const draw = () => {
+      wrap.replaceChildren(el('p', 'small', `Ask ${frName(id)} for a loan: up to ${max} gold (a quarter of their treasury) at 0 to 5% interest. You pay it back automatically, a little each hour while you play or focus. If you ever stop playing, the town bank pays ${frName(id)} back after ${BANK_DAYS} days, so a friendship never turns into a debt.`));
+      const seg = (opts, cur, set) => { const g = el('div', 'pol-opts'); for (const [v, lab] of opts) { const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(cur === v)); b.append(el('b', '', lab)); b.addEventListener('click', () => { set(v); draw(); }); g.append(b); } return g; };
+      const amts = [...new Set([0.25, 0.5, 1].map((k) => Math.max(10, Math.floor(max * k / 10) * 10)))];
+      wrap.append(el('span', 'label', 'How much'), seg(amts.map((a) => [a, `${a} gold`]), st.g, (v) => { st.g = v; }));
+      wrap.append(el('span', 'label', 'Interest you offer'), seg([0, 1, 2, 3, 5].map((p) => [p, `${p}%`]), st.p, (v) => { st.p = v; }));
+      const go = el('button', 'btn primary full', `Ask for ${st.g} gold`); go.addEventListener('click', () => { frSend(id, 'lreq', { g: st.g, p: st.p }); closeSheet(); toast(`Asked ${frName(id)}. The gold comes as soon as they say yes.`); }); wrap.append(go);
+    };
+    draw(); openSheet(`Borrow from ${frName(id)}`, wrap);
+  }
+  function lendTo(x) {
+    const B = frx(), max = Math.floor(treasuryCap() * 0.25);
+    if (x.g > max) { toast(`You can lend up to ${max} gold (a quarter of your treasury).`); return; }
+    if (state.gold + 1e-6 < x.g) { toast(`You have ${fmtGold(Math.max(0, state.gold))} gold.`); return; }
+    B.inbox = B.inbox.filter((y) => y !== x);
+    goldChange(-x.g, `Lent to ${x.name}`, 'loan');
+    B.lent.push({ ref: x.i, to: x.from, name: x.name, amount: x.g, due: Math.round(x.g * (1 + (x.p || 0) / 100)), got: 0, at: Date.now(), seen: Date.now() });
+    frSend(x.from, 'lgive', { r: x.i, g: x.g, p: clamp(x.p | 0, 0, 5) }); sfx.coin();
+    toast(`You lent ${x.name} ${x.g} gold. It comes back a little each hour they play or focus${x.p ? `, with ${x.p}% interest on the part they pay while playing` : ''}.`); refreshFriends();
+  }
+  function declineLoan(x) { const B = frx(); B.inbox = B.inbox.filter((y) => y !== x); frSend(x.from, 'ldec', { r: x.i }); refreshFriends(); }
+  // ---- A set time with a friend: "Tuesdays at 9:00 with Sara", a reminder 10 minutes before for both ----
+  const hm = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  const dateText = (x) => `${DAYS[x.d]}s at ${hm(x.h, x.m)}`;
+  function nextOcc(x, from) { const d = new Date(weekStart(from) + x.d * 86400000); d.setHours(x.h, x.m, 0, 0); let t = d.getTime(); if (t < from) { const d2 = new Date(t); d2.setDate(d2.getDate() + 7); t = d2.getTime(); } return t; }
+  function openSetTime(id) {
+    const wrap = el('div', 'list'), st = { d: (new Date().getDay() + 6) % 7, t: '09:00' };
+    const draw = () => {
+      wrap.replaceChildren(el('p', 'small', `Pick a weekly time to focus with ${frName(id)}. You both get a reminder 10 minutes before. If one of you can't come, the other still gets the session.`));
+      const g = el('div', 'pol-opts days'); DAYS.forEach((nm, i) => { const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(st.d === i)); b.append(el('b', '', nm.slice(0, 3))); b.addEventListener('click', () => { st.d = i; draw(); }); g.append(b); });
+      const ti = el('input'); ti.type = 'time'; ti.value = st.t; ti.setAttribute('aria-label', 'Time'); ti.addEventListener('change', () => { st.t = ti.value || '09:00'; });
+      const go = el('button', 'btn primary full', 'Save the time'); go.addEventListener('click', () => {
+        const [h, m] = String(st.t || '09:00').split(':').map((v) => v | 0), B = frx(), x = { id: msgId(), w: id, name: frName(id), d: st.d, h: clamp(h, 0, 23), m: clamp(m, 0, 59), added: Date.now() };
+        B.dates.push(x); B.dates = B.dates.slice(-10); save(); boardSoon(); closeSheet(); toast(`${dateText(x)} with ${x.name}. You both get a reminder 10 minutes before.`);
+      });
+      wrap.append(g, ti, go);
+    };
+    draw(); openSheet(`A set time with ${frName(id)}`, wrap);
+  }
+  // ---- Focus together: up to 4 friends in one session. If everyone finishes: +10% pay each and a Together chest. ----
+  function openTogether(pre) {
+    const ms = mutuals(); if (!ms.length) { toast('Add a friend first: you are friends once you have both added each other.'); return; }
+    const st = { sel: pre ? [pre] : ms.slice(0, 1), len: 25 }, wrap = el('div', 'list');
+    const draw = () => {
+      wrap.replaceChildren(el('p', 'small', `Invite up to ${TG_MAX} friends. You see each other's workers while you focus, and a tick when someone finishes a round. No chat or sound, only a wave between rounds. If everyone finishes, each of you gets +10% pay and a Together chest. If someone has to stop, the others just carry on.`));
+      const list = el('div', 'pol-opts');
+      for (const id of ms) { const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'checkbox'); b.setAttribute('aria-checked', String(st.sel.includes(id))); b.append(el('b', '', frName(id)), el('small', '', docOf(id).town || '')); b.addEventListener('click', () => { if (st.sel.includes(id)) st.sel = st.sel.filter((x) => x !== id); else if (st.sel.length < TG_MAX) st.sel.push(id); else toast(`Up to ${TG_MAX} friends.`); draw(); }); list.append(b); }
+      const lens = el('div', 'pol-opts'); for (const L of TG_LENS) { const b = el('button', 'pol-opt'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(st.len === L)); b.append(el('b', '', fmtMin(L))); b.addEventListener('click', () => { st.len = L; draw(); }); lens.append(b); }
+      const go = el('button', 'btn primary full', st.sel.length ? `Start together · ${fmtMin(st.len)}` : 'Pick a friend'); go.disabled = !st.sel.length || !!state.session;
+      go.addEventListener('click', () => startTogether(st.sel.slice(), st.len));
+      wrap.append(el('span', 'label', 'Who'), list, el('span', 'label', 'How long'), lens, go);
+    };
+    draw(); openSheet('Focus together', wrap);
+  }
+  function startTogether(ids, len) {
+    if (state.session) return;
+    const id = msgId();
+    state.together = { id, host: board.me, len, inv: ids.slice(0, TG_MAX), st: 'on', k: 0, at: Date.now() };
+    for (const f of state.together.inv) frSend(f, 'inv', { t: id, len });
+    closeSheet(); startSession(len, { together: id });
+    toast(`Invited ${state.together.inv.map(frName).join(', ')}. They join from their own phones.`);
+  }
+  function joinTogether(x) {
+    const B = frx(); B.inbox = B.inbox.filter((y) => y !== x);
+    if (state.session) { toast('Finish your session first.'); return; }
+    if (Date.now() - x.at > 20 * 60000) { toast('That invitation has ended.'); save(); return; }
+    state.together = { id: x.t, host: x.from, len: x.len, st: 'on', k: 0, at: Date.now() };
+    closeSheet(); startSession(x.len, { together: x.t });
+  }
+  const tgMembers = (T) => board.docs.filter((d) => d && d.id !== board.me && d.tg && d.tg.i === T.id);
+  function togetherEnd(s, done, r) {
+    const T = state.together; if (!T || T.id !== s.tg) return;
+    T.st = done ? 'done' : 'stop'; T.fin = Date.now(); T.pay = Math.max(0, (r.shiftPay || 0) + (r.coachGold || 0)); T.k = Math.max(T.k | 0, Math.floor(r.minutes / ROUND_FOCUS + 1e-9));
+    boardSoon(); togetherCheck(T.fin);
+  }
+  function togetherCheck(now) {
+    const T = state.together; if (!T || T.res || !T.fin) return;
+    const mem = tgMembers(T);
+    if (T.st === 'stop') { T.res = 'none'; save(); return; }
+    if (!mem.length) { if (now - T.fin > 30 * 60000) { T.res = 'solo'; save(); } return; }
+    const stopped = mem.find((d) => d.tg.st === 'stop');
+    if (stopped) { T.res = 'none'; save(); toast(`${frName(stopped)} had to stop early, so there's no Together bonus this time. Nobody loses anything.`); return; }
+    if (mem.every((d) => d.tg.st === 'done')) {
+      const bonus = Math.max(1, Math.round((T.pay || 0) * 0.1)), loot = chestLoot(2); applyLoot(loot);
+      goldChange(bonus, 'Focus together: +10% pay', 'gift'); T.res = 'bonus'; T.bonus = bonus;
+      ui.tgPrize = { loot, names: mem.map(frName), bonus, min: T.len }; save(); renderHud();
+      return;
+    }
+    if (now - T.fin > 12 * 3600000) { T.res = 'none'; save(); }
+  }
+  function togetherPopup() {
+    const P = ui.tgPrize; if (!P || state.session || ui.overlay || ui.visit || !$('scrim').hidden) return;
+    ui.tgPrize = null;
+    const wrap = el('div', 'list');
+    wrap.append(el('p', 'small', `You and ${P.names.join(', ')} all finished! +${P.bonus} gold (10% more pay) and a Together chest for each of you.`));
+    const go = el('button', 'btn primary full', 'Open the Together chest'); go.addEventListener('click', () => { closeSheet(); ui.lastResult = null; showChest({ minutes: P.min, chest: { rar: 2, loot: P.loot }, xp: null, solo: true, eye: 'Together chest' }); });
+    wrap.append(go); openSheet('Focused together', wrap); sfx.chime(); setTimeout(() => sfx.fanfare(), 250);
+  }
+  // The strip on the focus screen: your friends' workers, a tick for each finished round, and a wave between rounds.
+  function renderTogetherStrip(now) {
+    const box = $('focus-tg'), s = state.session, T = state.together;
+    if (!box) return;
+    if (!s || !s.tg || !T || T.id !== s.tg) { if (!box.hidden) { box.hidden = true; box.replaceChildren(); } return; }
+    const m = sessionMinutes(s, now), k = Math.floor(m / ROUND_FOCUS + 1e-9), mem = tgMembers(T);
+    if (k > (T.k | 0)) { T.k = k; boardSoon(); }
+    const hostDoc = T.host === board.me ? null : docOf(T.host), inv = T.host === board.me ? T.inv || [] : (hostDoc && hostDoc.tg && hostDoc.tg.inv) || [];
+    const ids = [...new Set([T.host].concat(inv))].filter((id) => id !== board.me);
+    const key = JSON.stringify([k, ids, mem.map((d) => [d.id, d.tg.st, d.tg.k, (d.tg.wv || 0) > now - 120000])]);
+    if (box.dataset.key === key && !box.hidden) return;
+    box.dataset.key = key; box.hidden = false; box.replaceChildren();
+    const row = el('div', 'tg-row');
+    const pal = (id) => { const d = mem.find((x) => x.id === id), st = d ? d.tg.st : 'inv', c = el('div', 'tg-pal ' + st + (d && (d.tg.wv || 0) > now - 120000 ? ' waving' : '')), img = el('img'); img.alt = ''; img.src = initialAvatar(frName(id), id);
+      c.append(img, el('b', '', frName(id)), el('small', '', st === 'done' ? 'done ✓' : st === 'stop' ? 'stopped' : st === 'inv' ? 'invited…' : `focusing${d.tg.k ? ' ' + '✓'.repeat(Math.min(6, d.tg.k)) : ''}`)); return c; };
+    for (const id of ids) row.append(pal(id));
+    box.append(el('div', 'tg-head', `Focusing together${k ? ` · ${'✓'.repeat(Math.min(6, k))}` : ''}`), row);
+    if (k >= 1 && m - k * ROUND_FOCUS < 2) { const wb = el('button', 'night-btn tg-wave', 'Wave 👋'); wb.addEventListener('click', () => { T.wv = Date.now(); boardSoon(); toast('You waved. 👋'); sfx.pop(); }); box.append(wb); }
+  }
+  // ---- The weekly Town Fair: you and your friends add up focus minutes toward one goal ----
+  function fairNow(now) {
+    const wk = weekKey(now), ms = mutuals().slice(0, 5);
+    const ppl = [{ id: board.me, name: 'You', min: myWeekMin(now) }].concat(ms.map((id) => { const d = docOf(id); return { id, name: frName(d), min: d && d.week === wk ? d.weekMin | 0 : 0 }; }));
+    const goal = Math.min(FAIR_MAX, FAIR_PER * ppl.length), total = ppl.reduce((a, p) => a + p.min, 0);
+    return { wk, ppl, goal, total, joined: ppl.filter((p) => p.min > 0).map((p) => p.name), n: ppl.length };
+  }
+  function fairCheck(now) {
+    if (!onBoard()) return; const F = fairNow(now), B = frx();
+    if (F.n < 2 || F.total < F.goal || B.fairGot === F.wk) return;
+    B.fairGot = F.wk;
+    if (!(boostNow(now) >= 15)) state.boost = { pts: 15, start: now, end: now + 24 * 3600000 };
+    state.tray.push({ id: state.nextId++, type: 'fairstall', origin: 'fair' });
+    save(); toast(`Town Fair! You and your friends focused ${fmtMin(F.total)} together this week. The fair is on in town for a day (everyone is happier), and a fair stall is waiting in Build → Decor.`); sfx.chime(); setTimeout(() => sfx.fanfare(), 250);
+  }
+  // ---- On every tick: reminders for set times, rounds of a together session ----
+  function friendsTick(now) {
+    if (!onBoard() || ui.visit) return;
+    const B = frx();
+    for (const x of B.dates) {
+      const T = nextOcc(x, now - 15 * 60000), left = T - now;
+      if (left > 0 && left <= 10 * 60000 && B.remind[x.id] !== T) { B.remind[x.id] = T; save(); toast(`In ${Math.ceil(left / 60000)} minutes: focus with ${x.name} (${hm(x.h, x.m)}).`); notify(`Focus with ${x.name} at ${hm(x.h, x.m)}`, 'In 10 minutes. Open Maplewick to start together.'); sfx.chime(); }
+    }
+    renderHome2();
+  }
+  const fastPoll = () => !!((state.session && state.session.tg) || (state.together && state.together.fin && !state.together.res) || (onBoard() && frx().dates.some((x) => { const t = nextOcc(x, Date.now() - 15 * 60000) - Date.now(); return t < 15 * 60000; })));
+  // The friend card on Home: an invitation, a set time that is due, or what is waiting in the inbox.
+  function renderHome2() {
+    const box = $('frbanner'); if (!box) return;
+    let show = null;
+    if (onBoard() && !ui.visit && !state.session && ui.screen === 'home') {
+      const B = frx(), now = Date.now(), inv = B.inbox.find((x) => x.k === 'inv' && now - x.at < 20 * 60000);
+      const due = B.dates.map((x) => ({ x, t: nextOcc(x, now - 15 * 60000) })).find((o) => o.t - now <= 10 * 60000);
+      const others = B.inbox.filter((x) => x.k !== 'inv').length;
+      if (inv) show = { key: 'inv' + inv.i, title: `${inv.name} invites you to focus`, sub: `${fmtMin(inv.len)} together · tap to join`, act: () => joinTogether(inv) };
+      else if (due) show = { key: 'dt' + due.x.id + due.t, title: `Focus with ${due.x.name} · ${hm(due.x.h, due.x.m)}`, sub: mutual(due.x.w) ? 'Your set time. Tap to start together.' : 'Your set time. Tap to start.', act: () => (mutual(due.x.w) ? startTogether([due.x.w], 25) : openStart()) };
+      else if (others) show = { key: 'in' + others, title: `${others} message${others > 1 ? 's' : ''} from friends`, sub: 'A trade or a loan to answer', act: () => { board.tab = board.tab || 'league'; openFriends(); } };
+    }
+    if (!show) { if (!box.hidden) { box.hidden = true; box.dataset.key = ''; } return; }
+    if (box.dataset.key === show.key && !box.hidden) return;
+    box.dataset.key = show.key; box.hidden = false; box.replaceChildren();
+    const ic = el('span', 'nb-ic'); ic.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m7 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6M2 19c0-3.3 2.9-6 6.5-6S15 15.7 15 19v1H2zm14.5-6c3 0 5.5 2.2 5.5 5v2h-5v-1c0-2.3-.9-4.4-2.4-5.8.6-.1 1.2-.2 1.9-.2"/></svg>';
+    const tx = el('span'); tx.append(el('b', '', show.title), el('small', '', show.sub));
+    const go = el('button', 'btn sm primary', 'Go'); go.addEventListener('click', show.act);
+    box.append(ic, tx, go); box.onclick = (e) => { if (e.target === box || e.target.closest('span')) show.act(); };
+  }
+  // ---- The friends part of the Friends sheet ----
+  function friendsSection(wrap) {
+    if (!onBoard()) return;
+    const B = frx(), now = Date.now(), sec = el('div', 'menu-sec frsec');
+    sec.append(el('h3', '', 'Friends'));
+    const ms = mutuals(), asked = board.docs.filter((d) => d && d.id !== board.me && Array.isArray(d.fr) && d.fr.includes(board.me) && !isFriend(d.id)), pend = B.friends.filter((id) => !mutual(id));
+    if (!ms.length && !asked.length && !pend.length) sec.append(el('p', 'small muted', 'Add friends from the list below (+ Friend). You are friends once you have both added each other. Then you can focus together, set a time, hold a Town Fair, leave gifts, trade and lend.'));
+    if (ms.length) { const chips = el('div', 'frchips'); for (const id of ms) { const b = el('button', 'frchip'); b.type = 'button'; const img = el('img'); img.alt = ''; img.src = initialAvatar(frName(id), id); b.append(img, el('span', '', frName(id))); b.addEventListener('click', () => openFriend(id)); chips.append(b); } sec.append(chips); }
+    for (const d of asked) { const r = el('div', 'frask'); r.append(el('span', 'small', `${frName(d)} (${d.town}) added you as a friend.`)); const ab = el('button', 'btn sm primary', 'Add back'); ab.addEventListener('click', () => addFriend(d.id)); r.append(ab); sec.append(r); }
+    if (pend.length) sec.append(el('p', 'tiny muted', `Waiting for ${pend.map(frName).join(', ')} to add you back.`));
+    // the inbox: invitations, trades, loan requests
+    for (const x of B.inbox.slice().reverse()) {
+      const r = el('div', 'frmsg'), acts = el('div', 'row');
+      if (x.k === 'inv') { if (now - x.at > 20 * 60000) continue; r.append(el('span', 'small', `${x.name} invites you to focus together for ${fmtMin(x.len)}.`)); const j = el('button', 'btn sm primary', 'Join'); j.addEventListener('click', () => joinTogether(x)); const n = el('button', 'btn sm', 'Not now'); n.addEventListener('click', () => { B.inbox = B.inbox.filter((y) => y !== x); save(); refreshFriends(); }); acts.append(n, j); }
+      else if (x.k === 'offer') { r.append(el('span', 'small', `${x.name} offers ${offerText(x, true)} (${(x.g / x.f).toFixed(1)} gold a food).`)); const a = el('button', 'btn sm primary', 'Accept'); a.addEventListener('click', () => acceptOffer(x)); const n = el('button', 'btn sm', 'No thanks'); n.addEventListener('click', () => declineOffer(x)); acts.append(n, a); }
+      else if (x.k === 'lreq') { r.append(el('span', 'small', `${x.name} asks to borrow ${x.g} gold at ${x.p | 0}% interest. If they stop playing, the town bank pays you back after ${BANK_DAYS} days.`)); const a = el('button', 'btn sm primary', `Lend ${x.g}`); a.addEventListener('click', () => lendTo(x)); const n = el('button', 'btn sm', 'Not now'); n.addEventListener('click', () => declineLoan(x)); acts.append(n, a); }
+      r.append(acts); sec.append(r);
+    }
+    for (const o of B.ob.filter((m) => m.k === 'offer' && !m.done)) { const r = el('div', 'frmsg mine'); r.append(el('span', 'small', `Your offer to ${frName(o.to)}: ${offerText(o, false)}. Waiting for an answer.`)); const c = el('button', 'btn sm', 'Take it back'); c.addEventListener('click', () => { offerBack(o, 'You took it back'); save(); boardSoon(); refreshFriends(); }); r.append(c); sec.append(r); }
+    for (const l of B.lent.filter((x) => !x.closed)) sec.append(el('p', 'tiny muted', `${l.name} owes you ${Math.max(0, Math.round(l.amount - (l.got || 0)))} of ${l.amount} gold.`));
+    if (ms.length) {
+      const row = el('div', 'row'); const tb = el('button', 'btn primary', 'Focus together'); tb.addEventListener('click', () => openTogether()); row.append(tb); sec.append(row);
+      if (B.dates.length) { const ul = el('div', 'frdates'); for (const x of B.dates) { const r = el('div', 'frask'); r.append(el('span', 'small', `${dateText(x)} with ${x.name}`)); const rm = el('button', 'link', 'Remove'); rm.addEventListener('click', () => { B.dates = B.dates.filter((y) => y !== x); B.datesNo[x.id] = Date.now(); save(); boardSoon(); refreshFriends(); }); r.append(rm); ul.append(r); } sec.append(ul); }
+      const F = fairNow(now), fair = el('div', 'fair'), bar = el('div', 'fairbar'), fill = el('span'); fill.style.width = Math.min(100, F.total / F.goal * 100) + '%'; bar.append(fill);
+      fair.append(el('b', '', B.fairGot === F.wk ? 'Town Fair: reached! 🎪' : `Town Fair: ${fmtMin(F.total)} of ${fmtMin(F.goal)} together`), bar, el('small', '', `${F.joined.length ? `Joined this week: ${F.joined.join(', ')}` : 'Nobody has focused yet this week'}. Reach it together and every town gets a fair for a day and a fair stall.`));
+      sec.append(fair);
+    }
+    wrap.append(sec);
+  }
+  function openFriend(id) {
+    const d = docOf(id); if (!d) return;
+    const wrap = el('div', 'list'), m = mutual(id);
+    wrap.append(el('p', 'small', `${d.town} · level ${d.level | 0} · ${d.residents | 0} people · ${d.streak | 0}-day streak${m ? '' : isFriend(id) ? ' · waiting for them to add you back' : ''}`));
+    const g = el('div', 'actions-grid');
+    g.append(actionBtn('Visit their town', null, '', () => { closeSheet(); visitTown(d, frName(d), id); }));
+    if (m) {
+      g.append(actionBtn('Focus together', 'up to 4 friends', '', () => openTogether(id)));
+      g.append(actionBtn('Set a time', 'every week', '', () => openSetTime(id)));
+      const gb = actionBtn('Leave a gift', gaveToday(id) ? 'tomorrow again' : 'once a day', '', () => openGift(id)); gb.disabled = gaveToday(id); g.append(gb);
+      g.append(actionBtn('Trade food', '0.5 to 2 gold a food', '', () => openTrade(id)));
+      g.append(actionBtn('Ask for a loan', `up to ${lendMax(d)} gold`, '', () => openLoanAsk(id)));
+    } else if (!isFriend(id)) g.append(actionBtn('+ Friend', null, '', () => { addFriend(id); openFriend(id); }));
+    wrap.append(g);
+    if (isFriend(id)) { const rm = el('button', 'link', 'Remove from friends'); rm.addEventListener('click', () => { removeFriend(id); closeSheet(); }); wrap.append(rm); }
+    openSheet(frName(d), wrap);
+  }
   async function renderBoardList(listEl) {
     const rows = boardRows(), ids = rows.filter((r) => r.live).map((r) => r.id);
     let ps = {};
@@ -10983,6 +11402,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       row.append(el('span', 'rk', String(i + 1)), img, nm, sc);
       const acts = el('div', 'lbacts');
       if (!me) { const vb = el('button', 'btn sm', 'Visit town'); vb.addEventListener('click', () => visitTown(r.d, r.live ? (ps[r.id] && ps[r.id].name) || '' : r.bot ? r.mayor : '', r.live ? r.id : null)); acts.append(vb); }
+      if (r.live && !me && onBoard()) { const fb = el('button', 'btn sm', mutual(r.id) ? 'Friend ✓' : isFriend(r.id) ? 'Asked' : '+ Friend'); fb.addEventListener('click', () => (isFriend(r.id) ? openFriend(r.id) : addFriend(r.id))); acts.append(fb); } // 11.10
       if (r.live && !me && realState().board.joined) { const cb = el('button', 'btn sm goldc', cheeredToday(r.id) ? 'Cheered ✓' : 'Cheer'); cb.disabled = cheeredToday(r.id); cb.addEventListener('click', () => { cheer(r.id); renderBoardList(listEl); }); acts.append(cb); }
       if (!r.live && !r.bot) { const rm = el('button', 'btn sm ghost', 'Remove'); rm.addEventListener('click', () => { state.friends = state.friends.filter((f) => f.key !== r.key); save(); renderBoardList(listEl); }); acts.append(rm); }
       if (acts.childNodes.length) row.append(acts);
@@ -11040,6 +11460,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else { const jb = el('button', 'btn primary', 'Join the leaderboard'); jb.addEventListener('click', async () => { state.board.joined = true; save(); board.last = ''; await boardPush(); openFriends(); }); j.append(jb); }
       wrap.append(j);
     }
+    friendsSection(wrap); // 11.10
     const tabs = el('div', 'tabs');
     for (const [k, lab] of [['league', 'League'], ['week', 'This week'], ['day', 'Today'], ['all', 'All time']]) { const tb = el('button', '', lab); tb.setAttribute('aria-selected', String(board.tab === k)); tb.addEventListener('click', () => { board.tab = k; openFriends(); }); tabs.append(tb); }
     const listEl = el('div', 'lb');
@@ -11068,12 +11489,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     openSheet('Friends', wrap);
     $('sheet').dataset.kind = 'friends';
     if (board.tab === 'league') renderLeague(listEl); else renderBoardList(listEl);
-    if (live && !board.unsub) {
-      board.unsub = board.db.collection('board').onSnapshot((snap) => {
-        board.docs = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); board.loaded = true; checkCheers();
-        if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends') { const l = $('sheet-body').querySelector('.lb'); if (l) { if (board.tab === 'league') renderLeague(l); else renderBoardList(l); } }
-      }, () => { board.unsub = null; });
-    }
+    if (live) boardWatch();
+  }
+  // 11.10: keep the board fresh in the background (every 5 minutes; every 20 s while Friends is open or friends focus
+  // together), and read friends' messages each time.
+  function boardWatch() {
+    if (!board.db || board.unsub) return;
+    board.unsub = board.db.collection('board').onSnapshot((snap) => {
+      board.docs = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); board.loaded = true; checkCheers(); friendsInbox();
+      if (!$('scrim').hidden && $('sheet').dataset.kind === 'friends' && !$('sheet-body').querySelector('input:focus')) { const l = $('sheet-body').querySelector('.lb'); if (l) { if (board.tab === 'league') renderLeague(l); else renderBoardList(l); } }
+    }, () => { board.unsub = null; });
   }
   // Moving your town between the home-screen app and Claude: one code holds your whole save.
   function openMoveTown() {
@@ -11584,7 +12009,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     return Math.round(BANK_LIMIT[L] * (1 + 0.1 * Math.min(5, state.stats.loansRepaid || 0)) / 50) * 50;
   }
   const principalLeft = (L) => Math.max(0, L.owed * L.amount / (L.total || L.owed || 1));
-  const loanRoom = () => Math.max(0, Math.floor((loanLimit() - loans().reduce((a, L) => a + principalLeft(L), 0)) / 10) * 10);
+  const loanRoom = () => Math.max(0, Math.floor((loanLimit() - loans().filter((L) => !L.friend).reduce((a, L) => a + principalLeft(L), 0)) / 10) * 10);
   function loanOffers() {
     const room = loanRoom(); if (room < 20) return [];
     return [...new Set([0.25, 0.5, 1].map((k) => Math.max(20, Math.floor(room * k / 10) * 10)))].filter((x) => x <= room).map((amount) => ({ amount }));
@@ -11620,6 +12045,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
   function loanDone(L, forgiven) {
     state.loans = loans().filter((x) => x !== L);
+    if (L.friend && L.ref) { frx().lpDone[L.ref] = [Math.round(L.amount - Math.max(0, L.owed) + (L.interest || 0)), 1, Date.now()]; boardSoon(); } // 11.10: tell the friend
     (state.loansDone || (state.loansDone = [])).push({ lender: L.lender, amount: L.amount, total: L.total, at: L.at, done: Date.now(), forgiven: !!forgiven, sig: null });
     if (state.loansDone.length > 20) state.loansDone.shift();
     if (!forgiven) state.stats.loansRepaid = (state.stats.loansRepaid || 0) + 1;
@@ -13333,6 +13759,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // 10.12
     menuSec(wrap, 'Rounds for big projects', el('p', '', 'A focus project over 30 minutes takes whole rounds of 30 minutes: 25 minutes of focus, then a 5-minute break. On the start sheet you can drag the lap switch to split it into shorter laps (15 minutes: 12½ + 2½) or longer ones (45 minutes, an hour…), as long as they add up. When a lap ends the bell rings and the clock keeps going: stop safely and take your break (every minute you focused counts), or skip the break and keep going. Progress is saved after every lap and every 30 minutes, so a big project can be spread over days. Projects of 30 minutes or less are done in one session: end early and they are torn down.'));
     menuSec(wrap, 'The golden shield', el('p', '', `Every finished focus puts a golden shield over your town for a fifth of the time you focused (25 minutes gives ${fmtMin(25 * SHIELD_K)}). Under it no new trouble starts (fires, break-ins, sickness, storms, roadworks, trash and weeds piling up), and trouble already going on stands still. Your firefighters, police and nurses keep working, so trouble can still end.`));
+    menuSec(wrap, 'Focusing with friends', el('p', '', `Add each other as friends (Friends › + Friend). Then you can focus together (up to ${TG_MAX} friends see each other's workers; if everyone finishes, each gets +10% pay and a Together chest, and if someone stops the others just carry on), set a weekly time with a reminder 10 minutes before, reach a Town Fair together (a fair for a day and a fair stall), leave a gift once a day, trade food at 0.5 to 2 gold a food, and lend up to a quarter of your treasury at 5% at most. If a borrower stops playing, the town bank pays the lender back after ${BANK_DAYS} days. A friend can help you, but can never cost you anything.`)); // 11.10
     menuSec(wrap, 'Leagues', el('p', '', `Every week you race 29 other towns in your league (Friends › League): players in the same league on the online board, and robot towns that fill the gaps. Points are focus minutes only, nothing you can buy. When the week ends, the top ${LG_UP} move up a league and the bottom ${LG_DOWN} move down, from Bronze to Diamond. The top 3 win a trophy for their town in the league's colour and a royal chest. A week you don't focus in doesn't count, and nobody ever loses their town.`)); // 11.08
     const tourBtn = el('button', 'btn full', 'Replay the quick tour'); tourBtn.addEventListener('click', () => { closeSheet(); if (ui.screen === 'play') leavePlay(false, true); setTimeout(() => startTour(true), 250); });
     menuSec(wrap, 'Quick tour', el('p', '', 'A one-minute walk through Home, your town and focusing.'), tourBtn);
@@ -13498,6 +13925,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     $('focus').classList.toggle('ready', rd);
     $('focus-end').textContent = rd ? 'Cancel · free' : 'End session';
     const L = s.laps ? lapInfo(s, now) : null;
+    renderTogetherStrip(now); // 11.10
     $('focus').classList.toggle('laps', !!L); $('focus').classList.toggle('lapwin', !!L && L.win && !rd);
     if (L) renderLapDots(L, rd); else $('focus-laps').hidden = true;
     if (rd) {
@@ -14327,6 +14755,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   $('mus-skip').addEventListener('click', musicSkip);
   $('visit-home').addEventListener('click', endVisit);
   $('visit-cheer').addEventListener('click', () => { if (ui.visit && ui.visit.id) cheer(ui.visit.id); });
+  $('visit-gift').addEventListener('click', () => { if (ui.visit && ui.visit.id) openGift(ui.visit.id); }); // 11.10
   $('season-card').addEventListener('click', openSeason);
   $('al-start').addEventListener('click', () => {
     if (ALARM.lap) { closeAlarm(); if (state.session) return; hideResult(); if (ui.recharge) closeRecharge(); startLaps(); return; } // 10.12: the next lap
@@ -14607,6 +15036,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     leagueSet: (o) => { Object.assign(league(), o); save(); return JSON.parse(JSON.stringify(state.league)); },
     leagueStep: () => { leagueStep(Date.now()); return JSON.parse(JSON.stringify(state.league)); },
     leaguePopup: () => leaguePopup(),
+    friends: () => { const B = frx(); return { me: board.me, kind: board.kind, joined: state.board.joined, friends: B.friends.slice(), mutual: mutuals(), inbox: B.inbox.map((x) => ({ k: x.k, from: x.from, g: x.g, f: x.f, s: x.s, len: x.len })), ob: B.ob.map((m) => ({ k: m.k, to: m.to, f: m.f, g: m.g, done: !!m.done })), lent: JSON.parse(JSON.stringify(B.lent)), dates: B.dates.map((x) => [x.w, x.d, x.h, x.m]), loans: loans().map((L) => ({ friend: L.friend || null, owed: L.owed, amount: L.amount })), tg: state.together ? JSON.parse(JSON.stringify(state.together)) : null, fair: fairNow(Date.now()), food: state.food, gold: state.gold, gave: B.gave }; }, // 11.10
+    frPoll: async () => { if (!board.db) return 0; const snap = await board.db.collection('board').get(); board.docs = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); board.loaded = true; friendsInbox(); return board.docs.length; },
+    frPush: async () => { board.last = ''; clearTimeout(board.timer); await boardPush(); return board.last.length; },
+    frCall: (fn, ...a) => ({ addFriend, openFriend, openTogether, startTogether, joinTogether: (i) => joinTogether(frx().inbox[i]), acceptOffer: (i) => acceptOffer(frx().inbox[i]), declineOffer: (i) => declineOffer(frx().inbox[i]), lendTo: (i) => lendTo(frx().inbox[i]), sendGift, makeOffer, openTrade, openLoanAsk, openSetTime, openGift, ask: (id, g, p) => frSend(id, 'lreq', { g, p }), age: (days) => { for (const l of frx().lent) { l.at -= days * 86400000; l.seen -= days * 86400000; } save(); return frx().lent.length; }, weekMin: (n) => { state.week = { key: weekKey(Date.now()), min: n }; save(); return n; }, prize: () => { const P = ui.tgPrize; togetherPopup(); return !!P; }, setTime: (id, d, h, m) => { const x = { id: msgId(), w: id, name: frName(id), d, h, m, added: Date.now() }; frx().dates.push(x); save(); boardSoon(); return x.id; } })[fn](...a),
     boardDocs: (docs) => { board.docs = docs; board.loaded = true; return board.docs.length; },
     lgRobots: (t, n) => Array.from({ length: n || 29 }, (_, j) => lgRobot('2026-W1', t, 0, j).M).sort((a, b) => b - a),
     lockState: () => ({ ps: navigator.mediaSession ? navigator.mediaSession.playbackState : null, els: (LOCK.els || []).map((x) => ({ paused: x.paused, src: x.src.slice(-40), t: Math.round(x.currentTime * 10) / 10, muted: x.muted })), track: state.track | 0, kind: navigator.audioSession ? navigator.audioSession.type : null }),
