@@ -6,6 +6,8 @@ import json, time, os, pathlib
 from playwright.sync_api import sync_playwright
 HERE = pathlib.Path(__file__).resolve().parent
 URL = os.environ.get('MAPLEWICK_URL', (HERE.parent.parent / 'app' / 'maplewick.html').as_uri())
+import re
+APP_V = re.search(r"APP_VERSION = '([0-9.]+)'", (HERE.parent.parent / 'app' / 'maplewick.html').read_text()).group(1)
 def D(pg, e): return pg.evaluate(f"() => window.MaplewickDebug.{e}")
 fails, errs = [], []
 def check(ok, what):
@@ -42,7 +44,7 @@ with sync_playwright() as p:
 
     # 1. the hello, and the start message
     pg = fresh()
-    check(any(m.get('version') == '12.06' for m in posts(pg, 'hello')), 'the game says hello to the app with its version')
+    check(any(m.get('version') == APP_V for m in posts(pg, 'hello')), 'the game says hello to the app with its version')
     start(pg)
     s = D(pg, 'state()')['session']
     f = posts(pg, 'focus')

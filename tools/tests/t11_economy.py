@@ -18,10 +18,10 @@ with sync_playwright() as p:
     pg.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('maplewick-town-v7', " + json.dumps(json.dumps(st)) + "); sessionStorage.setItem('seeded','1'); }")
     pg.goto(URL); pg.wait_for_timeout(900); D(pg, 'play()')
     hall = [x for x in D(pg, 'state()')['buildings'] if x['type'] == 'townhall'][0]['id']
-    u = D(pg, f'upgradeJob({hall})'); ok(u['cost'] == 9000, f"town hall 5 costs 9,000 ({u['cost']})")
+    u = D(pg, f'upgradeJob({hall})'); ok(u['cost'] == 12000, f"town hall 5 costs 12,000 (12.07) ({u['cost']})")
     for t in ['restaurant', 'library', 'cinema', 'townsquare']:
         ok(D(pg, f"addBuilding('{t}', 1)") is not None, f'a {t} fits')
-    D(pg, 'setHall(5)'); D(pg, 'setGold(11500)')
+    D(pg, 'setHall(5)'); D(pg, 'setGold(31000)')  # 12.07: the treasury at hall 5 holds 32,000
     i = D(pg, 'infl()'); ok(i['rate'] > 0, f"a nearly full treasury raises prices ({i['rate']*100:.2f}% a day)")
     k = D(pg, 'inflDays(7)'); ok(k > 1.02, f'after a week prices are up {round((k-1)*100,1)}%')
     i2 = D(pg, 'infl()'); ok(i2['fee'] > i['fee'], f"hiring costs more ({i['fee']} → {i2['fee']})")

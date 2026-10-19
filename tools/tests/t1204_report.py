@@ -9,6 +9,8 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
 srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Quiet, directory=str(ROOT)))
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{srv.server_address[1]}/app/maplewick.html'
+import re
+APP_V = re.search(r"APP_VERSION = '([0-9.]+)'", (ROOT / 'app' / 'maplewick.html').read_text()).group(1)
 def D(pg, e): return pg.evaluate(f"() => window.MaplewickDebug.{e}")
 fails, errs = [], []
 def check(ok, what):
@@ -37,7 +39,7 @@ with sync_playwright() as p:
     check(len(sent) == 1, 'Send posts the report to the server')
     d = sent[0]['data'] if sent else {}
     print('   keys:', sorted(d.keys()))
-    check(d.get('note') == 'The town froze after I came back.' and d.get('ver') == '12.06' and d.get('app') == '1.0.0', 'with the note, the game and app versions')
+    check(d.get('note') == 'The town froze after I came back.' and d.get('ver') == APP_V and d.get('app') == '1.0.0', 'with the note, the game and app versions')
     check(any('test error for the report' in e['msg'] for e in d.get('errors', [])), 'and recent errors')
     check(isinstance(d.get('state'), dict) and 'screen' in d['state'] and len(d.get('atPoints', [])) == 5, 'and what was on screen')
     check((d.get('shot') or '').startswith('data:image/jpeg;base64,'), 'and a picture of the town')

@@ -26,7 +26,7 @@ with sync_playwright() as p:
     u = D(pg, f"upgradeJob({cid})"); ok(u['cost'] == 75, f"cottage to level 2 costs 75 ({u['cost']})")
     hall = [x for x in D(pg, 'state()')['buildings'] if x['type'] == 'townhall'][0]
     u = D(pg, f"upgradeJob({hall['id']})"); ok(not u['ok'], 'town hall 4 needs 110 people')
-    e = D(pg, 'econ()'); ok(e['cap'] == 3500, f"treasury at hall 3 is 3,500 ({e['cap']})"); ok(e['fee']['sweeper'] == 80, f"sweeper fee 80 ({e['fee']['sweeper']})")
+    e = D(pg, 'econ()'); ok(e["cap"] == 4000, f"treasury at hall 3 is 4,000 ({e['cap']})"); ok(e['fee']['sweeper'] == 80, f"sweeper fee 80 ({e['fee']['sweeper']})")
     print('focusNet vs taxes:', round(e['focusNet'], 1), round(e['taxes'], 1), round(e['wages'], 1))
     ok(abs(e['focusNet'] - (e['taxes'] * 1.25 - e['wages'])) < 0.01, 'focus taxes ×1.25')
     j = D(pg, 'jobs()'); print('jobs', j[:3])

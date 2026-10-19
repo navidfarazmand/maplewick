@@ -1804,7 +1804,7 @@
   }
   rebalance(Object.keys(TYPES));
   TYPES.townhall.up = [null, null, [200, 15], [900, 60], [3000, 240]];
-  TYPES.townhall.cap = [0, 300, 1200, 3500, 14000]; // 12.07: room for the 12,000 gold town hall 5 (was 6,500)
+  TYPES.townhall.cap = [0, 300, 1200, 4000, 14000]; // 12.07: town hall 3 holds 4,000 (was 3,500), so the 3,000 upgrade and the feast's food fit // 12.07: room for the 12,000 gold town hall 5 (was 6,500)
   TYPES.townhouse.residents = [0, 12, 16, 22]; // 11.00: a House gives more per tile than a cottage
   // 11.01: the Monument, a free gift for your first finished named project (gold can't buy it)
   TYPES.monument = { name: 'Monument', cat: 'joy', size: 1, gift: true, max: 1, color: '#D8D2C4', roof: '#9C9486', radius: 2, boost: [0, 0.05], blurb: 'A stone for every project you finish. Homes within 2 tiles pay 5% more.' };
@@ -4652,7 +4652,7 @@
   }
   function checkJob(kind, b) {
     if (state.session) return { ok: false, why: 'A session is running.' };
-    const t = T(b); let cost, work;
+    const t = T(b); let cost, work, ferry = 0;
     let secs = null;
     if (kind === 'repair') { cost = b.burnt ? burnRepairCost(b) : t.repair; work = 1; secs = b.burnt ? Math.round(burnRepairSecs(b) * crewK()) : null; }
     else {
@@ -4663,13 +4663,14 @@
       if (jobMode('upgrade', b.type) === 'play') secs = upgradeSecs(b.type, L);
       if (b.type !== 'townhall' && L > hallLevel()) return { ok: false, why: `Upgrade the town hall to level ${L} first.`, cost, work };
       if (b.type === 'townhall' && city().residents < (HALL_RES[L] || 0)) return { ok: false, why: `The town needs ${HALL_RES[L]} residents first (it has ${city().residents}).`, cost, work, people: true };
-      if (b.type === 'townhall' && FEASTS[L] && foodOn() && (state.food || 0) < FEASTS[L]) return { ok: false, why: `A town this big needs a feast first: ${FEASTS[L]} food in store (you have ${Math.floor(state.food || 0)}). Build fields and a granary.`, cost, work, food: true };
+      if (b.type === 'townhall' && FEASTS[L] && foodOn() && (state.food || 0) < FEASTS[L]) { // 12.07: the food you are short of is bought from the ferry, as part of the price
+        const short = Math.ceil(FEASTS[L] - (state.food || 0)); cost += short * foodBuy(); ferry = short; }
       if (GROW[b.type] && !growSpot(b, L)) { const [w, d] = dimsOf(b.type, 0, L); return { ok: false, noRoom: true, why: `The ${tierName(b.type, L)} needs ${w}×${d} tiles, and there is no free tile next to the ${nameOf(b).toLowerCase()} to grow into. Move it to a spot with room, or clear a neighbour.`, cost, work }; }
     }
     if (jobMode(kind, b.type) === 'focus') work = projWork(work); // 10.13: over 30 minutes, whole rounds of 30 (25 + 5)
     if (queueFull(jobMode(kind, b.type))) return { ok: false, why: fullWhy(jobMode(kind, b.type)), cost, work, secs };
-    if (state.gold + 1e-6 < cost) return { ok: false, why: `Needs ${fmtGold(cost - state.gold + 0.999)} more gold.`, cost, work, secs, gold: true };
-    return { ok: true, cost, work, secs };
+    if (state.gold + 1e-6 < cost) return { ok: false, why: `Needs ${fmtGold(cost - state.gold + 0.999)} more gold${ferry ? ` (with ${ferry} food for the feast from the ferry)` : ''}.`, cost, work, secs, gold: true, ferry };
+    return { ok: true, cost, work, secs, ferry };
   }
   function planJob(kind, bid, quiet) {
     const b = byId(bid); if (!b) return null;
@@ -4678,7 +4679,7 @@
     if (!chk.ok) { if (!quiet) toast(chk.why); return null; }
     accrue(Date.now());
     goldChange(-chk.cost, `${kind === 'repair' ? 'Repair' : 'Upgrade'}: ${nameOf(b).toLowerCase()}${kind === 'upgrade' ? ` to level ${b.level + 1}` : ''}`, 'buy');
-    if (kind === 'upgrade' && b.type === 'townhall' && FEASTS[b.level + 1] && foodOn()) { const fe = FEASTS[b.level + 1]; state.food = Math.max(0, (state.food || 0) - fe); touch(); toast(`The town held a feast for the new town hall: ${fe} food.`); }
+    if (kind === 'upgrade' && b.type === 'townhall' && FEASTS[b.level + 1] && foodOn()) { const fe = FEASTS[b.level + 1]; state.food = Math.max(0, (state.food || 0) - fe); touch(); toast(`The town held a feast for the new town hall: ${fe} food${chk.ferry ? `, ${chk.ferry} of it from the ferry` : ''}.`); }
     const q = { id: state.nextId++, kind, type: b.type, bid, fromLevel: b.level, toLevel: kind === 'upgrade' ? b.level + 1 : b.level, work: chk.work, done: 0, paid: chk.cost, mode: jobMode(kind, b.type) };
     if (chk.secs) q.secs = chk.secs;
     state.queue.push(q);
@@ -15908,8 +15909,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const put = (type, at) => { const b = { id: state.nextId++, type, c: at.c, r: at.r, level: 1, origin: 'built' }; if (FOOT[type]) { b.rot = at.ro || 0; b.fp8 = true; } if (T(b).cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); return b; };
       const pay = (g, what) => { goldChange(-g, what, 'buy'); log.push(what); };
       // the town hall first, when the town is ready for it
-      { let ch = checkJob('upgrade', hall);
-        if (ch.food && !ch.people) { const need = Math.ceil(FEASTS[hall.level + 1] - (state.food || 0)), price = need * foodBuy(); if (need > 0 && state.gold - ch.cost - price >= 0 && (state.food || 0) + need <= foodCap()) { pay(price, `ferry food ${need}`); state.food = (state.food || 0) + need; ch = checkJob('upgrade', hall); } }
+      { const ch = checkJob('upgrade', hall); // the feast's missing food comes from the ferry, in the price (12.07)
         if (ch.cost != null && !ch.people && !ch.food && !ch.max && state.gold - ch.cost >= 0 && hall.level < T(hall).max) { if (FEASTS[hall.level + 1] && foodOn()) state.food -= FEASTS[hall.level + 1]; pay(ch.cost, `town hall ${hall.level + 1}`); hall.level += 1; touch(); } }
       // staff the town needs (and their building)
       for (const k of STAFF_ORDER) { const ro = roleInfo(k, city()); if (!ro.needed || ro.working >= ro.need) continue;

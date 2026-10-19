@@ -34,6 +34,7 @@ with sync_playwright() as p:
     pg.wait_for_timeout(2500)
     pg.screenshot(path=SH+'s15_start.png')
     (pg.click('.set-tog.card') if pg.is_visible('.set-tog.card') else None); pg.wait_for_timeout(300)
+    if pg.query_selector('.jobline') and not pg.query_selector('.jobs'): pg.click('.jobline'); pg.wait_for_timeout(300)  # 12.07: the job row folds into one line
     jr=pg.query_selector('.jobs'); jr.evaluate("e => e.scrollLeft = 9999"); pg.wait_for_timeout(200)
     sl=jr.evaluate("e => e.scrollLeft"); btns=pg.query_selector_all('.jobs .jobchip'); btns[-1].click(); pg.wait_for_timeout(300)
     print('scroll before', sl, 'after', pg.query_selector('.jobs').evaluate("e => e.scrollLeft"))
