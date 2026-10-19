@@ -1804,7 +1804,7 @@
   }
   rebalance(Object.keys(TYPES));
   TYPES.townhall.up = [null, null, [200, 15], [900, 60], [3000, 240]];
-  TYPES.townhall.cap = [0, 300, 1200, 3500, 10000]; // 12.07: room for the 9,000 gold town hall 5 (was 6,500)
+  TYPES.townhall.cap = [0, 300, 1200, 3500, 14000]; // 12.07: room for the 12,000 gold town hall 5 (was 6,500)
   TYPES.townhouse.residents = [0, 12, 16, 22]; // 11.00: a House gives more per tile than a cottage
   // 11.01: the Monument, a free gift for your first finished named project (gold can't buy it)
   TYPES.monument = { name: 'Monument', cat: 'joy', size: 1, gift: true, max: 1, color: '#D8D2C4', roof: '#9C9486', radius: 2, boost: [0, 0.05], blurb: 'A stone for every project you finish. Homes within 2 tiles pay 5% more.' };
@@ -1863,7 +1863,7 @@
       blurb: 'Treadmills and classes: homes within 3 tiles fall sick 10% less and are 2% happier. With a stadium in town it earns 10% more.' }
   });
   // 11.04 (roadmap parts 1 and 4, Navid): town halls 5 and 6, and the buildings that come with town hall 4 and 5.
-  TYPES.townhall.max = 6; TYPES.townhall.up.push([9000, 480], [20000, 720]); TYPES.townhall.cap.push(24000, 40000); // 12.07: was 12,000 and 25,000, less than the next upgrade costs
+  TYPES.townhall.max = 6; TYPES.townhall.up.push([12000, 480], [30000, 720]); TYPES.townhall.cap.push(32000, 50000); // 12.07: town halls 5 and 6 cost 12,000 and 30,000 (were 9,000 and 20,000), and each treasury holds the next upgrade (were 12,000 and 25,000)
   const FEASTS = { 4: 300, 5: 500, 6: 800 };
   Object.assign(TYPES, {
     greenhouse: { name: 'Greenhouse', cat: 'farm', size: 2, unlock: 5, cost: 900, work: 30, max: 3, color: '#D6EEF0', roof: '#7FB8C2', limit: [0, 0, 0, 0, 0, 2, 3], grow: [0, 8, 12, 16],
@@ -6018,7 +6018,7 @@
     const sk = curSeasonKey(); if (state.season.key !== sk) state.season = { key: sk, min: 0, got: [] }; state.season.min += mAll;
     const sz = SEASONS[curSeason()];
     if (state.season.min >= SEASON_GOAL[0] && !state.season.got.includes(0)) { state.season.got.push(0); state.tray.push({ id: state.nextId++, type: sz.item, origin: 'season' }); r.seasonItem = sz.item; }
-    if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { const prize = festPrize(100); state.season.got.push(1); state.gold += prize; state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize${prize > 100 ? ` (+${prize - 100} from your town)` : ''}`, n: prize }); r.seasonPrize = true; }
+    if (state.season.min >= SEASON_GOAL[1] && !state.season.got.includes(1)) { const prize = festPrize(100); state.season.got.push(1); earn(prize); state.streak.freezes = Math.min(3, state.streak.freezes + 1); r.gold.push({ ic: 'gift', label: `${sz.fest}: grand prize${prize > 100 ? ` (+${prize - 100} from your town)` : ''}`, n: prize }); r.seasonPrize = true; }
     state.lastTaxAt = now;
     state.session = null; appFocus(null); srvFocus('end', s, mAll); // 11.11, 12.00
     if (s.tg) togetherEnd(s, done, r); // 11.10
@@ -6033,7 +6033,7 @@
     // The combo multiplies everything this session earned: gold and XP.
     const goldBase = r.gold.reduce((a, g) => a + Math.max(0, g.n), 0), xpBase = r.xpParts.reduce((a, x) => a + x.n, 0);
     r.goldBase = goldBase; r.xpBase = xpBase;
-    if (mult > 1) { r.comboGold = Math.round(goldBase * (mult - 1)); r.comboXp = Math.round(xpBase * (mult - 1)); state.gold += r.comboGold; }
+    if (mult > 1) { r.comboGold = Math.round(goldBase * (mult - 1)); r.comboXp = Math.round(xpBase * (mult - 1)); r.comboGold = Math.round(earn(r.comboGold, r)); }
     const xpFrom = { level: state.level, xp: state.xp };
     const xpGain = xpBase + (r.comboXp || 0);
     r.xp = { gained: xpGain, from: xpFrom, ups: addXp(xpGain) };
