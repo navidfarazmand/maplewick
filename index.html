@@ -1075,7 +1075,9 @@
   .uprow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .uprow:last-of-type { border-bottom: 0; }
   .uprow b { font-size: 15px; } .uprow small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.3; } .uprow .fee { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 700; color: var(--gold); }
-  .uprow.off { opacity: .6; } .uprow .stepper { display: flex; align-items: center; gap: 6px; }
+  .uprow.off { opacity: .6; } .uprow .up-go { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .uprow .up-go .btn { min-width: 64px; } .uprow > canvas, .uprow > .icon, .uprow > :first-child { width: 40px !important; height: 36px !important; max-width: 40px; }
+  .uprow > div:nth-child(2) { min-width: 0; }
   .uprow .up-on { font-size: 12.5px; font-weight: 800; color: var(--good, #2B7548); }
   .jobline { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 12px; padding: 11px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 500 14.5px/1.35 var(--body); text-align: left; cursor: pointer; }
   .jobline.open { margin-bottom: 8px; }
@@ -1593,7 +1595,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.07'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.08'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -3261,42 +3263,78 @@
      safer: see litHome. ---------- */
   const LAMP_LIGHT = 2; // tiles a lamp post lights
   const NL = {
-    on: false, wins: [], lamps: [], pools: [], cur: null,
+    // 12.08 (Navid): lights were drawn after everything, so a window behind a cottage shone through it. Now every light
+    // and every building's outline is noted in drawing order (back to front); drawNightLights replays them on a layer
+    // of its own, where each building first blots out the light behind it, then adds its own.
+    on: false, seq: [], cur: null,
+    tx(c) { const m = c.getTransform(); return (X, Y) => [m.a * X + m.c * Y + m.e, m.b * X + m.d * Y + m.f]; },
     win(c, q) {
-      const b = this.cur, home = !!(b && TYPES[b.type] && T(b).cat === 'home'), lit = home && hasLights(b);
-      if (home && !lit) return; // 12.07 (Navid): a home's windows shine only with house lights
-      const m = c.getTransform(), k = Math.round(q[0][0] * 7.3 + q[0][1] * 3.1); this.wins.push({ k, lit, p: q.map(([x, y]) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]) }); },
-    lamp(c, x, y, heads, range) { const m = c.getTransform(), tx = (X, Y) => [m.a * X + m.c * Y + m.e, m.b * X + m.d * Y + m.f]; this.lamps.push({ heads: heads.map(([a, b]) => tx(a, b)), foot: tx(x, y), sc: Math.hypot(m.a, m.b), range: range || LAMP_LIGHT }); },
-    // 12.07: a home with house lights: its windows are always lit, and the ground a tile around it glows
-    pool(c, x, y, rt) { const m = c.getTransform(); this.pools.push({ x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f, sc: Math.hypot(m.a, m.b), rt }); },
+      const b = this.cur, sch = b && TYPES[b.type] ? lightPlan(b) : null; if (b && !sch) return; // 12.07: a home's windows shine only with house lights
+      const tx = this.tx(c), k = Math.round(q[0][0] * 7.3 + q[0][1] * 3.1); this.seq.push({ t: 'win', k: ((k % 997) + 997) % 997, sch, p: q.map(([x, y]) => tx(x, y)) });
+    },
+    lamp(c, x, y, heads, range) { const tx = this.tx(c), m = c.getTransform(); this.seq.push({ t: 'lamp', heads: heads.map(([a, b]) => tx(a, b)), foot: tx(x, y), sc: Math.hypot(m.a, m.b), range: range || LAMP_LIGHT }); },
+    pool(c, x, y, rt) { const tx = this.tx(c), m = c.getTransform(), [px, py] = tx(x, y); this.seq.push({ t: 'pool', x: px, y: py, sc: Math.hypot(m.a, m.b), rt }); },
+    // a building's outline on screen (its footprint raised to its roof), which hides the lights behind it
+    occ(c, b) {
+      const [w, d] = dimsB(b), s0 = sizeB(b), q = footPts(b.c, b.r, w, d), cx = (q[0][0] + q[2][0]) / 2, cy = (q[0][1] + q[2][1]) / 2, k = 0.86;
+      const ub = (HW / 30) * (1 + 0.35 * (s0 - 1)), H = Math.max(topOf(b.type, b.level), ROOF[b.type] ? ROOF[b.type](b.level) : 0, 14) * ub * 1.05;
+      const sh = q.map(([x, y]) => [cx + (x - cx) * k, cy + (y - cy) * k]), [T0, R0, B0, L0] = sh, tx = this.tx(c);
+      this.seq.push({ t: 'occ', p: [L0, B0, R0, [R0[0], R0[1] - H], [T0[0], T0[1] - H], [L0[0], L0[1] - H]].map(([x, y]) => tx(x, y)) });
+    },
   };
+  /* 12.08 (Navid): when each building's lights are on. Homes (with house lights) light up one window at a time between
+     dusk and nine, and switch off one by one from half past nine; by 1–3 am nearly all are dark. Offices and shops close
+     at their own hour, their windows going dark one by one; police, fire, clinics, hospitals and prisons stay lit all
+     night. Hours are town hours; after midnight they count on (25 = 1 am). */
+  const OPEN_TILL = { townhall: 18.5, bank: 17.5, school: 17, depot: 18, shed: 17.5, workshop: 19, cemetery: 16, granary: 18, field: 0, farm: 20, market: 20, bakery: 19, cafe: 22, bookshop: 20, arcade: 23.5, markethall: 20, hardware: 19, icecream: 21.5, pharmacy: 21, pub: 25.5, gym: 22, restaurant: 23.5, cinema: 24.5, theater: 24, hotel: 30, library: 20, daycare: 18 };
+  const ALL_NIGHT = ['police', 'firestation', 'clinic', 'prison', 'coastguard', 'watchtower', 'barracks'];
+  function lightPlan(b) {
+    const t = T(b), ln = lineOf(b.type);
+    if (t.cat === 'home') return hasLights(b) ? { home: true } : null;
+    if (ALL_NIGHT.includes(ln) || ALL_NIGHT.includes(b.type)) return { all: true };
+    const till = OPEN_TILL[ln] != null ? OPEN_TILL[ln] : OPEN_TILL[b.type] != null ? OPEN_TILL[b.type] : t.cat === 'shop' ? 21 : 19;
+    return { till };
+  }
+  // is this window lit at town hour h? f1, f2: the window's own random numbers (0–1)
+  function winLit(sch, k, h) {
+    const H = h < 12 ? h + 24 : h, f1 = (k % 97) / 97, f2 = ((k * 31) % 89) / 89;
+    if (sch.all) return f1 < 0.88; // a few rooms are always dark
+    if (sch.home) { const on = 17.2 + f1 * 3.8, off = 21.5 + 5.5 * Math.pow(f2, 1.6); return H >= on && H < off; }
+    if (f1 > 0.85) return false;
+    return H < sch.till + f2 * 0.8; // closing: the windows go dark one by one in the hour after closing time
+  }
   function drawNightLights(c, now) {
     const k = nightK(); if (k < 0.02) return;
-    const h = gameHour(), late = h >= 0.5 && h < 5, share = late ? 3 : 8; // out of 10 windows lit
-    c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'lighter';
+    const h = gameHour(), W = c.canvas.width, Hc = c.canvas.height;
+    if (!NL.cv) NL.cv = document.createElement('canvas');
+    const L = NL.cv; if (L.width !== W || L.height !== Hc) { L.width = W; L.height = Hc; }
+    const g = L.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, Hc);
     const ground = (fx, fy, rt, sc, a) => { // an oval of light on the ground, rt tiles across from its middle
       const rx = rt * HW * sc * 1.3, ry = rt * HH * sc * 1.3;
-      c.save(); c.translate(fx, fy); c.scale(1, ry / rx);
-      const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(255,206,120,${a * k})`); g.addColorStop(0.62, `rgba(255,190,100,${a * 0.45 * k})`); g.addColorStop(1, 'rgba(255,180,90,0)');
-      c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, Math.PI * 2); c.fill(); c.restore();
+      g.save(); g.translate(fx, fy); g.scale(1, ry / rx);
+      const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(255,206,120,${a * k})`); gr.addColorStop(0.62, `rgba(255,190,100,${a * 0.45 * k})`); gr.addColorStop(1, 'rgba(255,180,90,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, Math.PI * 2); g.fill(); g.restore();
     };
-    for (const P of NL.pools) ground(P.x, P.y, P.rt, P.sc, 0.3); // 12.07: house lights, a tile round the home
-    for (const L of NL.lamps) { // the pool on the ground first, then the glow round each lamp (12.07: wider for taller lamps)
-      ground(L.foot[0], L.foot[1], L.range + 0.4, L.sc, 0.3 + 0.04 * L.range);
-      for (const [hx, hy] of L.heads) {
-        const r = (13 + 1.5 * L.range) * L.sc, fl = reduced ? 1 : 0.94 + 0.06 * Math.sin(now / 90 + hx), a = 0.8 / Math.sqrt(L.heads.length);
-        const g2 = c.createRadialGradient(hx, hy, 0, hx, hy, r); g2.addColorStop(0, `rgba(255,232,170,${a * k * fl})`); g2.addColorStop(1, 'rgba(255,200,120,0)');
-        c.fillStyle = g2; c.beginPath(); c.arc(hx, hy, r, 0, Math.PI * 2); c.fill();
+    for (const E of NL.seq) {
+      if (E.t === 'occ') { g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000'; g.beginPath(); g.moveTo(E.p[0][0], E.p[0][1]); for (let i = 1; i < E.p.length; i++) g.lineTo(E.p[i][0], E.p[i][1]); g.closePath(); g.fill(); continue; }
+      g.globalCompositeOperation = 'lighter';
+      if (E.t === 'pool') ground(E.x, E.y, E.rt, E.sc, 0.26);
+      else if (E.t === 'lamp') {
+        ground(E.foot[0], E.foot[1], E.range + 0.4, E.sc, 0.28 + 0.04 * E.range);
+        for (const [hx, hy] of E.heads) {
+          const r = (13 + 1.5 * E.range) * E.sc, fl = reduced ? 1 : 0.94 + 0.06 * Math.sin(now / 90 + hx), a = 0.8 / Math.sqrt(E.heads.length);
+          const g2 = g.createRadialGradient(hx, hy, 0, hx, hy, r); g2.addColorStop(0, `rgba(255,232,170,${a * k * fl})`); g2.addColorStop(1, 'rgba(255,200,120,0)');
+          g.fillStyle = g2; g.beginPath(); g.arc(hx, hy, r, 0, Math.PI * 2); g.fill();
+        }
+      } else if (E.t === 'win') {
+        if (E.sch ? !winLit(E.sch, E.k, h) : ((E.k % 10) >= (h >= 0.5 && h < 5 ? 3 : 8))) continue;
+        const cx = (E.p[0][0] + E.p[2][0]) / 2, cy = (E.p[0][1] + E.p[2][1]) / 2, sz = Math.max(Math.abs(E.p[2][0] - E.p[0][0]), Math.abs(E.p[2][1] - E.p[0][1]), 2), hr = Math.min(sz * 1.6, 9 * Math.max(1, geo.dpr || 1));
+        const gw = g.createRadialGradient(cx, cy, 0, cx, cy, hr); gw.addColorStop(0, `rgba(255,190,90,${0.18 * k})`); gw.addColorStop(1, 'rgba(255,170,70,0)'); // a soft halo (12.08: smaller and dimmer)
+        g.fillStyle = gw; g.beginPath(); g.arc(cx, cy, hr, 0, Math.PI * 2); g.fill();
+        g.fillStyle = `rgba(255,200,100,${0.62 * k})`; g.beginPath(); g.moveTo(E.p[0][0], E.p[0][1]); for (let i = 1; i < 4; i++) g.lineTo(E.p[i][0], E.p[i][1]); g.closePath(); g.fill();
       }
     }
-    for (const W of NL.wins) {
-      if (((W.k % 10) + 10) % 10 >= (W.lit ? (late ? 7 : 10) : share)) continue; // 12.07: house lights keep every window on till late
-      const cx = (W.p[0][0] + W.p[2][0]) / 2, cy = (W.p[0][1] + W.p[2][1]) / 2, sz = Math.max(Math.abs(W.p[2][0] - W.p[0][0]), Math.abs(W.p[2][1] - W.p[0][1]), 2);
-      const g = c.createRadialGradient(cx, cy, 0, cx, cy, sz * 2.2); g.addColorStop(0, `rgba(255,190,90,${0.32 * k})`); g.addColorStop(1, 'rgba(255,170,70,0)'); // a soft halo
-      c.fillStyle = g; c.globalAlpha = 1; c.beginPath(); c.arc(cx, cy, sz * 2.2, 0, Math.PI * 2); c.fill();
-      c.fillStyle = '#FFC864'; c.globalAlpha = 0.95 * k; c.beginPath(); c.moveTo(W.p[0][0], W.p[0][1]); for (let i = 1; i < 4; i++) c.lineTo(W.p[i][0], W.p[i][1]); c.closePath(); c.fill();
-    }
-    c.globalAlpha = 1; c.restore();
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'lighter'; c.drawImage(L, 0, 0); c.restore();
   }
   /* ---------- 12.07 (Navid): street lamps stand on the corners where tiles meet, not on a tile or beside a building.
      Each one lights the ground around it at night; three levels, each taller, with more lamps and a wider light. They
@@ -4506,7 +4544,7 @@
     flowerbox: { on: true, note: '+1 gold/h on a home', hostText: 'a home', hosts: (b) => T(b).cat === 'home', what: () => '+1 gold an hour' },
     mural: { on: true, note: '+2 gold/h on a home or shop', hostText: 'a home or a shop', hosts: (b) => ['home', 'shop'].includes(T(b).cat), what: () => '+2 gold an hour' },
     awning: { on: true, note: '+3 gold/h on a shop', hostText: 'a shop', hosts: (b) => T(b).cat === 'shop', what: () => '+3 gold an hour' },
-    solar: { on: true, note: '−3/h running cost, or +2/h', hostText: 'a service building, a home or a shop', hosts: (b) => isServiceType(b.type) || ['home', 'shop'].includes(T(b).cat), what: (b) => (b && isServiceType(b.type) ? 'running cost −3 gold an hour' : b ? '+2 gold an hour' : 'running cost −3 gold an hour on a service building, +2 gold an hour on a home or a shop') },
+    solar: { on: true, note: '−3/h running cost, or +2/h', hostText: 'a service building, a home or a shop', hosts: (b) => isServiceType(b.type) || ['home', 'shop'].includes(T(b).cat), what: (b) => (b && isServiceType(b.type) ? 'saves 3 gold an hour of running cost' : b ? '+2 gold an hour' : 'saves 3 gold an hour of running cost on a service building, +2 gold an hour on a home or a shop') },
     tank: { on: true, note: '+2 food/h on a field', hostText: 'a field', hosts: (b) => b.type === 'field', what: () => '+2 food an hour' }
   };
   const hostsFor = (k, b) => canHost(b) && (!ADDON[k].hosts || ADDON[k].hosts(b));
@@ -6636,7 +6674,8 @@
   /* 12.07 (Navid: "buildings are the same pictures in all 4 rotations"): how the building being drawn is seen. In the
      views turned a quarter (1 and 3) it is drawn mirrored, so its front (the door) is on the other wall you can see,
      with the light still from the same side; in views 2 and 3 you look at its back, so there is no front door. */
-  const DRAWV = { mir: false, back: false };
+  const DRAWV = { mir: false, back: false, on: false, doors: 0, rot: 0 };
+  const TURNS_REAL = new Set(['farm']); // 12.08: drawn turned for real (their layout follows the view), not mirrored
   const LR = (a, b) => (DRAWV.mir ? b : a); // shades for the left and the right wall
   // The season the town is drawn in (set at the start of every frame).
   const SEA = { k: seasonOf(Date.now()) };
@@ -6759,8 +6798,10 @@
     line(c, wallPt(P, Q, u0 + (u1 - u0) * 0.12, vm + (v1 - vm) * 0.25), wallPt(P, Q, u0 + (u1 - u0) * 0.36, v1 - (v1 - v0) * 0.08), 'rgba(255,255,255,.65)', 0.7 * u);
     wallQuad(c, P, Q, u0 - 0.06, u1 + 0.06, v0 - 1.7 * u, v0 - 0.8 * u, '#CDBFA4');
   }
+  // 12.08: a plain pane of glass that also lights up at night (the hospital's rows of windows)
+  function glassQ(c, P, Q, u0, u1, v0, v1, fill) { if (NL.on && c === ctx) NL.win(c, [wallPt(P, Q, u0, v0), wallPt(P, Q, u1, v0), wallPt(P, Q, u1, v1), wallPt(P, Q, u0, v1)]); wallQuad(c, P, Q, u0, u1, v0, v1, fill); }
   function doorQ(c, P, Q, u0, u1, h, color, u) {
-    if (DRAWV.back) { windowQ(c, P, Q, u0 + (u1 - u0) * 0.08, u1 - (u1 - u0) * 0.08, h * 0.42, h * 0.95, '#A8CFE0', u); return; } // 12.07: the back of the building
+    if (DRAWV.on && (DRAWV.back || DRAWV.doors++ > 0)) { windowQ(c, P, Q, u0 + (u1 - u0) * 0.08, u1 - (u1 - u0) * 0.08, h * 0.42, h * 0.95, '#A8CFE0', u); return; } // 12.07: the back of the building; 12.08 (Navid): one main door only
     wallQuad(c, P, Q, u0 - 0.03, u1 + 0.03, 0, h + 0.9 * u, '#F4EEE0');
     wallQuad(c, P, Q, u0, u1, 0, h, color);
     wallQuad(c, P, Q, u0 + (u1 - u0) * 0.18, u1 - (u1 - u0) * 0.18, h * 0.55, h * 0.86, shade(color, 1.22));
@@ -7338,7 +7379,7 @@
         // 10.08: a big modern hospital: rows of windows, a red band, an entrance canopy, an ambulance bay, a helipad
         const h = (26 + level * 5) * u, f = box(c, x, y, hw, hh, 0.78, h, col);
         const rows = 3 + level, glassC = ruin ? '#3A322B' : '#A9CDE0';
-        for (let r0 = 0; r0 < rows; r0++) { const v0 = h * (0.16 + r0 * 0.74 / rows), v1 = v0 + h * 0.46 / rows; for (let i = 0; i < 6; i++) { const a1 = 0.06 + i * 0.15; wallQuad(c, f.B, f.R, a1, a1 + 0.1, v0, v1, glassC); wallQuad(c, f.L, f.B, a1, a1 + 0.1, v0, v1, shade(glassC, 0.85)); } }
+        for (let r0 = 0; r0 < rows; r0++) { const v0 = h * (0.16 + r0 * 0.74 / rows), v1 = v0 + h * 0.46 / rows; for (let i = 0; i < 6; i++) { const a1 = 0.06 + i * 0.15; glassQ(c, f.B, f.R, a1, a1 + 0.1, v0, v1, glassC); glassQ(c, f.L, f.B, a1, a1 + 0.1, v0, v1, shade(glassC, 0.85)); } }
         wallQuad(c, f.L, f.B, 0, 1, h * 0.9, h, roofc); wallQuad(c, f.B, f.R, 0, 1, h * 0.9, h, shade(roofc, 0.9));
         wallQuad(c, f.B, f.R, 0.4, 0.6, 0, h * 0.14, '#9ED0E0'); wallQuad(c, f.B, f.R, 0.36, 0.64, h * 0.14, h * 0.17, roofc);
         wallQuad(c, f.L, f.B, 0.08, 0.3, 0, h * 0.13, '#E9E4DA'); wallQuad(c, f.L, f.B, 0.1, 0.28, 0, h * 0.11, '#5E6B7A');
@@ -7756,23 +7797,29 @@
         break;
       }
       case 'farm': { // 11.02: a red barn and crops on 2×2 tiles; a silo from level 2, a tractor at level 3
+        // 12.08 (Navid: "in two pictures the barn is near the shore, in the other two the opposite"): the farm is laid
+        // out on its land, so every view turns it for real: G() turns a spot on the ground with the view, the barn's
+        // door is on the side it faces (hidden from behind), and things are drawn back to front.
+        const R = DRAWV.rot || 0, G = (dx, dy) => { const a = (dx + dy) / 2, bb = (dy - dx) / 2, [a2, b2] = R === 1 ? [-bb, a] : R === 2 ? [-a, -bb] : R === 3 ? [bb, -a] : [a, bb]; return [x + (a2 - b2) * hw, y + (a2 + b2) * hh]; };
         const sk = SEA.k, crop = ruin ? '#7A7A4A' : sk === 'winter' ? '#E6EDF0' : sk === 'spring' ? '#7CC152' : sk === 'summer' ? '#A8C63E' : '#E5B73B';
         diamond(c, x, y, hw * 0.95, hh * 0.95, ruin ? '#8E7A5E' : '#A3815A');
-        // furrows on the near half
-        for (let i = 0; i < 6; i++) {
-          const k = -0.1 + i * 0.16, a = [x - hw * 0.85 + hw * 0.85 * (k + 0.1), y + hh * (0.15 + 0.85 * (k + 0.1)) - hh * 0.15], b0 = [a[0] + hw * 0.8, a[1] - hh * 0.8];
+        for (let i = 0; i < 6; i++) { // furrows on the near half
+          const k = -0.1 + i * 0.16, ox = -0.85 + 0.85 * (k + 0.1), oy = 0.85 * (k + 0.1), a = G(ox, oy), b0 = G(ox + 0.8, oy - 0.8);
           line(c, a, b0, 'rgba(70,45,25,.45)', 1.1 * u);
-          for (let j = 0; j < 6; j++) { const p = lerpPt(a, b0, 0.08 + j * 0.17), ch = (sk === 'winter' ? 1.2 : 2 + 0.6 * level) * u, sw = reduced || ruin ? 0 : Math.sin(now / 700 + i + j * 1.7) * 0.5 * u; c.fillStyle = shade(crop, 0.82); c.beginPath(); c.ellipse(p[0] - 0.4 * u, p[1] - ch * 0.5, 1.2 * u, ch * 0.6, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = crop; c.beginPath(); c.ellipse(p[0] + sw, p[1] - ch * 0.6, 1 * u, ch * 0.62, 0, 0, Math.PI * 2); c.fill(); }
+          for (let j = 0; j < 6; j++) { const p = lerpPt(a, b0, 0.08 + j * 0.17), ch = (sk === 'winter' ? 1.2 : 2 + 0.6 * level) * u, sw = reduced || ruin ? 0 : Math.sin(now / 700 + i + j * 1.7) * 0.5 * u; c.fillStyle = shade(crop, 0.82); c.beginPath(); c.ellipse(p[0] - 0.4 * u, p[1] - ch * 0.5, 1.2 * u, ch * 0.6, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = crop; c.beginPath(); c.ellipse(p[0] + sw, p[1] - ch * 0.62, 1.1 * u, ch * 0.55, 0, 0, Math.PI * 2); c.fill(); }
         }
-        // the barn at the back
-        const bx = x + hw * 0.18, by = y - hh * 0.38, bh = 13 * u, fb = box(c, bx, by, hw * 0.42, hh * 0.42, 1, bh, col);
-        wallQuad(c, fb.B, fb.R, 0.3, 0.7, 0, bh * 0.78, ruin ? '#3A322B' : '#F1E7D8');
-        if (!ruin) { line(c, wallPt(fb.B, fb.R, 0.3, 0), wallPt(fb.B, fb.R, 0.7, bh * 0.78), shade(col, 0.6), 0.9 * u); line(c, wallPt(fb.B, fb.R, 0.7, 0), wallPt(fb.B, fb.R, 0.3, bh * 0.78), shade(col, 0.6), 0.9 * u); }
-        windowQ(c, fb.L, fb.B, 0.38, 0.62, bh * 0.45, bh * 0.75, ruin ? '#3A322B' : '#F1E7D8', u);
-        gable(c, bx, by, hw * 0.42, hh * 0.42, 1, bh, 9 * u, roofc);
-        if (level >= 2) { const sx = x - hw * 0.4, sy = y - hh * 0.36; box(c, sx, sy, 4.2 * u, 2.1 * u, 1, 20 * u, '#C9CED3'); c.fillStyle = '#8A97A1'; c.beginPath(); c.ellipse(sx, sy - 20 * u, 4.2 * u, 2.6 * u, 0, Math.PI, 0); c.fill(); for (let i = 1; i < 4; i++) line(c, [sx - 4.2 * u, sy - i * 5 * u], [sx, sy - i * 5 * u + 2.1 * u], 'rgba(0,0,0,.15)', 0.5 * u); }
-        if (level >= 3 && !ruin) { const tx = x + hw * 0.5, ty = y + hh * 0.2; box(c, tx, ty, 3.2 * u, 1.8 * u, 1, 3.6 * u, '#C8473D'); box(c, tx - 1 * u, ty - 3.6 * u, 1.6 * u, 1 * u, 1, 3 * u, '#C8473D'); c.fillStyle = '#1E1E1E'; for (const [dx, r0] of [[-2.6, 2.2], [2.4, 1.4]]) { c.beginPath(); c.arc(tx + dx * u, ty + 0.4 * u, r0 * u, 0, Math.PI * 2); c.fill(); } }
-        if (!ruin) { for (const [dx, dy] of [[-0.62, 0.05], [-0.5, 0.22]]) { const hx = x + dx * hw, hy = y + dy * hh; c.fillStyle = '#F6F2EA'; c.beginPath(); c.ellipse(hx, hy - 2 * u, 2.6 * u, 1.6 * u, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#2B1E16'; c.beginPath(); c.arc(hx + 0.8 * u, hy - 2.4 * u, 0.7 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#F6F2EA'; c.beginPath(); c.arc(hx + 2.4 * u, hy - 2.8 * u, 1 * u, 0, Math.PI * 2); c.fill(); } }
+        const things = [];
+        things.push({ at: G(0.18, -0.38), draw: ([bx, by]) => { // the barn: its big door on the side it faces
+          const bh = 13 * u, fb = box(c, bx, by, hw * 0.42, hh * 0.42, 1, bh, col), door = R === 0 ? [fb.B, fb.R] : R === 1 ? [fb.L, fb.B] : null, side = R === 0 ? [fb.L, fb.B] : [fb.B, fb.R];
+          if (door) { wallQuad(c, door[0], door[1], 0.3, 0.7, 0, bh * 0.78, ruin ? '#3A322B' : '#F1E7D8'); if (!ruin) { line(c, wallPt(door[0], door[1], 0.3, 0), wallPt(door[0], door[1], 0.7, bh * 0.78), shade(col, 0.6), 0.9 * u); line(c, wallPt(door[0], door[1], 0.7, 0), wallPt(door[0], door[1], 0.3, bh * 0.78), shade(col, 0.6), 0.9 * u); } }
+          windowQ(c, side[0], side[1], 0.38, 0.62, bh * 0.45, bh * 0.75, ruin ? '#3A322B' : '#F1E7D8', u);
+          if (!door) windowQ(c, fb.L, fb.B, 0.38, 0.62, bh * 0.45, bh * 0.75, ruin ? '#3A322B' : '#F1E7D8', u); // from behind: a window on each wall
+          const hT = hw * 0.42, vT = hh * 0.42; gableF(c, bx, by, { ac: [hT / 2, vT / 2], ar: [-hT / 2, vT / 2], w: R % 2 ? 1 : 1.01, d: R % 2 ? 1.01 : 1 }, 1, bh, 9 * u, roofc);
+        } });
+        if (level >= 2) things.push({ at: G(-0.4, -0.36), draw: ([sx, sy]) => { box(c, sx, sy, 4.2 * u, 2.1 * u, 1, 20 * u, '#C9CED3'); c.fillStyle = '#8A97A1'; c.beginPath(); c.ellipse(sx, sy - 20 * u, 4.2 * u, 2.6 * u, 0, Math.PI, 0); c.fill(); for (let i = 1; i < 4; i++) line(c, [sx - 4.2 * u, sy - i * 5 * u], [sx, sy - i * 5 * u + 2.1 * u], 'rgba(0,0,0,.15)', 0.5 * u); } });
+        if (level >= 3 && !ruin) things.push({ at: G(0.5, 0.2), draw: ([tx, ty]) => { box(c, tx, ty, 3.2 * u, 1.8 * u, 1, 3.6 * u, '#C8473D'); box(c, tx - 1 * u, ty - 3.6 * u, 1.6 * u, 1 * u, 1, 3 * u, '#C8473D'); c.fillStyle = '#1E1E1E'; for (const [dx, r0] of [[-2.6, 2.2], [2.4, 1.4]]) { c.beginPath(); c.arc(tx + dx * u, ty + 0.4 * u, r0 * u, 0, Math.PI * 2); c.fill(); } } });
+        if (!ruin) for (const [dx, dy] of [[-0.62, 0.05], [-0.5, 0.22]]) things.push({ at: G(dx, dy), draw: ([hx, hy]) => { c.fillStyle = '#F6F2EA'; c.beginPath(); c.ellipse(hx, hy - 2 * u, 2.6 * u, 1.6 * u, 0, 0, Math.PI * 2); c.fill(); c.fillStyle = '#2B1E16'; c.beginPath(); c.arc(hx + 0.8 * u, hy - 2.4 * u, 0.7 * u, 0, Math.PI * 2); c.fill(); c.fillStyle = '#F6F2EA'; c.beginPath(); c.arc(hx + 2.4 * u, hy - 2.8 * u, 1 * u, 0, Math.PI * 2); c.fill(); } });
+        things.sort((p, q) => p.at[1] - q.at[1]); for (const th of things) th.draw(th.at);
         break;
       }
       case 'markethall': { // 11.02: a long covered market with arched windows, a clock and striped awnings over its stalls
@@ -8213,6 +8260,64 @@
     drawHat(c, look, hx, hy, u, f);
     return hand;
   }
+  /* 12.08 (Navid: "can you show the gangs in town?"): four ways to show a gang, drawn for Navid to pick from.
+     A · a hideout shack at the edge of town with the three round a fire barrel; B · the crew walking the streets
+     together, sizing up the bank; C · their tags on the walls they hit, and a warning ring round the bank; D · a red
+     zone over the streets they hang about in, and a wanted poster at the police post. Only one will stay. */
+  const GANG_LOOKS = [{ skin: '#C68A5E', shirt: '#2B2F3A', pants: '#1E2028', hat: 'hood', hatColor: '#3A3F4E' }, { skin: '#F0C7A0', shirt: '#4B2E5E', pants: '#22222A', hat: 'hood', hatColor: '#5B3A72' }, { skin: '#8D5A3B', shirt: '#5E2A2A', pants: '#1E2028', hat: 'hood', hatColor: '#7A2E2E' }];
+  function gangDemo(objs, c, now, kind, px) {
+    const hall = townHall(), t = now / 1000, u = HW / 30;
+    const bank = state.buildings.find((b) => isBank(b) && live(b)) || state.buildings.find((b) => T(b).cat === 'shop' && live(b));
+    const pol = state.buildings.find((b) => lineOf(b.type) === 'police' && live(b));
+    let spot = null, bd = -1; for (let r = 0; r < N; r++) for (let cc = 0; cc < N; cc++) { if (!isOpen(cc, r) || at(cc, r) || !fits('cottage', cc, r)) continue; const d = Math.abs(cc - hall.c) + Math.abs(r - hall.r); if (d > bd && d < 9) { bd = d; spot = { c: cc, r }; } }
+    ui.gangSpot = spot;
+    const crew = (x, y, walk) => GANG_LOOKS.forEach((L, i) => { const a = i * 2.1 + t * (walk ? 0 : 0.6), ox = walk ? (i - 1) * 6 * u : Math.cos(a) * 7 * u, oy = walk ? (i - 1) * -2.5 * u : Math.sin(a) * 3.5 * u; person(c, x + ox, y + oy, u * 1.05, L, walk ? { walk: t * 9 + i, facing: 1 } : { facing: Math.cos(a) > 0 ? -1 : 1, arms: i === 1 ? 'wave' : 'rest', t }); });
+    const bubble = (x, y, txt, bg) => { c.font = `800 ${11 * px}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; const w = c.measureText(txt).width + 12 * px; c.fillStyle = bg || '#2B2F3A'; roundRect(c, x - w / 2, y - 9 * px, w, 18 * px, 9 * px); c.fill(); c.beginPath(); c.moveTo(x - 4 * px, y + 8 * px); c.lineTo(x, y + 13 * px); c.lineTo(x + 4 * px, y + 8 * px); c.fill(); c.fillStyle = '#FFF'; c.fillText(txt, x, y + 0.5 * px); };
+    const name = state.gang ? gangName(state.gang) : "Rex's gang";
+    if (kind === 'A' && spot) {
+      const p = tileCenter(spot.c, spot.r);
+      objs.push({ depth: vd(spot.c, spot.r), draw: () => {
+        const f = box(c, p.x - 4 * u, p.y - 2 * u, HW * 0.42, HH * 0.42, 1, 11 * u, '#7D6A57');
+        wallQuad(c, f.B, f.R, 0.35, 0.62, 0, 8 * u, '#3A2C22'); for (const v of [3, 6]) line(c, wallPt(f.L, f.B, 0.2, v * u), wallPt(f.L, f.B, 0.8, v * u + 1.5 * u), '#A07F5A', 1.3 * u);
+        poly(c, [[f.L[0] - 2 * u, f.L[1] - 11 * u], [f.B[0], f.B[1] - 9 * u], [f.R[0] + 2 * u, f.R[1] - 13 * u], [f.T[0], f.T[1] - 15 * u]], '#5A4A3C');
+        c.strokeStyle = '#B04BE0'; c.lineWidth = 1.3 * u; c.beginPath(); const g0 = wallPt(f.B, f.R, 0.7, 4 * u); c.moveTo(g0[0], g0[1]); for (let i = 1; i < 6; i++) c.lineTo(g0[0] + i * 1.4 * u, g0[1] - (i % 2 ? 2.6 : 0) * u); c.stroke();
+        const bx = p.x + 10 * u, by = p.y + 5 * u; box(c, bx, by, 2.6 * u, 1.3 * u, 1, 5 * u, '#59606A'); const fl = 0.8 + 0.2 * Math.sin(t * 9); c.fillStyle = `rgba(255,150,40,${0.9 * fl})`; tongue(c, bx, by - 5 * u, 2.2 * u, 5 * u * fl, '#F39C33'); tongue(c, bx, by - 5 * u, 1.2 * u, 3.4 * u * fl, '#FFE08A');
+        if (NL.on && c === ctx) NL.lamp(c, bx, by, [[bx, by - 7 * u]], 1.2); crew(bx - 4 * u, by + 6 * u, false);
+        tag(c, p.x, p.y - 30 * u, `🦹 ${name} · hideout`, px, 'rgba(43,47,58,.92)', '#fff');
+      } });
+    }
+    if (kind === 'B' && bank) {
+      const [w, d] = dimsB(bank), k = (t * 0.06) % 1, ring = [[-0.8, -0.8], [w - 0.2, -0.8], [w - 0.2, d - 0.2], [-0.8, d - 0.2]], seg = Math.floor(k * 4), f = k * 4 - seg, A = ring[seg], B = ring[(seg + 1) % 4];
+      const gc = bank.c + A[0] + (B[0] - A[0]) * f, gr = bank.r + A[1] + (B[1] - A[1]) * f, p = tileCenter(gc, gr);
+      objs.push({ depth: vd(gc, gr) + 0.1, draw: () => {
+        c.save(); c.setLineDash([3 * px, 4 * px]); c.strokeStyle = 'rgba(176,75,224,.55)'; c.lineWidth = 2 * px; c.beginPath(); ring.concat([ring[0]]).forEach(([a, b0], i) => { const q = tileCenter(bank.c + a, bank.r + b0); if (i) c.lineTo(q.x, q.y); else c.moveTo(q.x, q.y); }); c.stroke(); c.restore();
+        crew(p.x, p.y, true);
+        const bp = centerOf(bank); bubble(bp.x, bp.y - 62 * u, '👀 casing the bank', '#5B3A72');
+      } });
+    }
+    if (kind === 'C') {
+      const hit = state.buildings.filter((b) => live(b) && ['home', 'shop'].includes(T(b).cat)).slice(0, 4);
+      for (const b of hit) objs.push({ depth: vd(b.c, b.r) + 0.05, draw: () => {
+        const [w, d] = dimsB(b), q = footPts(b.c, b.r, w, d), B0 = q[2], R0 = q[1], P = [B0[0] + (R0[0] - B0[0]) * 0.35, B0[1] + (R0[1] - B0[1]) * 0.35 - 7 * u];
+        c.strokeStyle = '#B04BE0'; c.lineWidth = 1.6 * u; c.lineCap = 'round'; c.beginPath(); c.moveTo(P[0], P[1]); for (let i = 1; i < 7; i++) c.quadraticCurveTo(P[0] + (i - 0.5) * 1.6 * u, P[1] - (i % 2 ? 4 : -1) * u, P[0] + i * 1.6 * u, P[1] - (i % 3) * u); c.stroke();
+        c.fillStyle = '#F3C64B'; c.beginPath(); c.moveTo(P[0] + 2 * u, P[1] - 5 * u); c.lineTo(P[0] + 3 * u, P[1] - 8 * u); c.lineTo(P[0] + 4.5 * u, P[1] - 6 * u); c.lineTo(P[0] + 6 * u, P[1] - 8 * u); c.lineTo(P[0] + 7 * u, P[1] - 5 * u); c.closePath(); c.fill();
+      } });
+      if (bank) objs.push({ depth: 99, draw: () => { const bp = centerOf(bank), k = (t % 1.6) / 1.6, s0 = sizeB(bank); c.strokeStyle = `rgba(214,48,48,${0.9 * (1 - k)})`; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(bp.x, bp.y + 2, HW * s0 * (0.8 + k * 0.4), HH * s0 * (0.8 + k * 0.4), 0, 0, Math.PI * 2); c.stroke(); bubble(bp.x, bp.y - 58 * u, '⚠ The gang has its eye on the bank', '#B3432B'); } });
+    }
+    if (kind === 'D' && spot) {
+      objs.push({ depth: -5, draw: () => {
+        for (let r = spot.r - 2; r <= spot.r + 2; r++) for (let cc = spot.c - 2; cc <= spot.c + 2; cc++) { if (!isOpen(cc, r)) continue; const q = tileCenter(cc, r); diamond(c, q.x, q.y, HW - 1.5, HH - 0.8, 'rgba(214,48,48,.16)'); }
+        c.save(); c.setLineDash([6 * px, 4 * px]); c.strokeStyle = 'rgba(214,48,48,.8)'; c.lineWidth = 2 * px; outline(c, footPts(spot.c - 2, spot.r - 2, 5, 5)); c.restore();
+      } });
+      objs.push({ depth: 99, draw: () => { const q = tileCenter(spot.c, spot.r); tag(c, q.x, q.y - 4 * u, `🦹 ${name}'s streets · crime +15`, px, 'rgba(179,67,43,.95)', '#fff'); } });
+      if (pol) objs.push({ depth: vd(pol.c, pol.r) + 0.2, draw: () => {
+        const pp = centerOf(pol), x = pp.x + HW * 0.75, y = pp.y + HH * 0.2; line(c, [x, y], [x, y - 14 * u], '#6E4A2C', 1.2 * u);
+        c.fillStyle = '#F4E7C8'; c.fillRect(x - 6 * u, y - 26 * u, 12 * u, 13 * u); c.strokeStyle = '#8A6A48'; c.lineWidth = 0.6 * u; c.strokeRect(x - 6 * u, y - 26 * u, 12 * u, 13 * u);
+        c.fillStyle = '#3A3F4E'; c.beginPath(); c.arc(x, y - 20 * u, 2.6 * u, 0, Math.PI * 2); c.fill(); c.fillRect(x - 3.6 * u, y - 18 * u, 7.2 * u, 3 * u);
+        c.fillStyle = '#B3432B'; c.font = `900 ${2.6 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.fillText('WANTED', x, y - 23.6 * u);
+      } });
+    }
+  }
   // 10.19: a stroller, pushed by the hand, with the baby peeking out under the hood
   const PRAMS = ['#E46B8A', '#3B7DD8', '#8E5BB5', '#2E8F7A', '#E8A33D'];
   function pram(c, x, y, u, f, col, hand, bob) {
@@ -8248,6 +8353,7 @@
   function drawHat(c, look, hx, hy, u, f) {
     const h = look.hat, col = look.hatColor || '#F3C64B';
     if (!h) return;
+    if (h === 'hood') { c.fillStyle = col; c.beginPath(); c.arc(hx, hy - 0.2 * u, 3.5 * u, Math.PI * 0.92, Math.PI * 2.08); c.lineTo(hx + 3.2 * u, hy + 2.6 * u); c.lineTo(hx - 3.2 * u, hy + 2.6 * u); c.closePath(); c.fill(); c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(hx + f * 0.9 * u, hy + 0.6 * u, 2 * u, 2.3 * u, 0, 0, Math.PI * 2); c.fill(); return; } // 12.08: a gang member's hood
     if (h === 'hard') { c.fillStyle = col; c.beginPath(); c.arc(hx, hy - 0.7 * u, 3.15 * u, Math.PI, 0); c.fill(); c.fillRect(hx - 3.7 * u, hy - 1.2 * u, 7.4 * u, 1 * u); c.fillStyle = 'rgba(255,255,255,.4)'; c.fillRect(hx - 0.4 * u, hy - 3.6 * u, 0.8 * u, 2.4 * u); }
     else if (h === 'cap') { c.fillStyle = col; c.beginPath(); c.arc(hx, hy - 0.6 * u, 3 * u, Math.PI, 0); c.fill(); c.beginPath(); c.ellipse(hx + f * 2.6 * u, hy - 0.8 * u, 2.1 * u, 0.6 * u, 0, 0, Math.PI * 2); c.fill(); }
     else if (h === 'straw') { c.fillStyle = col; c.beginPath(); c.ellipse(hx, hy - 1 * u, 4.8 * u, 1.3 * u, 0, 0, Math.PI * 2); c.fill(); c.beginPath(); c.arc(hx, hy - 1.3 * u, 2.4 * u, Math.PI, 0); c.fill(); c.fillStyle = '#B5473A'; c.fillRect(hx - 2.4 * u, hy - 2 * u, 4.8 * u, 0.7 * u); }
@@ -8266,7 +8372,8 @@
     if (!live(b) || b.fire || nightK() > 0.6) return;
     const [w, d] = dimsB(b), n = farmersOn(b), t = now / 1000;
     for (let i = 0; i < n; i++) {
-      const tc = i % (w * d), tile = tileCenter(b.c + (tc % w), b.r + Math.floor(tc / w)), side = i < w * d ? -1 : 1;
+      let tc = i % (w * d); if (b.type === 'farm' && tc === 0) tc = 1 + (i % (w * d - 1)); // 12.08: nobody works on the barn's tile (the barn stands there)
+      const tile = tileCenter(b.c + (tc % w), b.r + Math.floor(tc / w)), side = i < w * d ? -1 : 1;
       const x = tile.x + side * HW * 0.28 + Math.sin(t * 0.4 + i * 2.1) * HW * 0.12, y = tile.y + (i % 2 ? -1 : 1) * HH * 0.18;
       person(c, x, y, 1, FARMER_LOOKS[(b.id + i) % FARMER_LOOKS.length], { facing: Math.sin(t * 0.4 + i * 2.1 + 1.2) > 0 ? 1 : -1, arms: 'sweep', t: t + i * 0.7 });
     }
@@ -8398,15 +8505,20 @@
     c.fillStyle = fg; c.fillText(txt, x, y + 0.5 * px);
   }
   // 10.13 (Navid): a building's level as rank stripes on a little patch, like a uniform's: two bars for level 2, three for 3.
-  function rankBars(c, x, y, u, n) {
+  // 12.08 (Navid): the stripes' colour says what the building does: gold for buildings that earn gold, blue for services,
+  // warm brown for anything that makes food. Every building shows them now (one stripe at level 1), instead of a coin.
+  const RANK_COL = { gold: ['#B07A10', '#FFD75A', '#FFF3C2'], service: ['#1E4E9C', '#7FB4FF', '#DCEBFF'], food: ['#5A3518', '#D9A066', '#F2D3AE'], other: ['#1F2A44', '#F3C64B', '#F4F1EA'] };
+  const rankKind = (b) => (isGrower(b) || b.type === 'granary' || b.type === 'fishmarket' ? 'food' : isServiceType(b.type) || ['townhall', 'cemetery', 'prison'].includes(b.type) || T(b).cat === 'civic' ? 'service' : ['home', 'shop'].includes(T(b).cat) || (T(b).cat === 'joy' && b.type === 'stadium') ? 'gold' : 'other');
+  function rankBars(c, x, y, u, n, kind) {
+    const [bg, bar, rim] = RANK_COL[kind] || RANK_COL.other;
     const w = 11 * u, bh = 2.1 * u, gap = 1.3 * u, pad = 1.6 * u, h = pad * 2 + n * bh + (n - 1) * gap, x0 = x - w / 2, y0 = y - h / 2;
     c.save();
     c.fillStyle = 'rgba(0,0,0,.28)'; roundRect(c, x0 + 0.8 * u, y0 + 1.2 * u, w, h, 1.6 * u); c.fill();
-    c.fillStyle = '#1F2A44'; roundRect(c, x0, y0, w, h, 1.6 * u); c.fill();
-    c.strokeStyle = '#F4F1EA'; c.lineWidth = 0.7 * u; roundRect(c, x0, y0, w, h, 1.6 * u); c.stroke();
+    c.fillStyle = bg; roundRect(c, x0, y0, w, h, 1.6 * u); c.fill();
+    c.strokeStyle = rim; c.lineWidth = 0.7 * u; roundRect(c, x0, y0, w, h, 1.6 * u); c.stroke();
     for (let i = 0; i < n; i++) {
       const by = y0 + h - pad - bh - i * (bh + gap);
-      c.fillStyle = '#F3C64B'; c.fillRect(x0 + pad, by, w - pad * 2, bh);
+      c.fillStyle = bar; c.fillRect(x0 + pad, by, w - pad * 2, bh);
       c.fillStyle = 'rgba(255,255,255,.45)'; c.fillRect(x0 + pad, by, w - pad * 2, bh * 0.32);
       c.fillStyle = 'rgba(120,70,0,.45)'; c.fillRect(x0 + pad, by + bh * 0.78, w - pad * 2, bh * 0.22);
     }
@@ -9100,7 +9212,7 @@
   let SZN = SEASONS.spring;
   function draw(now) {
     SEA.k = curSeason(); SZN = SEASONS[SEA.k];
-    NL.wins.length = 0; NL.lamps.length = 0; NL.pools.length = 0; NL.cur = null; NL.on = nightK() > 0.02; // 12.06: lights after dark
+    NL.seq.length = 0; NL.cur = null; NL.on = nightK() > 0.02; // 12.06: lights after dark (12.08: in drawing order)
     if (ui.dragEdge && ui.dragPt) { const sp0 = 7 / cam.z; cam.x += ui.dragEdge.x * sp0; cam.y += ui.dragEdge.y * sp0; camAnim = null; clampCam(); placeDragAt(ui.dragPt); } // 12.06: the map slides while you drag near an edge
     stepCam(now);
     const dt = Math.min(0.05, (now - (lastDraw || now)) / 1000); lastDraw = now;
@@ -9230,9 +9342,11 @@
       const s = sizeB(b), [bw, bd] = dimsB(b), rot = b.rot || 0, mir = !!(VIEW & 1), back = VIEW >= 2; // 12.06: turned with the view
       // 12.07: drawn mirrored in views 1 and 3 (a mirrored 2×1 lies the other way, so it keeps its own turn), from behind in 2 and 3
       const dB = (cc, type, level, x0, y0, hw0, hh0, o) => {
-        DRAWV.mir = mir; DRAWV.back = back; cc.save();
+        if (NL.on && cc === ctx) { NL.occ(cc, b); NL.cur = b; } // 12.08: this building hides the lights behind it
+        if (TURNS_REAL.has(type)) { DRAWV.rot = VIEW; try { drawBuilding(cc, type, level, x0, y0, hw0, hh0, o); } finally { DRAWV.rot = 0; NL.cur = null; } return; } // 12.08: laid out on its land
+        DRAWV.mir = mir; DRAWV.back = back; DRAWV.doors = 0; DRAWV.on = true; cc.save();
         if (mir) { cc.translate(x0, 0); cc.scale(-1, 1); cc.translate(-x0, 0); const ft = CanvasRenderingContext2D.prototype.fillText; cc.fillText = function (t2, tx, ty, mw) { this.save(); this.translate(tx, 0); this.scale(-1, 1); if (mw == null) ft.call(this, t2, 0, ty); else ft.call(this, t2, 0, ty, mw); this.restore(); }; }
-        try { drawBuilding(cc, type, level, x0, y0, hw0, hh0, o); } finally { if (mir) delete cc.fillText; cc.restore(); DRAWV.mir = false; DRAWV.back = false; }
+        try { drawBuilding(cc, type, level, x0, y0, hw0, hh0, o); } finally { NL.cur = null; if (mir) delete cc.fillText; cc.restore(); DRAWV.mir = false; DRAWV.back = false; DRAWV.on = false; }
       };
       objs.push({ depth: vd(b.c + (bw - 1) / 2, b.r + (bd - 1) / 2), draw: () => {
         const p = centerOf(b), hw = HW * s, hh = HH * s, u = HW / 30;
@@ -9275,9 +9389,8 @@
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
         const see = xray(b, p, s); if (see) { c.save(); c.globalAlpha = 0.26; } // 12.06: see-through
-        NL.cur = b; if (NL.on && hasLights(b)) NL.pool(c, p.x, p.y, Math.max(bw, bd) / 2 + 1); // 12.07: house lights
+        if (NL.on && hasLights(b) && winLit({ home: true }, (b.id * 37) % 997, gameHour())) NL.pool(c, p.x, p.y, Math.max(bw, bd) / 2 + 1); // 12.07: house lights (12.08: while the home is up)
         dB(c, b.type, b.level, p.x, p.y, hw, hh, { alpha: see ? 0.26 : 0, rot, choice: b.choice, ruin: b.ruin || !!b.shut, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
-        NL.cur = null;
         if (b.addons) drawAddons(c, b, now);
         if (isGrower(b)) drawFarmers(c, b, now); // 10.15; 11.02: farms too
         if (see) c.restore();
@@ -9286,7 +9399,7 @@
         else if (q && !bigQ(q) && !crewOnSite(q.bid)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
         if (b.burnt || (b.health != null && b.health < 100 && !b.fire)) soot(c, b, p, hw, hh, u, now);
         if (b.ruin && !q) badge(c, p.x + hw * 0.5, p.y - 26 * u, 7 * u, '#B3432B', '!');
-        if (T(b).cat !== 'decor' && !T(b).chest && b.level > 1 && !b.site) { const rt = (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u; rankBars(c, p.x - hw * 0.46, p.y - rt * 0.5, u * 0.7, b.level); } // 10.13: rank stripes, top left (10.15: smaller, on the corner of the building)
+        if (T(b).cat !== 'decor' && !T(b).chest && !special(T(b)) && !b.site && T(b).cat !== 'landmark' && b.type !== 'works' && b.type !== 'fallen') { const rt = (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u; rankBars(c, p.x - hw * 0.46, p.y - rt * 0.5, u * 0.7, b.level, rankKind(b)); } // 10.13: rank stripes, top left (10.15: smaller, on the corner of the building)
         if (ui.selected === b.id) { c.strokeStyle = '#FFF4C2'; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(p.x, p.y + 2, hw * 0.9, hh * 0.9, 0, 0, Math.PI * 2); c.stroke(); }
       } });
     }
@@ -9360,6 +9473,7 @@
         tag(c, x, y - 21 - 8.5 * px, state.builder, px, 'rgba(255,255,255,.94)', '#1E2A28');
       } });
     }
+    if (ui.gangDemo) gangDemo(objs, c, now, ui.gangDemo, px); // 12.08: design options for showing a gang (tests and the design canvas only)
     objs.sort((a, b) => a.depth - b.depth);
     for (const o of objs) o.draw();
     for (const fn of after) fn();
@@ -9418,17 +9532,7 @@
       c.save(); c.globalAlpha = (nkz - 0.6) * 2.5 * Math.sin(k * Math.PI) * 0.9; c.fillStyle = '#EEF2FF'; c.font = `800 ${(9 + k * 4) * px}px Figtree, system-ui, sans-serif`; c.textAlign = 'center';
       c.fillText('z', p.x + 6 + k * 6, y); c.restore();
     }
-    if (playing && !item && HW * z >= 18) {
-      const ci = city();
-      for (const b of state.buildings) {
-        if (revealFor(b.id) || busy.has(b.id)) continue;
-        const inf = ci.info.get(b.id); if (!inf || !(inf.income >= 0.5)) continue;
-        // 10.07 (Navid): no more "+12/h" tags all over the town, just a small gold coin on buildings that earn; the
-        // numbers are in each building's Details tab
-        const p = centerOf(b), s0 = dimsB(b)[0];
-        goldCoin(c, p.x + HW * 0.32 * (1 + 0.4 * (s0 - 1)), labelY(b) + 7, 4.6 * Math.max(px, 0.75), now + b.id * 300);
-      }
-    }
+    // 12.08 (Navid): no gold coins over buildings any more; the rank stripes say what a building does (gold: earns gold)
     const hit = (b, x, y, size, q, bub) => { const sp = toScreen(x, y), w = size.w * z, h = size.h * z; ui.hits.push({ x0: sp.x - w / 2 - 6, x1: sp.x + w / 2 + 6, y0: sp.y - h - 6, y1: sp.y + 6, bid: b.id, q: q || null, bubble: bub || null }); };
     for (const b of state.buildings) {
       if (!b.fire) continue;
@@ -10468,7 +10572,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   // The station's own vehicle, in the same kind of box as its staff.
   function vehicleRow(b) {
     const f = FLEET[b.type], t = T(b), playing = ui.screen === 'play';
-    const row = el('div', 'staff vehrow' + (b.vehicle ? '' : ' off'));
+    const row = el('div', 'staff vehrow' + (!b.vehicle && b.level < vehLevel(b.type) ? ' off' : '')); // 12.08: dimmed only when it can't be bought yet
     row.append(vehIcon(f.kind === 'fire' ? 'fire' : f.kind === 'police' ? 'police' : f.kind));
     const tx = el('div'); tx.append(el('b', '', f.name));
     const faster = ['firestation', 'police', 'clinic'].includes(lineOf(b.type)) ? ' They get there much faster than on foot.' : '';
@@ -10571,7 +10675,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       if (!have) tx.append(el('span', 'fee', locked ? `Needs town hall level ${t.unlock}` : capped ? capWhy(k) : `${cost} gold${k === 'lights' ? `, then ${LIGHTS_POWER} gold an hour` : ''}`));
       row.append(tx);
       const ask = ui.addonAsk && ui.addonAsk.bid === b.id && ui.addonAsk.k === k;
-      const go = el('div', 'stepper');
+      const go = el('div', 'up-go');
       if (have) { const rm = el('button', 'btn sm', 'Take down'); rm.disabled = !playing; rm.addEventListener('click', () => { removeAddon(b, k); }); go.append(el('span', 'up-on', '✓ On'), rm); }
       else if (!ask) { const ad = el('button', 'btn sm ' + (!locked && !capped && state.gold + 1e-6 >= cost ? 'playc' : ''), 'Add'); ad.disabled = locked || capped || !playing; ad.addEventListener('click', () => { ui.addonAsk = { bid: b.id, k }; renderPanel(); }); go.append(ad); }
       row.append(go);
@@ -15918,6 +16022,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   if (FB.cfg && !inFrame && (state.board.fb || state.board.fbPending)) fbLoad(); // back on the online leaderboard
   if (devOn()) window.MaplewickDebug = Object.freeze({ // 10.08: only on Navid's unlocked phone (and in tests)
     state: () => JSON.parse(JSON.stringify(state)),
+    gangDemo: (k) => { ui.gangDemo = k || null; return ui.gangDemo; }, // 12.08
+    gangSpot: () => ui.gangSpot || null,
     // 12.07: a balance simulator that runs the game's own economy. A finished focus session the normal way, time in play
     // or away, and a player who spends gold on what pays best (upgrades and new homes, shops and fields) and keeps the
     // staff the town needs. Buildings go up at once (the crew's time is skipped), and there are no fires or break-ins,
