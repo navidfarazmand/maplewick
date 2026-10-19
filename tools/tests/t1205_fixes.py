@@ -117,7 +117,7 @@ with sync_playwright() as p:
     if pg.is_visible('.lc-unfold'): pg.click('.lc-unfold'); pg.wait_for_timeout(500)
     t = pg.inner_text('.startsheet')
     print('   start page:', t[:400].replace('\n', ' | '))
-    check('min lap:' in t or 'laps:' in t, 'lap label says "… lap: … min focus + … min break"')
+    check('min focus +' in t and 'min break' in t, 'lap label says "… min focus + … min break" (12.10: the lap length is on the slider)')
     check('in all' in t, 'the total time is shown')
     pg.screenshot(path=SH + 'f05_start_laps.png')
     sb = pg.query_selector('.set-tog')

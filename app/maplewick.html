@@ -381,11 +381,23 @@
   .lapsw .lsw-rail { position: absolute; left: 0; right: 0; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px; background: rgba(255,255,255,.22); }
   .lapsw.nohi .lsw-rail { background: linear-gradient(90deg, rgba(255,255,255,.22) 50%, rgba(255,255,255,.08) 50%); }
   .lapsw .lsw-fill { position: absolute; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px; background: var(--gold-bright); transition: left .18s, width .18s; }
-  .lapsw .lsw-mid { position: absolute; left: 50%; top: 50%; width: 4px; height: 18px; margin: -9px 0 0 -2px; border-radius: 2px; background: rgba(255,255,255,.75); }
+  .lapsw .lsw-mid { position: absolute; left: 50%; top: 50%; width: 4px; height: 22px; margin: -11px 0 0 -2px; border-radius: 2px; background: var(--plan); box-shadow: 0 0 0 2px rgba(255,255,255,.5); }
+  .lapsw .lsw-mid[hidden] { display: none; }
+  .wanted { display: grid; gap: 14px; }
+  .wanted-poster { justify-self: center; width: min(320px, 100%); box-sizing: border-box; padding: 14px 14px 12px; background: #F1E6C8; color: #3A2615; border-radius: 6px; box-shadow: 0 10px 26px rgba(0,0,0,.35), inset 0 0 0 3px #D9C89C; transform: rotate(-1.2deg); display: grid; gap: 6px; text-align: center; font-family: var(--display); }
+  .wanted-poster .wp-title { font-size: 44px; font-weight: 800; letter-spacing: .06em; line-height: .9; color: #7A2E1E; }
+  .wanted-poster .wanted-art { width: 100%; height: auto; border: 2px solid #8A6A48; border-radius: 2px; display: block; }
+  .wanted-poster .wp-names { font-size: 18px; font-weight: 800; line-height: 1.1; }
+  .wanted-poster .wp-sub { font-family: var(--body); font-size: 13px; font-weight: 700; opacity: .8; }
+  .wanted-poster .wp-reward { display: flex; justify-content: center; align-items: baseline; gap: 8px; border-top: 2px dashed #B79F6E; border-bottom: 2px dashed #B79F6E; padding: 4px 0; }
+  .wanted-poster .wp-reward small { font-family: var(--body); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+  .wanted-poster .wp-reward b { font-size: 30px; color: #7A2E1E; }
+  .wanted-poster .wp-note { font-family: var(--body); font-size: 12.5px; font-weight: 600; }
+  .wanted-how h4 { margin: 0 0 6px; } .wanted-how ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; line-height: 1.4; }
+  .lapsw .lsw-tick.plan { color: #CFE2FF; font-weight: 900; opacity: 1; }
   .lapsw .lsw-thumb { position: absolute; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(20,0,60,.45), inset 0 0 0 4px var(--gold-bright); transition: left .18s cubic-bezier(.3,1.4,.6,1); }
   .lapsw .lsw-ticks { position: relative; height: 22px; margin: 0 14px; }
   .lapsw .lsw-tick { position: absolute; top: 0; transform: translateX(-50%); border: 0; background: none; color: inherit; font: inherit; font-size: 12px; font-weight: 700; opacity: .7; padding: 2px 4px; border-radius: 6px; white-space: nowrap; cursor: pointer; }
-  .lapsw .lsw-tick.mid { font-weight: 900; opacity: .95; }
   .lapsw .lsw-tick[aria-pressed="true"] { opacity: 1; background: rgba(255,255,255,.2); }
   .lapsw .lsw-none { position: absolute; right: 0; top: 2px; width: 45%; text-align: right; font-size: 10.5px; font-weight: 600; opacity: .55; line-height: 1.15; }
   .lapplan { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
@@ -455,7 +467,11 @@
   .set-tog .st-tx { display: flex; flex-direction: column; gap: 2px; }
   .set-tog .st-tx b { font-family: var(--display); font-size: 17px; }
   .set-tog .st-tx small { font-weight: 600; font-size: 13px; color: var(--muted); }
-  .lp-total { margin-top: 6px; text-align: center; font-weight: 800; font-size: 13.5px; opacity: .95; }
+  .lp-total { margin-top: 8px; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.16); text-align: center; display: grid; gap: 2px; }
+  .lp-total .lpt-big { display: flex; justify-content: center; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .lp-total .lpt-big b { font-family: var(--display); font-size: 26px; line-height: 1.05; }
+  .lp-total .lpt-end { font-weight: 800; font-size: 15px; padding: 2px 9px; border-radius: 999px; background: rgba(255,255,255,.88); color: #2A1460; }
+  .lp-total small { font-size: 12.5px; font-weight: 700; opacity: .85; }
   .lp-count { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 2px 0 8px; font-weight: 700; font-size: 14px; }
   .lp-count b { min-width: 64px; text-align: center; font-family: var(--display); font-size: 17px; }
   .lp-step { width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255,255,255,.2); color: inherit; font: inherit; font-size: 20px; font-weight: 800; line-height: 1; }
@@ -1430,7 +1446,7 @@
     <div class="focus-task" id="focus-task"></div>
     <div class="focus-meter"><span id="focus-meter"></span></div>
     <ul class="focus-list" id="focus-list"></ul>
-    <div class="phone-note">Put your phone away. The timer keeps running with the screen off. In the real app, picking up your phone stops <span id="focus-builder">Sam</span>.</div>
+    <div class="phone-note" id="phone-note">Put your phone away. The timer keeps running with the screen off. In the real app, picking up your phone stops <span id="focus-builder">Sam</span>.</div>
     <button class="lock-btn" id="focus-lock" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="2" fill="none"/></svg><span id="focus-lock-text">Show the time left on my lock screen</span></button>
     <div class="focus-actions" id="focus-actions">
       <button class="night-btn" id="focus-end">End session</button>
@@ -1571,7 +1587,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.09'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.10'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -3187,7 +3203,7 @@
   const stationReach = (x) => Math.round(baseReach(x.type, x.level) * (x.vehicle ? 1.5 : 1));
   // The best of the staffed stations that reach this building (0 when none does).
   const coverK = (k, b, st) => (st || stationsOf(k)).reduce((m, x) => (distFull(x, b) <= stationReach(x) ? Math.max(m, stationK(x)) : m), 0);
-  const catchChance = (v) => Math.min(0.97, (v.foot ? 0.6 : 0.9) + 0.08 * (stLevel(byId(v.station)) - 1));
+  const catchChance = (v) => { const b = byId(v.target), tip = b && b.robbed && gangTipped(b.robbed.thief) ? 0.25 : 0; return Math.min(0.97, (v.foot ? 0.6 : 0.9) + 0.08 * (stLevel(byId(v.station)) - 1) + tip); }; // 12.10: a tip-off helps
   const coversB = (k, b, st) => (st || stationsOf(k)).some((x) => distFull(x, b) <= stationReach(x));
   // Vehicles you can buy for a service building (from level 2): more reach and faster help, but they cost upkeep every hour.
   const FLEET = {
@@ -3316,7 +3332,7 @@
      tint that comes after: the buildings stand on the lit ground and hide it naturally. House lights do the same. */
   function groundLights(c) {
     const k = nightK(); if (k < 0.02) return;
-    const a = skyNow().tint[3] || 0, comp = 1 / Math.max(0.35, 1 - a), h = gameHour();
+    const a = skyNow().tint[3] || 0, comp = 1 / Math.max(0.35, 1 - 0.85 * a), h = gameHour();
     const pool = (x, y, rt, eff) => {
       const rx = rt * HW * 1.35, ry = rt * HH * 1.35, A = Math.min(1, eff * k * comp);
       c.save(); c.globalCompositeOperation = 'lighter'; c.translate(x, y); c.scale(1, ry / rx);
@@ -3324,6 +3340,7 @@
       c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, Math.PI * 2); c.fill(); c.restore();
     };
     for (const L of lampsNow()) { const p = tileCenter(L.c, L.r); pool(p.x, p.y, lampRange(L) + 0.3, 0.26 + 0.03 * lampRange(L)); }
+    if (ui.lamp && ui.lamp.pick && ui.screen === 'play') { const p = tileCenter(ui.lamp.pick.c, ui.lamp.pick.r); pool(p.x, p.y, LAMP_LV[1].range + 0.3, 0.32); } // 12.10: the lamp being placed lights up too
     for (const b of state.buildings) if (hasLights(b) && winLit({ home: true }, (b.id * 37) % 997, h)) { const [w, d] = dimsB(b), p = centerOf(b); pool(p.x, p.y, Math.max(w, d) / 2 + 1, 0.2); }
   }
   function drawNightLights(c, now) {
@@ -3678,7 +3695,11 @@
     gangTown(min || 0); // 12.09
     const g = state.gang; if (!g) return;
     const l = thiefById(g.leader);
-    if (!l || inPrison(g.leader)) { logIncident('gang', null, `${gangName(g)} broke up: ${l ? l.name : 'its leader'} is in jail`); state.gang = null; gangTown(0); return; }
+    if (!l || inPrison(g.leader)) {
+      logIncident('gang', null, `${gangName(g)} broke up: ${l ? l.name : 'its leader'} is in jail`);
+      if (l) { const rw = wantedReward(); goldChange(rw, `Reward: ${gangName(g)} broken up`, 'quest'); if (ui.screen === 'play') toast(`${gangName(g)} broke up: ${l.name} is in jail. The town council pays you the ${rw} gold reward. 🏅`); } // 12.10
+      state.gang = null; gangTown(0); return;
+    }
     if (now - (g.last || g.at) > GANG_WEEK) { logIncident('gang', null, `${gangName(g)} went quiet: a week without a getaway`); state.gang = null; gangTown(0); }
   }
   /* ---------- 12.09 (Navid): the gang in town. One gang at a time (state.gang). It has
@@ -3779,6 +3800,55 @@
     delete g.casing; const st = responderFor('police', bank);
     if (st && tierOf(st.type) >= 2) { state.lastHeist = Date.now(); logIncident('gang', bank, `${gangName(g)} gave up on ${placeName(bank)}: too close to the police`); toast(`${gangName(g)} saw the police station near ${placeName(bank)} and gave up. 🚓`); sfx.chime(); }
     else startRobbery(bank, true);
+  }
+  // 12.10 (Navid): the wanted poster. Tap it for the poster itself: a faded picture of the three, the reward the town
+  // council pays when the leader goes to jail, and how to help the police. "Tell the police" (once a town day, with a
+  // police building) makes catching a gang member at a break-in more likely for a day.
+  const wantedReward = () => 150 * Math.max(1, hallLevel());
+  const gangTipped = (tid) => { const g = state.gang; return !!g && (g.tipUntil || 0) > Date.now() && (tid === g.leader || (g.members || []).includes(tid)); };
+  function tipPolice() {
+    const g = state.gang; if (!g) return;
+    if (!state.buildings.some((b) => lineOf(b.type) === 'police' && live(b))) { toast('There is no police building to tell yet.'); return; }
+    if ((g.tipAt || 0) > Date.now() - 24 * thMs()) { toast('You already told the police today. They are watching.'); return; }
+    g.tipAt = Date.now(); g.tipUntil = Date.now() + 24 * thMs(); touch(); save(); sfx.chime();
+    toast(`The police know who to look for: for a day they catch ${gangName(g)} more often at a break-in.`); renderAll();
+  }
+  function wantedArt(g) {
+    const cv = document.createElement('canvas'), W = 300, H = 170; cv.width = W * 2; cv.height = H * 2; cv.className = 'wanted-art';
+    const c = cv.getContext('2d'); c.scale(2, 2);
+    c.fillStyle = '#E9DDBF'; c.fillRect(0, 0, W, H);
+    const all = [g.leader, ...(g.members || [])];
+    all.slice(0, 3).forEach((id, i) => { const L = GANG_LOOKS[i % GANG_LOOKS.length], x = 70 + i * 80 + (i === 1 ? 0 : 0), y = 160 - (i === 0 ? 4 : 0); person(c, x, y, i === 0 ? 7.6 : 6.6, { ...L, noEyes: false }, { facing: i === 2 ? -1 : 1 }); });
+    // faded, like an old print
+    c.globalCompositeOperation = 'color'; c.fillStyle = '#8A6A48'; c.fillRect(0, 0, W, H);
+    c.globalCompositeOperation = 'source-over'; c.fillStyle = 'rgba(233,221,191,.42)'; c.fillRect(0, 0, W, H);
+    for (let i = 0; i < 160; i++) { c.fillStyle = `rgba(90,60,30,${Math.random() * 0.12})`; c.fillRect(Math.random() * W, Math.random() * H, 1 + Math.random() * 2, 1 + Math.random() * 2); }
+    return cv;
+  }
+  function openWanted() {
+    const g = state.gang; if (!g) return;
+    const l = thiefById(g.leader), mates = (g.members || []).map((id) => (thiefById(id) || {}).name).filter(Boolean);
+    const wrap = el('div', 'wanted');
+    const pos = el('div', 'wanted-poster');
+    pos.append(el('div', 'wp-title', 'WANTED'), wantedArt(g), el('div', 'wp-names', [l ? l.name : 'The leader', ...mates].join(' · ')), el('div', 'wp-sub', `${gangName(g)}`));
+    const rw = el('div', 'wp-reward'); rw.append(el('small', '', 'Reward'), el('b', '', `${wantedReward()} gold`)); pos.append(rw);
+    pos.append(el('div', 'wp-note', `Paid by the town council when ${l ? l.name : 'the leader'} goes to jail.`));
+    wrap.append(pos);
+    const how = el('div', 'wanted-how'); how.append(el('h4', '', 'How to help the police'));
+    const ul = el('ul', '');
+    for (const t of [
+      `Seen them? Tell the police below: for a day they catch the gang more often at a break-in.`,
+      `A police station (not just a post) holds a thief it catches for a day. Holding ${l ? l.name : 'the leader'} stops the gang for that day.`,
+      `The Central police sends a thief caught twice to jail. Jail for ${l ? l.name : 'the leader'} breaks the gang up, and the reward is yours.`,
+      `Street lamps and police reach take their streets back. A police station that reaches the bank scares off a robbery.`,
+    ]) ul.append(el('li', '', t));
+    how.append(ul); wrap.append(how);
+    const grid = el('div', 'actions-grid');
+    const tipped = (g.tipAt || 0) > Date.now() - 24 * thMs();
+    grid.append(actionBtn(tipped ? 'The police are watching' : 'Tell the police', tipped ? 'for the rest of the day' : 'free, once a day', 'playc', () => { tipPolice(); closeSheet(); }, tipped || ui.screen !== 'play'));
+    grid.append(actionBtn('See the gang', 'the hideout and their streets', '', () => { closeSheet(); openPanel({ kind: 'gang' }); }, ui.screen !== 'play'));
+    wrap.append(grid);
+    openSheet('Wanted', wrap, { full: false });
   }
   function repairLamp(L) {
     const cost = Math.ceil(LAMP_LV[L.level || 1].cost / 2); if (!L || !L.broken) return;
@@ -4384,7 +4454,7 @@
     // ---- new incidents (none while one of the same kind is going on, and none at all under the golden shield)
     if (sh) return;
     casingStep(dt); // 12.09
-    if (state.gang && gangFree() && state.gang.zone && harshCrime()) { if (ui.vandalIn == null) ui.vandalIn = 180 + Math.random() * 240; ui.vandalIn -= dt * (1 + 0.8 * nightK()); if (ui.vandalIn <= 0 && ui.playVisit >= 25 && !ui.panel) { ui.vandalIn = null; vandalize(); } }
+    if (state.gang && gangFree() && state.gang.zone && harshCrime()) { if (ui.vandalIn == null) ui.vandalIn = 180 + Math.random() * 240; ui.vandalIn -= dt * (0.5 + 1.3 * nightK()); /* 12.10: mostly at night */ if (ui.vandalIn <= 0 && ui.playVisit >= 25 && !ui.panel) { ui.vandalIn = null; vandalize(); } }
     const live2 = state.buildings.filter((b) => canBurn(b) && !revealFor(b.id));
     if (ci.residents >= 16 && isDone('repair') && live2.length && !burningNow()) {
       if (!state.flags.fireSeen) {
@@ -4405,7 +4475,7 @@
         // the farther from a police station, the likelier
         const w = (b) => { if (coversB('police', b, st)) return 0.4; const d = st.length ? Math.min(...st.map((x) => dist(x, b) - stationReach(x))) : 4; return (2 + 0.6 * Math.max(0, d)) * (T(b).cat === 'shop' ? 1.3 : 1) * (litHome(b, lamps) ? 0.8 - 0.4 * nk : 1 + 0.8 * nk); }; // 12.06 (Navid): at night thieves pick dark homes first
         const bank = gangFree() && harshCrime() && Date.now() - (state.lastHeist || 0) > HEIST_GAP ? state.buildings.find((b) => isBank(b) && live(b) && !b.robbed && !b.fire) : null;
-        if (bank && Math.random() < 0.35) { if (!state.gang.casing) startCasing(bank); } // 11.02: a heist, only while a gang is free (12.09: they case the bank first)
+        if (bank && gangNight() && Math.random() < 0.35) { if (!state.gang.casing) startCasing(bank); } // 12.10: bank jobs at night only // 11.02: a heist, only while a gang is free (12.09: they case the bank first)
         else startRobbery(weighted(state.buildings.filter((b) => messy(b) && !b.fire && !revealFor(b.id)), (b) => w(b) * (teenCover(b) ? 0.7 : 1) * pubNight(b) * (inZone(b) ? 2 : 1))); // 12.09: twice as often in the gang's streets
       }
     }
@@ -5670,10 +5740,14 @@
   // 12 laps around the one you are on, with how many come before and after. cur = the lap you are on (1-based).
   const LAP_SHOW = 12;
   // 12.05 (Navid): how long it all takes, under the laps: "4 laps · 50 min of focus · 57½ min in all"
+  // 12.10 (Navid: "I always need to find the total"): the whole time in big letters, with the clock time it ends
   function lapTotalEl(laps) {
     const f = laps.reduce((a, x) => a + x.f, 0), all = laps.reduce((a, x) => a + x.f + x.b, 0);
     const half = (x) => (Math.abs(x - Math.round(x)) > 0.25 ? `${fmtMin(Math.floor(x))}½`.replace(' min½', '½ min') : fmtMin(Math.round(x)));
-    return el('div', 'lp-total', `${laps.length} lap${laps.length > 1 ? 's' : ''} · ${half(f)} of focus · ${half(all)} in all`);
+    const box = el('div', 'lp-total'), end = new Date(Date.now() + all * 60000);
+    const big = el('div', 'lpt-big'); big.append(el('b', '', `${half(all)} in all`), el('span', 'lpt-end', `done at ${hm(end.getHours(), end.getMinutes())}`));
+    box.append(big, el('small', '', `${laps.length} lap${laps.length > 1 ? 's' : ''} · ${half(f)} of focus`));
+    return box;
   }
   function lapPlanEl(P, len, cur, done) {
     const laps = lapPlan(P, len), box = el('div', 'lapplan');
@@ -8433,8 +8507,11 @@
   function drawGang(objs, c, now, px) {
     const g = state.gang; if (!g || !harshCrime()) return;
     const t = now / 1000, u = HW / 30, free = gangFree(), name = gangName(g);
-    const crewN = free ? [g.leader, ...(g.members || [])].filter((id) => !inPrison(id) && !inCustody(id)).length : 0;
-    const crew = (x, y, walk, n) => GANG_LOOKS.slice(0, n).forEach((L, i) => { const a = i * 2.1 + t * (walk ? 0 : 0.6), ox = walk ? (i - 1) * 6 * u : Math.cos(a) * 7 * u, oy = walk ? (i - 1) * -2.5 * u : Math.sin(a) * 3.5 * u; person(c, x + ox, y + oy, u * 1.05, L, walk ? { walk: t * 9 + i, facing: 1 } : { facing: Math.cos(a) > 0 ? -1 : 1, arms: i === 1 ? 'wave' : 'rest', t }); });
+    // 12.10 (Navid): a member who is out on a job (a break-in) is there, not at the hideout
+    const busy = new Set(state.buildings.filter((b) => b.robbed).map((b) => b.robbed.thief));
+    const all = [g.leader, ...(g.members || [])], here = free ? all.map((id, i) => ({ id, i })).filter((m) => !inPrison(m.id) && !inCustody(m.id) && !busy.has(m.id)) : [];
+    const crewN = here.length, ph = gangPhase();
+    const crew = (x, y, walk, n) => here.slice(0, n).map((m) => GANG_LOOKS[m.i % GANG_LOOKS.length]).forEach((L, i) => { const a = i * 2.1 + t * (walk ? 0 : 0.6), ox = walk ? (i - 1) * 6 * u : Math.cos(a) * 7 * u, oy = walk ? (i - 1) * -2.5 * u : Math.sin(a) * 3.5 * u; person(c, x + ox, y + oy, u * 1.05, L, walk ? { walk: t * 9 + i, facing: 1 } : { facing: Math.cos(a) > 0 ? -1 : 1, arms: i === 1 ? 'wave' : 'rest', t }); });
     const bubble = (x, y, txt, bg) => { c.font = `800 ${11 * px}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; const w = c.measureText(txt).width + 12 * px; NL.hideRect(c, x - w / 2, y - 9 * px, w, 22 * px); c.fillStyle = bg || '#2B2F3A'; roundRect(c, x - w / 2, y - 9 * px, w, 18 * px, 9 * px); c.fill(); c.beginPath(); c.moveTo(x - 4 * px, y + 8 * px); c.lineTo(x, y + 13 * px); c.lineTo(x + 4 * px, y + 8 * px); c.fill(); c.fillStyle = '#FFF'; c.fillText(txt, x, y + 0.5 * px); };
     // D · the red zone, on the ground
     const zone = free ? gangZone() : [];
@@ -8454,7 +8531,7 @@
     // A · the hideout
     const hd = g.hide;
     if (hd) {
-      const p = tileCenter(hd.c, hd.r), home = crewN && !g.casing;
+      const p = tileCenter(hd.c, hd.r), home = crewN && !g.casing && ph === 'out', inside = crewN && !g.casing && ph !== 'out';
       objs.push({ depth: vd(hd.c, hd.r), draw: () => {
         const f = box(c, p.x - 4 * u, p.y - 2 * u, HW * 0.42, HH * 0.42, 1, 11 * u, '#7D6A57');
         NL.hide(c, [f.L, f.B, f.R, [f.R[0] + 2 * u, f.R[1] - 13 * u], [f.T[0], f.T[1] - 15 * u], [f.L[0] - 2 * u, f.L[1] - 11 * u]]);
@@ -8463,6 +8540,11 @@
         c.strokeStyle = '#B04BE0'; c.lineWidth = 1.3 * u; c.beginPath(); const g0 = wallPt(f.B, f.R, 0.7, 4 * u); c.moveTo(g0[0], g0[1]); for (let i = 1; i < 6; i++) c.lineTo(g0[0] + i * 1.4 * u, g0[1] - (i % 2 ? 2.6 : 0) * u); c.stroke();
         const bx = p.x + 10 * u, by = p.y + 5 * u; box(c, bx, by, 2.6 * u, 1.3 * u, 1, 5 * u, '#59606A');
         if (home) { const fl = 0.8 + 0.2 * Math.sin(t * 9); tongue(c, bx, by - 5 * u, 2.2 * u, 5 * u * fl, '#F39C33'); tongue(c, bx, by - 5 * u, 1.2 * u, 3.4 * u * fl, '#FFE08A'); if (NL.on && c === ctx) NL.lamp(c, bx, by, [[bx, by - 7 * u]], 1.2); crew(bx - 4 * u, by + 6 * u, false, crewN); }
+        // 12.10 (Navid): most of the time they are inside: asleep by day, awake at night with the window lit
+        const win = [wallPt(f.L, f.B, 0.3, 4.5 * u), wallPt(f.L, f.B, 0.62, 4.5 * u + 1.2 * u), wallPt(f.L, f.B, 0.62, 8.5 * u + 1.2 * u), wallPt(f.L, f.B, 0.3, 8.5 * u)];
+        poly(c, win, inside && ph === 'awake' ? '#FFD27A' : '#2A2620');
+        if (inside && ph === 'awake' && NL.on && c === ctx) NL.lamp(c, (win[0][0] + win[2][0]) / 2, (win[0][1] + win[2][1]) / 2, [[(win[0][0] + win[2][0]) / 2, (win[0][1] + win[2][1]) / 2]], 0.6);
+        if (inside && ph === 'asleep' && !reduced) { c.fillStyle = 'rgba(255,255,255,.85)'; c.font = `800 ${4 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; for (let i = 0; i < 3; i++) { const k = ((t * 0.5 + i / 3) % 1); c.globalAlpha = 1 - k; c.fillText('z', p.x + (2 + k * 6) * u, p.y - (18 + k * 12) * u); } c.globalAlpha = 1; }
         tag(c, p.x, p.y - 30 * u, `🦹 ${name} · hideout`, px, 'rgba(43,47,58,.92)', '#fff');
         const sp = toScreen(p.x, p.y - 10 * u); ui.hits.push({ x0: sp.x - 40, x1: sp.x + 40, y0: sp.y - 50, y1: sp.y + 30, gang: true });
       } });
@@ -8483,7 +8565,47 @@
       c.fillStyle = '#F4E7C8'; c.fillRect(x - 6 * u, y - 26 * u, 12 * u, 13 * u); c.strokeStyle = '#8A6A48'; c.lineWidth = 0.6 * u; c.strokeRect(x - 6 * u, y - 26 * u, 12 * u, 13 * u);
       c.fillStyle = '#3A3F4E'; c.beginPath(); c.arc(x, y - 20 * u, 2.6 * u, 0, Math.PI * 2); c.fill(); c.fillRect(x - 3.6 * u, y - 18 * u, 7.2 * u, 3 * u);
       c.fillStyle = '#B3432B'; c.font = `900 ${2.6 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.fillText('WANTED', x, y - 23.6 * u);
+      const sp = toScreen(x, y - 19 * u), r0 = Math.max(22, 8 * u * cam.z); ui.hits.push({ x0: sp.x - r0, x1: sp.x + r0, y0: sp.y - r0, y1: sp.y + r0, wanted: true }); // 12.10: tap the poster
     } });
+  }
+  /* 12.10 (Navid): the gang keeps night hours. By day they sleep in the shack; at night they are awake inside (its
+     window lit) and come out round the fire barrel to plan, from 8:30 to 10:30 pm and from 1 to 3 am. Bank jobs
+     (casing and the robbery) only happen at night. */
+  function gangPhase(h) {
+    if (h == null) h = gameHour();
+    if (h >= 7 && h < 19) return 'asleep';
+    return (h >= 20.5 && h < 22.5) || (h >= 1 && h < 3) ? 'out' : 'awake';
+  }
+  const gangNight = () => { const h = gameHour(); return h >= 20 || h < 5; };
+  // 12.10 (Navid: "it said Sly Pete took 21 gold while Sly Pete was walking in circles at the hideout"): whoever does a
+  // break-in is drawn there: walking up to the building, then at its door with a sack until the police come or they
+  // get away. A vandal runs off from the window they just smashed.
+  const THIEF_LOOK = { skin: '#D9A77E', shirt: '#33373F', pants: '#1E2028', hat: 'hood', hatColor: '#2B2F3A' };
+  function thiefLook(tid) {
+    const g = state.gang, all = g ? [g.leader, ...(g.members || [])] : [], i = all.indexOf(tid);
+    if (i >= 0) return GANG_LOOKS[i % GANG_LOOKS.length];
+    return { ...THIEF_LOOK, skin: ['#D9A77E', '#8D5A3B', '#F0C7A0', '#C68A5E'][(tid || 0) % 4] };
+  }
+  function drawCulprits(objs, c, now) {
+    const u = HW / 30, t = now / 1000, real = Date.now();
+    for (const b of state.buildings) {
+      if (!live(b)) continue;
+      const r = b.robbed, v = b.vandal && real - b.vandal.at < 9000 ? b.vandal : null;
+      if (!r && !v) continue;
+      const [w, d] = dimsB(b), q = footPts(b.c, b.r, w, d), B0 = q[2], L0 = q[3], door = [B0[0] + (L0[0] - B0[0]) * 0.3, B0[1] + (L0[1] - B0[1]) * 0.3 + 3 * u];
+      const away = [door[0] - 26 * u, door[1] + 14 * u];
+      if (r) {
+        const k = clamp((real - r.at) / 5000, 0, 1), x = away[0] + (door[0] - away[0]) * k, y = away[1] + (door[1] - away[1]) * k, L = thiefLook(r.thief);
+        objs.push({ depth: vd(b.c + w - 0.5, b.r + d - 0.5) + 0.3, draw: () => {
+          const hand = person(c, x, y, u * 1.05, L, k < 1 ? { walk: t * 10, facing: 1 } : { facing: -1, arms: 'rest', t });
+          c.fillStyle = '#8A6A48'; c.beginPath(); c.ellipse(hand[0] + 1.5 * u, hand[1] + 2 * u, 2.4 * u, 2.8 * u, 0, 0, Math.PI * 2); c.fill(); // the sack
+          c.fillStyle = '#F3C64B'; c.font = `800 ${3 * u}px Figtree, system-ui, sans-serif`; c.textAlign = 'center'; c.fillText('$', hand[0] + 1.5 * u, hand[1] + 3 * u);
+        } });
+      } else {
+        const k = clamp((real - v.at) / 9000, 0, 1), x = door[0] + (away[0] - door[0]) * k * 1.6, y = door[1] + (away[1] - door[1]) * k * 1.6;
+        objs.push({ depth: vd(b.c + w - 0.5, b.r + d - 0.5) + 0.3, draw: () => { c.save(); c.globalAlpha *= 1 - Math.max(0, k - 0.75) * 4; person(c, x, y, u * 1.05, GANG_LOOKS[(b.id) % 3], { walk: t * 14, facing: -1 }); c.restore(); } });
+      }
+    }
   }
   // 12.09: what the gang leaves on a building: a smashed window on its left wall, its tag on the right wall
   function drawScars(c, b, u) {
@@ -8985,6 +9107,13 @@
     // 10.07: firefighters, nurses and teachers wait indoors and only come out for lunch and dinner; the police patrol
     const h = gameHour(), meal = (h >= 12 && h < 13) || (h >= 18.5 && h < 19.5);
     for (const w of walkers) w.indoors = (w.role === 'fire' || w.role === 'nurse' || w.role === 'teacher') && !meal;
+    // 12.10 (Navid): the police work in shifts, so they are not all out at once: by day two in three patrol, at night
+    // one in two with a night shift (one in three without), taking turns every two town hours.
+    const cops = walkers.filter((w) => w.role === 'police'), turn = Math.floor(townHours() / 2);
+    if (cops.length > 1) {
+      const share = nightK() > 0.5 ? (nightShift() ? 0.5 : 0.34) : 0.67, out = Math.max(1, Math.round(cops.length * share));
+      cops.forEach((w, j) => { w.indoors = (j + turn) % cops.length >= out; });
+    }
   }
   const claimed = (w, bid) => walkers.some((o) => o !== w && o.act && o.act.bid === bid);
   function planWalker(w, now) {
@@ -9511,11 +9640,23 @@
       if (playing && ui.spot) { const q2 = tileCenter(ui.spot.c, ui.spot.r); return { x: q2.x, y: q2.y, hw: HW * 0.7, d: vd(ui.spot.c, ui.spot.r) }; }
       return null;
     })();
+    // 12.10 (Navid): while placing a building or a street lamp, the buildings around the spot fade so you can see where
+    // it goes: right beside it 90% see-through, one tile further 80%, two tiles further 70%.
+    const placeRect = (() => {
+      if (item) { const sp2 = ui.preview ? { c: ui.preview.c, r: ui.preview.r } : (ui.hover ? anchorFor(item.type, ui.hover.c, ui.hover.r) : null); if (!sp2) return null; const [w2, d2] = dimsOf(item.type, rotFor(item.type)); return { c0: sp2.c, r0: sp2.r, c1: sp2.c + w2 - 1, r1: sp2.r + d2 - 1, id: item.moveId }; }
+      if (playing && ui.lamp && ui.lamp.pick) { const k = ui.lamp.pick; return { c0: k.c - 0.5, r0: k.r - 0.5, c1: k.c + 0.5, r1: k.r + 0.5 }; }
+      return null;
+    })();
     const xray = (b, p, s) => {
-      if (!xf || b.id === xf.id || T(b).cat === 'decor') return false;
+      if (placeRect) {
+        if (b.id === placeRect.id || T(b).cat === 'decor') return 0;
+        const [w2, d2] = dimsB(b), gc = Math.max(0, placeRect.c0 - (b.c + w2 - 1), b.c - placeRect.c1) - 1, gr = Math.max(0, placeRect.r0 - (b.r + d2 - 1), b.r - placeRect.r1) - 1, g = Math.max(gc, gr, 0);
+        return g === 0 ? 0.1 : g === 1 ? 0.2 : g === 2 ? 0.3 : 0;
+      }
+      if (!xf || b.id === xf.id || T(b).cat === 'decor') return 0;
       const [w2, d2] = dimsB(b); if (vd(b.c + (w2 - 1) / 2, b.r + (d2 - 1) / 2) <= xf.d + 0.01) return false; // behind it: nothing to hide
       const ub = (HW / 30) * (1 + 0.35 * (s - 1)), tall = Math.max(topOf(b.type, b.level), ROOF[b.type] ? ROOF[b.type](b.level) : 0, 24) * ub * 1.3;
-      return p.y - tall < xf.y + HH * 0.5 && Math.abs(p.x - xf.x) < HW * s * 0.95 + xf.hw;
+      return p.y - tall < xf.y + HH * 0.5 && Math.abs(p.x - xf.x) < HW * s * 0.95 + xf.hw ? 0.26 : 0;
     };
     for (const b of state.buildings) {
       if (item && ui.holding.id === b.id) continue;
@@ -9578,8 +9719,8 @@
         let sc = 1;
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
-        const see = xray(b, p, s); if (see) { c.save(); c.globalAlpha = 0.26; } // 12.06: see-through
-        dB(c, b.type, b.level, p.x, p.y, hw, hh, { alpha: see ? 0.26 : 0, rot, choice: b.choice, ruin: b.ruin || !!b.shut, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
+        const see = xray(b, p, s); if (see) { c.save(); c.globalAlpha = see; } // 12.06: see-through (12.10: by distance while placing)
+        dB(c, b.type, b.level, p.x, p.y, hw, hh, { alpha: see || 0, rot, choice: b.choice, ruin: b.ruin || !!b.shut, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
         if (b.addons) drawAddons(c, b, now);
         if (b.vandal || b.tag) drawScars(c, b, u); // 12.09: the gang's marks
         if (isGrower(b)) drawFarmers(c, b, now); // 10.15; 11.02: farms too
@@ -9589,7 +9730,7 @@
         else if (q && !bigQ(q) && !crewOnSite(q.bid)) badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
         if (b.burnt || (b.health != null && b.health < 100 && !b.fire)) soot(c, b, p, hw, hh, u, now);
         if (b.ruin && !q) badge(c, p.x + hw * 0.5, p.y - 26 * u, 7 * u, '#B3432B', '!');
-        if (T(b).cat !== 'decor' && !T(b).chest && !special(T(b)) && !b.site && T(b).cat !== 'landmark' && b.type !== 'works' && b.type !== 'fallen') { const rt = (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u; rankBars(c, p.x - hw * 0.46, p.y - rt * 0.5, u * 0.7, b.level, rankKind(b)); } // 10.13: rank stripes, top left (10.15: smaller, on the corner of the building)
+        if (T(b).cat !== 'decor' && !T(b).chest && !special(T(b)) && !b.site && T(b).cat !== 'landmark' && b.type !== 'works' && b.type !== 'fallen') { const rt = (ROOF[b.type] ? ROOF[b.type](b.level) : 24) * u; if (see) { c.save(); c.globalAlpha = Math.max(see, 0.3); } rankBars(c, p.x - hw * 0.46, p.y - rt * 0.5, u * 0.7, b.level, rankKind(b)); if (see) c.restore(); } // 10.13: rank stripes, top left (10.15: smaller, on the corner of the building)
         if (ui.selected === b.id) { c.strokeStyle = '#FFF4C2'; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(p.x, p.y + 2, hw * 0.9, hh * 0.9, 0, 0, Math.PI * 2); c.stroke(); }
       } });
     }
@@ -9600,6 +9741,7 @@
       c.save(); c.setLineDash([6, 5]); c.strokeStyle = 'rgba(122,82,48,.55)'; c.lineWidth = 2; outline(c, pts); c.restore();
     }
     for (const w of wild) objs.push(w);
+    if (playing && ui.lamp && ui.lamp.pick) { const k = ui.lamp.pick; objs.push({ depth: vd(k.c, k.r) + 0.02, draw: () => { const p = tileCenter(k.c, k.r); c.save(); c.globalAlpha = 0.85 + 0.15 * Math.sin(now / 260); drawStreetLamp(c, p.x, p.y, 1, HW / 30); c.restore(); } }); } // 12.10 (Navid): the lamp you are placing, not just a dot
     for (const L of lampList()) { if (!cornerOpen(L.c, L.r)) continue; objs.push({ depth: vd(L.c, L.r) + 0.02, draw: () => { const p = tileCenter(L.c, L.r); drawStreetLamp(c, p.x, p.y, L.level || 1, HW / 30, !!L.broken); if (ui.panel && ui.panel.kind === 'lampinfo' && ui.panel.id === L.id) { c.strokeStyle = '#FFF4C2'; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(p.x, p.y, HW * 0.45, HH * 0.45, 0, 0, Math.PI * 2); c.stroke(); } } }); } // 12.07
     ui.reveals = ui.reveals.filter((r) => !r.done);
     if (!ui.reveals.length && stage.classList.contains('peek') && !scheduleReveals.timer && !peekAt.timer) stage.classList.remove('peek');
@@ -9667,6 +9809,7 @@
       } });
     }
     drawGang(objs, c, now, px); // 12.09: the gang in town
+    drawCulprits(objs, c, now); // 12.10: thieves and vandals where they strike
     objs.sort((a, b) => a.depth - b.depth);
     for (const o of objs) o.draw();
     for (const fn of after) fn();
@@ -9677,7 +9820,11 @@
       c.fillStyle = g; c.fillRect(0, 0, geo.w, geo.h); c.restore(); } }
     // a soft evening or night light over the town (labels stay bright)
     const tint = skyNow().tint;
-    if (tint[3] > 0.005) { c.save(); c.setTransform(d, 0, 0, d, 0, 0); c.fillStyle = css(tint); c.fillRect(0, 0, geo.w, geo.h); c.restore(); }
+    // 12.10 (Navid: "the map at night gets completely faded"): the tint darkens the colours ("multiply") instead of
+    // laying a veil over them, so the town keeps its contrast at night; a little of the veil stays for the haze.
+    if (tint[3] > 0.005) { c.save(); c.setTransform(d, 0, 0, d, 0, 0); const a = tint[3], k = 0.8 * a;
+      c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgb(${tint.slice(0, 3).map((v) => Math.round(255 - k * (255 - v))).join(',')})`; c.fillRect(0, 0, geo.w, geo.h);
+      c.globalCompositeOperation = 'source-over'; c.fillStyle = css([tint[0], tint[1], tint[2], a * 0.12]); c.fillRect(0, 0, geo.w, geo.h); c.restore(); }
     if (NL.on) { drawNightLights(c, now); NL.on = false; } // 12.06
     // Drifting cloud shadows.
     // Clouds drift high above the town, with their shadows on the ground: more of them on grey days.
@@ -9951,7 +10098,7 @@
   function renderAll() {
     const playing = ui.screen === 'play';
     $('town-name').textContent = state.town;
-    $('focus-builder').textContent = state.builder;
+    if ($('focus-builder')) $('focus-builder').textContent = state.builder;
     stage.classList.toggle('home', !playing);
     $('homebar').hidden = playing; $('playbar').hidden = !playing; $('homebody').hidden = playing;
     if (!playing) ui.barOpen = false;
@@ -13800,10 +13947,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
   /* ---------- 10.13 (Navid): the lap switch. Drag it left for shorter laps, right for longer ones; 30 minutes (25 + 5)
      sits in the middle. Only lengths that add up to the whole project are on it. ---------- */
-  function lapSwitch(opts, cur, onChange) {
+  function lapSwitch(opts, cur, onChange, planL) {
     const ci = opts.indexOf(ROUND), lo = opts.slice(0, ci), hi = opts.slice(ci + 1);
-    const pos = (L) => (opts.length > 1 ? opts.indexOf(L) / (opts.length - 1) : 0.5), pr = pos(ROUND); // 10.16 (Navid): evenly spaced
-    const desc = (L) => `${fmtMin(L)} lap: ${fmtHalf(lapFocus(L))} min focus + ${fmtHalf(lapBreakOf(L))} min break`; // 12.05
+    const pos = (L) => (opts.length > 1 ? opts.indexOf(L) / (opts.length - 1) : 0.5); // 10.16 (Navid): evenly spaced
+    // 12.10 (Navid): the slider's own labels already say the lap length, so the line above says only how it splits.
+    // The mark that stood at 30 minutes now shows Sam's plan: the shortest lap that finishes it (none without a plan).
+    const pr = planL && opts.includes(planL) ? pos(planL) : null;
+    const desc = (L) => `${fmtHalf(lapFocus(L))} min focus + ${fmtHalf(lapBreakOf(L))} min break`; // 12.05
     const box = el('div', 'lapsw' + (hi.length ? '' : ' nohi')); box.tabIndex = 0; box.setAttribute('role', 'slider');
     box.setAttribute('aria-label', 'Lap length'); box.setAttribute('aria-valuemin', '0'); box.setAttribute('aria-valuemax', String(opts.length - 1));
     const head = el('div', 'lsw-head'), val = el('b', '');
@@ -13811,13 +13961,13 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const track = el('div', 'lsw-track'), rail = el('span', 'lsw-rail'), fill = el('span', 'lsw-fill'), mid = el('span', 'lsw-mid'), thumb = el('span', 'lsw-thumb');
     track.append(rail, fill, mid, thumb);
     const ticks = el('div', 'lsw-ticks'), tb = new Map();
-    for (const L of opts) { const t = el('button', 'lsw-tick' + (L === ROUND ? ' mid' : ''), shortMin(L)); t.type = 'button'; t.tabIndex = -1; t.style.left = pos(L) * 100 + '%'; t.addEventListener('click', (e) => { e.stopPropagation(); set(L, true); }); ticks.append(t); tb.set(L, t); }
+    for (const L of opts) { const t = el('button', 'lsw-tick' + (L === planL ? ' plan' : ''), shortMin(L) + (L === planL ? ' ✓' : '')); if (L === planL) t.title = `${state.builder}'s plan is done in one lap`; t.type = 'button'; t.tabIndex = -1; t.style.left = pos(L) * 100 + '%'; t.addEventListener('click', (e) => { e.stopPropagation(); set(L, true); }); ticks.append(t); tb.set(L, t); }
     if (!hi.length) ticks.append(Object.assign(el('span', 'lsw-none', 'longer laps don\'t add up to this project'), {}));
     box.append(head, track, ticks);
     let curL = cur, drag = false;
     const show = (L) => {
       curL = L; const p = pos(L);
-      thumb.style.left = p * 100 + '%'; fill.style.left = '0%'; fill.style.width = p * 100 + '%'; mid.style.left = pr * 100 + '%'; // 12.06 (Navid): filled from the shortest lap to yours
+      thumb.style.left = p * 100 + '%'; fill.style.left = '0%'; fill.style.width = p * 100 + '%'; if (pr != null) mid.style.left = pr * 100 + '%'; mid.hidden = pr == null; // 12.06 (Navid): filled from the shortest lap to yours
       val.textContent = desc(L); box.setAttribute('aria-valuenow', String(opts.indexOf(L))); box.setAttribute('aria-valuetext', desc(L));
       for (const [k, t] of tb) t.setAttribute('aria-pressed', String(k === L));
     };
@@ -13850,7 +14000,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       title.textContent = `Lap ${n0 + 1} of ${n0 + n}`;
       planBox.replaceChildren(lapPlanEl(P, L, 1), lapTotalEl(lapPlan(P, L))); // 12.05: and the total
     };
-    const sw = lapSwitch(opts, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
+    const sw = lapSwitch(opts, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); }, opts.find((L) => lapFocus(L) >= P - 1e-6));
     update(startPick.lapLen);
     if (brk) card.append(el('span', 'lc-eye', `Break · ${fmtClock(breakLeft())} left`));
     card.append(top);
@@ -13886,7 +14036,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       return row;
     };
     const update = (L) => planBox.replaceChildren(stepper(), oneLap(L), lapTotalEl(lapsFor(L)));
-    const sw = lapSwitch(LAP_LENS, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); });
+    const pw = focusJobs().length ? planWork() : 0;
+    const sw = lapSwitch(LAP_LENS, startPick.lapLen, (L, final) => { startPick.lapLen = L; startPick.mode = 'laps'; if (final) renderStart(); else update(L); }, pw > 0 ? LAP_LENS.find((L) => lapFocus(L) >= pw - 1e-6) : null);
     update(startPick.lapLen);
     card.append(top);
     if (isLaps) card.append(sw, planBox); else card.append(el('span', 'lc-unfold', 'As many laps as you like, with breaks ▾'));
@@ -14602,10 +14753,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (wait) lab.append(`${state.builder} finishes `, finB(), `, then you (${jobName(wait.q)} needs longer):`);
       else lab.append(`${state.builder} finishes `, finB(), ', then you:');
     } else lab.append('Your job');
-    const jobsHidden = isLaps && !(hasRounds && pv.sim.leftover > 0.05); // 12.05 (Navid): in laps, your job shows only when Sam finishes in the lap and you work after
+    const jobsHidden = isLaps && hasRounds && !(pv.sim.leftover > 0.05); // 12.10 (Navid): laps without a project work your job, so you choose it here too // 12.05 (Navid): in laps, your job shows only when Sam finishes in the lap and you work after
     // 12.07 (design A): with a set time, what Sam does and your job fold into one line; a tap opens the job choices
-    const jobFold = !isLaps && !startPick.jobsOpen, cj = currentJob();
-    if (!isLaps) {
+    const oneLine = !isLaps || !hasRounds, jobFold = oneLine && !startPick.jobsOpen, cj = currentJob();
+    if (oneLine) {
       const jl = el('button', 'jobline' + (jobFold ? '' : ' open')); jl.type = 'button'; jl.setAttribute('aria-expanded', String(!jobFold));
       const tx = el('span', 'jl-tx'); tx.append(...lab.childNodes);
       if (planned && pv.sim.leftover < 0.05) { /* Sam uses the whole session: nothing to add */ }
@@ -15162,7 +15313,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     const job = jobs().find((j) => j.bid === s.jobBid) || currentJob();
     return { s, m, sim, cur, job };
   }
+  // 12.10 (Navid: "on Android I can leave the app and come back and nothing happens"): the note under the timer says
+  // whether the phone check is really on, so it is clear which version is running: the Android app watches the phone;
+  // a browser or the home-screen web app cannot see other apps.
+  function phoneNoteText() {
+    const B = state.builder;
+    if (APP.on) return `Phone check is on: unlocked in another app for ${APP_GRACE} seconds or more stops ${B}. The screen going off is fine.${APP.ev.length ? '' : ' (Waiting for the phone\'s first report.)'}`;
+    return `Put your phone away. The timer keeps running with the screen off. This browser version can't see other apps; the Android app stops ${B} when you pick up your phone.`;
+  }
   function renderFocus(now) {
+    { const pn = $('phone-note'), tx = phoneNoteText(); if (pn && pn.textContent !== tx) pn.textContent = tx; }
     const f = focusNow(now); if (!f) return;
     const { s, m, sim, cur, job } = f;
     const rd = inReady(s, now);
@@ -15949,6 +16109,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (!ui.holding && !ui.attach && !ui.lamp) for (let i = ui.hits.length - 1; i >= 0; i--) {
       const h = ui.hits[i]; if (sx < h.x0 || sx > h.x1 || sy < h.y0 || sy > h.y1) continue;
       if (h.camp != null) { if (ui.screen === 'play') openPanel({ kind: 'camp', camp: h.camp }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'camp', camp: h.camp }), 420); return; } // 11.06
+      if (h.wanted) { openWanted(); return; } // 12.10
       if (h.gang) { if (ui.screen === 'play') openPanel({ kind: 'gang' }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'gang' }), 420); return; } // 12.09
       if (h.pirate) { if (ui.screen === 'play') openPanel({ kind: 'pirate' }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'pirate' }), 420); return; } // 11.05
       if (h.plot) { const go = () => openPanel({ kind: 'land', plot: h.plot }); if (ui.screen === 'home') { if (enterPlay()) setTimeout(go, 420); } else go(); return; }
@@ -16292,6 +16453,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     lit: (bid) => litHome(byId(bid)),
     power: () => lampPower(),
     startLamp: () => { startLamp(); return !!ui.lamp; },
+    toScreen: (c, r) => { const q = tileCenter(c, r), sp = toScreen(q.x, q.y); return { x: sp.x, y: sp.y }; }, // 12.10: tests
+    pickLamp: (c, r) => { if (!ui.lamp) startLamp(); if (!ui.lamp || !cornerOk(c, r)) return false; ui.lamp.pick = { c, r }; renderAll(); return true; },
+    openWanted: () => { openWanted(); return !$('scrim').hidden; },
+    gangPhase: (h) => gangPhase(h),
+    openStart: (d) => { openStart(d || 0); return !$('scrim').hidden; }, // 12.10: tests
     // 10.19: families. hours: pretend that many hours passed (births, leave ending)
     famAhead: (hours) => { const F = fam(); F.at -= hours * 3600000; for (const k of F.kids) { k.born -= hours * 3600000; k.leaveEnd -= hours * 3600000; } familyStep(Date.now()); return { kids: F.kids.length, births: F.births, leave: onLeaveNow().length, babies: babiesNow().length }; },
     birth: (n) => { const F = fam(); for (let i = 0; i < (n || 1); i++) { F.at = Date.now() - 1441 * 3600000 / Math.max(1, city().residents) - 60000; const b0 = F.births; let tries = 0; while (F.births === b0 && tries++ < 20) { F.at = Date.now() - 1441 * 3600000 / Math.max(1, city().residents); familyStep(Date.now()); } } return { births: F.births, leave: onLeaveNow().length, workers: city().jobs.workers, leavePay: econ().leave, mood: econ().mood.families }; },
