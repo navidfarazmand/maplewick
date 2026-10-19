@@ -22,9 +22,9 @@ def seeded(ctx, st):
 
 def focus25(pg):
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(400)
-    if not pg.is_visible('.durations'):
+    if not pg.is_visible('.setcard'):
         pg.click('.set-tog'); pg.wait_for_timeout(300)
-    pg.click('.durations button:nth-child(5)'); pg.wait_for_timeout(200)  # 45m
+    pg.click('.setcard .sc-tick[aria-label="45 min"]'); pg.wait_for_timeout(200)  # 45m
     pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300)
     D(pg, 'skipReady()'); D(pg, 'jumpFocus(46)'); pg.wait_for_timeout(1200)
 

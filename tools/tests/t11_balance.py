@@ -1,4 +1,4 @@
-# 11.00: the balance. Checks prices, upkeep, the town hall's people rule, staff and the ferry.
+# 11.00: the balance (12.07: prices of buildings and upgrades ×(1 + 0.25 per town hall level above 1)). Checks prices, upkeep, the town hall's people rule, staff and the ferry.
 import json, time, os, pathlib
 from playwright.sync_api import sync_playwright
 HERE = pathlib.Path(__file__).resolve().parent
@@ -18,12 +18,12 @@ with sync_playwright() as p:
     pg.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('maplewick-town-v7', " + json.dumps(json.dumps(st)) + "); sessionStorage.setItem('seeded','1'); }")
     pg.goto(URL); pg.wait_for_timeout(900)
     D(pg, 'play()'); pg.wait_for_timeout(400)
-    c = D(pg, "newCost('cottage')"); ok(c['cost'] == 40, f"cottage costs 40 ({c['cost']})")
-    c = D(pg, "newCost('firestation')"); ok(c['cost'] == 100, f"fire post costs 100 ({c['cost']})")
-    c = D(pg, "newCost('clinic')"); ok(c['cost'] == 360, f"clinic costs 360 ({c['cost']})")
-    c = D(pg, "newCost('field')"); ok(c['cost'] == 80, f"field costs 80 ({c['cost']})")
+    c = D(pg, "newCost('cottage')"); ok(c['cost'] == 60, f"cottage costs 60 at town hall 3 (12.07: ×1.5) ({c['cost']})")
+    c = D(pg, "newCost('firestation')"); ok(c['cost'] == 150, f"fire post costs 150 ({c['cost']})")
+    c = D(pg, "newCost('clinic')"); ok(c['cost'] == 540, f"clinic costs 540 ({c['cost']})")
+    c = D(pg, "newCost('field')"); ok(c['cost'] == 120, f"field costs 120 ({c['cost']})")
     cid = D(pg, "addBuilding('cottage', 1)")
-    u = D(pg, f"upgradeJob({cid})"); ok(u['cost'] == 50, f"cottage to level 2 costs 50 ({u['cost']})")
+    u = D(pg, f"upgradeJob({cid})"); ok(u['cost'] == 75, f"cottage to level 2 costs 75 ({u['cost']})")
     hall = [x for x in D(pg, 'state()')['buildings'] if x['type'] == 'townhall'][0]
     u = D(pg, f"upgradeJob({hall['id']})"); ok(not u['ok'], 'town hall 4 needs 110 people')
     e = D(pg, 'econ()'); ok(e['cap'] == 3500, f"treasury at hall 3 is 3,500 ({e['cap']})"); ok(e['fee']['sweeper'] == 80, f"sweeper fee 80 ({e['fee']['sweeper']})")

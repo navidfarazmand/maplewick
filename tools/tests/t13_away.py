@@ -73,7 +73,7 @@ with sync_playwright() as p:
     pg2=seeded(st)
     pg2.evaluate("() => document.querySelector('#btn-focus').click()"); pg2.wait_for_timeout(400)
     (pg2.click('.set-tog.card') if pg2.is_visible('.set-tog.card') else None); pg2.wait_for_timeout(250)
-    pg2.click('.durations button:nth-child(4)'); pg2.wait_for_timeout(200)  # 25m
+    pg2.click('.setcard .sc-tick[aria-label="25 min"]'); pg2.wait_for_timeout(200)  # 25m
     pg2.click('.startsheet .btn.primary.full'); pg2.wait_for_timeout(300)
     D(pg2,'skipReady()'); D(pg2,'jumpFocus(26)'); pg2.wait_for_timeout(900)
     print('silver after 25', D(pg2,'silver()'))

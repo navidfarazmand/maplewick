@@ -18,7 +18,7 @@ with sync_playwright() as p:
     pg.goto(URL); pg.wait_for_timeout(900)
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(400)
     (pg.click('.set-tog.card') if pg.is_visible('.set-tog.card') else None); pg.wait_for_timeout(250)
-    pg.click('.durations button:nth-child(3)'); pg.wait_for_timeout(200)  # 15m
+    pg.click('.setcard .sc-tick[aria-label="15 min"]'); pg.wait_for_timeout(200)  # 15m
     pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300)
     print('sess', bool(D(pg,'state()')['session']))
     D(pg,'skipReady()'); D(pg,'jumpFocus(16)'); pg.wait_for_timeout(900)
@@ -28,7 +28,7 @@ with sync_playwright() as p:
     pg.screenshot(path=SH+'silver1_progress.png')
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(400)
     (pg.click('.set-tog.card') if pg.is_visible('.set-tog.card') else None); pg.wait_for_timeout(250)
-    pg.click('.durations button:nth-child(3)'); pg.wait_for_timeout(200)
+    pg.click('.setcard .sc-tick[aria-label="15 min"]'); pg.wait_for_timeout(200)
     pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300)
     D(pg,'skipReady()'); D(pg,'jumpFocus(16)'); pg.wait_for_timeout(1200)
     print('silver', D(pg,'silver()'))

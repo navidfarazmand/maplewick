@@ -65,7 +65,7 @@ with sync_playwright() as p:
     st2['queue'][0]['work']=50
     pg=seeded(ctx,st2)
     pg.evaluate("() => document.querySelector('#btn-focus').click()"); pg.wait_for_timeout(400)
-    pg.click('.durations button:nth-child(5)'); pg.wait_for_timeout(300)  # 45m
+    pg.click('.setcard .sc-tick[aria-label="45 min"]'); pg.wait_for_timeout(300)  # 45m
     lab=pg.inner_text('.startsheet > .label:nth-of-type(2)') if pg.query_selector('.startsheet > .label:nth-of-type(2)') else ''
     print('label:', pg.eval_on_selector_all('.startsheet .label','els=>els.map(e=>e.textContent)'))
     pg.click('.startsheet .btn.primary.full'); pg.wait_for_timeout(300)

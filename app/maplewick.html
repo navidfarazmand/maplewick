@@ -450,7 +450,7 @@
   .lapcard .lc-unfold { font-size: 12.5px; font-weight: 700; opacity: .85; }
   .set-tog { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; background: none; padding: 6px 2px; font: inherit; font-weight: 700; font-size: 15px; color: var(--ink); text-align: left; }
   .set-tog:disabled { opacity: 1; cursor: default; }
-  .set-tog.card { padding: 12px 14px; margin: 6px 0 2px; border-radius: 16px; border: 0; color: #fff; background: linear-gradient(135deg, #FF9A3D, #E8572A); box-shadow: 0 6px 16px -8px rgba(232,87,42,.7), inset 0 -3px 0 rgba(0,0,0,.14); } /* 12.06 (Navid): orange, apart from the purple laps */
+  .set-tog.card { padding: 12px 14px; margin: 6px 0 2px; border-radius: 16px; border: 0; color: #fff; background: var(--sc-bg); box-shadow: 0 8px 18px -8px var(--sc-glow), inset 0 -3px 0 rgba(90,0,30,.16); } /* 12.06 (Navid): apart from the purple laps; 12.07: the sunrise colours of the slider card */
   .set-tog.card .st-tx small { color: rgba(255,255,255,.88); } .set-tog.card .chev { background: rgba(255,255,255,.22); color: #fff; }
   .set-tog .st-tx { display: flex; flex-direction: column; gap: 2px; }
   .set-tog .st-tx b { font-family: var(--display); font-size: 17px; }
@@ -1019,6 +1019,56 @@
   .ptile.k-xp { background: var(--xp-soft); color: var(--xp); }
   .ptile.k-food { background: #F6E7B8; color: #7A5A12; }
   .ptiles.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } .ptiles.four .ptile { padding: 7px 8px; } .ptiles.four .ptile b { font-size: 19px; }
+  /* 12.07: the combo stamp on the gold box (it used to sit on the eight blocks) */
+  .ptile.cmbon { position: relative; overflow: visible; animation: cmbShake .2s ease-out; animation-delay: var(--dl, 0s); }
+  .ptile.cmbon b.num { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .ptile .was { position: relative; font-size: .62em; opacity: .45; animation: cmbFade .26s ease-out both; animation-delay: var(--d0, 0s); }
+  .ptile .was .strike { position: absolute; inset: -2px -3px; width: calc(100% + 6px); height: calc(100% + 4px); overflow: visible; }
+  .ptile .was .strike path { fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 100; animation: cmbStrike .26s cubic-bezier(.2, .7, .3, 1) both; animation-delay: var(--d0, 0s); }
+  .ptile .stamp { display: inline-block; padding: 1px 7px 0; border-radius: 8px; background: linear-gradient(180deg, #F47A45, #D2481A); color: #FFF; font-size: .9em; transform: rotate(-6deg); box-shadow: 0 2px 0 #9A3510, inset 0 0 0 1.5px rgba(255,255,255,.55); animation: tileStamp .42s both; animation-delay: var(--ds, 0s); }
+  @keyframes tileStamp { 0% { opacity: 0; transform: rotate(-6deg) scale(1.9); } 30% { opacity: 1; } 55% { transform: rotate(-6deg) scale(1); } 78% { transform: rotate(-6deg) scale(.92); } 100% { opacity: 1; transform: rotate(-6deg) scale(1); } }
+  /* 12.07 (Navid picked design A): one long lap on a slider, in its own bright sunrise colours so it never looks like
+     the lesser choice next to the purple laps. A slow shine runs across it. */
+  .setcard { position: relative; overflow: hidden; display: grid; gap: 8px; margin: 6px 0 14px; padding: 14px 14px 6px; border-radius: 20px; color: #FFFFFF;
+    background: var(--sc-bg); box-shadow: 0 0 0 3px var(--sc-ring), 0 12px 26px -12px var(--sc-glow), inset 0 -3px 0 rgba(90, 0, 30, .16); }
+  :root { --sc-bg: linear-gradient(135deg, #F2457E, #C22872); --sc-btn: linear-gradient(135deg, #F2457E, #B8236C); --sc-ring: rgba(194, 40, 114, .22); --sc-glow: rgba(184, 35, 108, .6); } /* 12.07: Navid picked 5 · Raspberry */
+  .setcard::before { content: ''; position: absolute; inset: -40% auto -40% -60%; width: 45%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); transform: skewX(-18deg); animation: scShine 4.6s ease-in-out infinite; pointer-events: none; }
+  @keyframes scShine { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+  @media (prefers-reduced-motion: reduce) { .setcard::before { animation: none; display: none; } }
+  .setcard > * { position: relative; }
+  .setcard .sc-eye { font-size: 11.5px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .92); text-shadow: 0 1px 0 rgba(120, 20, 30, .25); }
+  .setcard .sc-big { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .setcard .sc-val { font-family: var(--display); font-size: 46px; line-height: .95; text-shadow: 0 2px 0 rgba(140, 20, 40, .28); }
+  .setcard .sc-chips { display: inline-flex; gap: 5px; flex-wrap: wrap; }
+  .setcard .sc-chip { border-radius: 99px; padding: 4px 10px; font-size: 12.5px; font-weight: 800; white-space: nowrap; background: rgba(70, 0, 25, .26); color: #FFF6C2; }
+  .setcard .sc-chip.combo { background: #FFFFFF; color: #D2481A; }
+  .setcard .sc-chip.minus { background: rgba(60, 0, 20, .42); color: #FFD3DC; }
+  .setcard .sc-chip.all { background: rgba(255, 255, 255, .24); color: #FFFFFF; }
+  .setcard .sc-slider { outline: none; border-radius: 14px; }
+  .setcard .sc-slider:focus-visible { box-shadow: 0 0 0 3px rgba(255, 255, 255, .6); }
+  .setcard .sc-track { position: relative; height: 58px; margin: 0 14px; touch-action: none; cursor: grab; }
+  .setcard.drag .sc-track { cursor: grabbing; }
+  .setcard .sc-rail { position: absolute; left: 0; right: 0; top: 34px; height: 10px; margin-top: -5px; border-radius: 5px; background: rgba(90, 0, 30, .28); }
+  .setcard .sc-fill { position: absolute; left: 0; top: 34px; height: 10px; margin-top: -5px; border-radius: 5px; background: linear-gradient(90deg, #FFF3B0, #FFFFFF); box-shadow: 0 0 10px rgba(255, 255, 255, .6); transition: width .16s; }
+  .setcard .sc-thumb { position: absolute; top: 34px; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 5px #FFD84A, 0 4px 12px rgba(120, 0, 30, .45); transition: left .16s cubic-bezier(.3, 1.4, .6, 1); }
+  .setcard.drag .sc-thumb { transform: scale(1.12); }
+  .setcard .sc-mark { position: absolute; top: 0; width: 0; }
+  .setcard .sc-mark small { position: absolute; left: 0; top: 0; transform: translateX(-50%); white-space: nowrap; font-size: 11.5px; font-weight: 900; color: #FFFFFF; text-shadow: 0 1px 2px rgba(120, 0, 30, .45); }
+  .setcard .sc-mark i { position: absolute; left: -1.5px; top: 18px; width: 3px; height: 26px; border-radius: 2px; background: rgba(255, 255, 255, .9); }
+  .setcard .sc-mark.goal small { color: #FFF3B0; }
+  .setcard .sc-ticks { position: relative; height: 34px; margin: 0 14px; }
+  .setcard .sc-tick { position: absolute; top: 0; height: 34px; min-width: 34px; transform: translateX(-50%); border: 0; background: none; padding: 0 2px; color: rgba(255, 255, 255, .82); font: 800 12.5px var(--body); white-space: nowrap; cursor: pointer; border-radius: 8px; }
+  .setcard .sc-tick[aria-pressed="true"] { color: #7A1430; background: #FFFFFF; height: 26px; top: 4px; padding: 0 7px; box-shadow: 0 2px 0 rgba(120, 0, 30, .25); }
+  .uprow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .uprow:last-of-type { border-bottom: 0; }
+  .uprow b { font-size: 15px; } .uprow small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.3; } .uprow .fee { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 700; color: var(--gold); }
+  .uprow.off { opacity: .6; } .uprow .stepper { display: flex; align-items: center; gap: 6px; }
+  .uprow .up-on { font-size: 12.5px; font-weight: 800; color: var(--good, #2B7548); }
+  .jobline { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 12px; padding: 11px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 500 14.5px/1.35 var(--body); text-align: left; cursor: pointer; }
+  .jobline.open { margin-bottom: 8px; }
+  .jobline .jl-tx { flex: 1; min-width: 0; } .jobline b { font-weight: 800; }
+  .jobline .chev { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+  .btn.primary.energy { background: var(--sc-btn); border-color: #E2335A; color: #FFFFFF; box-shadow: 0 10px 22px -10px rgba(240, 36, 111, .7); }
   .pextras { display: grid; gap: 3px; font-size: 13px; font-weight: 600; }
   .pextras span::before { content: '★ '; color: var(--gold-bright); }
   .tally { display: grid; gap: 8px; position: relative; cursor: pointer; }
@@ -1519,7 +1569,7 @@
   // at most 8 minutes), and anything of 20 minutes of work or more needs focus.
   const BIG_WORK = 20, PLAY_BUILD_SEC = [0, 8, 12, 16, 20], BUILD_MAX_SEC = 480;
   const PLAY_PER_MIN = 6; // minutes of focus for one minute of play
-  const APP_VERSION = '12.06'; // 10.01, 10.02… for updates; the first number goes up for a major one
+  const APP_VERSION = '12.07'; // 10.01, 10.02… for updates; the first number goes up for a major one
   const MIN_SESSION = 5;
   // 10.13 (Navid): a focus project over 30 minutes takes whole rounds of 30 minutes: 25 of focus, then a 5-minute break.
   // You can split it into shorter or longer laps (15 min = 12½ + 2½, 45 min = 37½ + 7½, 1 h = 50 + 10…) as long as they
@@ -1556,6 +1606,7 @@
   // Arrays are indexed by level (index 0 unused). up[L] = [gold, focus minutes] to reach level L.
   // limit[hall level] = how many of this building the town can have.
   // Jobs trade gold for play time: no job is simply the best.
+  const LAMP_MAX_T = [0, 4, 10, 16, 24]; // 12.07: street lamps by town hall level
   const TYPES = {
     townhall: { name: 'Town hall', cat: 'civic', size: 2, max: 4, color: '#E7DCC2', roof: '#4E6B90',
       up: [null, null, [120, 15], [350, 45], [800, 90]], cap: [0, 200, 500, 1000, 2500],
@@ -1644,10 +1695,11 @@
       needs: [['60 residents', () => city().residents >= 60], ['2 parks', () => countLive('park') >= 2]] },
     tree: { name: 'Tree', cat: 'decor', size: 1, unlock: 1, cost: 5, max: 1, dec: 0.03, color: '#3E8E57', roof: '#2F6F45', limit: [0, 14, 18, 24, 30], blurb: 'Homes next to it pay 5% more (up to 15% from decorations).' },
     flowers: { name: 'Flowers', cat: 'decor', size: 1, unlock: 1, cost: 5, max: 1, dec: 0.04, color: '#E46B8A', roof: '#F3C64B', limit: [0, 8, 12, 16, 20], blurb: 'Homes next to it pay 5% more (up to 15% from decorations).' },
-    bench: { name: 'Bench', cat: 'decor', size: 1, unlock: 2, cost: 8, max: 1, color: '#9A6B43', roof: '#6E4A2C', limit: [0, 0, 8, 12, 16], blurb: 'Homes next to it pay 4% more. At night it lights everything within 2 tiles, and thieves go for the dark homes.' },
+    bench: { name: 'Bench', cat: 'decor', size: 1, unlock: 2, cost: 8, max: 1, color: '#9A6B43', roof: '#6E4A2C', limit: [0, 0, 8, 12, 16], blurb: 'A seat for a chat: homes next to it pay a little more.' },
     hydrant: { name: 'Fire hydrant', cat: 'decor', size: 1, unlock: 1, cost: 12, max: 1, dec: 0, color: '#D9342B', roof: '#B32820', limit: [0, 4, 6, 8, 10], blurb: 'Fires start half as often within 2 tiles, and firefighters put them out faster there.', needs: [['a fire station', () => countLive('firestation') >= 1]] },
     bin: { name: 'Trash bins', cat: 'decor', size: 1, unlock: 1, cost: 10, max: 1, dec: 0, color: '#3E8E57', roof: '#2F6F45', limit: [0, 4, 6, 8, 10], blurb: 'Trash piles up 40% slower within 2 tiles.' },
-    lamp: { name: 'Lamp post', cat: 'decor', size: 1, unlock: 2, cost: 8, max: 1, color: '#3B4A57', roof: '#FFD978', limit: [0, 0, 8, 12, 16], blurb: 'Homes next to it pay 4% more. At night it lights everything within 2 tiles, and thieves go for the dark homes.' },
+    lamp: { name: 'Street lamp', cat: 'decor', size: 1, unlock: 2, cost: 30, max: 1, color: '#3B4A57', roof: '#FFD978', limit: LAMP_MAX_T, blurb: 'Stands on a corner where tiles meet. At night it lights the ground 2 tiles around (3 and 4 at levels 2 and 3), and thieves go for the dark homes. A home on its corner pays 4% more. Electricity: 1 gold an hour (2 and 3 at higher levels).' },
+    lights: { name: 'House lights', cat: 'decor', size: 1, unlock: 1, cost: 25, max: 1, dec: 0, color: '#3B4A57', roof: '#FFC864', limit: [0, 99, 99, 99, 99], blurb: 'Lights for a home: at night its windows shine and light the street a tile around it. Electricity: 1 gold an hour.' },
     // 10.13 (Navid): upgrades you put on a building (not on a tile). Each adds or saves a fixed amount.
     mural: { name: 'Mural', cat: 'decor', size: 1, unlock: 1, cost: 45, max: 1, dec: 0, color: '#E8A93A', roof: '#5AA9D6', limit: [0, 3, 6, 9, 12], blurb: 'A painting on the wall of a home or a shop: it earns 2 gold an hour more.' },
     flowerbox: { name: 'Window boxes', cat: 'decor', size: 1, unlock: 1, cost: 20, max: 1, dec: 0, color: '#8A5A33', roof: '#E46B8A', limit: [0, 4, 8, 12, 16], blurb: 'Flower boxes under the windows of a home: it earns 1 gold an hour more.' },
@@ -1752,7 +1804,7 @@
   }
   rebalance(Object.keys(TYPES));
   TYPES.townhall.up = [null, null, [200, 15], [900, 60], [3000, 240]];
-  TYPES.townhall.cap = [0, 300, 1200, 3500, 6500];
+  TYPES.townhall.cap = [0, 300, 1200, 3500, 10000]; // 12.07: room for the 9,000 gold town hall 5 (was 6,500)
   TYPES.townhouse.residents = [0, 12, 16, 22]; // 11.00: a House gives more per tile than a cottage
   // 11.01: the Monument, a free gift for your first finished named project (gold can't buy it)
   TYPES.monument = { name: 'Monument', cat: 'joy', size: 1, gift: true, max: 1, color: '#D8D2C4', roof: '#9C9486', radius: 2, boost: [0, 0.05], blurb: 'A stone for every project you finish. Homes within 2 tiles pay 5% more.' };
@@ -1811,7 +1863,7 @@
       blurb: 'Treadmills and classes: homes within 3 tiles fall sick 10% less and are 2% happier. With a stadium in town it earns 10% more.' }
   });
   // 11.04 (roadmap parts 1 and 4, Navid): town halls 5 and 6, and the buildings that come with town hall 4 and 5.
-  TYPES.townhall.max = 6; TYPES.townhall.up.push([9000, 480], [20000, 720]); TYPES.townhall.cap.push(12000, 25000);
+  TYPES.townhall.max = 6; TYPES.townhall.up.push([9000, 480], [20000, 720]); TYPES.townhall.cap.push(24000, 40000); // 12.07: was 12,000 and 25,000, less than the next upgrade costs
   const FEASTS = { 4: 300, 5: 500, 6: 800 };
   Object.assign(TYPES, {
     greenhouse: { name: 'Greenhouse', cat: 'farm', size: 2, unlock: 5, cost: 900, work: 30, max: 3, color: '#D6EEF0', roof: '#7FB8C2', limit: [0, 0, 0, 0, 0, 2, 3], grow: [0, 8, 12, 16],
@@ -2847,7 +2899,14 @@
      winter; 30% less next to a workshop, factory or depot). Every resident eats a quarter of a food an hour. Market
      stalls and bakeries sell it (and earn 20% more while there is food). The store holds 150, each granary more.
      When the store is empty and the fields can't keep up, homes go hungry: they pay less and the town is sadder. */
-  const FOOD_EAT = 0.25, FOOD_PRICE = 0.5, FOOD_CELLAR = 150, FEAST = 300, FOOD_SHOP = 20;
+  /* 12.07 (Navid: "too easy to have full gold and full food"): a bigger town paid more taxes for every focus minute while
+     prices stayed the same, so towns snowballed (everything built by about day 60 with 2 hours a day) and gold went past
+     the treasury limit. Now prices grow with the town hall, people eat a bit
+     more, and the treasury limit holds for every gold you earn (focus pay included). Tested with tools/tests/t1207_sim.py. */
+  const BAL = { sizeK: 0.25, hallK: 1, eat: 0.3 };
+  const sizeK = () => 1 + BAL.sizeK * Math.max(0, hallLevel() - 1); // prices of buildings and upgrades by town hall level
+  const r5 = (x) => Math.max(5, Math.round(x / 5) * 5);
+  const FOOD_PRICE = 0.5, FOOD_CELLAR = 150, FEAST = 300, FOOD_SHOP = 20;
   const FOOD_BUY0 = 2, foodBuy = () => Math.max(2, Math.round(FOOD_BUY0 * priceIdx())); // 11.04: inflation // 11.00: the ferry sells food for 2 gold each, so winter or the feast can never lock the town
   const FOOD_SEASON = { spring: 1, summer: 1.2, autumn: 1.3, winter: 0.5 };
   const DIRTY = ['workshop', 'factory', 'induspark', 'depot', 'recycling', 'wasteplant'];
@@ -2863,7 +2922,7 @@
     if (!foodOn()) return null;
     const fields = act.filter(isGrower); // 11.02: fields and farms
     const staffN = STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0); // 11.00: staff eat as much as two residents
-    const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = (residents + 2 * staffN) * FOOD_EAT + soldiers() * SOLDIER_FOOD, have = state.food || 0; // 11.06: soldiers eat a food an hour
+    const grown = fields.reduce((a, b) => a + fieldYield(b, J, act), 0), people = (residents + 2 * staffN) * BAL.eat + soldiers() * SOLDIER_FOOD, have = state.food || 0; // 11.06: soldiers eat a food an hour
     const supplied = have > FOOD_SHOP, shopEat = supplied ? act.filter((b) => ['market', 'bakery', 'markethall', 'restaurant'].includes(b.type) && !b.shut).reduce((a, b) => a + (b.type === 'bakery' || b.type === 'restaurant' ? 1 : b.type === 'markethall' ? 1.5 : 0.5) * b.level * (PRICED.includes(b.type) ? { cheap: 1.25, dear: 0.8 }[priceOf(b)] || 1 : 1), 0) : 0;
     const fed = have > 0.5 ? 1 : people > 0 ? clamp(grown / people, 0, 1) : 1;
     return { grown, people, shopEat, eaten: people + shopEat, fed, supplied, fields: fields.length, residents, staffN };
@@ -2892,14 +2951,13 @@
           joy += bst; from.push([o.type === 'park' && (o.overgrown || 0) > 0.3 ? 'overgrown park' : t.name, bst]);
         }
         else if (t.cat === 'decor' && d <= 1) decor += t.dec != null ? t.dec : 0.05;
-        if (o.addons && o.addons.lamp && d <= 1) decor += 0.04; // a lamp post beside a building next door
         // Some buildings bother (or delight) the homes right next to them.
         if (t.near && d <= t.near.r) {
           if (t.near.v < 0) { const nv = t.nearOT && choiceOf(o) === 'on' ? t.nearOT : t.near.v; noise += -nv; from.push([nv !== t.near.v ? `${t.near.label} (overtime)` : t.near.label, nv, o.id]); }
           else { joy += t.near.v; from.push([t.near.label, t.near.v, o.id]); }
         }
       }
-      if (h.addons && h.addons.lamp) decor += 0.04;
+      if (lampList().some((L) => cornerDist(L, h) <= 0.01)) decor += 0.04; // 12.07: a street lamp on one of its corners
       // 11.03: prices and the new businesses around a home
       for (const o of act) {
         if (o === h || T(o).cat !== 'shop' || o.fire || o.shut) continue;
@@ -3063,6 +3121,14 @@
     let add = Math.min(amount, cap - state.gold);
     state.gold += add; return add;
   }
+  // 12.07: gold you earn (focus pay, gifts, badges, chests) fills the treasury up to its limit too; what doesn't fit is
+  // noted on r (the result) so the result card can say so. Losses still take gold away, even into debt.
+  function earn(n, r) {
+    if (!(n > 0)) { state.gold += n || 0; return n || 0; }
+    const add = Math.min(n, Math.max(0, treasuryCap() - state.gold)); state.gold += add;
+    if (r && n - add > 0) r.overflow = (r.overflow || 0) + n - add;
+    return add;
+  }
   // Full taxes while you focus (paid at the end) or play; a tenth the rest of the time, so leaving the app open never pays.
   const taxRate = () => (ui.screen === 'play' ? 1 : AWAY_RATE);
   function accrue(now) {
@@ -3142,7 +3208,7 @@
     factory: [0, 4, 9, 13], induspark: [0, 9, 18, 27], park: [0, 0, 1, 1], fountain: [0, 1, 1, 2], amusement: [0, 3, 6, 9], stadium: [0, 6, 13], field: [0, 0, 1, 2], granary: [0, 0, 1, 2] };
   const runAt = (type, L) => { const r = RUNNING_BY_LEVEL[type]; if (r) return r[clamp(L || 1, 1, r.length - 1)] || 0; return RUNNING[type] ? RUNNING[type] * 2 * (L || 1) : 0; };
   const runningOf = (b) => (live(b) && !b.shut && (seasonOpen(b) || !SEASONAL[b.type]) && runAt(b.type, b.level) ? Math.max(0, Math.round((runAt(b.type, b.level) + (b.type === 'daycare' ? (DAYCARE[choiceOf(b)] || 6) * 0.5 : 0)) * priceIdx() * (isServiceType(b.type) && state.buildings.some((x) => x.type === 'wasteplant' && live(x)) ? 0.85 : 1)) - (b.addons && b.addons.solar && isServiceType(b.type) ? 3 : 0)) : 0); // 10.13: solar panels save 3 an hour
-  const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0);
+  const runningCosts = () => state.buildings.reduce((a, b) => a + runningOf(b), 0) + lampPower(); // 12.07: + electricity for lamps and house lights
   // Thieves who are caught sit in the police station's cells for a while: each one costs a little to keep (10.04).
   const JAIL_COST = 3;
   const jailCells = () => state.buildings.reduce((a, b) => a + (lineOf(b.type) === 'police' && live(b) ? TYPES[b.type].cells[b.level] || 0 : 0), 0);
@@ -3169,25 +3235,36 @@
      safer: see litHome. ---------- */
   const LAMP_LIGHT = 2; // tiles a lamp post lights
   const NL = {
-    on: false, wins: [], lamps: [],
-    win(c, q) { const m = c.getTransform(), k = Math.round(q[0][0] * 7.3 + q[0][1] * 3.1); this.wins.push({ k, p: q.map(([x, y]) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]) }); },
-    lamp(c, x, y, u) { const m = c.getTransform(), tx = (X, Y) => [m.a * X + m.c * Y + m.e, m.b * X + m.d * Y + m.f]; this.lamps.push({ head: tx(x, y - 26 * u), foot: tx(x, y), sc: Math.hypot(m.a, m.b) }); },
+    on: false, wins: [], lamps: [], pools: [], cur: null,
+    win(c, q) {
+      const b = this.cur, home = !!(b && TYPES[b.type] && T(b).cat === 'home'), lit = home && hasLights(b);
+      if (home && !lit) return; // 12.07 (Navid): a home's windows shine only with house lights
+      const m = c.getTransform(), k = Math.round(q[0][0] * 7.3 + q[0][1] * 3.1); this.wins.push({ k, lit, p: q.map(([x, y]) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]) }); },
+    lamp(c, x, y, heads, range) { const m = c.getTransform(), tx = (X, Y) => [m.a * X + m.c * Y + m.e, m.b * X + m.d * Y + m.f]; this.lamps.push({ heads: heads.map(([a, b]) => tx(a, b)), foot: tx(x, y), sc: Math.hypot(m.a, m.b), range: range || LAMP_LIGHT }); },
+    // 12.07: a home with house lights: its windows are always lit, and the ground a tile around it glows
+    pool(c, x, y, rt) { const m = c.getTransform(); this.pools.push({ x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f, sc: Math.hypot(m.a, m.b), rt }); },
   };
   function drawNightLights(c, now) {
     const k = nightK(); if (k < 0.02) return;
     const h = gameHour(), late = h >= 0.5 && h < 5, share = late ? 3 : 8; // out of 10 windows lit
     c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'lighter';
-    for (const L of NL.lamps) { // the pool on the ground first, then the glow round the lamp
-      const [fx, fy] = L.foot, rx = (LAMP_LIGHT + 0.6) * HW * L.sc, ry = (LAMP_LIGHT + 0.6) * HH * L.sc;
+    const ground = (fx, fy, rt, sc, a) => { // an oval of light on the ground, rt tiles across from its middle
+      const rx = rt * HW * sc * 1.3, ry = rt * HH * sc * 1.3;
       c.save(); c.translate(fx, fy); c.scale(1, ry / rx);
-      const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(255,206,120,${0.42 * k})`); g.addColorStop(0.6, `rgba(255,190,100,${0.2 * k})`); g.addColorStop(1, 'rgba(255,180,90,0)');
+      const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(255,206,120,${a * k})`); g.addColorStop(0.62, `rgba(255,190,100,${a * 0.45 * k})`); g.addColorStop(1, 'rgba(255,180,90,0)');
       c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, Math.PI * 2); c.fill(); c.restore();
-      const [hx, hy] = L.head, r = 22 * L.sc, fl = reduced ? 1 : 0.94 + 0.06 * Math.sin(now / 90 + hx);
-      const g2 = c.createRadialGradient(hx, hy, 0, hx, hy, r); g2.addColorStop(0, `rgba(255,232,170,${0.9 * k * fl})`); g2.addColorStop(1, 'rgba(255,200,120,0)');
-      c.fillStyle = g2; c.beginPath(); c.arc(hx, hy, r, 0, Math.PI * 2); c.fill();
+    };
+    for (const P of NL.pools) ground(P.x, P.y, P.rt, P.sc, 0.3); // 12.07: house lights, a tile round the home
+    for (const L of NL.lamps) { // the pool on the ground first, then the glow round each lamp (12.07: wider for taller lamps)
+      ground(L.foot[0], L.foot[1], L.range + 0.4, L.sc, 0.3 + 0.04 * L.range);
+      for (const [hx, hy] of L.heads) {
+        const r = (13 + 1.5 * L.range) * L.sc, fl = reduced ? 1 : 0.94 + 0.06 * Math.sin(now / 90 + hx), a = 0.8 / Math.sqrt(L.heads.length);
+        const g2 = c.createRadialGradient(hx, hy, 0, hx, hy, r); g2.addColorStop(0, `rgba(255,232,170,${a * k * fl})`); g2.addColorStop(1, 'rgba(255,200,120,0)');
+        c.fillStyle = g2; c.beginPath(); c.arc(hx, hy, r, 0, Math.PI * 2); c.fill();
+      }
     }
     for (const W of NL.wins) {
-      if (((W.k % 10) + 10) % 10 >= share) continue;
+      if (((W.k % 10) + 10) % 10 >= (W.lit ? (late ? 7 : 10) : share)) continue; // 12.07: house lights keep every window on till late
       const cx = (W.p[0][0] + W.p[2][0]) / 2, cy = (W.p[0][1] + W.p[2][1]) / 2, sz = Math.max(Math.abs(W.p[2][0] - W.p[0][0]), Math.abs(W.p[2][1] - W.p[0][1]), 2);
       const g = c.createRadialGradient(cx, cy, 0, cx, cy, sz * 2.2); g.addColorStop(0, `rgba(255,190,90,${0.32 * k})`); g.addColorStop(1, 'rgba(255,170,70,0)'); // a soft halo
       c.fillStyle = g; c.globalAlpha = 1; c.beginPath(); c.arc(cx, cy, sz * 2.2, 0, Math.PI * 2); c.fill();
@@ -3195,9 +3272,33 @@
     }
     c.globalAlpha = 1; c.restore();
   }
-  // A home is lit at night when a lamp post stands within LAMP_LIGHT tiles of it (or beside it).
-  function lampsNow() { return state.buildings.filter((o) => o.addons && o.addons.lamp && live(o)); }
-  function litHome(b, lamps) { return (lamps || lampsNow()).some((o) => dist(o, b) <= LAMP_LIGHT); }
+  /* ---------- 12.07 (Navid): street lamps stand on the corners where tiles meet, not on a tile or beside a building.
+     Each one lights the ground around it at night; three levels, each taller, with more lamps and a wider light. They
+     use electricity, a little gold every hour. A lamp sits at a grid corner: (c, r) are half numbers (3.5, 6.5), the
+     point where four tiles meet. Homes can also have their own house lights (an upgrade on the home's card): bright
+     windows after dark that light a tile around the home. A home is lit when either reaches it. ---------- */
+  const LAMP_LV = [null,
+    { name: 'Street lamp', h: 26, heads: 1, range: 2, cost: 30, power: 1 },
+    { name: 'Double street lamp', h: 36, heads: 2, range: 3, cost: 55, power: 2 },
+    { name: 'Tall street lamp', h: 48, heads: 3, range: 4, cost: 95, power: 3 }];
+  const LAMP_MAX = LAMP_MAX_T;
+  const LIGHTS_POWER = 1; // gold an hour for a home's house lights
+  const lampList = () => (Array.isArray(state.lamps) ? state.lamps : (state.lamps = []));
+  const lampMax = () => LAMP_MAX[Math.min(LAMP_MAX.length - 1, hallLevel())] || 0;
+  const lampRange = (L) => LAMP_LV[L.level || 1].range;
+  // the four tiles around a corner: a lamp needs at least one of them cleared, and must not stand inside a building
+  const cornerTiles = (c, r) => [[c - 0.5, r - 0.5], [c + 0.5, r - 0.5], [c - 0.5, r + 0.5], [c + 0.5, r + 0.5]];
+  const cornerOpen = (c, r) => cornerTiles(c, r).some(([a, b]) => a >= 0 && b >= 0 && a < N && b < N && isOpen(a, b));
+  const cornerInside = (c, r) => state.buildings.some((b) => { const [w, d] = dimsB(b); return c > b.c - 0.5 + 1e-6 && c < b.c + w - 0.5 - 1e-6 && r > b.r - 0.5 + 1e-6 && r < b.r + d - 0.5 - 1e-6; });
+  const lampAt = (c, r) => lampList().find((L) => Math.abs(L.c - c) < 0.01 && Math.abs(L.r - r) < 0.01);
+  const cornerOk = (c, r) => c >= -0.5 && r >= -0.5 && c <= N - 0.5 && r <= N - 0.5 && cornerOpen(c, r) && !cornerInside(c, r) && !lampAt(c, r);
+  // distance in tiles from a corner to the nearest edge of a building
+  function cornerDist(L, b) { const [w, d] = dimsB(b); const dx = Math.max(0, b.c - 0.5 - L.c, L.c - (b.c + w - 0.5)), dy = Math.max(0, b.r - 0.5 - L.r, L.r - (b.r + d - 0.5)); return Math.hypot(dx, dy); }
+  const hasLights = (b) => !!(b && b.addons && b.addons.lights && live(b));
+  const lampPower = () => lampList().reduce((a, L) => a + LAMP_LV[L.level || 1].power, 0) + state.buildings.filter(hasLights).length * LIGHTS_POWER;
+  // A home is lit at night when a street lamp reaches it or it has its own house lights.
+  function lampsNow() { return lampList().filter((L) => cornerOpen(L.c, L.r)); }
+  function litHome(b, lamps) { return hasLights(b) || (lamps || lampsNow()).some((L) => cornerDist(L, b) <= lampRange(L)); }
   function litShare() { const hs = state.buildings.filter((b) => live(b) && T(b).cat === 'home'); if (!hs.length) return 1; const L = lampsNow(); return hs.filter((b) => litHome(b, L)).length / hs.length; }
   function roleInfo(k, ci) {
     const r = STAFF[k], needed = !!r.needed(ci), need = needed ? r.need(ci) : 0, hired = state.staff[k] || 0, cap = staffCapacity(k), working = Math.min(hired, cap);
@@ -3424,7 +3525,7 @@
       if (!coversB('police', b)) out.push('Out of police reach: nobody patrols here');
       if (nightK() > 0.5) out.push('At night, when most people are asleep');
       if (J.k > 0 && J.unemp > 0.04) out.push(`${Math.round(J.unemp * 100)}% of workers have no job (${ci.jobs.jobless} people)`);
-      if (!nearAddon(b, 'lamp', 1)) out.push('No street lamp next to it');
+      if (!litHome(b)) out.push('A dark street: no lamp or house lights reach it');
       if (crimeLevel() >= 45) out.push(`Crime in town is ${crimeWord(crimeLevel()).toLowerCase()} (${Math.round(crimeLevel())}%)`);
       if (TYPES.school && hallLevel() >= TYPES.school.unlock && !coversB('teacher', b)) out.push('Bored kids: no school in reach');
       if (moodNow(Date.now()).value < 50) out.push('An unhappy town');
@@ -4240,27 +4341,36 @@
   }
 
   /* ---------- Hiring: one-off fee at the staff's own building (or from the town hall), then a wage every hour ---------- */
-  function hire(k) {
+  // 12.07: hired or let go from a building's own card, the change is that building's (and every branch keeps its crew)
+  function pinCrews(k, atB, d) {
+    const si = staffIn(k); for (const b of staffBuildings(k)) b.crew = si.count.get(b.id) || 0;
+    if (atB) atB.crew = Math.max(0, (atB.crew || 0) + d);
+  }
+  function hire(k, atB) {
     const r = STAFF[k], ro = roleInfo(k, city());
     if (ui.screen !== 'play') { toast('Hire staff during play time.'); return false; }
     if (!ro.hasHome) { toast(`Build a ${TYPES[r.home].name.toLowerCase()} first. ${r.plural.charAt(0).toUpperCase() + r.plural.slice(1)} work from there.`); return false; }
+    if (atB && (serviceCost(atB).staff || 0) >= (T(atB).slots[atB.level] || 0)) { toast(`No room here: this ${nameOf(atB).toLowerCase()} holds ${T(atB).slots[atB.level] || 0}. Upgrade it or build another.`); return false; }
     if (ro.hired >= ro.cap) { toast(`No room: your ${TYPES[r.home].name.toLowerCase()}${staffBuildings(k).length > 1 ? 's hold' : ' holds'} ${ro.cap}. Upgrade it or build another.`); return false; }
     const fee = hireFee(k, ro.hired), wage = wageOf(k, ro.hired);
     if (state.gold + 1e-6 < fee) { toast(`Hiring costs ${fee} gold. You need ${fmtGold(fee - state.gold + 0.999)} more.`); return false; }
     accrue(Date.now());
+    if (atB) pinCrews(k, atB, 1);
     goldChange(-fee, `Hired a ${STAFF[k].name.toLowerCase()}`, 'staff'); state.staff[k] = ro.hired + 1;
     state.stats.hired = (state.stats.hired || 0) + 1;
     touch(); save(); sfx.coin();
-    const home = staffBuildings(k)[0];
+    const home = atB || staffBuildings(k)[0];
     if (home) { const p = centerOf(home); burst(p.x, p.y - 20, 18); floats.push({ x: p.x, y: p.y - HH * sizeB(home) - 30, t0: performance.now(), text: `New ${r.name.toLowerCase()}!`, soft: true }); }
     toast(`You hired your ${ordinal(ro.hired + 1)} ${r.name.toLowerCase()} for ${fee} gold. Wage: ${wage} gold an hour. Watch them get to work.`);
     checkQuests(false); renderAll();
     return true;
   }
-  function letGo(k) {
+  function letGo(k, atB) {
     if (ui.screen !== 'play') { toast('You can change staff during play time.'); return false; }
     if (!(state.staff[k] > 0)) return false;
+    if (atB && !(serviceCost(atB).staff > 0)) return false;
     accrue(Date.now());
+    if (atB) pinCrews(k, atB, -1);
     state.staff[k] -= 1; touch(); save(); sfx.pop();
     toast(`One ${STAFF[k].name.toLowerCase()} left. You save ${wageOf(k, state.staff[k])} gold an hour; hiring again costs ${hireFee(k)} gold.`);
     renderAll();
@@ -4355,17 +4465,17 @@
   /* ---------- Builder's plan ---------- */
   const builtCount = (type) => state.buildings.filter((b) => b.type === type && b.origin === 'built').length;
   function newCost(type) {
-    const t = TYPES[type], n = Math.min(8, builtCount(type)), cost0 = Math.round(t.cost * (1 + 0.4 * n)), cost = priceIdx() > 1 ? pIdx(cost0) : cost0, mode = jobMode('build', type); // 11.04: inflation
+    const t = TYPES[type], n = Math.min(8, builtCount(type)), cost0 = r5(t.cost * (1 + 0.4 * n) * sizeK()), cost = priceIdx() > 1 ? pIdx(cost0) : cost0, mode = jobMode('build', type); // 11.04: inflation
     if (mode === 'focus') return { cost, mode, work: projWork(t.focus ? Math.round(t.focus * (1 + 0.25 * n)) : isServiceType(type) ? Math.round(serviceWork(cost0) * (1 + 0.25 * n)) : Math.max(1, Math.round(t.work * (1 + 0.5 * n)))) }; // 10.12: whole laps
     const secs = newSecs(type, cost);
     return { cost, mode, secs, work: Math.max(1, Math.round(t.work * (1 + 0.5 * n))) };
   }
-  const countType = (type) => state.buildings.filter((b) => b.type === type).length + state.tray.filter((x) => x.type === type).length + (ADDON[type] ? state.buildings.filter((b) => b.addons && b.addons[type]).length : 0);
+  const countType = (type) => type === 'lamp' ? lampList().length : state.buildings.filter((b) => b.type === type).length + state.tray.filter((x) => x.type === type).length + (ADDON[type] ? state.buildings.filter((b) => b.addons && b.addons[type]).length : 0);
   /* ---------- Add-ons (10.08, Navid): fire hydrants, lamp posts and trash bins don't take a tile; they go beside a building. ---------- */
   const ADDON = {
     hydrant: { note: 'Fewer fires nearby', what: () => 'fires start half as often within 2 tiles' },
     bin: { note: 'Less trash nearby', what: () => 'trash piles up 40% slower within 2 tiles' },
-    lamp: { note: '+4% next door, lights 2 tiles at night', what: () => `homes next to it pay 4% more. At night it lights everything within ${LAMP_LIGHT} tiles: thieves go for dark homes first, and lit ones see up to 40% fewer break-ins` },
+    lights: { on: true, note: 'Bright windows at night · 1 gold/h', hostText: 'a home', hosts: (b) => T(b).cat === 'home', what: () => `its windows light up at night and light the street a tile around it, so thieves pass it by (up to 40% fewer break-ins). Electricity: ${LIGHTS_POWER} gold an hour` },
     // 10.13: put on a building
     flowerbox: { on: true, note: '+1 gold/h on a home', hostText: 'a home', hosts: (b) => T(b).cat === 'home', what: () => '+1 gold an hour' },
     mural: { on: true, note: '+2 gold/h on a home or shop', hostText: 'a home or a shop', hosts: (b) => ['home', 'shop'].includes(T(b).cat), what: () => '+2 gold an hour' },
@@ -4383,6 +4493,43 @@
     if (countType(type) >= capFor(type)) { toast(capWhy(type)); return; }
     if (state.gold + 1e-6 < decorCost(type)) { toast(`A ${t.name.toLowerCase()} costs ${decorCost(type)} gold.`); return; }
     closePanel(true); ui.attach = { type }; ui.panel = { kind: 'attach' }; renderAll(); sfx.pop();
+  }
+  // 12.07: street lamps go on corners. Pick one (the dots on the map), then confirm on the card.
+  function startLamp() {
+    if (hallLevel() < TYPES.lamp.unlock) { toast(`Street lamps need town hall level ${TYPES.lamp.unlock}.`); return; }
+    if (lampList().length >= lampMax()) { toast(`Room for ${lampMax()} street lamps at this town hall level. Upgrade the town hall for more, or make the ones you have taller and brighter.`); return; }
+    if (state.gold + 1e-6 < LAMP_LV[1].cost) { toast(`A street lamp costs ${LAMP_LV[1].cost} gold.`); return; }
+    closePanel(true); ui.lamp = { pick: null }; ui.panel = { kind: 'lamp' }; renderAll(); sfx.pop();
+  }
+  const pickCorner = (wx, wy) => { const [cf, rf] = gridAtWorld(wx, wy); return { c: Math.round(cf + 0.5) - 0.5, r: Math.round(rf + 0.5) - 0.5 }; };
+  const lampHomes = (L, range) => state.buildings.filter((b) => live(b) && T(b).cat === 'home' && cornerDist(L, b) <= (range || lampRange(L))).length;
+  function confirmLamp() {
+    const k = ui.lamp && ui.lamp.pick; if (!k || !cornerOk(k.c, k.r)) return;
+    const cost = LAMP_LV[1].cost; if (state.gold + 1e-6 < cost) { toast(`A street lamp costs ${cost} gold.`); return; }
+    goldChange(-cost, 'Street lamp', 'buy');
+    const L = { id: state.nextId++, c: k.c, r: k.r, level: 1 }; lampList().push(L);
+    ui.lamp = null; ui.panel = null; touch(); accrue(Date.now()); sfx.place(); save();
+    toast(`Street lamp up: it lights ${lampHomes(L)} home${lampHomes(L) === 1 ? '' : 's'} at night. Electricity: ${LAMP_LV[1].power} gold an hour. Tap it to make it taller.`); checkQuests(false); afterAction(); renderAll();
+  }
+  function upgradeLamp(L) {
+    const nx = LAMP_LV[(L.level || 1) + 1]; if (!nx) return;
+    if (ui.screen !== 'play') { toast('Upgrade it during play time.'); return; }
+    if (state.gold + 1e-6 < nx.cost) { toast(`It costs ${nx.cost} gold. You need ${fmtGold(nx.cost - state.gold + 0.999)} more.`); return; }
+    goldChange(-nx.cost, `${nx.name} (upgrade)`, 'buy'); L.level = (L.level || 1) + 1;
+    touch(); save(); sfx.chime(); const p = tileCenter(L.c, L.r); burst(p.x, p.y - 30, 16);
+    toast(`${nx.name}: it lights ${nx.range} tiles around now (${lampHomes(L)} homes). Electricity: ${nx.power} gold an hour.`); renderAll();
+  }
+  function removeLamp(L) {
+    const back = Math.floor(LAMP_LV[L.level || 1].cost / 2);
+    state.lamps = lampList().filter((x) => x !== L); if (back) goldChange(back, 'Took down a street lamp', 'sell');
+    ui.panel = null; touch(); save(); renderAll(); toast(`Street lamp taken down (+${back} gold).`);
+  }
+  // the lamp under a finger, from its foot up its post
+  function lampUnder(sx, sy) {
+    let best = null, by = -1e9; const u = HW / 30 * cam.z;
+    for (const L of lampList()) { const p = tileCenter(L.c, L.r), f = toScreen(p.x, p.y), h = LAMP_LV[L.level || 1].h * u;
+      if (Math.abs(sx - f.x) < Math.max(12, 8 * u) && sy > f.y - h - 10 && sy < f.y + 10 && f.y > by) { best = L; by = f.y; } }
+    return best;
   }
   // 10.13: tapping a building picks it; the card asks before anything is bought.
   function attachTo(b) {
@@ -4408,10 +4555,22 @@
     if (back) goldChange(back, `Took down the ${TYPES[k].name.toLowerCase()}`, 'sell');
     touch(); save(); renderAll(); toast(`${TYPES[k].name} taken down${back ? ` (+${back} gold)` : ''}.`);
   }
+  // 12.07: lamp posts that stood beside a building move to a free corner of that building (a level-1 street lamp)
+  function lampsToCorners() {
+    let n = 0;
+    for (const b of state.buildings) {
+      if (!b.addons || !b.addons.lamp) continue;
+      const [w, d] = dimsB(b), cs = [[b.c - 0.5, b.r + d - 0.5], [b.c + w - 0.5, b.r + d - 0.5], [b.c - 0.5, b.r - 0.5], [b.c + w - 0.5, b.r - 0.5]];
+      const at = cs.find(([c, r]) => cornerOk(c, r));
+      if (at) lampList().push({ id: state.nextId++, c: at[0], r: at[1], level: 1 }); else state.gold += Math.floor((TYPES.lamp.cost || 0) / 2);
+      delete b.addons.lamp; if (!Object.keys(b.addons).length) delete b.addons; n++;
+    }
+    if (n) { touch(); save(); setTimeout(() => toast(`Street lamps now stand on the corners where tiles meet: ${n} moved there. Tap one to make it taller and brighter.`), 2600); }
+  }
   // Older towns had hydrants, lamps and bins on their own tiles: move each beside the nearest building.
   function attachOldAddons() {
     let n = 0;
-    for (const o of state.buildings.filter((x) => ADDON[x.type])) {
+    for (const o of state.buildings.filter((x) => ADDON[x.type] || x.type === 'lamp')) { // 12.07: old lamps on a tile go to a corner after this
       const host = state.buildings.filter((b) => canHost(b) && !(b.addons && b.addons[o.type])).sort((a, b) => dist(a, o) - dist(b, o))[0];
       if (host) host.addons = Object.assign({}, host.addons || {}, { [o.type]: true }); else state.gold += Math.floor((TYPES[o.type].cost || 0) / 2);
       state.buildings = state.buildings.filter((x) => x !== o); n++;
@@ -4497,7 +4656,7 @@
     else {
       const L = b.level + 1;
       if (L > t.max) return { ok: false, why: 'Fully upgraded.', max: true };
-      cost = priceIdx() > 1 ? pIdx(t.up[L][0]) : t.up[L][0]; work = upgradeWork(b.type, L); // 11.04: inflation
+      { const c0 = r5(t.up[L][0] * (b.type === 'townhall' ? BAL.hallK : sizeK())); cost = priceIdx() > 1 ? pIdx(c0) : c0; } work = upgradeWork(b.type, L); // 11.04: inflation; 12.07: prices grow with the town
       if (b.type !== 'townhall' && state.buildings.some((x) => lineOf(x.type) === 'workshop' && live(x) && !x.fire && (x.type !== 'workshop' || choiceOf(x) === 'materials'))) cost = Math.max(5, Math.round(cost * 0.9 / 5) * 5); // 11.02: building materials
       if (jobMode('upgrade', b.type) === 'play') secs = upgradeSecs(b.type, L);
       if (b.type !== 'townhall' && L > hallLevel()) return { ok: false, why: `Upgrade the town hall to level ${L} first.`, cost, work };
@@ -5757,21 +5916,21 @@
       r.shiftPay = leftW * job.gold;
       if (r.shiftMin >= 1 && Math.random() < 0.3) r.quip = TYPES[job.type].job.lines[Math.floor(Math.random() * 3)];
     }
-    state.gold += r.shiftPay;
+    r.shiftPay = earn(r.shiftPay, r); // 12.07: the treasury limit holds for focus pay too
     if (r.shiftPay >= 0.5) r.gold.push({ ic: 'work', label: `${fmtMin(Math.max(1, r.shiftMin))} at work: ${job.verb.toLowerCase()}`, n: r.shiftPay });
     if (cm.m !== 1 && r.shiftPay >= 0.5) {
-      const dl = r.shiftPay * (cm.m - 1); state.gold += dl; r.coachGold = dl;
+      const dl = earn(r.shiftPay * (cm.m - 1), r); r.coachGold = dl;
       r.gold.push({ ic: 'work', label: cm.kind === 'boost' ? `Starter boost +${cm.pct}% (focus coach)` : `Short session −${cm.pct}% (your focus goal is ${state.coach.target} min)`, n: dl });
     }
     // 10.11: some jobs bring in food too. What doesn't fit in the store is sold cheaply at the market.
     if (leftW > 0.05 && m > 0 && job.food > 0 && foodOn()) {
       const made = leftW * job.food, room = Math.max(0, foodCap() - (state.food || 0)), kept = Math.min(made, room), sold = made - kept, sg = sold * FOOD_PRICE * 0.5;
       state.food = (state.food || 0) + kept; state.stats.foodJob = (state.stats.foodJob || 0) + made;
-      if (sg >= 0.5) { state.gold += sg; r.gold.push({ ic: 'work', label: 'Extra food sold cheaply (the store was full)', n: sg }); }
+      if (sg >= 0.5) { earn(sg, r); r.gold.push({ ic: 'work', label: 'Extra food sold cheaply (the store was full)', n: sg }); }
       r.jobFood = { made, kept, sold };
     }
     // The town lived on for the whole session (an unfinished lap too).
-    r.taxes = addTaxes(s.income * mAll / 60);
+    { const tw = s.income * mAll / 60; r.taxes = addTaxes(tw); if (tw > 0 && r.taxes < tw - 0.5) r.overflow = (r.overflow || 0) + tw - r.taxes; }
     if (r.taxes >= 0.5) r.gold.push({ ic: 'home', label: 'Taxes while you focused', n: r.taxes });
     else if (r.taxes <= -0.5) r.gold.push({ ic: 'home', label: 'Wages were more than taxes', n: r.taxes });
     const lp = payLoan(mAll / 60, true);
@@ -5799,7 +5958,7 @@
       if (m >= 10 && Math.random() < 0.2) {
         r.gift = Math.round(2 + m * 0.15);
         r.giftText = GIFTS[Math.floor(Math.random() * GIFTS.length)].replace('{n}', giver);
-        state.gold += r.gift; r.gold.push({ ic: 'gift', label: r.giftText, n: r.gift });
+        r.gift = earn(r.gift, r); r.gold.push({ ic: 'gift', label: r.giftText, n: r.gift });
       }
       // Focus energy: a longer session lifts the town's mood more, for longer.
       if (m >= 10) {
@@ -5809,7 +5968,7 @@
       // Badges: the next one on the ladder, if this session was long enough. One per session.
       const nb = nextBadge();
       if (nb && mAll + 1e-9 >= nb.min) {
-        state.badges.push(nb.min); state.gold += nb.reward; r.badge = nb;
+        state.badges.push(nb.min); earn(nb.reward, r); r.badge = nb;
         r.gold.push({ ic: 'badge', label: `${TIER_NAMES[nb.tier]} badge · ${fmtMin(nb.min)}`, n: nb.reward, tier: nb.tier });
         r.xpParts.push({ ic: 'badge', label: 'New badge', n: 50 });
       }
@@ -5884,6 +6043,7 @@
     if (r.coach && (r.coach.up || r.coach.down)) setTimeout(() => toast(r.coach.up ? `Focus coach: well done! Your new goal is ${r.coach.to} minutes.` : `Focus coach: let's ease off a little. Your goal is ${r.coach.to} minutes for now.`), 2600);
     try { anaSession(s, r, mAll, done, now); } catch (e) { /* data is never worth a crash */ }
     ui.reveals = r.built.filter((b) => b.bid != null).map((b) => ({ bid: b.bid, kind: b.kind, from: b.from, t0: null, fired: false }));
+    if ((r.overflow || 0) >= 1) (r.lost = r.lost || []).push({ text: `Your treasury was full, so ${fmtGold(r.overflow)} gold didn't fit. Spend some first, or upgrade the town hall or a bank for more room.`, short: `Treasury full: ${fmtGold(r.overflow)} gold didn't fit` }); // 12.07
     ui.lastResult = r;
     save();
     hideFocus();
@@ -6446,6 +6606,11 @@
   function diamond(c, x, y, hw, hh, fill) { poly(c, [[x, y - hh], [x + hw, y], [x, y + hh], [x - hw, y]], fill); }
   // ART holds the outline width and the clock for the building being drawn (set in drawBuilding).
   const ART = { w: 0, u: 1, t: 0 };
+  /* 12.07 (Navid: "buildings are the same pictures in all 4 rotations"): how the building being drawn is seen. In the
+     views turned a quarter (1 and 3) it is drawn mirrored, so its front (the door) is on the other wall you can see,
+     with the light still from the same side; in views 2 and 3 you look at its back, so there is no front door. */
+  const DRAWV = { mir: false, back: false };
+  const LR = (a, b) => (DRAWV.mir ? b : a); // shades for the left and the right wall
   // The season the town is drawn in (set at the start of every frame).
   const SEA = { k: seasonOf(Date.now()) };
   const lerpPt = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
@@ -6459,14 +6624,14 @@
   }
   function box(c, x, y, hw, hh, s, h, color) {
     const L = [x - hw * s, y], R = [x + hw * s, y], B = [x, y + hh * s], Tp = [x, y - hh * s];
-    wallFill(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], color, 0.8, h);
-    wallFill(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], color, 0.93, h);
+    wallFill(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], color, LR(0.8, 0.93), h);
+    wallFill(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], color, LR(0.93, 0.8), h);
     poly(c, [[Tp[0], Tp[1] - h], [R[0], R[1] - h], [B[0], B[1] - h], [L[0], L[1] - h]], shade(color, 1.1));
     if (ART.w && h > 3 * ART.u) {
       // a darker footing where the walls meet the ground, then crisp edges
       const fh = Math.min(h * 0.12, 1.8 * ART.u);
-      poly(c, [L, B, [B[0], B[1] - fh], [L[0], L[1] - fh]], shade(color, 0.66));
-      poly(c, [B, R, [R[0], R[1] - fh], [B[0], B[1] - fh]], shade(color, 0.76));
+      poly(c, [L, B, [B[0], B[1] - fh], [L[0], L[1] - fh]], shade(color, LR(0.66, 0.76)));
+      poly(c, [B, R, [R[0], R[1] - fh], [B[0], B[1] - fh]], shade(color, LR(0.76, 0.66)));
       c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; c.lineJoin = 'round';
       outline(c, [L, B, R, [R[0], R[1] - h], [Tp[0], Tp[1] - h], [L[0], L[1] - h]]);
       c.beginPath(); c.moveTo(B[0], B[1]); c.lineTo(B[0], B[1] - h); c.lineTo(L[0], L[1] - h); c.moveTo(B[0], B[1] - h); c.lineTo(R[0], R[1] - h); c.stroke();
@@ -6478,13 +6643,13 @@
   function rectPts(x, y, F, s) { const { ac, ar } = F; return { T: [x - s * (ac[0] + ar[0]), y - s * (ac[1] + ar[1])], R: [x + s * (ac[0] - ar[0]), y + s * (ac[1] - ar[1])], B: [x + s * (ac[0] + ar[0]), y + s * (ac[1] + ar[1])], L: [x - s * (ac[0] - ar[0]), y - s * (ac[1] - ar[1])] }; }
   function boxF(c, x, y, F, s, h, color) {
     const { L, R, B, T: Tp } = rectPts(x, y, F, s);
-    wallFill(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], color, 0.8, h);
-    wallFill(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], color, 0.93, h);
+    wallFill(c, [L, B, [B[0], B[1] - h], [L[0], L[1] - h]], color, LR(0.8, 0.93), h);
+    wallFill(c, [B, R, [R[0], R[1] - h], [B[0], B[1] - h]], color, LR(0.93, 0.8), h);
     poly(c, [[Tp[0], Tp[1] - h], [R[0], R[1] - h], [B[0], B[1] - h], [L[0], L[1] - h]], shade(color, 1.1));
     if (ART.w && h > 3 * ART.u) {
       const fh = Math.min(h * 0.12, 1.8 * ART.u);
-      poly(c, [L, B, [B[0], B[1] - fh], [L[0], L[1] - fh]], shade(color, 0.66));
-      poly(c, [B, R, [R[0], R[1] - fh], [B[0], B[1] - fh]], shade(color, 0.76));
+      poly(c, [L, B, [B[0], B[1] - fh], [L[0], L[1] - fh]], shade(color, LR(0.66, 0.76)));
+      poly(c, [B, R, [R[0], R[1] - fh], [B[0], B[1] - fh]], shade(color, LR(0.76, 0.66)));
     }
     if (ART.w) {
       c.strokeStyle = 'rgba(38,28,18,.26)'; c.lineWidth = ART.w; c.lineJoin = 'round';
@@ -6568,6 +6733,7 @@
     wallQuad(c, P, Q, u0 - 0.06, u1 + 0.06, v0 - 1.7 * u, v0 - 0.8 * u, '#CDBFA4');
   }
   function doorQ(c, P, Q, u0, u1, h, color, u) {
+    if (DRAWV.back) { windowQ(c, P, Q, u0 + (u1 - u0) * 0.08, u1 - (u1 - u0) * 0.08, h * 0.42, h * 0.95, '#A8CFE0', u); return; } // 12.07: the back of the building
     wallQuad(c, P, Q, u0 - 0.03, u1 + 0.03, 0, h + 0.9 * u, '#F4EEE0');
     wallQuad(c, P, Q, u0, u1, 0, h, color);
     wallQuad(c, P, Q, u0 + (u1 - u0) * 0.18, u1 - (u1 - u0) * 0.18, h * 0.55, h * 0.86, shade(color, 1.22));
@@ -6954,8 +7120,8 @@
     ART.w = 0.75 * u; ART.u = u; ART.t = now;
     c.save();
     if (opt.alpha) c.globalAlpha = opt.alpha;
-    if (fpv) { const q = rectPts(x + 3 * u, y + 2.5 * u, fpv, 1); poly(c, [q.T, q.R, q.B, q.L], 'rgba(30,50,30,.2)'); }
-    else if (t.cat !== 'decor') { c.fillStyle = 'rgba(30,50,30,.2)'; c.beginPath(); c.ellipse(x + 3 * u, y + 2.5 * u, hw * 0.82, hh * 0.82, 0, 0, Math.PI * 2); c.fill(); }
+    if (fpv) { const q = rectPts(x + LR(3, -3) * u, y + 2.5 * u, fpv, 1); poly(c, [q.T, q.R, q.B, q.L], 'rgba(30,50,30,.2)'); }
+    else if (t.cat !== 'decor') { c.fillStyle = 'rgba(30,50,30,.2)'; c.beginPath(); c.ellipse(x + LR(3, -3) * u, y + 2.5 * u, hw * 0.82, hh * 0.82, 0, 0, Math.PI * 2); c.fill(); }
     const artKey = ART_OF[type];
     if (artKey) TIER_ART[artKey](c, x, y, hw, hh, u, fpv, level, col, roofc, glass, now, ruin);
     else switch (type) {
@@ -6965,8 +7131,7 @@
         doorQ(c, f.B, f.R, 0.42, 0.58, h * 0.45, '#5B4632', u);
         for (const uu of [0.12, 0.27, 0.7, 0.84]) windowQ(c, f.B, f.R, uu, uu + 0.08, h * 0.5, h * 0.78, '#BFD8E6', u, uu === 0.27);
         for (const uu of [0.15, 0.4, 0.65]) windowQ(c, f.L, f.B, uu, uu + 0.1, h * 0.5, h * 0.78, '#A9C4D3', u);
-        box(c, x + hw * 0.2, y + hh * 0.42, 7 * u, 3.5 * u, 1, 1.6 * u, '#D8CFBC');
-        for (const uu of [0.36, 0.64]) wallQuad(c, f.B, f.R, uu, uu + 0.03, 0, h * 0.5, '#F6F0E2');
+        if (!DRAWV.back) { box(c, x + hw * 0.2, y + hh * 0.42, 7 * u, 3.5 * u, 1, 1.6 * u, '#D8CFBC'); for (const uu of [0.36, 0.64]) wallQuad(c, f.B, f.R, uu, uu + 0.03, 0, h * 0.5, '#F6F0E2'); } // 12.07: steps and pillars only at the front
         pyramid(c, x, y, hw, hh, 0.78, h, (14 + level * 3) * u, roofc);
         const top = y - h - (14 + level * 3) * u;
         line(c, [x, top], [x, top - 14 * u], '#4A3B2B', 1.6 * u);
@@ -7909,11 +8074,15 @@
         c.fillStyle = '#4A6E9C'; c.beginPath(); c.ellipse(x, y - 6 * u, w, w * 0.45, 0, 0, Math.PI); c.fill();
         break;
       }
-      case 'lamp': {
-        if (NL.on && c === ctx) NL.lamp(c, x, y, u); // 12.06: its light at night
-        line(c, [x, y], [x, y - 24 * u], col, 2 * u);
-        c.fillStyle = roofc; c.beginPath(); c.arc(x, y - 26 * u, 4 * u, 0, Math.PI * 2); c.fill();
-        c.fillStyle = 'rgba(255,217,120,.25)'; c.beginPath(); c.arc(x, y - 26 * u, 9 * u, 0, Math.PI * 2); c.fill();
+      case 'lamp': { // 12.07: three levels (an icon here; on the map it is drawn on its corner)
+        const sc = 0.62 + 0.12 * (3 - Math.min(3, level || 1)); drawStreetLamp(c, x, y + 6 * u, level || 1, u * sc);
+        break;
+      }
+      case 'lights': { // 12.07: a home's house lights: a warm bulb
+        c.fillStyle = 'rgba(255,200,100,.28)'; c.beginPath(); c.arc(x, y - 14 * u, 14 * u, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#FFC864'; c.beginPath(); c.arc(x, y - 15 * u, 8 * u, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#FFF2C4'; c.beginPath(); c.arc(x - 2.6 * u, y - 17.5 * u, 2.8 * u, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#59606A'; c.fillRect(x - 4 * u, y - 8 * u, 8 * u, 5 * u); c.fillStyle = '#3B4A57'; c.fillRect(x - 3 * u, y - 3 * u, 6 * u, 2 * u);
         break;
       }
     }
@@ -8109,9 +8278,30 @@
   function drawAddons(c, b, now) {
     const [w, d] = dimsB(b), pts = footPts(b.c, b.r, w, d), L = pts[3], B = pts[2], R = pts[1];
     const lerp2 = (P, Q, t, dy) => [P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t + (dy || 0)];
-    const spots = { hydrant: lerp2(L, B, 0.22, 1), bin: lerp2(L, B, 0.78, 1), lamp: lerp2(B, R, 0.8, 1) };
-    for (const k of ['hydrant', 'bin', 'lamp']) if (b.addons[k]) { const [ax, ay] = spots[k]; drawBuilding(c, k, 1, ax, ay, HW * 0.5, HH * 0.5, { time: now }); }
+    const spots = { hydrant: lerp2(L, B, 0.22, 1), bin: lerp2(L, B, 0.78, 1) };
+    for (const k of ['hydrant', 'bin']) if (b.addons[k]) { const [ax, ay] = spots[k]; drawBuilding(c, k, 1, ax, ay, HW * 0.5, HH * 0.5, { time: now }); }
     if (b.addons.mural || b.addons.flowerbox || b.addons.awning || b.addons.solar || b.addons.tank) drawApplied(c, b, now);
+  }
+  /* 12.07: a street lamp on its corner. Level 1: one lamp on a post; level 2: taller, with an arm and two lamps;
+     level 3: tallest, three lamps. At night its light is drawn after the night tint (NL). */
+  function drawStreetLamp(c, x, y, lv, u) {
+    const L = LAMP_LV[lv] || LAMP_LV[1], h = L.h * u, pw = (1.8 + 0.4 * lv) * u, on = nightK() > 0.05;
+    c.fillStyle = 'rgba(20,30,25,.22)'; c.beginPath(); c.ellipse(x + 2 * u, y + 0.5 * u, 5 * u, 2.2 * u, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#4A535C'; c.beginPath(); c.ellipse(x, y, 3.2 * u, 1.6 * u, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#3B4A57'; c.fillRect(x - pw / 2, y - h, pw, h); c.fillStyle = '#5B6B78'; c.fillRect(x - pw / 2, y - h, pw * 0.4, h);
+    const heads = [];
+    if (lv === 1) heads.push([x, y - h - 2 * u]);
+    else {
+      const arm = (lv === 2 ? 8 : 10) * u, ay = y - h + 3 * u;
+      line(c, [x - arm, ay], [x + arm, ay], '#3B4A57', 1.6 * u);
+      for (const sx of [-1, 1]) { line(c, [x + sx * arm, ay], [x + sx * arm, ay + 2.5 * u], '#3B4A57', 1 * u); heads.push([x + sx * arm, ay + 4.5 * u]); }
+      if (lv === 3) heads.push([x, y - h - 2 * u]);
+    }
+    for (const [hx, hy] of heads) {
+      c.fillStyle = '#2E3A44'; c.beginPath(); c.moveTo(hx - 4 * u, hy - 1.5 * u); c.lineTo(hx + 4 * u, hy - 1.5 * u); c.lineTo(hx + 2 * u, hy - 4.5 * u); c.lineTo(hx - 2 * u, hy - 4.5 * u); c.closePath(); c.fill();
+      c.fillStyle = on ? '#FFE7A8' : '#FFD978'; c.beginPath(); c.arc(hx, hy, 2.6 * u, 0, Math.PI * 2); c.fill();
+    }
+    if (NL.on && c === ctx) NL.lamp(c, x, y, heads, L.range);
   }
   // 10.13: upgrades on a building: a mural on its wall, window boxes, an awning over the door, solar panels on the roof,
   // a water tank by a field. Drawn on a unit square stretched over the wall (or roof) they sit on.
@@ -8883,7 +9073,7 @@
   let SZN = SEASONS.spring;
   function draw(now) {
     SEA.k = curSeason(); SZN = SEASONS[SEA.k];
-    NL.wins.length = 0; NL.lamps.length = 0; NL.on = nightK() > 0.02; // 12.06: lights after dark
+    NL.wins.length = 0; NL.lamps.length = 0; NL.pools.length = 0; NL.cur = null; NL.on = nightK() > 0.02; // 12.06: lights after dark
     if (ui.dragEdge && ui.dragPt) { const sp0 = 7 / cam.z; cam.x += ui.dragEdge.x * sp0; cam.y += ui.dragEdge.y * sp0; camAnim = null; clampCam(); placeDragAt(ui.dragPt); } // 12.06: the map slides while you drag near an edge
     stepCam(now);
     const dt = Math.min(0.05, (now - (lastDraw || now)) / 1000); lastDraw = now;
@@ -8922,6 +9112,11 @@
       if (h % 9 === 2) { c.fillStyle = '#B9B2A4'; c.beginPath(); c.ellipse(p.x + oy, p.y + ox * 0.3, 2.2, 1.3, 0, 0, Math.PI * 2); c.fill(); }
     }
     const item = playing ? heldItem() : null;
+    if (playing && (ui.lamp || (ui.panel && ui.panel.kind === 'lampinfo'))) { // 12.07: the corners a lamp can go on, and its light
+      const pk = ui.lamp ? ui.lamp.pick : lampList().find((L) => L.id === ui.panel.id), rng = ui.lamp ? LAMP_LV[1].range : pk ? lampRange(pk) : 0;
+      if (pk) { const q = tileCenter(pk.c, pk.r); c.save(); c.translate(q.x, q.y); c.scale(1, HH / HW); c.fillStyle = 'rgba(255,206,120,.3)'; c.strokeStyle = 'rgba(255,200,70,.95)'; c.setLineDash([5 * px, 4 * px]); c.lineWidth = 1.6 * px; c.beginPath(); c.arc(0, 0, rng * HW * 1.42, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore(); }
+      if (ui.lamp) for (let rr = -0.5; rr <= N - 0.5; rr++) for (let cc = -0.5; cc <= N - 0.5; cc++) { if (!cornerOk(cc, rr)) continue; const q = tileCenter(cc, rr), on = pk && pk.c === cc && pk.r === rr; c.fillStyle = on ? '#FFD84A' : '#FFF4C2'; c.strokeStyle = 'rgba(120,80,20,.85)'; c.lineWidth = 1.2 * px; c.beginPath(); c.ellipse(q.x, q.y, (on ? 7 : 4.2) * px, (on ? 4 : 2.5) * px, 0, 0, Math.PI * 2); c.fill(); c.stroke(); }
+    }
     if (playing && ui.attach) { for (const b of state.buildings) { if (!hostsFor(ui.attach.type, b) || (b.addons && b.addons[ui.attach.type])) continue; const [w, d] = dimsB(b); poly(c, footPts(b.c, b.r, w, d), 'rgba(96,205,80,.42)'); } }
     if (item) {
       const showNums = HW * z >= 20;
@@ -9005,7 +9200,13 @@
             c.strokeStyle = '#F3A23A'; c.lineWidth = 0.9 * k; c.setLineDash([3 * k, 2 * k]); c.beginPath(); c.moveTo(tp.x - 0.78 * HW, tp.y - 5 * k); c.lineTo(tp.x, tp.y - 0.78 * HH - 5 * k); c.lineTo(tp.x + 0.78 * HW, tp.y - 5 * k); c.lineTo(tp.x, tp.y + 0.78 * HH - 5 * k); c.closePath(); c.stroke(); c.setLineDash([]);
             if (stake.move && i === 0 && j === 0) { const ga = (HW / 30); c.fillStyle = 'rgba(232,169,58,.95)'; c.beginPath(); c.moveTo(tp.x, tp.y - 6 * ga); c.lineTo(tp.x + 4 * ga, tp.y - 12 * ga); c.lineTo(tp.x - 4 * ga, tp.y - 12 * ga); c.closePath(); c.fill(); } } });
         } }
-      const s = sizeB(b), [bw, bd] = dimsB(b), rot = (b.rot || 0) ^ (VIEW & 1); // 12.06: turned with the view
+      const s = sizeB(b), [bw, bd] = dimsB(b), rot = b.rot || 0, mir = !!(VIEW & 1), back = VIEW >= 2; // 12.06: turned with the view
+      // 12.07: drawn mirrored in views 1 and 3 (a mirrored 2×1 lies the other way, so it keeps its own turn), from behind in 2 and 3
+      const dB = (cc, type, level, x0, y0, hw0, hh0, o) => {
+        DRAWV.mir = mir; DRAWV.back = back; cc.save();
+        if (mir) { cc.translate(x0, 0); cc.scale(-1, 1); cc.translate(-x0, 0); const ft = CanvasRenderingContext2D.prototype.fillText; cc.fillText = function (t2, tx, ty, mw) { this.save(); this.translate(tx, 0); this.scale(-1, 1); if (mw == null) ft.call(this, t2, 0, ty); else ft.call(this, t2, 0, ty, mw); this.restore(); }; }
+        try { drawBuilding(cc, type, level, x0, y0, hw0, hh0, o); } finally { if (mir) delete cc.fillText; cc.restore(); DRAWV.mir = false; DRAWV.back = false; }
+      };
       objs.push({ depth: vd(b.c + (bw - 1) / 2, b.r + (bd - 1) / 2), draw: () => {
         const p = centerOf(b), hw = HW * s, hh = HH * s, u = HW / 30;
         const q = jobFor(b.id);
@@ -9013,8 +9214,8 @@
         if (rv) {
           if (rv.t0 == null || now < rv.t0) {
             // Before its moment: still the construction site, the ruin or the old level.
-            if (rv.kind === 'build' || rv.kind === 'move') drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { site: true, lv: rv.kind === 'move' ? b.level : 1, progress: 0.97, time: now, rot });
-            else drawBuilding(c, b.type, rv.kind === 'upgrade' ? rv.from : b.level, p.x, p.y, hw, hh, { ruin: rv.kind === 'repair', time: now, scaffold: true, progress: 0.97, rot });
+            if (rv.kind === 'build' || rv.kind === 'move') dB(c, b.type, b.level, p.x, p.y, hw, hh, { site: true, lv: rv.kind === 'move' ? b.level : 1, progress: 0.97, time: now, rot });
+            else dB(c, b.type, rv.kind === 'upgrade' ? rv.from : b.level, p.x, p.y, hw, hh, { ruin: rv.kind === 'repair', time: now, scaffold: true, progress: 0.97, rot });
             return;
           }
           const k = (now - rv.t0) / 650;
@@ -9029,7 +9230,7 @@
           if (k < 1) {
             const sc = Math.max(0.05, easeBack(clamp(k, 0, 1)));
             c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3));
-            drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { time: now, rot });
+            dB(c, b.type, b.level, p.x, p.y, hw, hh, { time: now, rot });
             c.restore();
             return;
           }
@@ -9038,7 +9239,7 @@
         // 10.13: being moved: taken apart behind the scaffold (the pieces pile up for the trailer), then put up again
         if (b.moving && q && q.kind === 'move') {
           const sp = q.split || 0.33, k = q.done / q.work, up = !!b.moving.up, kp = up ? clamp((k - sp) / (1 - sp), 0, 1) : clamp(k / sp, 0, 1);
-          drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { site: true, lv: b.level, progress: up ? kp : 1 - kp * 0.94, ring: kp, pile: Math.round(up ? (1 - kp) * 4 : kp * 4), time: now, rot });
+          dB(c, b.type, b.level, p.x, p.y, hw, hh, { site: true, lv: b.level, progress: up ? kp : 1 - kp * 0.94, ring: kp, pile: Math.round(up ? (1 - kp) * 4 : kp * 4), time: now, rot });
           if (!crewOnSite(q.bid) && ui.screen === 'play') badge(c, p.x + hw * 0.5, p.y - 30 * u, 7 * u, '#E07A2F', activeBuilds().includes(q) ? '…' : '⌛');
           if (ui.selected === b.id) { c.strokeStyle = '#FFF4C2'; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(p.x, p.y + 2, hw * 0.9, hh * 0.9, 0, 0, Math.PI * 2); c.stroke(); }
           return;
@@ -9047,7 +9248,9 @@
         if (ui.bump && ui.bump.bid === b.id) { const k = (now - ui.bump.t0) / 320; if (k < 1) sc = 1 + 0.09 * Math.sin(k * Math.PI) * (1 - k * 0.5); else ui.bump = null; }
         if (sc !== 1) { c.save(); c.translate(p.x, p.y + hh * 0.3); c.scale(sc, sc); c.translate(-p.x, -(p.y + hh * 0.3)); }
         const see = xray(b, p, s); if (see) { c.save(); c.globalAlpha = 0.26; } // 12.06: see-through
-        drawBuilding(c, b.type, b.level, p.x, p.y, hw, hh, { alpha: see ? 0.26 : 0, rot, choice: b.choice, ruin: b.ruin || !!b.shut, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
+        NL.cur = b; if (NL.on && hasLights(b)) NL.pool(c, p.x, p.y, Math.max(bw, bd) / 2 + 1); // 12.07: house lights
+        dB(c, b.type, b.level, p.x, p.y, hw, hh, { alpha: see ? 0.26 : 0, rot, choice: b.choice, ruin: b.ruin || !!b.shut, site: b.site, time: now, scaffold: !!q && !b.site && q.done > 0, progress: q ? q.done / q.work : 0, trash: b.trash, overgrown: b.overgrown, leaves: b.leaves, fire: b.fire ? fireK(b) : 0 });
+        NL.cur = null;
         if (b.addons) drawAddons(c, b, now);
         if (isGrower(b)) drawFarmers(c, b, now); // 10.15; 11.02: farms too
         if (see) c.restore();
@@ -9067,6 +9270,7 @@
       c.save(); c.setLineDash([6, 5]); c.strokeStyle = 'rgba(122,82,48,.55)'; c.lineWidth = 2; outline(c, pts); c.restore();
     }
     for (const w of wild) objs.push(w);
+    for (const L of lampList()) { if (!cornerOpen(L.c, L.r)) continue; objs.push({ depth: vd(L.c, L.r) + 0.02, draw: () => { const p = tileCenter(L.c, L.r); drawStreetLamp(c, p.x, p.y, L.level || 1, HW / 30); if (ui.panel && ui.panel.kind === 'lampinfo' && ui.panel.id === L.id) { c.strokeStyle = '#FFF4C2'; c.lineWidth = 3 * px; c.beginPath(); c.ellipse(p.x, p.y, HW * 0.45, HH * 0.45, 0, 0, Math.PI * 2); c.stroke(); } } }); } // 12.07
     ui.reveals = ui.reveals.filter((r) => !r.done);
     if (!ui.reveals.length && stage.classList.contains('peek') && !scheduleReveals.timer && !peekAt.timer) stage.classList.remove('peek');
     stepVehicles(dt, now);
@@ -10028,7 +10232,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
   function closePanel(silent) {
     const had = !!ui.panel;
-    ui.panel = null; ui.selected = null; ui.spot = null; ui.staffAsk = null;
+    ui.panel = null; ui.selected = null; ui.spot = null; ui.staffAsk = null; ui.lamp = null; ui.addonAsk = null;
     if (!silent) { renderAll(); if (had) afterAction(); }
   }
   function panelHead(type, level, opt, title, chips) {
@@ -10100,6 +10304,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else if (p.kind === 'build') renderBuildPanel(box, p);
       else if (p.kind === 'place') renderPlacePanel(box);
       else if (p.kind === 'attach') renderAttachPanel(box);
+      else if (p.kind === 'lamp') renderLampPanel(box); // 12.07
+      else if (p.kind === 'lampinfo') renderLampInfo(box, lampList().find((L) => L.id === p.id));
       else if (p.kind === 'alert') renderAlertPanel(box, byId(p.bid));
       else if (p.kind === 'land') renderLandPanel(box, p.plot);
       else if (p.kind === 'pirate') renderPiratePanel(box); // 11.05
@@ -10251,12 +10457,16 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (why) { const n = el('div', 'staffnotes'); n.style.gridColumn = '1 / -1'; n.append(el('div', 'snote', why)); row.append(n); }
     return row;
   }
-  // How many of a role's staff work in each of its buildings (one each first, then filling up), and their wages.
+  // How many of a role's staff work in each of its buildings, and their wages. 12.07 (Navid: a building shows only its
+  // own staff): a building where staff were hired or let go from its own card keeps that crew (b.crew); everyone else
+  // is shared out as before (one each first, then filling up), and anyone left over fills any room.
   function staffIn(k) {
-    const bs = staffBuildings(k), n0 = staffWorking(k), out = new Map(bs.map((b) => [b.id, 0]));
+    const bs = staffBuildings(k), n0 = staffWorking(k), out = new Map(bs.map((b) => [b.id, 0])), room = (b) => (TYPES[b.type].slots[b.level] || 0) - out.get(b.id);
     let left = n0;
-    for (const b of bs) if (left > 0) { out.set(b.id, 1); left -= 1; }
-    for (const b of bs) { const room = (TYPES[b.type].slots[b.level] || 0) - out.get(b.id); const add = Math.max(0, Math.min(room, left)); out.set(b.id, out.get(b.id) + add); left -= add; }
+    for (const b of bs) if (b.crew != null && left > 0) { const add = Math.max(0, Math.min(b.crew, room(b), left)); out.set(b.id, add); left -= add; }
+    const free = bs.filter((b) => b.crew == null);
+    for (const b of free) if (left > 0 && room(b) > 0) { out.set(b.id, 1); left -= 1; }
+    for (const b of free.concat(bs)) { const add = Math.max(0, Math.min(room(b), left)); out.set(b.id, out.get(b.id) + add); left -= add; }
     // wages: the first hires are the cheapest
     const wages = new Map(); let i = 0; for (const b of bs) { let w = 0; for (let j = 0; j < out.get(b.id); j++) w += wageOf(k, i++); wages.set(b.id, w); }
     return { count: out, wages };
@@ -10307,6 +10517,49 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     wrap.append(sec);
   }
+  /* 12.07 (Navid): a building's Upgrades tab: house lights for a home (bright windows at night that light a tile around
+     it, a little electricity every hour), and the other things you can put on it (window boxes, a mural, an awning,
+     solar panels, a water tank). Each one asks before it is bought. */
+  const UP_ORDER = ['lights', 'flowerbox', 'mural', 'awning', 'solar', 'tank'];
+  const upgradesFor = (b) => (canHost(b) ? UP_ORDER.filter((k) => ADDON[k] && hostsFor(k, b)) : []);
+  function buyAddonHere(k, b) {
+    const t = TYPES[k], cost = decorCost(k);
+    if (ui.screen !== 'play') { toast('Add upgrades during play time.'); return; }
+    if (hallLevel() < t.unlock) { toast(`Needs town hall level ${t.unlock}.`); return; }
+    if (countType(k) >= capFor(k)) { toast(capWhy(k)); return; }
+    if (state.gold + 1e-6 < cost) { toast(`${t.name} cost${k === 'solar' || k === 'flowerbox' || k === 'lights' ? '' : 's'} ${cost} gold. You need ${fmtGold(cost - state.gold + 0.999)} more.`); return; }
+    goldChange(-cost, `${t.name} on ${placeName(b)}`, 'buy');
+    b.addons = Object.assign({}, b.addons || {}, { [k]: true }); ui.addonAsk = null;
+    touch(); accrue(Date.now()); sfx.place(); bump(b.id); save();
+    toast(`${t.name} on ${placeName(b)}: ${ADDON[k].what(b)}.`); checkQuests(false); renderAll();
+  }
+  function renderUpgradesTab(box, b) {
+    if (!live(b)) { box.append(el('p', 'small', 'Once it is built (or repaired), you can add upgrades here.')); return; }
+    const playing = ui.screen === 'play';
+    for (const k of upgradesFor(b)) {
+      const t = TYPES[k], have = !!(b.addons && b.addons[k]), locked = hallLevel() < t.unlock, cost = decorCost(k), capped = !have && countType(k) >= capFor(k);
+      const row = el('div', 'uprow' + (have ? ' have' : '') + (locked ? ' off' : ''));
+      row.append(icon(k, 1, 40, 36));
+      const tx = el('div'); tx.append(el('b', '', t.name)); const wt = el('small', ''); wt.append(colorize(capFirst(ADDON[k].what(b)) + '.')); tx.append(wt);
+      if (!have) tx.append(el('span', 'fee', locked ? `Needs town hall level ${t.unlock}` : capped ? capWhy(k) : `${cost} gold${k === 'lights' ? `, then ${LIGHTS_POWER} gold an hour` : ''}`));
+      row.append(tx);
+      const ask = ui.addonAsk && ui.addonAsk.bid === b.id && ui.addonAsk.k === k;
+      const go = el('div', 'stepper');
+      if (have) { const rm = el('button', 'btn sm', 'Take down'); rm.disabled = !playing; rm.addEventListener('click', () => { removeAddon(b, k); }); go.append(el('span', 'up-on', '✓ On'), rm); }
+      else if (!ask) { const ad = el('button', 'btn sm ' + (!locked && !capped && state.gold + 1e-6 >= cost ? 'playc' : ''), 'Add'); ad.disabled = locked || capped || !playing; ad.addEventListener('click', () => { ui.addonAsk = { bid: b.id, k }; renderPanel(); }); go.append(ad); }
+      row.append(go);
+      if (ask) {
+        const cf = el('div', 'confirm'); cf.style.gridColumn = '1 / -1';
+        cf.append(el('span', 'small', `Put ${k === 'solar' || k === 'flowerbox' || k === 'lights' ? '' : 'a '}${t.name.toLowerCase()} on ${placeName(b)} for ${cost} gold?${k === 'lights' ? ` Electricity: ${LIGHTS_POWER} gold an hour.` : ''}`));
+        const rr = el('div', 'row'), no = el('button', 'btn sm', 'Cancel'), yes = el('button', 'btn sm playc', `Add · ${cost} gold`);
+        no.addEventListener('click', () => { ui.addonAsk = null; renderPanel(); }); yes.disabled = state.gold + 1e-6 < cost; yes.addEventListener('click', () => buyAddonHere(k, b));
+        rr.append(no, yes); cf.append(rr); row.append(cf);
+      }
+      box.append(row);
+    }
+    if (!playing) box.append(el('p', 'tiny muted', 'Add upgrades during play time.'));
+    if (T(b).cat === 'home') box.append(el('p', 'tiny muted', hasLights(b) ? 'At night its windows shine and light the street a tile around it.' : 'Without house lights its windows stay dark at night. A street lamp nearby lights the street too.'));
+  }
   function renderInfoPanel(box, b) {
     if (!b) { ui.panel = null; return; }
     if (ui.visit) { renderVisitInfo(box, b); return; }
@@ -10340,10 +10593,10 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     box.append(panelHead(b.type, b.level, { ruin: b.ruin, site: b.site, progress: q ? q.done / q.work : 0, fire: b.fire ? 1 : 0, trash: b.trash, overgrown: b.overgrown }, `${nameOf(b)}${b.label ? ' · ' + b.label : b.resident ? ' · ' + b.resident : ''}`, chips));
     // Two tabs: what you can do here, and everything about it (including what people ask for).
     const reqs = questsAt(b).filter((rq) => !(b.fire && rq.alert));
-    const hasStaffTab = !!t.staff, hall = b.type === 'townhall';
-    const tab = p.tab === 'info' || p.tab === 'report' ? 'report' : p.tab === 'staff' && hasStaffTab ? 'staff' : p.tab === 'services' && hall ? 'services' : 'actions';
+    const hasStaffTab = !!t.staff, hall = b.type === 'townhall', hasUp = upgradesFor(b).length > 0; // 12.07: Upgrades (house lights and the rest)
+    const tab = p.tab === 'info' || p.tab === 'report' ? 'report' : p.tab === 'staff' && hasStaffTab ? 'staff' : p.tab === 'services' && hall ? 'services' : p.tab === 'upgrades' && hasUp ? 'upgrades' : 'actions';
     const tabs = el('div', 'ctabs'); tabs.setAttribute('role', 'tablist');
-    for (const [key, label] of [['actions', 'Actions'], ['report', 'Details']].concat(hasStaffTab ? [['staff', 'Staff']] : [], hall ? [['services', 'Services']] : [])) {
+    for (const [key, label] of [['actions', 'Actions'], ['report', 'Details']].concat(hasStaffTab ? [['staff', 'Staff']] : [], hasUp ? [['upgrades', 'Upgrades']] : [], hall ? [['services', 'Services']] : [])) {
       const tb = el('button', '', label); tb.type = 'button'; tb.setAttribute('role', 'tab'); tb.setAttribute('aria-selected', String(tab === key)); tb.dataset.tab = key;
       if (key === 'report' && reqs.length) tb.append(el('span', 'dot-n', String(reqs.length)));
       tb.addEventListener('click', () => { p.tab = key; renderPanel(); });
@@ -10354,10 +10607,11 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     // 10.11: full screen shows every tab, one box after another (swipe up and down); the tabs jump to a box
     if (p.full) {
       renderFullSections(box, tabs, tab, [['actions', 'Actions', actions], ['report', 'Details', (bx) => renderReportTab(bx, b, reqs, inf, mood, myJob)]]
-        .concat(hasStaffTab ? [['staff', 'Staff', (bx) => renderStaffTab(bx, b)]] : [], hall ? [['services', 'Services', (bx) => renderServicesTab(bx)]] : []));
+        .concat(hasStaffTab ? [['staff', 'Staff', (bx) => renderStaffTab(bx, b)]] : [], hasUp ? [['upgrades', 'Upgrades', (bx) => renderUpgradesTab(bx, b)]] : [], hall ? [['services', 'Services', (bx) => renderServicesTab(bx)]] : []));
       return;
     }
     if (tab === 'report') { renderReportTab(box, b, reqs, inf, mood, myJob); return; }
+    if (tab === 'upgrades') { renderUpgradesTab(box, b); return; }
     if (tab === 'staff') { renderStaffTab(box, b); return; }
     if (tab === 'services') { renderServicesTab(box); return; }
     actions(box);
@@ -10735,6 +10989,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
         const ok = !locked && !capped && fitsHere && money;
         const d = deltaAt(type, p.c, p.r);
         const why = locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : !fitsHere ? 'This spot is taken.' : !money ? `Needs ${fmtGold(decorCost(type) - state.gold + 0.999)} more gold.` : '';
+        if (type === 'lamp') { const okL = !locked && !capped && state.gold + 1e-6 >= LAMP_LV[1].cost; card(type, okL ? '' : 'off', () => { if (okL) startLamp(); else toast(locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : `Needs ${fmtGold(LAMP_LV[1].cost - state.gold + 0.999)} more gold.`); }, [goldLine(LAMP_LV[1].cost), el('span', '', 'on a corner'), fxChip('good', `lights ${LAMP_LV[1].range} tiles`)], locked ? `Town hall ${t.unlock}` : 'Lights the street at night', locked ? 'lock' : 'pos', locked ? '' : `${lampList().length}/${lampMax()}`); continue; }
         if (ADDON[type]) { const okA = !locked && !capped && money; card(type, okA ? '' : 'off', () => { if (okA) startAttach(type); else toast(locked ? `Needs town hall level ${t.unlock}.` : capped ? capWhy(type) : `Needs ${fmtGold(decorCost(type) - state.gold + 0.999)} more gold.`); }, [goldLine(decorCost(type)), el('span', '', ADDON[type].on ? 'on a building' : 'beside a building')], locked ? `Town hall ${t.unlock}` : ADDON[type].note, locked ? 'lock' : 'pos', locked ? '' : capLabel(type)); continue; }
         card(type, ok ? '' : 'off', () => { if (ok) startDecor(type, p.c, p.r); else toast(why); }, [goldLine(decorCost(type)), d != null && d >= 0.5 && !locked ? fxChip('gold', `+${Math.round(d)}/h here`) : fxChip('good', `+${Math.round(((t.near && t.near.v) || 0.05) * 100)}% next door`), el('span', '', 'instant')], locked ? `Town hall ${t.unlock}` : '', locked ? 'lock' : 'pos', locked ? '' : capLabel(type));
       }
@@ -10908,6 +11163,32 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     else if (t.cat === 'home') f.unshift(`${t.residents[level || 1]} residents, each paying ${g1(HOME_TAX)} gold an hour`);
     if (f.length) { const ul = el('ul', 'does'); for (const x of f.slice(0, max || 8)) { const li = el('li'); li.append(colorize(x)); ul.append(li); } box.append(ul); }
     return box;
+  }
+  // 12.07: putting up a street lamp: tap a corner, then confirm here
+  function renderLampPanel(box) {
+    const k = ui.lamp && ui.lamp.pick, lv = LAMP_LV[1], cancel = () => actionBtn('Cancel', null, '', () => { ui.lamp = null; ui.panel = null; renderAll(); });
+    if (k) {
+      const n = lampHomes(k, lv.range);
+      box.append(panelHead('lamp', 1, {}, 'Put up a street lamp here?', [pill(`${lv.cost} gold`, 'gold'), pill(`lights ${lv.range} tiles`, 'good'), pill(`${lv.power} gold/h electricity`, 'bad')]));
+      box.append(el('p', 'small', `It stands on this corner and lights ${n} home${n === 1 ? '' : 's'} at night: thieves go for the dark homes first. Make it taller later for more light (${LAMP_LV[2].range} and ${LAMP_LV[3].range} tiles).`));
+      const grid = el('div', 'actions-grid');
+      grid.append(actionBtn(`Put it up · ${lv.cost} gold`, 'ready right away', 'playc', confirmLamp, state.gold + 1e-6 < lv.cost));
+      grid.append(actionBtn('Pick another corner', null, '', () => { ui.lamp.pick = null; renderAll(); }), cancel());
+      box.append(grid); return;
+    }
+    box.append(panelHead('lamp', 1, {}, 'Put up a street lamp', [pill(`${lv.cost} gold`, 'gold'), pill(`${lampList().length} of ${lampMax()}`, '')]));
+    box.append(el('p', 'small', 'Tap a corner where tiles meet (the dots on the map). Street lamps stand between tiles, so they take no room from buildings.'));
+    const grid = el('div', 'actions-grid'); grid.append(cancel()); box.append(grid);
+  }
+  function renderLampInfo(box, L) {
+    if (!L) { ui.panel = null; return; }
+    const lv = L.level || 1, cur = LAMP_LV[lv], nx = LAMP_LV[lv + 1], n = lampHomes(L);
+    box.append(panelHead('lamp', lv, {}, cur.name, [pill(`Level ${lv}`), pill(`lights ${cur.range} tiles`, 'good'), pill(`−${cur.power} gold/h`, 'bad')]));
+    box.append(el('p', 'small', `At night it lights the ground ${cur.range} tiles around and ${n} home${n === 1 ? '' : 's'}: lit homes see up to 40% fewer break-ins.${nx ? ` Level ${lv + 1} is taller with ${nx.heads} lamps: ${nx.range} tiles (${lampHomes(L, nx.range)} homes), ${nx.power} gold an hour.` : ' It is as tall and bright as a street lamp gets.'}`));
+    const grid = el('div', 'actions-grid'), playing = ui.screen === 'play';
+    if (nx) grid.append(actionBtn(`Upgrade · ${nx.cost} gold`, `${nx.heads} lamps, ${nx.range} tiles`, 'playc', () => upgradeLamp(L), !playing || state.gold + 1e-6 < nx.cost));
+    grid.append(actionBtn('Take down', `+${Math.floor(cur.cost / 2)} gold back`, '', () => removeLamp(L), !playing), actionBtn('Close', null, '', () => closePanel()));
+    box.append(grid);
   }
   function renderAttachPanel(box) {
     const k = ui.attach && ui.attach.type; if (!k) { ui.panel = null; return; }
@@ -12466,7 +12747,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     state.ledgerAcc = {};
   }
   // Changes the gold and writes it down.
-  function goldChange(n, label, kind) { state.gold += n; ledger(n, label, kind); }
+  function goldChange(n, label, kind) { if (n > 0 && ['chest', 'gift', 'quest', 'level'].includes(kind)) n = earn(n); else state.gold += n; ledger(n, label, kind); } // 12.07: earnings stop at the treasury limit
 
   /* Loans. Only with a bank: its level sets the most you can owe (repaying on time raises it). A neighbour town lends
      the gold; you sign a contract and pay it back in instalments, only while you play or focus. Shorter plans cost
@@ -12726,7 +13007,54 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   }
   // One row per staff role: what they do, how many work, room, fee and wage, and a hire stepper (play time only).
   // Hiring and letting go both ask first: the fee is real money.
+  /* 12.07 (Navid): on a service building's card, only the people who work there: how many of its places are filled, what
+     they cost, whether they keep up with the places in its own reach, and + / − that hire or let go here. The whole
+     town's staff stay on the town hall's list (Town staff & wages). */
+  function branchRow(k, b) {
+    const r = STAFF[k], t = T(b), ci = city(), ro = roleInfo(k, ci), playing = ui.screen === 'play';
+    const si = staffIn(k), here = si.count.get(b.id) || 0, slots = t.slots[b.level] || 0, wages = si.wages.get(b.id) || 0;
+    const mine = state.buildings.filter((x) => SERVES[k].what(x) && coversB(k, x, [b])), inReach = mine.length;
+    const needHere = ro.needed && ro.homes ? Math.max(inReach ? 1 : 0, Math.round(ro.need * inReach / ro.homes)) : 0;
+    const row = el('div', 'staff' + (ro.needed && here < needHere ? ' short' : '')); row.dataset.role = k;
+    row.append(staffIcon(k));
+    const tx = el('div'); tx.append(el('b', '', `${capFirst(r.plural)} at this ${nameOf(b).toLowerCase()}`));
+    tx.append(el('small', '', `${here} of ${slots} place${slots === 1 ? '' : 's'} filled here · reach ${stationReach(b)} tiles`));
+    const nf = hireFee(k, ro.hired), nw = wageOf(k, ro.hired);
+    tx.append(el('span', 'fee', `${here < slots ? `Hire one here: ${nf} gold, then ${nw} gold an hour` : 'Every place here is filled'}${here ? ` · wages here ${Math.round(wages)}/h` : ''}`));
+    if (ro.needed && inReach) {
+      const st = !here ? 'bad' : here >= needHere ? 'ok' : here >= needHere * 0.7 ? 'mid' : 'bad', word = SERVES[k].word;
+      const head = !here ? 'Nobody on duty here' : st === 'ok' ? 'Keeping up' : st === 'mid' ? 'Busy' : 'Can\'t keep up';
+      tx.append(el('small', 'keepup k-' + st, `${head}: ${here} of the ${needHere} needed for the ${inReach} ${word} in its reach.${here < needHere ? ` Hire ${needHere - here} more here${here + (needHere - here) > slots ? ', or upgrade it for more room' : ''}.` : ''}`));
+    } else if (!inReach) tx.append(el('small', 'keepup', `Nothing it looks after is in its reach yet.`));
+    row.append(tx);
+    const notes = el('div', 'staffnotes'); notes.style.gridColumn = '1 / -1';
+    if (here >= slots) { const nx = t.slots[b.level + 1]; notes.append(el('div', 'snote', `No room for more here.${nx ? ` Level ${b.level + 1} holds ${nx}.` : ''}`)); }
+    else if (!playing) notes.append(el('div', 'snote', 'Hire during play time.'));
+    else if (state.gold + 1e-6 < nf) notes.append(el('div', 'snote', `The next hire costs ${nf} gold: you need ${fmtGold(nf - state.gold + 0.999)} more.`));
+    const all = el('button', 'link', `All ${r.plural} in town (${ro.hired})`); all.addEventListener('click', () => { closePanel(true); openMood('staff'); }); notes.append(all);
+    const ask = ui.staffAsk && ui.staffAsk.k === k && ui.staffAsk.bid === b.id ? ui.staffAsk.op : null;
+    if (ask) {
+      const box = el('div', 'confirm'); box.style.gridColumn = '1 / -1'; box.style.marginTop = '2px';
+      const can = ask === 'hire' ? state.gold + 1e-6 >= nf : true;
+      box.append(el('span', 'small', ask === 'hire' ? `Hire a ${r.name.toLowerCase()} for this ${nameOf(b).toLowerCase()} for ${nf} gold? Then ${nw} gold an hour.${can ? '' : ` You need ${fmtGold(nf - state.gold + 0.999)} more gold.`}` : `Let one ${r.name.toLowerCase()} here go? You save about ${wageOf(k, ro.hired - 1)} gold an hour.`));
+      const rr = el('div', 'row');
+      const no = el('button', 'btn sm', 'Cancel'); no.addEventListener('click', () => { ui.staffAsk = null; refreshStaffViews(true); });
+      const yes = el('button', 'btn sm ' + (ask === 'hire' ? 'playc' : 'primary'), ask === 'hire' ? `Hire · ${nf} gold` : 'Let go'); yes.disabled = !can;
+      yes.addEventListener('click', () => { ui.staffAsk = null; if (ask === 'hire') hire(k, b); else letGo(k, b); refreshStaffViews(true); });
+      rr.append(no, yes); box.append(rr); row.append(el('span'), box); row.append(notes);
+      return row;
+    }
+    const stp = el('div', 'stepper');
+    const minus = el('button', '', '−'); minus.setAttribute('aria-label', `Let one ${r.name.toLowerCase()} here go`); minus.disabled = !playing || here <= 0;
+    minus.addEventListener('click', () => { ui.staffAsk = { k, op: 'fire', bid: b.id }; refreshStaffViews(true); });
+    const plus = el('button', 'add', '+'); plus.setAttribute('aria-label', `Hire a ${r.name.toLowerCase()} here for ${nf} gold`); plus.disabled = !playing || here >= slots;
+    plus.addEventListener('click', () => { ui.staffAsk = { k, op: 'hire', bid: b.id }; refreshStaffViews(true); });
+    stp.append(minus, el('span', '', String(here)), plus);
+    row.append(stp, notes);
+    return row;
+  }
   function staffRow(k, atB) {
+    if (atB) return branchRow(k, atB); // 12.07 (Navid): a building's card shows only its own staff
     const ci = city(), ro = roleInfo(k, ci), r = STAFF[k], playing = ui.screen === 'play';
     const short = ro.needed && ro.working < ro.need;
     const row = el('div', 'staff' + (!ro.hasHome && !ro.hired ? ' off' : '') + (short && ro.hasHome ? ' short' : ''));
@@ -13845,6 +14173,53 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     if (M.show === 'totals') return { show: 'totals', n: M.stones.length, min: M.stones.reduce((a, s) => a + (s.focus || 0), 0) };
     return { show: 'names', n: M.stones.length, s: M.stones.filter((s) => !s.hidden).slice(-30).map((s) => [String(s.name).slice(0, 40), s.planned | 0, s.laps | 0, s.focus | 0, s.date | 0]) };
   }
+  /* ---------- 12.07 (Navid picked "A · One long lap (slider)" from the set-time picker options): one session, no
+     breaks, any length from 5 minutes to 2 hours on one slider. It has its own bright colour (raspberry; Navid picked it from five) so it stands next to the purple laps as an equal choice, not a lesser one. The marks on the slider say where
+     Sam's plan is done and where the coach's goal is. While dragging, the minutes, the chips and the boxes below change
+     at once; the sheet is drawn again when the slider is let go. ---------- */
+  function setCardEl(opts, pvs, allD, live) {
+    const pos = (d) => (opts.length > 1 ? opts.indexOf(d) / (opts.length - 1) : 0.5);
+    const card = el('section', 'setcard'); card.setAttribute('role', 'group'); card.setAttribute('aria-label', 'One long lap');
+    card.append(el('span', 'sc-eye', 'One long lap · no breaks'));
+    const big = el('div', 'sc-big'), val = el('b', 'sc-val'), chips = el('span', 'sc-chips');
+    big.append(val, chips); card.append(big);
+    const box = el('div', 'sc-slider'); box.tabIndex = 0; box.setAttribute('role', 'slider'); box.setAttribute('aria-label', 'Session length');
+    box.setAttribute('aria-valuemin', '0'); box.setAttribute('aria-valuemax', String(opts.length - 1));
+    const track = el('div', 'sc-track'), rail = el('span', 'sc-rail'), fill = el('span', 'sc-fill'), thumb = el('span', 'sc-thumb');
+    track.append(rail, fill);
+    const mark = (d, cls, text) => { const m = el('span', 'sc-mark ' + cls); m.style.left = pos(d) * 100 + '%'; m.append(el('small', '', text), el('i', '')); track.append(m); };
+    if (allD) mark(allD, 'sam', `✓ ${state.builder}'s plan done`);
+    const cg = coachGoal(); if (cg && opts.includes(cg) && cg !== allD) mark(cg, 'goal', 'goal');
+    track.append(thumb);
+    const ticks = el('div', 'sc-ticks'), tb = new Map();
+    for (const d of opts) { const t = el('button', 'sc-tick', shortMin(d)); t.type = 'button'; t.tabIndex = -1; t.style.left = pos(d) * 100 + '%'; t.setAttribute('aria-label', fmtMin(d)); t.addEventListener('click', (e) => { e.stopPropagation(); set(d, true); }); ticks.append(t); tb.set(d, t); }
+    box.append(track, ticks); card.append(box);
+    let cur = startPick.duration, drag = false;
+    const show = (d, init) => {
+      cur = d; const p = pos(d), pv = pvs.get(d) || sessionPreview(d);
+      thumb.style.left = fill.style.width = p * 100 + '%';
+      val.textContent = fmtMin(d);
+      chips.replaceChildren();
+      if (pv.bonusPct >= 4) chips.append(el('span', 'sc-chip bonus', `+${pv.bonusPct}% long-focus bonus`));
+      if (pv.combo > 1.001) chips.append(el('span', 'sc-chip combo', `Combo ×${pv.combo.toFixed(1)}`));
+      if (pv.unfinished) chips.append(el('span', 'sc-chip minus', `${pv.unfinished} job${pv.unfinished > 1 ? 's' : ''} won't finish`));
+      else if (d === allD) chips.append(el('span', 'sc-chip all', '✓ whole plan'));
+      { const room = Math.max(0, treasuryCap() - state.gold); if (pv.gold > room + 1) chips.append(el('span', 'sc-chip minus', room < 1 ? 'Treasury full' : `Only ${fmtGold(room)} gold fits`)); } // 12.07
+      for (const [k, t] of tb) t.setAttribute('aria-pressed', String(k === d));
+      box.setAttribute('aria-valuenow', String(opts.indexOf(d))); box.setAttribute('aria-valuetext', `${fmtMin(d)}: about ${fmtGold(pv.gold)} gold`);
+      if (!init) for (const f of live) f(pv, d);
+    };
+    const set = (d, final) => { if (d !== cur) { startPick.duration = d; show(d); try { sfx.tick(); } catch (e) { /* quiet */ } } if (final) renderStart(); };
+    const nearest = (e) => { const r = track.getBoundingClientRect(), x = clamp((e.clientX - r.left) / Math.max(1, r.width), 0, 1); let best = cur, bd = 9; for (const d of opts) { const q = Math.abs(pos(d) - x); if (q < bd) { bd = q; best = d; } } return best; };
+    track.addEventListener('pointerdown', (e) => { drag = true; card.classList.add('drag'); try { track.setPointerCapture(e.pointerId); } catch (er) { /* ignore */ } set(nearest(e), false); e.preventDefault(); e.stopPropagation(); });
+    track.addEventListener('pointermove', (e) => { if (drag) set(nearest(e), false); });
+    const up = (e) => { if (!drag) return; drag = false; card.classList.remove('drag'); e.stopPropagation(); renderStart(); };
+    track.addEventListener('pointerup', up); track.addEventListener('pointercancel', up);
+    box.addEventListener('keydown', (e) => { const i = opts.indexOf(cur); if (e.key === 'ArrowLeft' && i > 0) { set(opts[i - 1], true); e.preventDefault(); } else if (e.key === 'ArrowRight' && i < opts.length - 1) { set(opts[i + 1], true); e.preventDefault(); } });
+    box.style.touchAction = 'none';
+    show(cur, true); // the boxes below are drawn for this length already
+    return card;
+  }
   function renderStart() {
     const wrap = el('div', 'startsheet');
     const rq = roundJobs(), hasRounds = rq.length > 0, isLaps = startPick.mode === 'laps';
@@ -13854,7 +14229,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       wrap.append(taskCardEl(rq[0], startPick.lapLen)); // 11.01: not on sessions under 25 minutes
     // The eight set lengths (10.13: always the same eight).
     const opts = FIXED.slice();
-    if (!opts.includes(startPick.duration)) { opts[opts.length - 1] = startPick.duration; opts.sort((a, b) => a - b); }
+    if (!opts.includes(startPick.duration)) { opts.push(startPick.duration); opts.sort((a, b) => a - b); } // 12.07: a length asked for (a rescue, a short job) joins the slider
     const pvs = new Map(opts.map((d) => [d, sessionPreview(d)]));
     const allD = singles.length ? opts.find((d) => !pvs.get(d).unfinished) : null;
     // 10.15 (Navid): no long sentence here: "How long?" sits next to the title (the ✓ on a block says what finishes Sam's plan)
@@ -13864,48 +14239,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       const tx = el('span', 'st-tx'); tx.append(el('b', '', 'Or focus a set time'), el('small', '', 'One session of 5 minutes to 2 hours, and your job'));
       setTog.append(tx, el('span', 'chev', '▾')); setTog.addEventListener('click', () => { startPick.mode = 'fixed'; renderStart(); });
     } else setTog.disabled = true;
-    wrap.append(setTog);
-    const durs = el('div', 'durations'); durs.hidden = isLaps;
-    for (const d of opts) {
-      const pv = pvs.get(d);
-      const g = pv.unfinished ? 0 : clamp(Math.log(d / 5) / Math.log(24), 0, 1);
-      const b = el('button', d === allD ? 'exact' : ''); b.type = 'button';
-      b.style.setProperty('--g', Math.round(g * 100) + '%'); b.style.setProperty('--gs', (g * 5).toFixed(1) + 'px');
-      b.setAttribute('aria-pressed', String(!isLaps && startPick.duration === d));
-      b.append(el('b', '', shortMin(d)));
-      const gl = el('span', 'gold'); gl.append(coinEl());
-      // 10.14 (Navid picked "3 · Stamp"): with a combo, the block is struck through from bottom left to top right and the
-      // combo reward is stamped on it. Shortest first, each block a quarter of a second after the one before. The
-      // animation plays once when the sheet opens; drawn again later (a tap on a length) it shows the end at once.
-      if (pv.combo > 1.001 && pv.gold - pv.goldBase >= 1) {
-        gl.append(`+${fmtGold(pv.goldBase)}`);
-        const k = opts.indexOf(d), s0 = 0.55 + 0.25 * k - (performance.now() - (startPick.cmbAt || 0)) / 1000;
-        b.classList.add('cmbon');
-        b.style.setProperty('--d0', s0.toFixed(3) + 's'); b.style.setProperty('--ds', (s0 + 0.22).toFixed(3) + 's'); b.style.setProperty('--dl', (s0 + 0.42).toFixed(3) + 's');
-        b.style.setProperty('--bgc', 'color-mix(in oklab, var(--high) var(--g, 50%), var(--low))');
-        const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('class', 'strike'); sv.setAttribute('viewBox', '0 0 100 100'); sv.setAttribute('preserveAspectRatio', 'none'); sv.setAttribute('aria-hidden', 'true');
-        const ph = document.createElementNS('http://www.w3.org/2000/svg', 'path'); ph.setAttribute('d', 'M8 90 C 30 72, 58 44, 92 10'); ph.setAttribute('pathLength', '100'); sv.append(ph);
-        const st = el('span', 'stamp'); st.append(coinEl(), `+${fmtGold(pv.gold)}`);
-        const wrap = el('span', 'cmbwrap'); wrap.append(gl, el('span', 'stamp-ring'), st);
-        b.append(sv, wrap);
-      } else { gl.append(`+${fmtGold(pv.gold)}`); b.append(gl); }
-      // 10.15 (Navid): play time (and food) under the gold, and the long-session bonus as a green stamp on the corner
-      const more = el('span', 'dmore'), pl = el('span', 'dplay'); pl.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO.play}</svg>`; pl.append(fmtClock(pv.play)); more.append(pl);
-      if (pv.shiftFood >= 0.5) { const fd = el('span', 'dfood'); fd.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO.food}</svg>`; fd.append(String(Math.round(pv.shiftFood))); more.append(fd); }
-      b.append(more);
-      // 10.16 (Navid): first every combo stamp, then the bonus stamps one after another
-      if (pv.bonusPct >= 4) { const anyCombo = opts.some((x) => pvs.get(x).combo > 1.001 && pvs.get(x).gold - pvs.get(x).goldBase >= 1), j = opts.filter((x) => pvs.get(x).bonusPct >= 4).indexOf(d);
-        const sb = (anyCombo ? 0.55 + 0.25 * (opts.length - 1) + 0.6 : 0.6) + 0.25 * j - (performance.now() - (startPick.cmbAt || 0)) / 1000; const bs = el('span', 'bonus-stamp', `+${pv.bonusPct}%`); bs.style.setProperty('--db', sb.toFixed(3) + 's'); b.append(bs); }
-      let note = '', nc = '';
-      if (pv.unfinished) { note = `−${pv.unfinished}`; nc = 'minus'; }
-      else if (d === allD) { note = '✓ all'; nc = 'all'; }
-      else if (coachGoal() === d) { note = 'goal'; nc = 'all'; }
-      if (note) b.append(el('span', 'note ' + nc, note));
-      b.setAttribute('aria-label', `${fmtMin(d)}: about ${fmtGold(pv.gold)} gold${pv.unfinished ? `, ${pv.unfinished} job${pv.unfinished > 1 ? 's' : ''} won't finish` : ''}`);
-      b.addEventListener('click', () => { startPick.mode = 'fixed'; startPick.duration = d; renderStart(); });
-      durs.append(b);
-    }
-    wrap.append(durs);
+    if (isLaps) wrap.append(setTog); // 12.07: open, the bright card below has its own title
+    const live = []; // 12.07: what changes while the slider is dragged (the sheet is drawn again when it is let go)
+    if (!isLaps) wrap.append(setCardEl(opts, pvs, allD, live));
     const lenL = startPick.lapLen, m = isLaps ? lapFocus(lenL) : startPick.duration, pv = isLaps ? sessionPreview(m, { laps: true }) : (pvs.get(m) || sessionPreview(m));
     // One line says what Sam does with this session and what you do after.
     const lab = el('span', 'label');
@@ -13921,7 +14257,17 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else lab.append(`${state.builder} finishes `, finB(), ', then you:');
     } else lab.append('Your job');
     const jobsHidden = isLaps && !(hasRounds && pv.sim.leftover > 0.05); // 12.05 (Navid): in laps, your job shows only when Sam finishes in the lap and you work after
-    if (!jobsHidden) wrap.append(lab);
+    // 12.07 (design A): with a set time, what Sam does and your job fold into one line; a tap opens the job choices
+    const jobFold = !isLaps && !startPick.jobsOpen, cj = currentJob();
+    if (!isLaps) {
+      const jl = el('button', 'jobline' + (jobFold ? '' : ' open')); jl.type = 'button'; jl.setAttribute('aria-expanded', String(!jobFold));
+      const tx = el('span', 'jl-tx'); tx.append(...lab.childNodes);
+      if (planned && pv.sim.leftover < 0.05) { /* Sam uses the whole session: nothing to add */ }
+      else if (cj) { if (/:\s*$/.test(tx.lastChild && tx.lastChild.textContent || '')) tx.lastChild.textContent = tx.lastChild.textContent.replace(/:\s*$/, ' '); else tx.append(': '); tx.append(el('b', '', cj.verb.toLowerCase()), ` · ${jobGold(cj)}`); }
+      jl.append(tx, el('span', 'chev', jobFold ? '▾' : '▴'));
+      jl.addEventListener('click', () => { startPick.jobsOpen = !startPick.jobsOpen; renderStart(); });
+      wrap.append(jl);
+    } else if (!jobsHidden) wrap.append(lab);
     const oldJr = !$('scrim').hidden && document.querySelector('#sheet .startsheet .jobs'), jrLeft = oldJr ? oldJr.scrollLeft : null; // 10.15: keep the job row where it was
     const jr = el('div', 'jobs' + (planned && pv.sim.leftover < 0.05 ? ' idle' : ''));
     for (const j of jobs()) {
@@ -13933,15 +14279,28 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       b.addEventListener('click', () => { state.job = j.bid; save(); renderStart(); });
       jr.append(b);
     }
-    if (!jobsHidden) wrap.append(jr);
+    if (!jobsHidden && !jobFold) wrap.append(jr);
     const box = el('div', 'preview');
     if (isLaps) box.append(el('span', 'eyebrow', 'For each lap'));
     const tl = el('div', 'ptiles');
-    const ptile = (k, ic, val, unit) => { const t = el('div', 'ptile k-' + k), tp = el('span', 'pt-top'), ico = el('span', 'ti-ic'); if (ic === 'coin') ico.append(coinEl()); else ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO[ic]}</svg>`; tp.append(ico, unit); t.append(tp, el('b', 'num', val)); tl.append(t); };
-    ptile('gold', 'coin', `+${fmtGold(pv.gold)}`, 'gold');
-    ptile('play', 'play', `+${fmtClock(pv.play)}`, 'play');
-    if (pv.shiftFood >= 0.5) { ptile('food', 'food', `+${Math.round(pv.shiftFood)}`, 'food'); tl.classList.add('four'); }
-    ptile('xp', 'xp', `+${pv.xp}`, 'XP');
+    const ptile = (k, ic, val, unit) => { const t = el('div', 'ptile k-' + k), tp = el('span', 'pt-top'), ico = el('span', 'ti-ic'); if (ic === 'coin') ico.append(coinEl()); else ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${RICO[ic]}</svg>`; tp.append(ico, unit); const n = el('b', 'num', val); t.append(tp, n); tl.append(t); return n; };
+    const nGold = ptile('gold', 'coin', `+${fmtGold(pv.gold)}`, 'gold');
+    // 12.07: the combo stamp (10.14) moved from the eight blocks to the gold tile: the normal reward is struck through
+    // and the combo reward is stamped on it, once, as the sheet opens.
+    const stampGold = (p, anim) => {
+      nGold.replaceChildren(); nGold.parentNode.classList.remove('cmbon');
+      if (!(p.combo > 1.001 && p.gold - p.goldBase >= 1)) { nGold.append(`+${fmtGold(p.gold)}`); return; }
+      const s0 = anim ? 0.45 - (performance.now() - (startPick.cmbAt || 0)) / 1000 : -5;
+      const t = nGold.parentNode; t.classList.add('cmbon'); t.style.setProperty('--d0', s0.toFixed(3) + 's'); t.style.setProperty('--ds', (s0 + 0.22).toFixed(3) + 's'); t.style.setProperty('--dl', (s0 + 0.42).toFixed(3) + 's');
+      const was = el('span', 'was', `+${fmtGold(p.goldBase)}`), sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('class', 'strike'); sv.setAttribute('viewBox', '0 0 100 100'); sv.setAttribute('preserveAspectRatio', 'none'); sv.setAttribute('aria-hidden', 'true');
+      const ph = document.createElementNS('http://www.w3.org/2000/svg', 'path'); ph.setAttribute('d', 'M6 88 C 30 70, 60 42, 94 12'); ph.setAttribute('pathLength', '100'); sv.append(ph); was.append(sv);
+      nGold.append(was, el('span', 'stamp', `+${fmtGold(p.gold)}`));
+    };
+    stampGold(pv, true);
+    const nPlay = ptile('play', 'play', `+${fmtClock(pv.play)}`, 'play');
+    const nFood = pv.shiftFood >= 0.5 ? ptile('food', 'food', `+${Math.round(pv.shiftFood)}`, 'food') : null; if (nFood) tl.classList.add('four');
+    const nXp = ptile('xp', 'xp', `+${pv.xp}`, 'XP');
+    live.push((p) => { stampGold(p, false); nPlay.textContent = `+${fmtClock(p.play)}`; if (nFood) nFood.textContent = `+${Math.round(p.shiftFood)}`; nXp.textContent = `+${p.xp}`; });
     box.append(tl);
     const extras = [];
     if (isLaps) {
@@ -13955,6 +14314,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
       else extras.push(`Play earned today: ${fmtMin(Math.round(playDayNow().sec / 60))} of ${fmtMin(DAILY_PLAY / 60)}. You can hold up to ${fmtMin(PLAY_CAP / 60)}.`);
       if (singles.some((q) => pv.sim.items.some((x) => x.q === q && !x.waiting))) extras.push('Short projects (30 minutes or less) have to be finished in one go: end early and they are torn down.');
     }
+    { const room = Math.max(0, treasuryCap() - state.gold); if (pv.gold > room + 1) extras.unshift(room < 1 ? 'Your treasury is full, so the gold from this session won\'t fit. Spend some first, or upgrade the town hall or a bank for more room.' : `Only ${fmtGold(room)} more gold fits in your treasury. Spend some first, or upgrade the town hall or a bank for more room.`); } // 12.07
     if (startPick.rescue && !isLaps) { const fb = byId(startPick.rescue); if (fb && fb.fire) extras.unshift(`Finish it and the fire at ${placeName(fb)} is out.`); }
     if (pv.onPlan) extras.push(`On your plan: ${pv.block.label || 'focus block'} · +50% XP and a silver chest or better`);
     if (pv.goalGold) extras.push(`Finish it to earn the ${TIER_NAMES[pv.goal.badge.tier].toLowerCase()} ${fmtMin(pv.goal.goal)} badge`);
@@ -13974,7 +14334,8 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     wrap.append(box);
     const run = lapRunNow(), next = (run ? run.n : 0) + 1;
     const freeOf = isLaps && !hasRounds ? (run && run.free && run.of > run.n ? run.of : (run ? run.n : 0) + clamp(startPick.lapN || 2, 1, 16)) : 0;
-    const go = el('button', 'btn primary full' + (comboNow() > 0 ? ' combo' : ''), isLaps ? `Start lap ${next}${freeOf ? ` of ${freeOf}` : ''} · ${fmtHalf(lapFocus(lenL))} min` : `Start ${fmtMin(m)} of focus`);
+    const go = el('button', 'btn primary full' + (isLaps ? (comboNow() > 0 ? ' combo' : '') : ' energy'), isLaps ? `Start lap ${next}${freeOf ? ` of ${freeOf}` : ''} · ${fmtHalf(lapFocus(lenL))} min` : `Start ${fmtMin(m)} of focus`);
+    if (!isLaps) live.push((p, d) => { go.textContent = `Start ${fmtMin(d)} of focus`; });
     go.style.minHeight = '52px'; go.style.fontSize = '17px';
     go.addEventListener('click', () => (isLaps ? startLaps(lenL) : startSession(m, startPick.rescue ? { rescue: startPick.rescue } : undefined)));
     wrap.append(go);
@@ -15237,9 +15598,9 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     // With a card or the bottom bar open, the first tap on the map just closes it.
     if (ui.screen === 'play' && ui.barOpen) { closeBar(); return; }
-    if (ui.screen === 'play' && ui.panel && ui.panel.kind !== 'place' && ui.panel.kind !== 'attach' && !ui.holding) { closePanel(); return; }
+    if (ui.screen === 'play' && ui.panel && ui.panel.kind !== 'place' && ui.panel.kind !== 'attach' && ui.panel.kind !== 'lamp' && !ui.holding) { closePanel(); return; }
     // Speech bubbles, request markers and land signs lead to what needs doing.
-    if (!ui.holding && !ui.attach) for (let i = ui.hits.length - 1; i >= 0; i--) {
+    if (!ui.holding && !ui.attach && !ui.lamp) for (let i = ui.hits.length - 1; i >= 0; i--) {
       const h = ui.hits[i]; if (sx < h.x0 || sx > h.x1 || sy < h.y0 || sy > h.y1) continue;
       if (h.camp != null) { if (ui.screen === 'play') openPanel({ kind: 'camp', camp: h.camp }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'camp', camp: h.camp }), 420); return; } // 11.06
       if (h.pirate) { if (ui.screen === 'play') openPanel({ kind: 'pirate' }); else if (enterPlay()) setTimeout(() => openPanel({ kind: 'pirate' }), 420); return; } // 11.05
@@ -15259,6 +15620,12 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     }
     if (ui.screen === 'home') { enterPlay(sx, sy); return; }
     const w = toWorld(sx, sy), tl = tileAtWorld(w.x, w.y);
+    if (ui.lamp) { // 12.07: a corner for a street lamp
+      const k = pickCorner(w.x, w.y);
+      if (!cornerOk(k.c, k.r)) { toast(lampAt(k.c, k.r) ? 'A lamp already stands on that corner.' : !cornerOpen(k.c, k.r) ? 'That land is still wild. Clear it first.' : 'Street lamps go on corners between tiles, not inside a building.'); return; }
+      ui.lamp.pick = k; sfx.pop(); renderAll(); return;
+    }
+    if (!ui.holding && !ui.attach) { const L = lampUnder(sx, sy); if (L) { openPanel({ kind: 'lampinfo', id: L.id }); return; } } // 12.07
     if (ui.attach) { if (!tl) return; const hb = at(tl.c, tl.r); if (hb) attachTo(hb); else toast('Tap a building to put it beside.'); return; }
     if (ui.holding) {
       if (!tl) return;
@@ -15491,6 +15858,7 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
     appInit(); // 11.11: the Android app
     if (!devOn() && state.speed > 1) { state.speed = 1; save(); } // test speed is for the developer only
     attachOldAddons();
+    lampsToCorners(); // 12.07
     migrateTiers();
     fitFootprints();
     foodIntro();
@@ -15523,6 +15891,51 @@ sw|Paka amelala.|The cat is asleep.|Paka/PAH-kah/cat;amelala/ah-meh-LAH-lah/has 
   if (FB.cfg && !inFrame && (state.board.fb || state.board.fbPending)) fbLoad(); // back on the online leaderboard
   if (devOn()) window.MaplewickDebug = Object.freeze({ // 10.08: only on Navid's unlocked phone (and in tests)
     state: () => JSON.parse(JSON.stringify(state)),
+    // 12.07: a balance simulator that runs the game's own economy. A finished focus session the normal way, time in play
+    // or away, and a player who spends gold on what pays best (upgrades and new homes, shops and fields) and keeps the
+    // staff the town needs. Buildings go up at once (the crew's time is skipped), and there are no fires or break-ins,
+    // so the player here has it easier than a real one.
+    simFocus: (m) => { if (state.session) return null; ui.screen = 'home'; startSession(m); const s = state.session; if (!s) return null; s.start = Date.now() - m * 60000 / (s.speed || 1); const g0 = state.gold, f0 = state.food || 0; finishSession('complete', true); try { hideCelebration(); hideResult(); CH.active = false; $('chest').hidden = true; closeSheet(); hideFocus(); } catch (e) { /* quiet */ } return { gold: state.gold - g0, food: (state.food || 0) - f0 }; },
+    simTime: (min, mode) => { const keep = ui.screen; ui.screen = mode === 'play' ? 'play' : 'home'; state.lastTaxAt = Date.now() - min * 60000; accrue(Date.now()); ui.screen = keep; if (mode === 'play') state.playSec = 0; return { gold: state.gold, food: state.food || 0 }; },
+    bal: (o) => { if (o) Object.assign(BAL, o); return { ...BAL }; },
+    simDay: () => { state.playDay = { key: 'sim' + Math.random(), sec: 0 }; state.combo = { n: 0, until: 0 }; },
+    simStat: () => { const e = econ(), ci = city(), F = ci.food; return { gold: Math.round(state.gold), cap: treasuryCap(), food: Math.round(state.food || 0), foodCap: foodCap(), hall: hallLevel(), res: ci.residents, net: Math.round(e.net), focusNet: Math.round(focusNet(e)), grown: F ? Math.round(F.grown) : 0, eaten: F ? Math.round(F.eaten) : 0, mood: e.mood.value, staff: STAFF_ORDER.reduce((a, k) => a + (state.staff[k] || 0), 0), n: state.buildings.length, lv: state.buildings.filter((b) => ['home', 'shop'].includes(T(b).cat) || isGrower(b)).map((b) => b.level) }; },
+    simInvest: (o) => {
+      o = o || {}; const reserve = o.reserve || 0, log = [], hall = townHall();
+      const near = (type) => { let best = null, bd = 1e9; for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) for (const ro of FOOT[type] ? [0, 1] : [0]) { if (!fits(type, c, r, null, ro)) continue; const d = Math.abs(c - hall.c) + Math.abs(r - hall.r); if (d < bd) { bd = d; best = { c, r, ro }; } } return best; };
+      const put = (type, at) => { const b = { id: state.nextId++, type, c: at.c, r: at.r, level: 1, origin: 'built' }; if (FOOT[type]) { b.rot = at.ro || 0; b.fp8 = true; } if (T(b).cat === 'home') b.resident = nextName(); state.buildings.push(b); touch(); return b; };
+      const pay = (g, what) => { goldChange(-g, what, 'buy'); log.push(what); };
+      // the town hall first, when the town is ready for it
+      { let ch = checkJob('upgrade', hall);
+        if (ch.food && !ch.people) { const need = Math.ceil(FEASTS[hall.level + 1] - (state.food || 0)), price = need * foodBuy(); if (need > 0 && state.gold - ch.cost - price >= 0 && (state.food || 0) + need <= foodCap()) { pay(price, `ferry food ${need}`); state.food = (state.food || 0) + need; ch = checkJob('upgrade', hall); } }
+        if (ch.cost != null && !ch.people && !ch.food && !ch.max && state.gold - ch.cost >= 0 && hall.level < T(hall).max) { if (FEASTS[hall.level + 1] && foodOn()) state.food -= FEASTS[hall.level + 1]; pay(ch.cost, `town hall ${hall.level + 1}`); hall.level += 1; touch(); } }
+      // staff the town needs (and their building)
+      for (const k of STAFF_ORDER) { const ro = roleInfo(k, city()); if (!ro.needed || ro.working >= ro.need) continue;
+        if (ro.hired >= ro.cap) { const home = STAFF[k].home; if (TYPES[home] && hallLevel() >= (TYPES[home].unlock || 1) && countType(home) < capFor(home)) { const cst = newCost(home).cost, at = near(home); if (at && state.gold - cst >= reserve) { pay(cst, 'new ' + home); put(home, at); } } continue; }
+        const fee = hireFee(k, ro.hired); if (state.gold - fee >= reserve) { pay(fee, 'hire ' + k); state.staff[k] = ro.hired + 1; touch(); } }
+      // then whatever pays back fastest (food counted at a gold each)
+      for (let guard = 0; guard < 60; guard++) {
+        const c0 = []; const base = city().total;
+        for (const b of state.buildings) { if (!live(b) || b.site) continue; const t = T(b); if (!(['home', 'shop'].includes(t.cat) || isGrower(b) || b.type === 'granary')) continue;
+          if (b.level >= t.max || b.level + 1 > hallLevel()) continue; const ch = checkJob('upgrade', b); if (ch.cost == null || ch.noRoom) continue;
+          const gain = isGrower(b) ? ((t.grow[b.level + 1] || 0) - (t.grow[b.level] || 0)) * (o.foodW || 1) : b.type === 'granary' ? (o.granW || 1.5) : (levelGain(b) || 0);
+          if (gain > 0.05) c0.push({ up: b, cost: ch.cost, sc: gain / ch.cost }); }
+        for (const type of o.build || Object.keys(TYPES).filter((k) => ['home', 'shop'].includes(TYPES[k].cat) || ['field', 'farm', 'granary', 'greenhouse'].includes(k))) { const t = TYPES[type]; if (!t || hallLevel() < (t.unlock || 1) || countType(type) >= capFor(type)) continue; if (type === 'field' && !foodOn()) continue;
+          const cst = newCost(type).cost; let best = null, bg = 0;
+          if (t.grow || type === 'granary') { best = near(type); bg = t.grow ? t.grow[1] * (o.foodW || 1) : (o.granW || 1.5); }
+          else for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const g = deltaAt(type, c, r); if (g != null && g > bg) { bg = g; best = anchorFor(type, c, r); best.ro = rotFor(type); } }
+          if (best && bg > 0.05) c0.push({ type, at: best, cost: cst, sc: bg / cst }); }
+        c0.sort((a, b) => b.sc - a.sc); const x = c0.find((y) => state.gold - y.cost >= reserve); if (!x) break;
+        if (x.up) { pay(x.cost, `${x.up.type} → ${x.up.level + 1}`); x.up.level += 1; touch(); } else { pay(x.cost, 'new ' + x.type); put(x.type, x.at); }
+      }
+      save(); return log;
+    },
+    lamp: (c, r, lv) => { if (!cornerOk(c, r)) return null; const L = { id: state.nextId++, c, r, level: lv || 1 }; lampList().push(L); touch(); save(); return L.id; }, // 12.07
+    lamps: () => lampList().map((L) => ({ ...L, homes: lampHomes(L) })),
+    cornerOk: (c, r) => cornerOk(c, r),
+    lit: (bid) => litHome(byId(bid)),
+    power: () => lampPower(),
+    startLamp: () => { startLamp(); return !!ui.lamp; },
     // 10.19: families. hours: pretend that many hours passed (births, leave ending)
     famAhead: (hours) => { const F = fam(); F.at -= hours * 3600000; for (const k of F.kids) { k.born -= hours * 3600000; k.leaveEnd -= hours * 3600000; } familyStep(Date.now()); return { kids: F.kids.length, births: F.births, leave: onLeaveNow().length, babies: babiesNow().length }; },
     birth: (n) => { const F = fam(); for (let i = 0; i < (n || 1); i++) { F.at = Date.now() - 1441 * 3600000 / Math.max(1, city().residents) - 60000; const b0 = F.births; let tries = 0; while (F.births === b0 && tries++ < 20) { F.at = Date.now() - 1441 * 3600000 / Math.max(1, city().residents); familyStep(Date.now()); } } return { births: F.births, leave: onLeaveNow().length, workers: city().jobs.workers, leavePay: econ().leave, mood: econ().mood.families }; },
