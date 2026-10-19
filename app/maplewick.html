@@ -2900,10 +2900,12 @@
      stalls and bakeries sell it (and earn 20% more while there is food). The store holds 150, each granary more.
      When the store is empty and the fields can't keep up, homes go hungry: they pay less and the town is sadder. */
   /* 12.07 (Navid: "too easy to have full gold and full food"): a bigger town paid more taxes for every focus minute while
-     prices stayed the same, so towns snowballed (everything built by about day 60 with 2 hours a day) and gold went past
-     the treasury limit. Now prices grow with the town hall, people eat a bit
-     more, and the treasury limit holds for every gold you earn (focus pay included). Tested with tools/tests/t1207_sim.py. */
-  const BAL = { sizeK: 0.25, hallK: 1, eat: 0.3 };
+     prices stayed the same, so towns snowballed, and focus pay went past the treasury limit. Now prices of buildings and
+     upgrades grow with the town hall (+25% for each level above 1), the treasury limit holds for every gold you earn (focus
+     pay, combos, gifts, badges, chests, prizes), and each treasury is big enough for the next town hall. Food use stays
+     at a quarter an hour (a third made town hall 4's feast out of reach for an hour-a-day player). Tested with
+     tools/tests/t1207_sim.py; hallK and eat stay here so the simulator can try other values. */
+  const BAL = { sizeK: 0.25, hallK: 1, eat: 0.25 };
   const sizeK = () => 1 + BAL.sizeK * Math.max(0, hallLevel() - 1); // prices of buildings and upgrades by town hall level
   const r5 = (x) => Math.max(5, Math.round(x / 5) * 5);
   const FOOD_PRICE = 0.5, FOOD_CELLAR = 150, FEAST = 300, FOOD_SHOP = 20;
